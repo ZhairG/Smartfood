@@ -11,30 +11,39 @@ El proyecto está organizado bajo el paquete principal `com.smartfood.app` con l
 ```text
 com.smartfood.app/
 ├── SmartfoodApp.kt                        # Aplicación base anotada con @HiltAndroidApp
-├── MainActivity.kt
+├── MainActivity.kt                        # Entrada principal con NavHost y @AndroidEntryPoint
 │
 ├── data/                                  # CAPA DE DATOS (Data Layer)
 │   ├── source/
 │   │   └── FirebaseAuthDataSource.kt     # Fuente de datos directa con Firebase Authentication
-│   └── repository/
-│       ├── AuthRepository.kt             # Interfaz de abstracción del repositorio
-│       └── AuthRepositoryImpl.kt         # Implementación que orquesta FirebaseAuthDataSource
+│   ├── repository/
+│   │   ├── AuthRepository.kt             # Interfaz de abstracción del repositorio
+│   │   └── AuthRepositoryImpl.kt         # Implementación que orquesta FirebaseAuthDataSource
+│   └── di/                               # INYECCIÓN DE DEPENDENCIAS DE DATOS
+│       └── DataModule.kt                 # Módulo Hilt que provee Firebase y el AuthRepository
 │
-├── di/                                    # INYECCIÓN DE DEPENDENCIAS (Dagger Hilt)
-│   └── AuthModule.kt                     # Módulo Hilt que provee FirebaseAuth, DataSource y AuthRepository
+├── ui/                                    # CAPA DE INTERFAZ (UI Layer)
+│   ├── auth/                              # Módulo de autenticación (Login, Registro, Recuperación)
+│   │   ├── AuthContract.kt               # AuthUiState y AuthEvent (UDF centralizado)
+│   │   └── AuthViewModel.kt              # Lógica de presentación y consumo del repositorio
+│   └── theme/
 │
-└── ui/                                    # CAPA DE INTERFAZ (UI Layer)
-    ├── auth/                              # Módulo de autenticación (Login, Registro, Recuperación)
-    │   ├── login/
-    │   │   ├── LoginContract.kt          # LoginUiState y LoginUiEvent (UDF)
-    │   │   └── LoginViewModel.kt         # Lógica de presentación y consumo de AuthRepository
-    │   ├── register/
-    │   │   ├── RegisterContract.kt       # RegisterUiState y RegisterUiEvent (UDF)
-    │   │   └── RegisterViewModel.kt      # Lógica de registro y validación de contraseñas
-    │   └── recovery/
-    │       ├── PasswordRecoveryContract.kt # PasswordRecoveryUiState y PasswordRecoveryUiEvent
-    │       └── PasswordRecoveryViewModel.kt # Lógica para restablecimiento de contraseña
-    └── theme/
+├── domain/                                # CAPA DE DOMINIO (Domain Layer)
+│   └── usecase/
+│       └── auth/
+│           ├── ValidatePasswordUseCase.kt
+│           ├── LoginUseCase.kt
+│           ├── RegisterUseCase.kt
+│           └── RecoverPasswordUseCase.kt
+│
+├── navigation/                            # NAVEGACIÓN (Jetpack Navigation Compose)
+│   ├── Routes.kt                         # Clases/Objetos de rutas Type-Safe con @Serializable
+│   └── AppNavigation.kt                  # NavHost y declaración de grafos de pantallas
+│
+├── notifications/                         # Gestión de notificaciones push
+├── admin/                                 # Módulos de administración
+└── utils/                                 # Extensiones y utilidades
+    └── CoroutinesExt.kt                  # Manejo seguro de corrutinas (safeRunCatching)
 ```
 
 ---
@@ -46,27 +55,31 @@ com.smartfood.app/
 - **[FirebaseAuthDataSource.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/data/source/FirebaseAuthDataSource.kt):** Gestiona las llamadas directas al SDK de Firebase Auth utilizando `kotlinx.coroutines.tasks.await()`.
 - **[AuthRepositoryImpl.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/data/repository/AuthRepositoryImpl.kt):** Implementa el repositorio encapsulando las respuestas en `Result<Unit>` para manejo seguro de excepciones.
 
-#### 2. Inyección de Dependencias (`di/` y `SmartfoodApp`)
+#### 2. Inyección de Dependencias (`data/di/` y `SmartfoodApp`)
 - **[SmartfoodApp.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/SmartfoodApp.kt):** Clase `Application` marcada con `@HiltAndroidApp` para habilitar Hilt en todo el proyecto.
 - **[AndroidManifest.xml](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/AndroidManifest.xml):** Se vinculó `android:name=".SmartfoodApp"`.
-- **[AuthModule.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/di/AuthModule.kt):** Módulo `@InstallIn(SingletonComponent::class)` que provee `FirebaseAuth.getInstance()`, `FirebaseAuthDataSource` y vincula `AuthRepositoryImpl` con `AuthRepository`.
+- **[DataModule.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/data/di/DataModule.kt):** Módulo `@InstallIn(SingletonComponent::class)` que provee `FirebaseAuth.getInstance()` y enlaza (`@Binds`) `AuthRepositoryImpl` con `AuthRepository`.
 
-#### 3. Capa de Interfaz (`ui/auth/`)
+#### 3. Capa de Dominio (`domain/`)
+- Encapsula la lógica de negocio pura en **Casos de Uso (UseCases)** inyectables para evitar sobrecargar los ViewModels.
+- **[ValidatePasswordUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/ValidatePasswordUseCase.kt):** Verifica si una contraseña cumple los requisitos (longitud, mayúsculas, caracteres especiales).
+- **[LoginUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/LoginUseCase.kt)**, **[RegisterUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/RegisterUseCase.kt)**, **[RecoverPasswordUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/RecoverPasswordUseCase.kt):** Orquestan las validaciones previas y la llamada al `AuthRepository`.
+
+#### 4. Capa de Interfaz (`ui/auth/`)
 Sigue el patrón **UDF (Unidirectional Data Flow)** recomendado por Android:
-- **Flujo hacia abajo (State):** El `ViewModel` expone un `StateFlow<UiState>` inmutable.
-- **Flujo hacia arriba (Events):** Los elementos UI emiten eventos a través de `onEvent(UiEvent)`.
+- **Flujo hacia abajo (State):** El `ViewModel` expone un `StateFlow<AuthUiState>` inmutable.
+- **Flujo hacia arriba (Events):** Los elementos UI emiten eventos a través de `onEvent(AuthEvent)`.
 
-- **Login:**
-  - [LoginContract.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/login/LoginContract.kt): `LoginUiState` (email, password, isLoading, isSuccess, errorMessage) y `LoginUiEvent`.
-  - [LoginViewModel.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/login/LoginViewModel.kt): Controla validación y llamada al repositorio con corrutinas (`viewModelScope`).
+- **Autenticación (Centralizada):**
+  - [AuthUiState.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/AuthUiState.kt) y [AuthEvent.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/AuthEvent.kt): Estado completo (campos, booleanos de validación, carga, errores) y eventos sellados.
+  - [AuthViewModel.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/AuthViewModel.kt): Inyecta los UseCases correspondientes para controlar el flujo asíncrono y actualizar la UI de manera reactiva.
 
-- **Registro:**
-  - [RegisterContract.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/register/RegisterContract.kt): `RegisterUiState` (email, password, confirmPassword, loading, etc.) y `RegisterUiEvent`.
-  - [RegisterViewModel.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/register/RegisterViewModel.kt): Validación de coincidencia de contraseñas y registro.
+#### 5. Navegación Type-Safe (`navigation/`)
+- **[Routes.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/navigation/Routes.kt):** Objetos anotados con `@Serializable` para garantizar el tipado estricto de rutas.
+- **[AppNavigation.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/navigation/AppNavigation.kt):** Configuración central del `NavHost` con Jetpack Compose.
 
-- **Recuperación de Contraseña:**
-  - [PasswordRecoveryContract.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/recovery/PasswordRecoveryContract.kt): `PasswordRecoveryUiState` y `PasswordRecoveryUiEvent`.
-  - [PasswordRecoveryViewModel.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/recovery/PasswordRecoveryViewModel.kt): Envío de correo de reseteo mediante el repositorio.
+#### 6. Utilidades (`utils/`)
+- **[CoroutinesExt.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/utils/CoroutinesExt.kt):** Define la función `safeRunCatching` para evitar atrapar `CancellationException`, garantizando la correcta cancelación estructurada de las corrutinas de Kotlin.
 
 
 ### 🛠 Tecnologías y Herramientas
@@ -98,5 +111,10 @@ Se ha configurado la capa lógica de autenticación siguiendo las mejores práct
   * `DataModule.kt`: Módulo de Hilt que enlaza (`@Binds`) la interfaz del repositorio con su implementación y provee (`@Provides`) la instancia de `FirebaseAuth`.
 
 * **UI Layer (UDF):**
-  * `AuthContract.kt`: Definición del estado inmutable `AuthUiState` (que incluye validaciones de contraseña en tiempo real) y la jerarquía de eventos `AuthEvent` para comunicar acciones de la vista al ViewModel.
-  * `AuthViewModel.kt`: ViewModel (`@HiltViewModel`) que expone el estado vía `StateFlow`, valida los inputs y consume el repositorio de forma asíncrona utilizando `viewModelScope.launch`.
+  * `AuthUiState.kt` y `AuthEvent.kt`: Estado inmutable (con validaciones dinámicas) y jerarquía de eventos `AuthEvent` para comunicar acciones de la vista al ViewModel.
+  * `AuthViewModel.kt`: ViewModel (`@HiltViewModel`) que inyecta UseCases y gestiona el flujo unidireccional de datos de forma asíncrona.
+
+### 3. Refactorización a Clean Architecture y Corrutinas Seguras
+* **Domain Layer:** Extracción de toda la lógica de negocio pura desde el ViewModel hacia Casos de Uso independientes (`ValidatePasswordUseCase`, `LoginUseCase`, `RegisterUseCase`, `RecoverPasswordUseCase`).
+* **UI Layer Cleanup:** Limpieza de carpetas obsoletas (`login/`, `register/`, `recovery/`) en favor de una gestión de autenticación centralizada.
+* **Seguridad Asíncrona:** Implementación de la extensión `safeRunCatching` para asegurar el respeto a la cancelación estructurada (`CancellationException`) de Kotlin Coroutines en el Data Layer.
