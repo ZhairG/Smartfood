@@ -3,8 +3,9 @@ package com.smartfood.app.navigation
 import kotlinx.serialization.Serializable
 
 /**
- * Definición Type-Safe de las rutas de la aplicación utilizando Kotlin Serialization.
+  * Definición Type-Safe de las rutas de la aplicación utilizando Kotlin Serialization.
  */
+@Serializable
 sealed interface Route {
 
     // --- Grafos Anidados ---
@@ -16,6 +17,9 @@ sealed interface Route {
 
 
     // --- Pantallas Individuales ---
+    @Serializable
+    data object Splash : Route
+
     @Serializable
     data object Login : Route
 
