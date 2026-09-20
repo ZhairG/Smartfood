@@ -1,5 +1,7 @@
 package com.smartfood.app.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,11 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.smartfood.app.ui.auth.AuthViewModel
+import com.smartfood.app.ui.auth.login.LoginScreen
+import com.smartfood.app.ui.splash.SplashScreen
 
 @Composable
 fun AppNavigation(
@@ -32,12 +40,42 @@ fun AppNavigation(
         modifier = modifier
     ) {
         // Grafo de Autenticación
-        navigation<Route.AuthGraph>(startDestination = Route.Login) {
-            composable<Route.Login> {
-                PlaceholderScreen(
-                    title = "Pantalla de Login",
-                    onNavigate = { navController.navigate(Route.Home) },
-                    buttonText = "Ir a Home (Simular Login)"
+        navigation<Route.AuthGraph>(startDestination = Route.Splash) {
+            
+            composable<Route.Splash>(
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(300)
+                    )
+                }
+            ) {
+                SplashScreen(
+                    onNavigateNext = {
+                        // Navegación hacia Login vaciando el Splash del BackStack
+                        navController.navigate(Route.Login) {
+                            popUpTo(Route.Splash) { inclusive = true }
+                        }
+                    }
+                )
+            }
+            
+            composable<Route.Login>(
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(300)
+                    )
+                }
+            ) {
+                val authViewModel: AuthViewModel = hiltViewModel()
+                val authState by authViewModel.uiState.collectAsStateWithLifecycle()
+
+                LoginScreen(
+                    state = authState,
+                    onEvent = authViewModel::onEvent,
+                    onNavigateToRegister = { navController.navigate(Route.Register) },
+                    onNavigateToRecovery = { navController.navigate(Route.PasswordRecovery) }
                 )
             }
             composable<Route.Register> {

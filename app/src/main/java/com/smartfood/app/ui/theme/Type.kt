@@ -6,29 +6,49 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
+// TODO: Descomentar y añadir import com.smartfood.app.R cuando se agreguen las fuentes res/font/poppins_*.ttf
+// val Poppins = FontFamily(
+//     Font(R.font.poppins_medium, FontWeight.Medium),
+//     Font(R.font.poppins_semibold, FontWeight.SemiBold),
+//     Font(R.font.poppins_bold, FontWeight.Bold)
+// )
+
+val Poppins = FontFamily.Default // Fallback temporal para compilar sin errores
+
 val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+    // Wordmark
+    displayLarge = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.Bold,
+        fontSize = 40.sp,
+        lineHeight = 60.sp
     ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
+    // Title
+    headlineLarge = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.Bold,
+        fontSize = 35.sp,
+        lineHeight = 52.5.sp
+    ),
+    // Body
+    bodyLarge = TextStyle(
+        fontFamily = Poppins,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 15.sp,
+        lineHeight = 22.5.sp
+    ),
+    // Link
+    labelLarge = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 15.sp,
+        lineHeight = 22.5.sp
+    ),
+    // Button
+    titleLarge = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 22.sp,
+        lineHeight = 33.sp
     )
-    */
 )
