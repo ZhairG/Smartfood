@@ -16,6 +16,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 
+/**
+ * Nombre: Theme.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Configuración del Tema de Material 3 para la aplicación Smartfood.
+ * Soporta modos claro/oscuro y gestiona la inyección de barras de sistema Edge-to-Edge y espaciados personalizados.
+ */
+
 private val LightColorScheme = lightColorScheme(
     primary = GreenDark,
     onPrimary = White,
@@ -66,6 +74,13 @@ private val DarkColorScheme = darkColorScheme(
     onError = White
 )
 
+/**
+ * Tema principal de la aplicación Smartfood.
+ *
+ * @param darkTheme Indica si se debe aplicar el esquema de colores en modo oscuro.
+ * @param dynamicColor Indica si se deben utilizar colores dinámicos (Android 12+).
+ * @param content Contenido Composable que será renderizado dentro del tema.
+ */
 @Composable
 fun SmartfoodTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -84,15 +99,10 @@ fun SmartfoodTheme(
 
     val context = LocalContext.current
 
-    // Adapta automáticamente los colores de las barras de estado (TopBar) y navegación (NavBar)
     DisposableEffect(darkTheme) {
         val activity = context as? ComponentActivity
         activity?.enableEdgeToEdge(
-            // TopBar (Status Bar): Siempre con íconos claros (SurfaceLight style) sobre el fondo verde oscuro
             statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
-            // NavBar (Navigation Bar): 
-            // - En modo oscuro: Íconos claros (SurfaceLight) sobre fondo oscuro
-            // - En modo claro: Íconos oscuros (SurfaceDark) sobre fondo claro
             navigationBarStyle = if (darkTheme) {
                 SystemBarStyle.dark(AndroidColor.TRANSPARENT)
             } else {
@@ -102,7 +112,6 @@ fun SmartfoodTheme(
         onDispose {}
     }
 
-    // Inyectamos nuestro LocalSpacing en el árbol de Compose
     CompositionLocalProvider(
         LocalSpacing provides Spacing()
     ) {

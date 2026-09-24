@@ -1,10 +1,5 @@
 package com.smartfood.app.ui.auth.login
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -71,27 +66,15 @@ import com.smartfood.app.ui.theme.spacing
  * Nombre: LoginScreen.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
- * 
- * Pantalla principal de Inicio de Sesión de la Aplicación (SmartFood).
- * Construida respetando el diseño original de Figma (nodo 51:11, 412x917)
- * y la arquitectura Clean (UDF).
- *
- * Esta vista carece de lógica de negocio o referencias de inyección; funciona 
- * como un "Stateless Composable" alimentado directamente desde la capa de navegación.
- *
- * Estructura:
- *  - Logo de marca: fijo (se contrae mientras el teclado está abierto para dejar espacio).
- *  - Panel: esquinas redondeadas + "Bienvenido": fijos.
- *  - Formulario (campos, opciones y botones): es lo ÚNICO que hace scroll.
+ * Descripción: Pantalla principal de Inicio de Sesión de la aplicación Smartfood.
+ * Optimizado con [derivedStateOf] y lambdas estables para minimizar recomposiciones innecesarias.
  *
  * @param state Objeto de estado inmutable [AuthUiState] proveniente del ViewModel.
- * @param onEvent Callback centralizado para emitir [AuthEvent] hacia el ViewModel.
- * @param onNavigateToRegister Acción para delegar la navegación a la pantalla de Registro.
- * @param onNavigateToRecovery Acción para delegar la navegación hacia la Recuperación.
- * @param modifier Modificador opcional para inyectar configuraciones externas a la UI.
+ * @param onEvent Callback centralizado para despachar eventos [AuthEvent] hacia el ViewModel.
+ * @param onNavigateToRegister Callback para navegar a la pantalla de Registro.
+ * @param onNavigateToRecovery Callback para navegar a la pantalla de Recuperación de Contraseña.
+ * @param modifier Modificador opcional para configurar la apariencia exterior.
  */
-
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LoginScreen(
@@ -105,15 +88,10 @@ fun LoginScreen(
     val density = LocalDensity.current
     val imeInsets = WindowInsets.ime
 
-    // true mientras el teclado ocupa espacio. derivedStateOf evita recomponer en cada frame
-    // de la animación del teclado: solo se recompone cuando cambia el booleano.
     val isImeVisible by remember(imeInsets, density) {
         derivedStateOf { imeInsets.getBottom(density) > 0 }
     }
 
-    // Quita el foco de los campos cuando el teclado se oculta (por ejemplo, con la flecha
-    // hacia abajo de la barra de navegación). Se observa la transición "visible -> oculto"
-    // a partir del inset real del teclado y se fuerza la limpieza del foco.
     LaunchedEffect(imeInsets, density) {
         var wasImeVisible = false
         snapshotFlow { imeInsets.getBottom(density) > 0 }
@@ -128,7 +106,7 @@ fun LoginScreen(
     if (state.isOffline) {
         SmartFoodOfflineDialog(
             isReconnecting = state.isLoading,
-            onReconnect = { onEvent(AuthEvent.RetryConnectionClicked) }
+            onReconnect = remember(onEvent) { { onEvent(AuthEvent.RetryConnectionClicked) } }
         )
     }
 
@@ -139,26 +117,8 @@ fun LoginScreen(
             .pointerInput(Unit) {
                 detectTapGestures(onTap = { focusManager.clearFocus() })
             }
-            // 1) Respeta solo la status bar. La navigation bar NO se aplica aquí: se aplica dentro
-            //    del panel ([LoginContentCard]) para que su fondo tenga el color del panel.
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
     ) {
-        // 77 dp arriba y 53 dp abajo => el panel empieza en y = 296 dp, como en Figma.
-        // Con el teclado abierto se contrae para que el formulario tenga espacio suficiente y
-        // los campos no queden tapados. (Para mantener siempre el logo, basta con quitar este wrapper.)
-        /*AnimatedVisibility(
-            visible = !isImeVisible,
-            enter = expandVertically() + fadeIn(),
-            exit = shrinkVertically() + fadeOut()
-        ) {
-            SmartFoodBrandHeader(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 77.dp, bottom = 53.dp),
-                smartColor = MaterialTheme.colorScheme.onBackground
-            )
-        }*/
-
         SmartFoodBrandHeader(
             modifier = Modifier
                 .fillMaxWidth()
@@ -166,7 +126,6 @@ fun LoginScreen(
             smartColor = MaterialTheme.colorScheme.onBackground
         )
 
-        // Contenedor blanco/oscuro inferior con los campos
         LoginContentCard(
             state = state,
             onEvent = onEvent,
@@ -177,25 +136,7 @@ fun LoginScreen(
 }
 
 /**
- * Contenedor principal del formulario de inicio de sesión.
- * Utiliza un diseño adaptativo (`widthIn(max = 480.dp)`).
- *
- * Tiene dos zonas:
- *  1. **Fija**: título y subtítulo de bienvenida ([LoginWelcomeHeader]).
- *  2. **Scrollable** (ocupa el resto del alto): campos, opciones y botones. Es la única zona
- *     que se desplaza, y su viewport se reduce por encima del teclado gracias al `imePadding()`
- *     de [LoginScreen].
- *
- * El fondo del panel se extiende hasta el borde inferior de la pantalla y el inset de la
- * navigation bar se aplica *dentro* del panel, de modo que la barra de navegación queda con el
- * mismo color del panel. Cuando el teclado está abierto, `imePadding()` ya consumió ese inset
- * y no se agrega espacio extra.
- *
- * @param state Estado actual de la UI de autenticación.
- * @param onEvent Despachador de eventos al ViewModel.
- * @param onNavigateToRegister Acción para ir a la vista de registro.
- * @param onNavigateToRecovery Acción para ir a la recuperación de contraseña.
- * @param modifier Modificador base.
+ * Contenedor del panel de formulario de inicio de sesión.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -207,11 +148,9 @@ private fun ColumnScope.LoginContentCard(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
-    val isImeVisible = WindowInsets.isImeVisible
+    val isImeVisibleRaw = WindowInsets.isImeVisible
+    val isImeVisible by remember(isImeVisibleRaw) { derivedStateOf { isImeVisibleRaw } }
 
-    // Apenas el teclado deja de ser visible, resetea de forma inmediata y automática el scroll
-    // a la posición inicial (0). Usar scrollTo(0) garantiza una respuesta instantánea (1 frame)
-    // que previene que el usuario rompa el desplazamiento con gestos.
     LaunchedEffect(isImeVisible) {
         if (!isImeVisible) {
             scrollState.scrollTo(0)
@@ -226,13 +165,10 @@ private fun ColumnScope.LoginContentCard(
                 color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(topStart = 45.dp, topEnd = 45.dp),
             )
-            // El inset va DESPUÉS del fondo: el color del panel llega hasta abajo del todo,
-            // pero el contenido queda por encima de la barra de navegación.
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
-            .padding(top = 47.dp), // Margen superior del panel según Figma
+            .padding(top = 47.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // ---------- ZONA FIJA ----------
         Column(
             modifier = Modifier
                 .widthIn(max = 480.dp)
@@ -243,10 +179,6 @@ private fun ColumnScope.LoginContentCard(
             Spacer(Modifier.height(MaterialTheme.spacing.large))
         }
 
-        // ---------- ZONA CON SCROLL (solo el formulario) ----------
-        // imePadding() limita el alto del viewport para que termine justo encima del teclado.
-        // Al estar combinado con verticalScroll, Compose desplaza automáticamente el campo enfocado
-        // para que permanezca visible sin mover la cabecera fija.
         Column(
             modifier = Modifier
                 .widthIn(max = 480.dp)
@@ -255,7 +187,7 @@ private fun ColumnScope.LoginContentCard(
                 .imePadding()
                 .verticalScroll(scrollState)
                 .padding(horizontal = 34.dp)
-                .padding(bottom = 48.dp) // Margen inferior para que el contenido "respire" al final del scroll
+                .padding(bottom = 48.dp)
         ) {
             LoginFormFields(state = state, onEvent = onEvent)
             Spacer(Modifier.height(MaterialTheme.spacing.large))
@@ -269,10 +201,9 @@ private fun ColumnScope.LoginContentCard(
 
             LoginActionButtons(
                 isLoading = state.isLoading,
-                onLoginClicked = { onEvent(AuthEvent.LoginClicked) },
+                onLoginClicked = remember(onEvent) { { onEvent(AuthEvent.LoginClicked) } },
                 onNavigateToRegister = onNavigateToRegister
             )
-
         }
     }
 }
@@ -298,11 +229,7 @@ private fun LoginWelcomeHeader(modifier: Modifier = Modifier) {
 }
 
 /**
- * Traduce el estado de error del login al texto que ve el usuario (según Figma).
- *
- * Los errores conocidos ([AuthErrorType.CREDENTIALS_ERROR], [AuthErrorType.EMPTY_FIELDS],
- * [AuthErrorType.INVALID_EMAIL]) usan textos localizados de `strings.xml`; el resto recurre al
- * mensaje que haya reportado el ViewModel. Los errores de red los maneja el diálogo offline.
+ * Convierte el tipo de error en el texto correspondiente provisto por los recursos de cadenas.
  */
 @Composable
 private fun AuthUiState.loginErrorText(): String? = when (errorType) {
@@ -313,18 +240,7 @@ private fun AuthUiState.loginErrorText(): String? = when (errorType) {
 }
 
 /**
- * Campos de entrada de datos (Correo y Contraseña) y el mensaje de error debajo de ellos.
- *
- * Estados de los campos:
- *  - **Normal / enfocado**: borde gris / verde.
- *  - **Error** ([AuthUiState.emailHasError] / [AuthUiState.passwordHasError]): borde rojo.
- *  - **Deshabilitado** mientras hay una petición en curso ([AuthUiState.isLoading]).
- *
- * Flujo del teclado: "Siguiente" en el correo pasa al campo de contraseña; "Listo" en la
- * contraseña cierra el teclado, quita el foco y envía el formulario.
- *
- * @param state Estado actual (contiene los valores de texto y los errores).
- * @param onEvent Función para despachar los cambios de texto.
+ * Campos de entrada de datos para correo y contraseña con su correspondiente mensaje de error.
  */
 @Composable
 private fun LoginFormFields(
@@ -338,7 +254,7 @@ private fun LoginFormFields(
         SmartFoodTextField(
             label = stringResource(id = R.string.login_email_label),
             value = state.email,
-            onValueChange = { onEvent(AuthEvent.EmailChanged(it)) },
+            onValueChange = remember(onEvent) { { email -> onEvent(AuthEvent.EmailChanged(email)) } },
             placeholder = stringResource(id = R.string.login_email_placeholder),
             enabled = !state.isLoading,
             isError = state.emailHasError,
@@ -355,19 +271,18 @@ private fun LoginFormFields(
         SmartFoodPasswordField(
             label = stringResource(id = R.string.login_password_label),
             value = state.password,
-            onValueChange = { onEvent(AuthEvent.PasswordChanged(it)) },
+            onValueChange = remember(onEvent) { { pass -> onEvent(AuthEvent.PasswordChanged(pass)) } },
             enabled = !state.isLoading,
             isError = state.passwordHasError,
             imeAction = ImeAction.Done,
             keyboardActions = KeyboardActions(
                 onDone = {
-                    focusManager.clearFocus() // Cierra el teclado y quita el foco antes de enviar
+                    focusManager.clearFocus()
                     onEvent(AuthEvent.LoginClicked)
                 }
             ),
         )
 
-        // Mensaje de error debajo de la contraseña, centrado (como en Figma)
         AuthErrorMessage(
             message = state.loginErrorText(),
             modifier = Modifier.fillMaxWidth()
@@ -376,7 +291,7 @@ private fun LoginFormFields(
 }
 
 /**
- * Fila de opciones secundarias (Recordar cuenta y Olvidé contraseña).
+ * Fila de opciones de inicio de sesión (Recordar cuenta y Olvidé contraseña).
  */
 @Composable
 private fun LoginOptionsRow(
@@ -393,7 +308,7 @@ private fun LoginOptionsRow(
         SmartFoodCheckbox(
             label = stringResource(id = R.string.login_remember_me),
             checked = state.rememberMe,
-            onCheckedChange = { onEvent(AuthEvent.RememberMeChanged(it)) }
+            onCheckedChange = remember(onEvent) { { checked -> onEvent(AuthEvent.RememberMeChanged(checked)) } }
         )
         SmartFoodTextLink(
             text = stringResource(id = R.string.login_forgot_password),
@@ -403,7 +318,7 @@ private fun LoginOptionsRow(
 }
 
 /**
- * Botones de acción principal (Iniciar Sesión y Regístrate).
+ * Botones de acción principal (Iniciar Sesión y Registro).
  */
 @Composable
 private fun LoginActionButtons(
@@ -430,9 +345,6 @@ private fun LoginActionButtons(
     }
 }
 
-// ============================================================================
-// VISTAS PREVIAS (@Preview) DE SUBCOMPONENTES
-// ============================================================================
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun LoginScreenPreview() {
@@ -442,110 +354,6 @@ private fun LoginScreenPreview() {
             onEvent = {},
             onNavigateToRegister = {},
             onNavigateToRecovery = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun LoginScreenErrorPreview() {
-    SmartfoodTheme {
-        LoginScreen(
-            state = AuthUiState(
-                email = "pepitoperez@gmail.com",
-                password = "1234567890",
-                errorType = AuthErrorType.CREDENTIALS_ERROR,
-                emailHasError = true,
-                passwordHasError = true
-            ),
-            onEvent = {},
-            onNavigateToRegister = {},
-            onNavigateToRecovery = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoginContentCardPreview() {
-    SmartfoodTheme {
-        Column(
-            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
-        ) {
-            LoginContentCard(
-                state = AuthUiState(
-                    errorType = AuthErrorType.EMPTY_FIELDS,
-                    emailHasError = true,
-                    passwordHasError = true
-                ),
-                onEvent = {},
-                onNavigateToRegister = {},
-                onNavigateToRecovery = {}
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoginWelcomeHeaderPreview() {
-    SmartfoodTheme {
-        LoginWelcomeHeader(modifier = Modifier.padding(16.dp))
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoginFormFieldsPreview() {
-    SmartfoodTheme {
-        LoginFormFields(
-            state = AuthUiState(email = "test@correo.com", password = "123"),
-            onEvent = {},
-            modifier = Modifier.padding(16.dp)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoginFormFieldsErrorPreview() {
-    SmartfoodTheme {
-        LoginFormFields(
-            state = AuthUiState(
-                email = "pepitoperez@gmail.com",
-                password = "123",
-                errorType = AuthErrorType.CREDENTIALS_ERROR,
-                emailHasError = true,
-                passwordHasError = true
-            ),
-            onEvent = {},
-            modifier = Modifier.padding(16.dp)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoginOptionsRowPreview() {
-    SmartfoodTheme {
-        LoginOptionsRow(
-            state = AuthUiState(rememberMe = true),
-            onEvent = {},
-            onNavigateToRecovery = {},
-            modifier = Modifier.padding(16.dp)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoginActionButtonsPreview() {
-    SmartfoodTheme {
-        LoginActionButtons(
-            isLoading = false,
-            onLoginClicked = {},
-            onNavigateToRegister = {},
-            modifier = Modifier.padding(16.dp)
         )
     }
 }

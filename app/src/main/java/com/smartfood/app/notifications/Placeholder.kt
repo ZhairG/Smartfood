@@ -1,3 +1,8 @@
 package com.smartfood.app.notifications
 
-// Placeholder para mantener la estructura de directorios en Git
+/**
+ * Nombre: Placeholder.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Marcador de posición para el módulo de notificaciones.
+ */

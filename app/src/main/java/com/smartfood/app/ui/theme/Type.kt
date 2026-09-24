@@ -6,45 +6,50 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// TODO: Descomentar y añadir import com.smartfood.app.R cuando se agreguen las fuentes res/font/poppins_*.ttf
-// val Poppins = FontFamily(
-//     Font(R.font.poppins_medium, FontWeight.Medium),
-//     Font(R.font.poppins_semibold, FontWeight.SemiBold),
-//     Font(R.font.poppins_bold, FontWeight.Bold)
-// )
+/**
+ * Nombre: Type.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Sistema tipográfico de la aplicación Smartfood.
+ * Mapea la jerarquía visual de Figma a la estructura de [Typography] de Material 3.
+ */
 
-val Poppins = FontFamily.Default // Fallback temporal para compilar sin errores
+/** Familia tipográfica predeterminada. Fallback hasta incorporar archivos de fuentes personalizadas. */
+val Poppins = FontFamily.Default
 
+/**
+ * Configuración de la tipografía para la aplicación.
+ */
 val Typography = Typography(
-    // Wordmark
+    // Wordmark principal (Ej. "SmartFood")
     displayLarge = TextStyle(
         fontFamily = Poppins,
         fontWeight = FontWeight.Bold,
         fontSize = 40.sp,
         lineHeight = 60.sp
     ),
-    // Title
+    // Título de bienvenida
     headlineLarge = TextStyle(
         fontFamily = Poppins,
         fontWeight = FontWeight.Bold,
         fontSize = 35.sp,
         lineHeight = 52.5.sp
     ),
-    // Body
+    // Texto de cuerpo principal y etiquetas de campo
     bodyLarge = TextStyle(
         fontFamily = Poppins,
         fontWeight = FontWeight.Medium,
         fontSize = 15.sp,
         lineHeight = 22.5.sp
     ),
-    // Link
+    // Enlaces e hipervínculos
     labelLarge = TextStyle(
         fontFamily = Poppins,
         fontWeight = FontWeight.SemiBold,
         fontSize = 15.sp,
         lineHeight = 22.5.sp
     ),
-    // Button
+    // Texto de botones principales
     titleLarge = TextStyle(
         fontFamily = Poppins,
         fontWeight = FontWeight.SemiBold,

@@ -3,15 +3,20 @@ package com.smartfood.app.domain.usecase.auth
 import javax.inject.Inject
 
 /**
- * Caso de uso responsable de validar el formato de un correo electrónico antes de
- * enviarlo al servidor (prevención de errores: evita una llamada de red innecesaria).
- *
- * Es una validación de formato básica (usuario@dominio.tld); la existencia real de la cuenta
- * la determina el backend.
+ * Nombre: ValidateEmailUseCase.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Caso de uso responsable de validar la estructura sintáctica de un correo electrónico.
+ * Previene llamadas de red innecesarias ante entradas mal formateadas.
  */
 class ValidateEmailUseCase @Inject constructor() {
 
-    /** @return `true` si [email] (ignorando espacios en los extremos) tiene un formato válido. */
+    /**
+     * Valida si el formato de una dirección de correo electrónico es sintácticamente correcto.
+     *
+     * @param email Cadena de texto del correo electrónico a evaluar.
+     * @return `true` si el correo cumple con el patrón regex estándar; `false` en caso contrario.
+     */
     fun execute(email: String): Boolean = EMAIL_REGEX.matches(email.trim())
 
     private companion object {

@@ -4,6 +4,14 @@ import com.smartfood.app.data.source.FirebaseAuthDataSource
 import com.smartfood.app.utils.safeRunCatching
 import javax.inject.Inject
 
+/**
+ * Nombre: AuthRepositoryImpl.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Implementación concreta del contrato [AuthRepository] utilizando [FirebaseAuthDataSource].
+ *
+ * @param dataSource Fuente de datos remota basada en Firebase Auth.
+ */
 class AuthRepositoryImpl @Inject constructor(
     private val dataSource: FirebaseAuthDataSource
 ) : AuthRepository {
