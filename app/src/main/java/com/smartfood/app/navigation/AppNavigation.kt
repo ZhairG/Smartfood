@@ -78,6 +78,7 @@ fun AppNavigation(
                     onNavigateToRecovery = { navController.navigate(Route.PasswordRecovery) }
                 )
             }
+
             composable<Route.Register> {
                 PlaceholderScreen(
                     title = "Pantalla de Registro",

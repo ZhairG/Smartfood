@@ -27,6 +27,9 @@ val GreyLight = Color(0xFF9AA39D)
 val GreyDivider = Color(0xFFD9D9D9)
 val GreyTransparent60 = Color(0x99CCCCCC) // #CCCCCC - 60%
 
+// === Estados de error (extraído de Figma: bordes y mensajes de error) ===
+val ErrorRed = Color(0xFFD92E2E)
+
 // === Colores extraídos del nuevo mockup ===
 val SurfaceDark = Color(0xFF0E2118) // Fondo del panel negro
 val InputDark = Color(0xFF172B21) // Fondo del TextField

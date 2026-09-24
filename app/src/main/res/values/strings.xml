@@ -10,7 +10,17 @@
     <string name="login_remember_me">Recuérdame</string>
     <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
     <string name="login_button_text">Iniciar Sesión</string>
-    <string name="login_button_loading">Cargando…</string>
+    <string name="login_button_loading">Iniciando</string>
     <string name="login_no_account_prompt">¿No tienes cuenta?</string>
     <string name="login_register_action">Regístrate</string>
+
+    <!-- Validations -->
+    <string name="error_invalid_credentials">Correo o contraseña incorrectos</string>
+    <string name="error_empty_fields">Correo o contraseña no pueden estar vacíos</string>
+    <string name="error_invalid_email">Ingresa un correo electrónico válido</string>
+
+    <!-- Offline Connection -->
+    <string name="offline_dialog_title">Sin conexión a Internet</string>
+    <string name="offline_dialog_button">Reconectar</string>
+    <string name="offline_dialog_connecting">Conectando</string>
 </resources>
