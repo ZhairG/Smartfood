@@ -24,6 +24,9 @@ sealed interface Route {
     data object Login : Route
 
     @Serializable
+    data object OfflineConnection : Route
+
+    @Serializable
     data object Register : Route
 
     @Serializable

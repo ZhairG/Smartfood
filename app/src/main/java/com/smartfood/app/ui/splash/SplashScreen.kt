@@ -40,16 +40,16 @@ fun SplashScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.onBackground), // Cambiado a background para coincidir con tu app
+            .background(Color(0xFFF0FDF4)),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             painter = painterResource(id = R.drawable.logo_smartfood_circle),
-            contentDescription = "Logo de SmartFood", // Accesibilidad y UI Testing
-            tint = Color.Unspecified, 
+            contentDescription = "Logo de SmartFood",
+            tint = Color.Unspecified,
             modifier = Modifier
                 .size(width = 128.dp, height = 135.dp)
-                .testTag("splash_logo") // Etiqueta para testing
+                .testTag("splash_logo")
         )
     }
 }

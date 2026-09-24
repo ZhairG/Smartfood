@@ -11,7 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
-/** Enlace de texto usando el color secundario y la tipografía de labelLarge. */
+/**
+ * Componente atómico de Texto enlazable.
+ *
+ * Utiliza el color secundario de la aplicación para resaltar que es interactivo y aplica
+ * el rol semántico [Role.Button] para mejorar la accesibilidad (TalkBack).
+ *
+ * @param text Texto subrayable o visible.
+ * @param onClick Acción que se ejecuta al presionar.
+ * @param modifier Modificador de tamaño y posición opcional.
+ */
 @Composable
 fun SmartFoodTextLink(
     text: String,
@@ -26,7 +35,17 @@ fun SmartFoodTextLink(
     )
 }
 
-/** Frase + enlace en una línea, p. ej. "¿No tienes cuenta? Regístrate". */
+/**
+ * Componente compuesto por una frase genérica de invitación (prompt) y un componente interactivo
+ * [SmartFoodTextLink] (acción). Se renderizan en una sola fila.
+ *
+ * Ejemplo de uso: "¿No tienes cuenta? Regístrate"
+ *
+ * @param prompt Frase no clickeable (Ej. "¿No tienes cuenta?").
+ * @param action Texto clickeable para el [SmartFoodTextLink] (Ej. "Regístrate").
+ * @param onClick Acción desencadenada cuando se toca el parámetro [action].
+ * @param modifier Modificador base para el contenedor (Row).
+ */
 @Composable
 fun SmartFoodPromptLink(
     prompt: String,

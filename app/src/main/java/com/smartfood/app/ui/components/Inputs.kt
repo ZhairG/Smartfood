@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -28,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,7 +44,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
-/** Campo de texto con etiqueta encima (50 dp de alto, esquinas de 10 dp, borde de 1 dp). */
+/**
+ * Componente atómico de Campo de Texto genérico (TextField) con estilo de SmartFood.
+ * 
+ * Este campo incluye su propia etiqueta (Label) y soporta personalización para íconos
+ * adicionales o componentes dentro de la caja gracias a [trailingContent].
+ *
+ * @param label Texto superior descriptivo para el campo.
+ * @param value Valor actual del texto introducido por el usuario.
+ * @param onValueChange Callback que notifica cambios en el texto.
+ * @param modifier Modificador opcional.
+ * @param placeholder Texto fantasma que se muestra cuando [value] está vacío.
+ * @param keyboardOptions Opciones de comportamiento del teclado (Ej. Siguiente, Listo).
+ * @param keyboardActions Acciones que se disparan desde los botones de acción del teclado.
+ * @param visualTransformation Transforma la representación visual del texto ingresado (Ej. Contraseña).
+ * @param enabled Si es `false` el campo no se puede enfocar ni editar (Ej. mientras hay una petición en curso).
+ * @param isError Si es `true` el campo se dibuja con el borde de error (rojo), que tiene prioridad sobre el foco.
+ * @param trailingContent Componente [Composable] opcional al final de la caja de texto (generalmente un Icono).
+ */
 @Composable
 fun SmartFoodTextField(
     label: String,
@@ -52,9 +72,23 @@ fun SmartFoodTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    enabled: Boolean = true,
+    isError: Boolean = false,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
     val shape = RoundedCornerShape(10.dp) // Medida exacta de Figma
+
+    // Estado de interacción para saber si el campo está seleccionado (enfocado)
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    
+    // Prioridad de estados: error (rojo) > enfocado (verde) > normal (gris)
+    val borderColor = when {
+        isError -> MaterialTheme.colorScheme.error
+        isFocused -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.outline
+    }
+    val borderWidth = if (isError) 2.dp else 1.dp // Figma: el borde de error es más grueso
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(
@@ -66,6 +100,7 @@ fun SmartFoodTextField(
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
+            enabled = enabled,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp), // Medida exacta de Figma
@@ -73,14 +108,15 @@ fun SmartFoodTextField(
             singleLine = true,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
+            interactionSource = interactionSource,
             visualTransformation = visualTransformation,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary), // Cursor también en verde
             decorationBox = { innerTextField ->
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.surfaceVariant, shape) // InputDark / White
-                        .border(1.dp, MaterialTheme.colorScheme.outline, shape) // BorderDark / GreyDivider
+                        .border(borderWidth, borderColor, shape) // Usa la variable de color dinámico
                         .padding(start = 15.dp, end = if (trailingContent != null) 6.dp else 15.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -101,7 +137,22 @@ fun SmartFoodTextField(
     }
 }
 
-/** Variante para contraseñas: oculta el texto y agrega el botón de ojo para mostrarlo. */
+/**
+ * Variante específica de [SmartFoodTextField] configurada exclusivamente para campos de contraseña.
+ * 
+ * Gestiona localmente la visibilidad del texto (con un botón de "Ojo" integrado) para no obligar
+ * a la capa de UI State del padre a recordar si el texto está visible u oculto, respetando la Encapsulación.
+ *
+ * @param label Texto superior descriptivo.
+ * @param value Contraseña actual introducida.
+ * @param onValueChange Callback notificado al cambiar el texto.
+ * @param modifier Modificador opcional.
+ * @param placeholder Texto opcional fantasma.
+ * @param imeAction Tipo de botón de acción del teclado. Por defecto es [ImeAction.Done].
+ * @param keyboardActions Acciones que se ejecutan desde el teclado.
+ * @param enabled Si es `false` el campo no se puede enfocar ni editar.
+ * @param isError Si es `true` el campo se dibuja con el borde de error (rojo).
+ */
 @Composable
 fun SmartFoodPasswordField(
     label: String,
@@ -111,6 +162,8 @@ fun SmartFoodPasswordField(
     placeholder: String? = null,
     imeAction: ImeAction = ImeAction.Done,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    enabled: Boolean = true,
+    isError: Boolean = false,
 ) {
     var visible by rememberSaveable { mutableStateOf(false) }
 
@@ -123,6 +176,8 @@ fun SmartFoodPasswordField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = imeAction),
         keyboardActions = keyboardActions,
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+        enabled = enabled,
+        isError = isError,
         trailingContent = {
             IconButton(onClick = { visible = !visible }, modifier = Modifier.size(40.dp)) {
                 Icon(
@@ -136,7 +191,17 @@ fun SmartFoodPasswordField(
     )
 }
 
-/** Casilla (24 dp) con etiqueta; toda la fila es tocable. */
+/**
+ * Componente interactivo de Casilla de Verificación (Checkbox) acompañado de su etiqueta.
+ * 
+ * Enfatiza la accesibilidad y UX al aplicar la propiedad [toggleable] a toda la fila (Row), 
+ * permitiendo al usuario cambiar el estado presionando el texto y no solo el cuadrito pequeño.
+ *
+ * @param label Etiqueta descriptiva que acompaña a la casilla.
+ * @param checked Booleano que dicta si la casilla está seleccionada.
+ * @param onCheckedChange Función ejecutada con el nuevo valor cuando ocurre una interacción.
+ * @param modifier Modificador opcional exterior.
+ */
 @Composable
 fun SmartFoodCheckbox(
     label: String,
