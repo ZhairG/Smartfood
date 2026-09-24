@@ -26,8 +26,19 @@ import com.smartfood.app.R
 import com.smartfood.app.ui.theme.SmartfoodTheme
 
 /**
- * Dialogo modal reutilizable que notifica al usuario la falta de conexión
- * y ofrece un botón para reintentar la acción.
+ * Nombre: Dialogs.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Componentes modales reutilizables para el flujo de la aplicación.
+ */
+
+/**
+ * Diálogo modal reutilizable para notificar estados de desconexión a la red.
+ * Ofrece al usuario un botón primario para reintentar la conexión.
+ *
+ * @param isReconnecting Indica si se encuentra en proceso un reintento de reconexión.
+ * @param onReconnect Callback invocado al presionar el botón de reintento.
+ * @param onDismissRequest Callback invocado al intentar cerrar el diálogo.
  */
 @Composable
 fun SmartFoodOfflineDialog(
@@ -47,7 +58,7 @@ fun SmartFoodOfflineDialog(
                 .fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(45.dp) // Curvatura de Figma
+                    shape = RoundedCornerShape(45.dp)
                 )
                 .padding(top = 32.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

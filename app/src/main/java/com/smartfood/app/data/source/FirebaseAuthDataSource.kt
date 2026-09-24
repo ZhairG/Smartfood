@@ -1,30 +1,57 @@
 package com.smartfood.app.data.source
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 /**
- * Fuente de datos remota para gestionar la autenticación directa con Firebase.
+ * Nombre: FirebaseAuthDataSource.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Fuente de datos remota para la integración directa con el SDK de Firebase Authentication.
+ *
+ * @param firebaseAuth Instancia opcional inyectada de [FirebaseAuth].
  */
-class FirebaseAuthDataSource @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+open class FirebaseAuthDataSource @Inject constructor(
+    private val firebaseAuth: FirebaseAuth?
 ) {
-    val currentUser get() = firebaseAuth.currentUser
+    /** Usuario actualmente autenticado en Firebase. */
+    open val currentUser: FirebaseUser? get() = firebaseAuth?.currentUser
 
-    suspend fun signInWithEmailAndPassword(email: String, pass: String) {
-        firebaseAuth.signInWithEmailAndPassword(email, pass).await()
+    /**
+     * Autentica al usuario con correo y contraseña en Firebase Auth.
+     *
+     * @param email Correo electrónico.
+     * @param pass Contraseña.
+     */
+    open suspend fun signInWithEmailAndPassword(email: String, pass: String) {
+        firebaseAuth?.signInWithEmailAndPassword(email, pass)?.await()
     }
 
-    suspend fun createUserWithEmailAndPassword(email: String, pass: String) {
-        firebaseAuth.createUserWithEmailAndPassword(email, pass).await()
+    /**
+     * Registra un nuevo usuario en Firebase Auth.
+     *
+     * @param email Correo electrónico.
+     * @param pass Contraseña.
+     */
+    open suspend fun createUserWithEmailAndPassword(email: String, pass: String) {
+        firebaseAuth?.createUserWithEmailAndPassword(email, pass)?.await()
     }
 
-    suspend fun sendPasswordResetEmail(email: String) {
-        firebaseAuth.sendPasswordResetEmail(email).await()
+    /**
+     * Envía una solicitud de restablecimiento de contraseña vía correo.
+     *
+     * @param email Correo electrónico.
+     */
+    open suspend fun sendPasswordResetEmail(email: String) {
+        firebaseAuth?.sendPasswordResetEmail(email)?.await()
     }
 
-    fun signOut() {
-        firebaseAuth.signOut()
+    /**
+     * Cierra la sesión activa en el SDK de Firebase.
+     */
+    open fun signOut() {
+        firebaseAuth?.signOut()
     }
 }

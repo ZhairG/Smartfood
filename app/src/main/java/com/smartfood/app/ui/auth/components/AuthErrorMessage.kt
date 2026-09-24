@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -27,12 +28,14 @@ import androidx.compose.ui.unit.dp
 import com.smartfood.app.ui.theme.SmartfoodTheme
 
 /**
- * Componente modular animado para mostrar errores genéricos de autenticación o de red.
- * Se muestra centrado, con un ícono de advertencia y en color de error (como en Figma), y se
- * anuncia automáticamente en TalkBack al aparecer (`liveRegion`).
- * 
- * @param message El texto del error a mostrar. Si es nulo o vacío, el componente se oculta animadamente.
- * @param modifier Modificador para adaptar el diseño exterior del componente.
+ * Nombre: AuthErrorMessage.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Componente animado para la notificación de errores en los formularios de autenticación.
+ * Optimizado con [graphicsLayer] para renderizar las animaciones de aparición en la capa de dibujo GPU.
+ *
+ * @param message Texto del mensaje de error a mostrar. Si es nulo o vacío, se oculta animadamente.
+ * @param modifier Modificador opcional para personalizar el diseño.
  */
 @Composable
 fun AuthErrorMessage(
@@ -51,12 +54,15 @@ fun AuthErrorMessage(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .graphicsLayer {
+                        clip = false
+                    }
                     .padding(vertical = 10.dp)
                     .semantics { liveRegion = LiveRegionMode.Polite }
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Warning,
-                    contentDescription = null, // Decorativo: el texto que sigue ya describe el error
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(18.dp)
                 )

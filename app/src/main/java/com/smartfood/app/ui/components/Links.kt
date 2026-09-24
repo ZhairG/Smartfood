@@ -12,14 +12,19 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
 /**
+ * Nombre: Links.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Componentes atómicos para enlaces interactivos y llamadas a la acción en texto.
+ */
+
+/**
  * Componente atómico de Texto enlazable.
+ * Aplica color secundario y rol semántico [Role.Button] para mejorar la accesibilidad con TalkBack.
  *
- * Utiliza el color secundario de la aplicación para resaltar que es interactivo y aplica
- * el rol semántico [Role.Button] para mejorar la accesibilidad (TalkBack).
- *
- * @param text Texto subrayable o visible.
- * @param onClick Acción que se ejecuta al presionar.
- * @param modifier Modificador de tamaño y posición opcional.
+ * @param text Texto visible del enlace.
+ * @param onClick Callback ejecutado al presionar sobre el texto.
+ * @param modifier Modificador opcional.
  */
 @Composable
 fun SmartFoodTextLink(
@@ -29,22 +34,19 @@ fun SmartFoodTextLink(
 ) {
     Text(
         text = text,
-        style = MaterialTheme.typography.labelLarge, // Mapeado a Link (15.sp, SemiBold)
+        style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.secondary,
         modifier = modifier.clickable(role = Role.Button, onClick = onClick),
     )
 }
 
 /**
- * Componente compuesto por una frase genérica de invitación (prompt) y un componente interactivo
- * [SmartFoodTextLink] (acción). Se renderizan en una sola fila.
+ * Componente que combina un texto informativo previo (prompt) con un enlace interactivo [SmartFoodTextLink].
  *
- * Ejemplo de uso: "¿No tienes cuenta? Regístrate"
- *
- * @param prompt Frase no clickeable (Ej. "¿No tienes cuenta?").
- * @param action Texto clickeable para el [SmartFoodTextLink] (Ej. "Regístrate").
- * @param onClick Acción desencadenada cuando se toca el parámetro [action].
- * @param modifier Modificador base para el contenedor (Row).
+ * @param prompt Texto informativo (ej. "¿No tienes cuenta?").
+ * @param action Texto clickeable para la acción (ej. "Regístrate").
+ * @param onClick Callback ejecutado al presionar sobre el enlace de la acción.
+ * @param modifier Modificador base para la fila.
  */
 @Composable
 fun SmartFoodPromptLink(
@@ -55,7 +57,7 @@ fun SmartFoodPromptLink(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(10.dp), // Medida de Figma
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

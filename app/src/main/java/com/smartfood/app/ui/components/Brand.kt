@@ -20,7 +20,20 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 
-/** Logotipo en texto: "Smart" + "Food" (en color secundario/naranja). */
+/**
+ * Nombre: Brand.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Componentes de identidad de marca (Wordmark y Encabezado de marca).
+ */
+
+/**
+ * Componente atómico de isotipo de texto "SmartFood".
+ * Renderiza "Smart" en el color indicado y "Food" en el color secundario (naranja).
+ *
+ * @param modifier Modificador opcional para personalizar el diseño.
+ * @param smartColor Color para la palabra "Smart". Por defecto toma el valor de `onPrimaryContainer`.
+ */
 @Composable
 fun SmartFoodWordmark(
     modifier: Modifier = Modifier,
@@ -31,12 +44,18 @@ fun SmartFoodWordmark(
             withStyle(SpanStyle(color = smartColor)) { append("Smart") }
             withStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary)) { append("Food") }
         },
-        style = MaterialTheme.typography.displayLarge, // Mapeado a Wordmark (40.sp, Bold)
+        style = MaterialTheme.typography.displayLarge,
         modifier = modifier,
     )
 }
 
-/** Encabezado de marca: círculo con el logo (100 dp) y logotipo debajo. */
+/**
+ * Encabezado de marca de la aplicación.
+ * Muestra el ícono del logo dentro de un contenedor circular blanco y el isotipo [SmartFoodWordmark] debajo.
+ *
+ * @param modifier Modificador opcional para ajustar el diseño.
+ * @param smartColor Color para el segmento "Smart" del isotipo.
+ */
 @Composable
 fun SmartFoodBrandHeader(
     modifier: Modifier = Modifier,
@@ -45,19 +64,19 @@ fun SmartFoodBrandHeader(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp), // Medida exacta de Figma
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Box(
             modifier = Modifier
-                .size(100.dp) // Medida exacta de Figma para el círculo contenedor
+                .size(100.dp)
                 .background(color = Color.White, shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.logo_smartfood_circle),
                 contentDescription = null,
-                tint = Color.Unspecified, // Respeta los colores del SVG
-                modifier = Modifier.size(64.dp), // Ajusta este tamaño para que el icono encaje bien dentro del círculo
+                tint = Color.Unspecified,
+                modifier = Modifier.size(64.dp),
             )
         }
         SmartFoodWordmark(smartColor = smartColor)

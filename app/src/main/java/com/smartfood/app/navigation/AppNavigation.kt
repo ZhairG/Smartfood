@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -25,13 +25,20 @@ import com.smartfood.app.ui.auth.AuthViewModel
 import com.smartfood.app.ui.auth.login.LoginScreen
 import com.smartfood.app.ui.splash.SplashScreen
 
+/**
+ * Nombre: AppNavigation.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Contenedor y gestor principal del árbol de navegación Jetpack Compose (Type-Safe).
+ *
+ * @param modifier Modificador opcional para el contenedor [NavHost].
+ * @param navController Controlador de navegación [NavHostController].
+ */
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-    // Aquí puedes añadir la lógica para determinar si el usuario ya está logueado
-    // y cambiar el startDestination entre AuthGraph y MainGraph.
     val startDestination = Route.AuthGraph
 
     NavHost(
@@ -52,7 +59,6 @@ fun AppNavigation(
             ) {
                 SplashScreen(
                     onNavigateNext = {
-                        // Navegación hacia Login vaciando el Splash del BackStack
                         navController.navigate(Route.Login) {
                             popUpTo(Route.Splash) { inclusive = true }
                         }
@@ -86,6 +92,7 @@ fun AppNavigation(
                     buttonText = "Volver al Login"
                 )
             }
+
             composable<Route.PasswordRecovery> {
                 PlaceholderScreen(
                     title = "Recuperar Contraseña",
@@ -95,13 +102,12 @@ fun AppNavigation(
             }
         }
 
-        // Grafo Principal (Home / Dashboard)
+        // Grafo Principal
         navigation<Route.MainGraph>(startDestination = Route.Home) {
             composable<Route.Home> {
                 PlaceholderScreen(
                     title = "Pantalla de Home",
                     onNavigate = { 
-                        // Cerrar sesión y volver al login
                         navController.navigate(Route.AuthGraph) {
                             popUpTo(Route.MainGraph) { inclusive = true }
                         }
@@ -114,7 +120,11 @@ fun AppNavigation(
 }
 
 /**
- * Pantalla temporal para visualizar la navegación antes de construir las UIs reales.
+ * Pantalla temporal utilizada para prototipar rutas antes de la implementación de la UI completa.
+ *
+ * @param title Título visible de la pantalla.
+ * @param onNavigate Callback al presionar el botón.
+ * @param buttonText Texto a mostrar en el botón de acción.
  */
 @Composable
 fun PlaceholderScreen(

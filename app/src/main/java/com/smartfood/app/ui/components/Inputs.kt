@@ -35,7 +35,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
@@ -45,22 +44,26 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
 /**
- * Componente atómico de Campo de Texto genérico (TextField) con estilo de SmartFood.
- * 
- * Este campo incluye su propia etiqueta (Label) y soporta personalización para íconos
- * adicionales o componentes dentro de la caja gracias a [trailingContent].
+ * Nombre: Inputs.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Componentes atómicos de entrada de datos (TextField, PasswordField y Checkbox).
+ */
+
+/**
+ * Componente atómico de Campo de Texto genérico con estilo de SmartFood.
  *
- * @param label Texto superior descriptivo para el campo.
- * @param value Valor actual del texto introducido por el usuario.
- * @param onValueChange Callback que notifica cambios en el texto.
+ * @param label Texto descriptivo superior para el campo.
+ * @param value Valor actual del texto ingresado.
+ * @param onValueChange Callback notificado al modificar el texto.
  * @param modifier Modificador opcional.
- * @param placeholder Texto fantasma que se muestra cuando [value] está vacío.
- * @param keyboardOptions Opciones de comportamiento del teclado (Ej. Siguiente, Listo).
- * @param keyboardActions Acciones que se disparan desde los botones de acción del teclado.
- * @param visualTransformation Transforma la representación visual del texto ingresado (Ej. Contraseña).
- * @param enabled Si es `false` el campo no se puede enfocar ni editar (Ej. mientras hay una petición en curso).
- * @param isError Si es `true` el campo se dibuja con el borde de error (rojo), que tiene prioridad sobre el foco.
- * @param trailingContent Componente [Composable] opcional al final de la caja de texto (generalmente un Icono).
+ * @param placeholder Texto de sugerencia exhibido cuando [value] está vacío.
+ * @param keyboardOptions Opciones de comportamiento del teclado.
+ * @param keyboardActions Acciones disparadas desde las teclas del teclado.
+ * @param visualTransformation Transforma la representación visual del texto.
+ * @param enabled Si es `false`, deshabilita la interacción con el campo.
+ * @param isError Si es `true`, dibuja el borde con color de error (rojo).
+ * @param trailingContent Composable opcional al final del contenedor de texto.
  */
 @Composable
 fun SmartFoodTextField(
@@ -76,24 +79,21 @@ fun SmartFoodTextField(
     isError: Boolean = false,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
-    val shape = RoundedCornerShape(10.dp) // Medida exacta de Figma
-
-    // Estado de interacción para saber si el campo está seleccionado (enfocado)
+    val shape = RoundedCornerShape(10.dp)
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     
-    // Prioridad de estados: error (rojo) > enfocado (verde) > normal (gris)
     val borderColor = when {
         isError -> MaterialTheme.colorScheme.error
         isFocused -> MaterialTheme.colorScheme.primary
         else -> MaterialTheme.colorScheme.outline
     }
-    val borderWidth = if (isError) 2.dp else 1.dp // Figma: el borde de error es más grueso
+    val borderWidth = if (isError) 2.dp else 1.dp
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyLarge, // Mapeado a Body (15.sp, Medium)
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
 
@@ -103,20 +103,20 @@ fun SmartFoodTextField(
             enabled = enabled,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp), // Medida exacta de Figma
+                .height(50.dp),
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
             singleLine = true,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             interactionSource = interactionSource,
             visualTransformation = visualTransformation,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary), // Cursor también en verde
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             decorationBox = { innerTextField ->
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surfaceVariant, shape) // InputDark / White
-                        .border(borderWidth, borderColor, shape) // Usa la variable de color dinámico
+                        .background(MaterialTheme.colorScheme.surfaceVariant, shape)
+                        .border(borderWidth, borderColor, shape)
                         .padding(start = 15.dp, end = if (trailingContent != null) 6.dp else 15.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -138,20 +138,18 @@ fun SmartFoodTextField(
 }
 
 /**
- * Variante específica de [SmartFoodTextField] configurada exclusivamente para campos de contraseña.
- * 
- * Gestiona localmente la visibilidad del texto (con un botón de "Ojo" integrado) para no obligar
- * a la capa de UI State del padre a recordar si el texto está visible u oculto, respetando la Encapsulación.
+ * Variante específica de [SmartFoodTextField] configurada exclusivamente para contraseñas.
+ * Gestiona de forma encapsulada la visibilidad del texto mediante el botón de visibilidad.
  *
- * @param label Texto superior descriptivo.
- * @param value Contraseña actual introducida.
- * @param onValueChange Callback notificado al cambiar el texto.
+ * @param label Texto descriptivo superior.
+ * @param value Valor actual de la contraseña.
+ * @param onValueChange Callback notificado al modificar la contraseña.
  * @param modifier Modificador opcional.
- * @param placeholder Texto opcional fantasma.
- * @param imeAction Tipo de botón de acción del teclado. Por defecto es [ImeAction.Done].
- * @param keyboardActions Acciones que se ejecutan desde el teclado.
- * @param enabled Si es `false` el campo no se puede enfocar ni editar.
- * @param isError Si es `true` el campo se dibuja con el borde de error (rojo).
+ * @param placeholder Texto de sugerencia opcional.
+ * @param imeAction Tipo de botón de acción en el teclado.
+ * @param keyboardActions Acciones disparadas desde el teclado.
+ * @param enabled Si es `false`, el campo no es editable.
+ * @param isError Si es `true`, dibuja el borde con color de error (rojo).
  */
 @Composable
 fun SmartFoodPasswordField(
@@ -192,14 +190,12 @@ fun SmartFoodPasswordField(
 }
 
 /**
- * Componente interactivo de Casilla de Verificación (Checkbox) acompañado de su etiqueta.
- * 
- * Enfatiza la accesibilidad y UX al aplicar la propiedad [toggleable] a toda la fila (Row), 
- * permitiendo al usuario cambiar el estado presionando el texto y no solo el cuadrito pequeño.
+ * Componente atómico de Casilla de Verificación (Checkbox) interactiva con etiqueta.
+ * Permite alternar la selección tocando la fila completa para mejorar la usabilidad.
  *
- * @param label Etiqueta descriptiva que acompaña a la casilla.
- * @param checked Booleano que dicta si la casilla está seleccionada.
- * @param onCheckedChange Función ejecutada con el nuevo valor cuando ocurre una interacción.
+ * @param label Etiqueta que describe la casilla de verificación.
+ * @param checked Estado booleano de selección.
+ * @param onCheckedChange Callback ejecutado al alternar el estado.
  * @param modifier Modificador opcional exterior.
  */
 @Composable
@@ -216,9 +212,8 @@ fun SmartFoodCheckbox(
             onValueChange = onCheckedChange,
         ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(7.dp), // Medida exacta de Figma
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
     ) {
-        // Usa Checkbox nativo para mejor accesibilidad y animaciones
         Checkbox(
             checked = checked,
             onCheckedChange = null,
@@ -230,7 +225,7 @@ fun SmartFoodCheckbox(
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.labelLarge, // Mapeado a Link (15.sp, SemiBold)
+            style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

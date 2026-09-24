@@ -6,31 +6,43 @@ import androidx.compose.runtime.Immutable
  * Nombre: AuthUiState.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
- * Descripción: Estado completo y UDF (Unidirectional Data Flow) para la pantalla de Autenticación.
- * 
- * La anotación @Immutable asegura a Jetpack Compose que este objeto y sus propiedades
- * nunca cambiarán después de ser instanciados, optimizando dramáticamente y evitando
- * recomposiciones innecesarias de la UI.
+ * Descripción: Estado inmutable completo (Unidirectional Data Flow) de la pantalla de Autenticación.
+ *
+ * La anotación `@Immutable` optimiza las recomposiciones en Jetpack Compose al garantizar
+ * la inmutabilidad de sus propiedades.
+ *
+ * @property email Correo electrónico ingresado por el usuario.
+ * @property password Contraseña ingresada por el usuario.
+ * @property confirmPassword Confirmación de contraseña ingresada por el usuario.
+ * @property rememberMe Estado de la casilla "Recordarme".
+ * @property isLoading Indica si hay una operación asíncrona en curso.
+ * @property isSuccess Indica si la operación de autenticación finalizó con éxito.
+ * @property errorMessage Mensaje de error formateado o reportado.
+ * @property errorType Clasificación en enum del error ocurrido.
+ * @property isOffline Indica si la aplicación se encuentra sin conexión a la red.
+ * @property emailHasError Indica si el campo de correo debe mostrar borde de error.
+ * @property passwordHasError Indica si el campo de contraseña debe mostrar borde de error.
+ * @property hasMinimumLength Cumplimiento de longitud mínima en la contraseña.
+ * @property hasUppercase Cumplimiento de al menos una letra mayúscula en la contraseña.
+ * @property hasSpecialCharacter Cumplimiento de al menos un carácter especial en la contraseña.
+ * @property passwordsMatch Indica si las contraseñas coinciden en el registro.
  */
 @Immutable
 data class AuthUiState(
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
-    val rememberMe: Boolean = true, // Elevación de estado: Sacado de la UI al ViewModel
+    val rememberMe: Boolean = true,
     
-    // Estado de carga y resultados
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val errorMessage: String? = null,
-    val errorType: AuthErrorType? = null, // Usando Enums para tipado fuerte
+    val errorType: AuthErrorType? = null,
     val isOffline: Boolean = false,
 
-    // Estado de error por campo (borde rojo en los campos de texto)
     val emailHasError: Boolean = false,
     val passwordHasError: Boolean = false,
     
-    // Validaciones de contraseña en tiempo real
     val hasMinimumLength: Boolean = false,
     val hasUppercase: Boolean = false,
     val hasSpecialCharacter: Boolean = false,

@@ -11,8 +11,16 @@ import androidx.compose.ui.unit.dp
  * Nombre: Spacing.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
- * Descripción: Define el Design System de espaciados para evitar valores hardcodeados en la UI.
- * Esto garantiza que la interfaz mantenga proporciones consistentes en todas las pantallas.
+ * Descripción: Define el Design System de espaciados estandarizados para la aplicación.
+ * Garantiza proporciones visuales consistentes en todas las pantallas.
+ *
+ * @property extraSmall Espaciado de 4dp para márgenes mínimos.
+ * @property small Espaciado de 8dp para separación pequeña.
+ * @property medium Espaciado de 16dp para separación estándar.
+ * @property large Espaciado de 24dp para separación amplia.
+ * @property extraLarge Espaciado de 32dp para separaciones de secciones principales.
+ * @property paddingForm Margen horizontal estándar del formulario (34dp).
+ * @property topPanel Margen superior del panel inferior (47dp).
  */
 data class Spacing(
     val extraSmall: Dp = 4.dp,
@@ -24,11 +32,14 @@ data class Spacing(
     val topPanel: Dp = 47.dp
 )
 
+/** CompositionLocal para proveer el objeto de espaciado en la jerarquía de Composables. */
 val LocalSpacing = compositionLocalOf { Spacing() }
 
 /**
- * Extensión para acceder fácilmente al espaciado desde MaterialTheme.
- * Ejemplo de uso: Modifier.padding(MaterialTheme.spacing.medium)
+ * Extensión para acceder al objeto [Spacing] directamente desde [MaterialTheme].
+ * Ejemplo de uso: `Modifier.padding(MaterialTheme.spacing.medium)`
+ *
+ * @return El objeto [Spacing] actual proveído por el tema.
  */
 val MaterialTheme.spacing: Spacing
     @Composable

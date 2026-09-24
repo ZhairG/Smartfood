@@ -19,9 +19,15 @@ import javax.inject.Inject
  * Nombre: AuthViewModel.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
- * Descripción: ViewModel central para la Autenticación. Intercepta eventos de la UI, 
- * delega la lógica de negocio a los Casos de Uso (Domain Layer) y expone
- * un estado inmutable reactivo (StateFlow).
+ * Descripción: ViewModel central para el flujo de autenticación.
+ * Intercepta los eventos de usuario [AuthEvent], ejecuta la lógica mediante Casos de Uso
+ * de la capa de Dominio y expone un [AuthUiState] inmutable a través de [StateFlow].
+ *
+ * @param loginUseCase Caso de uso para inicio de sesión.
+ * @param registerUseCase Caso de uso para registro de usuarios.
+ * @param recoverPasswordUseCase Caso de uso para recuperación de contraseña.
+ * @param validatePasswordUseCase Caso de uso para validación de formato de contraseña.
+ * @param validateEmailUseCase Caso de uso para validación de formato de correo electrónico.
  */
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -33,8 +39,15 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
+
+    /** Estado reactivo inmutable expuesto a la vista. */
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    /**
+     * Procesador centralizado de eventos provistos por la interfaz de usuario.
+     *
+     * @param event Evento emitido por la UI.
+     */
     fun onEvent(event: AuthEvent) {
         when (event) {
             is AuthEvent.EmailChanged -> {
@@ -74,18 +87,16 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * Intenta iniciar sesión usando el caso de uso `LoginUseCase`.
+     * Inicia el proceso de autenticación validando precondiciones y delegando a [LoginUseCase].
      */
     private fun login() {
         val currentState = _uiState.value
 
-        // Prevención de envíos duplicados (doble toque, o "Listo" del teclado + botón).
         if (currentState.isLoading) return
 
         val email = currentState.email.trim()
         val password = currentState.password
 
-        // Validaciones locales: evitan una llamada de red innecesaria y marcan el campo con error.
         if (email.isBlank() || password.isBlank()) {
             _uiState.update {
                 it.copy(
@@ -97,6 +108,7 @@ class AuthViewModel @Inject constructor(
             }
             return
         }
+
         if (!validateEmailUseCase.execute(email)) {
             _uiState.update {
                 it.copy(
@@ -109,8 +121,6 @@ class AuthViewModel @Inject constructor(
             return
         }
 
-        // Se marca la carga de forma síncrona (antes de lanzar la corrutina) para que un segundo
-        // evento inmediato ya encuentre `isLoading = true` y sea descartado por la guarda de arriba.
         _uiState.update { it.copy(email = email, isLoading = true).withoutErrors() }
 
         viewModelScope.launch {
@@ -125,7 +135,7 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * Intenta registrar una nueva cuenta usando el caso de uso `RegisterUseCase`.
+     * Inicia el proceso de registro de un nuevo usuario delegando a [RegisterUseCase].
      */
     private fun register() {
         val currentState = _uiState.value
@@ -147,7 +157,7 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * Intenta enviar un correo de recuperación de contraseña.
+     * Inicia el envío del correo de recuperación de contraseña delegando a [RecoverPasswordUseCase].
      */
     private fun recoverPassword() {
         val currentState = _uiState.value
@@ -165,8 +175,7 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * Limpia los errores e intenta reanudar la acción fallida de acuerdo
-     * a los campos previamente llenados.
+     * Restablece el estado de desconexión y reintenta la acción correspondiente según los campos ingresados.
      */
     private fun retryConnection() {
         _uiState.update { it.copy(isOffline = false, errorMessage = null, errorType = null) }
@@ -174,24 +183,24 @@ class AuthViewModel @Inject constructor(
         val currentState = _uiState.value
         if (currentState.email.isNotBlank() && currentState.password.isNotBlank()) {
             if (currentState.hasMinimumLength && currentState.hasUppercase) {
-                register() // Caso de Registro
+                register()
             } else {
-                login() // Caso de Login
+                login()
             }
         }
     }
 
     /**
-     * Analiza una excepción asíncrona y la mapea al estado reactivo correcto.
-     * Si detecta fallos de conectividad, enciende la bandera `isOffline`.
-     * 
-     * @param error Excepción lanzada por la capa de datos.
-     * @param defaultType Clasificación semántica del error en caso de que no sea de red.
+     * Procesa las excepciones lanzadas por la capa de datos para actualizar el estado UI.
+     *
+     * @param error Excepción capturada.
+     * @param defaultType Tipo de error predeterminado si no es un fallo de conectividad.
      */
     private fun handleError(error: Throwable, defaultType: AuthErrorType) {
-        val isNetworkError = error.message?.contains("network", ignoreCase = true) == true ||
-                             error.message?.contains("host", ignoreCase = true) == true ||
-                             error.message?.contains("timeout", ignoreCase = true) == true
+        val message = error.message ?: ""
+        val isNetworkError = message.contains("network", ignoreCase = true) ||
+                             message.contains("host", ignoreCase = true) ||
+                             message.contains("timeout", ignoreCase = true)
         
         if (isNetworkError) {
             _uiState.update { it.copy(isLoading = false, isOffline = true, errorType = AuthErrorType.NETWORK_ERROR) }
@@ -199,9 +208,8 @@ class AuthViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isLoading = false, 
-                    errorMessage = error.localizedMessage ?: "Ha ocurrido un error",
+                    errorMessage = error.localizedMessage ?: "Ha ocurrido un error inesperado",
                     errorType = defaultType,
-                    // Un error de credenciales no indica cuál de los dos datos falló: se marcan ambos (Figma).
                     emailHasError = defaultType == AuthErrorType.CREDENTIALS_ERROR,
                     passwordHasError = defaultType == AuthErrorType.CREDENTIALS_ERROR
                 )
@@ -210,8 +218,7 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * Limpia el mensaje, el tipo de error y el borde rojo de los campos. Se usa cuando el usuario
-     * vuelve a editar un campo o cuando arranca una nueva petición.
+     * Limpia los errores y banderas de resaltado en el estado de la interfaz.
      */
     private fun AuthUiState.withoutErrors(): AuthUiState = copy(
         errorMessage = null,
