@@ -22,10 +22,16 @@ val Transparent = Color(0x00FFFFFF)
 
 // === Verdes (Tono Principal) ===
 /** Verde principal de la marca. */
-val GreenMain = Color(0xFF16A34A)
+val GreenMain = Color(0xFF4ADE80)
+
+/** Verde de símbolo de verificación en pantallas de éxito. */
+val GreenSymbol = Color(0xFF22C55E)
 
 /** Verde oscuro usado en fondos y contenedores. */
 val GreenDark = Color(0xFF14532D)
+
+/** Verde más oscuro usado en fondos y contenedores del modo oscuro. */
+val GreenDark2 = Color(0xFF10271C)
 
 /** Verde claro suave para fondos de tarjetas y contenedores claros. */
 val GreenLight = Color(0xFFF0FDF4)
@@ -84,3 +90,10 @@ val TextMuted = Color(0xFFA8B7AE)
 
 /** Fondo claro para el panel en modo claro. */
 val SurfaceLight = Color(0xFFF3F7F4)
+
+// === Sombras ===
+/** Color de sombra estándar de botones (30% opacidad). */
+val ShadowColorStandard = Color(0x4D000000)
+
+/** Color de sombra de diálogos modales (50% opacidad). */
+val ShadowColorModal = Color(0x80000000)

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
@@ -46,7 +47,7 @@ fun SplashScreen(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.logo_smartfood_circle),
-            contentDescription = "Logo de SmartFood",
+            contentDescription = stringResource(id = R.string.cd_smartfood_logo),
             tint = Color.Unspecified,
             modifier = Modifier
                 .size(width = 128.dp, height = 135.dp)

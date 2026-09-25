@@ -21,11 +21,17 @@ enum class AuthErrorType {
     /** Error de credenciales incorrectas (correo o contraseña erróneos). */
     CREDENTIALS_ERROR,
 
-    /** Error por campos vacíos en el formulario de inicio de sesión. */
+    /** Error por campos vacíos en el formulario de inicio de sesión o registro. */
     EMPTY_FIELDS,
 
     /** Error por correo electrónico con formato inválido. */
     INVALID_EMAIL,
+
+    /** Error por cuenta no existente en inicio de sesión. */
+    ACCOUNT_NOT_FOUND,
+
+    /** Error por cuenta existente previamente en registro. */
+    ACCOUNT_ALREADY_EXISTS,
 
     /** Error genérico o no clasificado. */
     UNKNOWN_ERROR

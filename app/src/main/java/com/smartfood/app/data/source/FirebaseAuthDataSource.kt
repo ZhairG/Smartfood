@@ -30,13 +30,14 @@ open class FirebaseAuthDataSource @Inject constructor(
     }
 
     /**
-     * Registra un nuevo usuario en Firebase Auth.
+     * Registra un nuevo usuario en Firebase Auth y envía automáticamente el correo de confirmación predeterminado.
      *
      * @param email Correo electrónico.
      * @param pass Contraseña.
      */
     open suspend fun createUserWithEmailAndPassword(email: String, pass: String) {
         firebaseAuth?.createUserWithEmailAndPassword(email, pass)?.await()
+        firebaseAuth?.currentUser?.sendEmailVerification()?.await()
     }
 
     /**
