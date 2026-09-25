@@ -1,6 +1,7 @@
 package com.smartfood.app.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -21,8 +23,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.smartfood.app.R
 import com.smartfood.app.ui.auth.AuthViewModel
 import com.smartfood.app.ui.auth.login.LoginScreen
+import com.smartfood.app.ui.auth.register.RegisterScreen
+import com.smartfood.app.ui.components.ActionSuccessScreen
 import com.smartfood.app.ui.splash.SplashScreen
 
 /**
@@ -30,6 +35,7 @@ import com.smartfood.app.ui.splash.SplashScreen
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
  * Descripción: Contenedor y gestor principal del árbol de navegación Jetpack Compose (Type-Safe).
+ * Configurado con transición de empuje (Push) fluida de 600 ms e interpolación Ease in and out.
  *
  * @param modifier Modificador opcional para el contenedor [NavHost].
  * @param navController Controlador de navegación [NavHostController].
@@ -53,7 +59,10 @@ fun AppNavigation(
                 exitTransition = {
                     slideOutOfContainer(
                         towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = tween(300)
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
                     )
                 }
             ) {
@@ -70,7 +79,10 @@ fun AppNavigation(
                 enterTransition = {
                     slideIntoContainer(
                         towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = tween(300)
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
                     )
                 }
             ) {
@@ -85,19 +97,60 @@ fun AppNavigation(
                 )
             }
 
-            composable<Route.Register> {
-                PlaceholderScreen(
-                    title = "Pantalla de Registro",
-                    onNavigate = { navController.popBackStack() },
-                    buttonText = "Volver al Login"
+            composable<Route.Register>(
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
+                }
+            ) {
+                val authViewModel: AuthViewModel = hiltViewModel()
+                val authState by authViewModel.uiState.collectAsStateWithLifecycle()
+
+                RegisterScreen(
+                    state = authState,
+                    onEvent = authViewModel::onEvent,
+                    onNavigateToLogin = { navController.popBackStack() },
+                    onNavigateToSuccess = {
+                        navController.navigate(Route.RegisterSuccess) {
+                            popUpTo(Route.Register) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable<Route.RegisterSuccess>(
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
+                }
+            ) {
+                ActionSuccessScreen(
+                    title = stringResource(id = R.string.register_success_title),
+                    body = stringResource(id = R.string.register_success_body),
+                    buttonText = stringResource(id = R.string.register_success_login_button),
+                    onButtonClick = {
+                        navController.navigate(Route.Login) {
+                            popUpTo(Route.AuthGraph) { inclusive = false }
+                        }
+                    }
                 )
             }
 
             composable<Route.PasswordRecovery> {
                 PlaceholderScreen(
-                    title = "Recuperar Contraseña",
+                    title = stringResource(id = R.string.title_recovery_screen),
                     onNavigate = { navController.popBackStack() },
-                    buttonText = "Volver al Login"
+                    buttonText = stringResource(id = R.string.action_back_to_login)
                 )
             }
         }
@@ -106,13 +159,13 @@ fun AppNavigation(
         navigation<Route.MainGraph>(startDestination = Route.Home) {
             composable<Route.Home> {
                 PlaceholderScreen(
-                    title = "Pantalla de Home",
+                    title = stringResource(id = R.string.title_home_screen),
                     onNavigate = { 
                         navController.navigate(Route.AuthGraph) {
                             popUpTo(Route.MainGraph) { inclusive = true }
                         }
                     },
-                    buttonText = "Cerrar Sesión"
+                    buttonText = stringResource(id = R.string.action_logout)
                 )
             }
         }

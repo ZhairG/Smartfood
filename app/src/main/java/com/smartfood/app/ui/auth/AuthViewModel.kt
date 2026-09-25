@@ -19,7 +19,7 @@ import javax.inject.Inject
  * Nombre: AuthViewModel.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
- * Descripción: ViewModel central para el flujo de autenticación.
+ * Descripción: ViewModel central para el flujo de autenticación (Login y Registro).
  * Intercepta los eventos de usuario [AuthEvent], ejecuta la lógica mediante Casos de Uso
  * de la capa de Dominio y expone un [AuthUiState] inmutable a través de [StateFlow].
  *
@@ -50,6 +50,9 @@ class AuthViewModel @Inject constructor(
      */
     fun onEvent(event: AuthEvent) {
         when (event) {
+            is AuthEvent.FullNameChanged -> {
+                _uiState.update { it.copy(fullName = event.fullName).withoutErrors() }
+            }
             is AuthEvent.EmailChanged -> {
                 _uiState.update { it.copy(email = event.email).withoutErrors() }
             }
@@ -77,6 +80,9 @@ class AuthViewModel @Inject constructor(
             }
             is AuthEvent.RememberMeChanged -> {
                 _uiState.update { it.copy(rememberMe = event.isChecked) }
+            }
+            is AuthEvent.AcceptedTermsChanged -> {
+                _uiState.update { it.copy(acceptedTerms = event.isChecked) }
             }
             AuthEvent.LoginClicked -> login()
             AuthEvent.RegisterClicked -> register()
@@ -140,12 +146,44 @@ class AuthViewModel @Inject constructor(
     private fun register() {
         val currentState = _uiState.value
 
+        if (currentState.isLoading) return
+
+        val fullName = currentState.fullName.trim()
+        val email = currentState.email.trim()
+        val password = currentState.password
+
+        if (fullName.isBlank() || email.isBlank() || password.isBlank()) {
+            _uiState.update {
+                it.copy(
+                    errorMessage = null,
+                    errorType = AuthErrorType.EMPTY_FIELDS,
+                    fullNameHasError = fullName.isBlank(),
+                    emailHasError = email.isBlank(),
+                    passwordHasError = password.isBlank()
+                )
+            }
+            return
+        }
+
+        if (!validateEmailUseCase.execute(email)) {
+            _uiState.update {
+                it.copy(
+                    errorMessage = null,
+                    errorType = AuthErrorType.INVALID_EMAIL,
+                    emailHasError = true,
+                    passwordHasError = false
+                )
+            }
+            return
+        }
+
+        _uiState.update { it.copy(isLoading = true, errorMessage = null, errorType = null) }
+
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null, errorType = null) }
             registerUseCase.execute(
-                currentState.email,
-                currentState.password,
-                currentState.confirmPassword
+                email,
+                password,
+                password // En el formulario de Figma registro usa un único campo de contraseña
             )
                 .onSuccess {
                     _uiState.update { it.copy(isLoading = false, isSuccess = true) }
@@ -182,7 +220,7 @@ class AuthViewModel @Inject constructor(
         
         val currentState = _uiState.value
         if (currentState.email.isNotBlank() && currentState.password.isNotBlank()) {
-            if (currentState.hasMinimumLength && currentState.hasUppercase) {
+            if (currentState.fullName.isNotBlank()) {
                 register()
             } else {
                 login()
@@ -192,9 +230,11 @@ class AuthViewModel @Inject constructor(
 
     /**
      * Procesa las excepciones lanzadas por la capa de datos para actualizar el estado UI.
+     * Intercepta fallos de cuenta no encontrada, cuenta existente y errores de configuración de Firebase,
+     * activando los bordes rojos para los campos de texto en la interfaz.
      *
      * @param error Excepción capturada.
-     * @param defaultType Tipo de error predeterminado si no es un fallo de conectividad.
+     * @param defaultType Tipo de error predeterminado si no es un fallo de conectividad o cuenta.
      */
     private fun handleError(error: Throwable, defaultType: AuthErrorType) {
         val message = error.message ?: ""
@@ -202,16 +242,36 @@ class AuthViewModel @Inject constructor(
                              message.contains("host", ignoreCase = true) ||
                              message.contains("timeout", ignoreCase = true)
         
+        val isUserNotFound = message.contains("user-not-found", ignoreCase = true) ||
+                              message.contains("no user record", ignoreCase = true)
+
+        val isEmailAlreadyInUse = message.contains("email-already-in-use", ignoreCase = true) ||
+                                   message.contains("already exists", ignoreCase = true)
+
+        val isConfigNotFound = message.contains("CONFIGURATION_NOT_FOUND", ignoreCase = true)
+
         if (isNetworkError) {
             _uiState.update { it.copy(isLoading = false, isOffline = true, errorType = AuthErrorType.NETWORK_ERROR) }
         } else {
+            val resolvedType = when {
+                isUserNotFound -> AuthErrorType.ACCOUNT_NOT_FOUND
+                isEmailAlreadyInUse -> AuthErrorType.ACCOUNT_ALREADY_EXISTS
+                else -> defaultType
+            }
+
+            val resolvedErrorMessage = when {
+                isConfigNotFound -> "El servicio de autenticación por correo no está habilitado en Firebase Console"
+                else -> error.localizedMessage ?: "Ha ocurrido un error inesperado"
+            }
+
             _uiState.update {
                 it.copy(
                     isLoading = false, 
-                    errorMessage = error.localizedMessage ?: "Ha ocurrido un error inesperado",
-                    errorType = defaultType,
-                    emailHasError = defaultType == AuthErrorType.CREDENTIALS_ERROR,
-                    passwordHasError = defaultType == AuthErrorType.CREDENTIALS_ERROR
+                    errorMessage = resolvedErrorMessage,
+                    errorType = resolvedType,
+                    fullNameHasError = defaultType == AuthErrorType.VALIDATION_ERROR,
+                    emailHasError = true,
+                    passwordHasError = true
                 )
             }
         }
@@ -223,6 +283,7 @@ class AuthViewModel @Inject constructor(
     private fun AuthUiState.withoutErrors(): AuthUiState = copy(
         errorMessage = null,
         errorType = null,
+        fullNameHasError = false,
         emailHasError = false,
         passwordHasError = false
     )

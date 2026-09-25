@@ -38,6 +38,10 @@ sealed interface Route {
     @Serializable
     data object Register : Route
 
+    /** Pantalla de confirmación de registro exitoso. */
+    @Serializable
+    data object RegisterSuccess : Route
+
     /** Pantalla de recuperación de contraseña. */
     @Serializable
     data object PasswordRecovery : Route

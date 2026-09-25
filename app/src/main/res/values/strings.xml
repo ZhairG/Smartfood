@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">Smartfood</string>
 
+    <!-- Content Descriptions & Accessibility -->
+    <string name="cd_smartfood_logo">Logo de SmartFood</string>
+    <string name="cd_show_password">Mostrar contraseña</string>
+    <string name="cd_hide_password">Ocultar contraseña</string>
+
     <!-- Login Screen -->
     <string name="login_welcome_title">Bienvenido</string>
     <string name="login_welcome_subtitle">Inicia sesión para ver tus recetas guardadas y tu inventario.</string>
@@ -14,10 +19,45 @@
     <string name="login_no_account_prompt">¿No tienes cuenta?</string>
     <string name="login_register_action">Regístrate</string>
 
-    <!-- Validations -->
+    <!-- Register Screen -->
+    <string name="register_welcome_title">Crea tu cuenta</string>
+    <string name="register_welcome_subtitle">Empieza a aprovechar cada ingrediente de tu cocina.</string>
+    <string name="register_name_label">Nombre completo</string>
+    <string name="register_name_placeholder">Ej. Pepito Perez</string>
+    <string name="register_terms_accept">Acepto los </string>
+    <string name="register_terms_link">Términos y condiciones</string>
+    <string name="register_terms_and"> y la </string>
+    <string name="register_privacy_link">Política de privacidad</string>
+    <string name="register_button_text">Crear Cuenta</string>
+    <string name="register_button_loading">Iniciando</string>
+    <string name="register_already_have_account_prompt">¿Ya tienes cuenta?</string>
+    <string name="register_login_action">Inicia sesión</string>
+
+    <!-- Register Success Screen -->
+    <string name="register_success_title">¡Cuenta creada con éxito!</string>
+    <string name="register_success_body">Ya puedes acceder a todas nuestras funciones. Te enviamos un correo de confirmación.</string>
+    <string name="register_success_login_button">Continuar</string>
+
+    <!-- Password Checklist Requirements -->
+    <string name="password_req_min_length">Mínimo 8 caracteres</string>
+    <string name="password_req_uppercase">Una letra mayúscula</string>
+    <string name="password_req_special_char">Un número y carácter especial</string>
+    <string name="password_req_match">¿Coinciden?</string>
+
+    <!-- Navigation & Placeholders -->
+    <string name="title_register_screen">Pantalla de Registro</string>
+    <string name="title_recovery_screen">Recuperar Contraseña</string>
+    <string name="title_home_screen">Pantalla de Home</string>
+    <string name="action_back_to_login">Volver al Login</string>
+    <string name="action_logout">Cerrar Sesión</string>
+
+    <!-- Validations & Errors -->
     <string name="error_invalid_credentials">Correo o contraseña incorrectos</string>
-    <string name="error_empty_fields">Correo o contraseña no pueden estar vacíos</string>
+    <string name="error_empty_fields">Los campos no pueden estar vacíos</string>
     <string name="error_invalid_email">Ingresa un correo electrónico válido</string>
+    <string name="error_account_not_found">No existe una cuenta registrada con este correo electrónico</string>
+    <string name="error_account_already_exists">Ya existe una cuenta registrada con este correo electrónico</string>
+    <string name="error_firebase_config_not_found">El servicio de autenticación no está habilitado en Firebase Console</string>
 
     <!-- Offline Connection -->
     <string name="offline_dialog_title">Sin conexión a Internet</string>

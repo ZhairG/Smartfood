@@ -57,6 +57,15 @@ class AuthViewModelTest {
     }
 
     @Test
+    fun `cuando se envia evento FullNameChanged, el estado se actualiza`() {
+        viewModel.onEvent(AuthEvent.FullNameChanged("Pepito Perez"))
+
+        val state = viewModel.uiState.value
+        assertEquals("Pepito Perez", state.fullName)
+        assertFalse(state.fullNameHasError)
+    }
+
+    @Test
     fun `cuando se envia evento EmailChanged, el estado se actualiza y se limpian errores`() {
         viewModel.onEvent(AuthEvent.EmailChanged("test@correo.com"))
 
@@ -99,30 +108,28 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `cuando se presiona LoginClicked con credenciales validas, establece estado de exito`() = runTest {
-        fakeRepository.loginResult = Result.success(Unit)
+    fun `cuando el inicio de sesion falla por cuenta no encontrada, establece ACCOUNT_NOT_FOUND`() = runTest {
+        fakeRepository.loginResult = Result.failure(RuntimeException("The user-not-found error occurred"))
 
-        viewModel.onEvent(AuthEvent.EmailChanged("user@test.com"))
+        viewModel.onEvent(AuthEvent.EmailChanged("notfound@test.com"))
         viewModel.onEvent(AuthEvent.PasswordChanged("SecurePass#1"))
         viewModel.onEvent(AuthEvent.LoginClicked)
 
         val state = viewModel.uiState.value
-        assertTrue(state.isSuccess)
-        assertFalse(state.isLoading)
-        assertNull(state.errorType)
+        assertEquals(AuthErrorType.ACCOUNT_NOT_FOUND, state.errorType)
     }
 
     @Test
-    fun `cuando el inicio de sesion falla por credenciales, establece CREDENTIALS_ERROR`() = runTest {
-        fakeRepository.loginResult = Result.failure(RuntimeException("Invalid credentials"))
+    fun `cuando el registro falla por cuenta existente, establece ACCOUNT_ALREADY_EXISTS`() = runTest {
+        fakeRepository.registerResult = Result.failure(RuntimeException("The email-already-in-use error occurred"))
 
-        viewModel.onEvent(AuthEvent.EmailChanged("user@test.com"))
+        viewModel.onEvent(AuthEvent.FullNameChanged("Pepito Perez"))
+        viewModel.onEvent(AuthEvent.EmailChanged("exists@test.com"))
         viewModel.onEvent(AuthEvent.PasswordChanged("SecurePass#1"))
-        viewModel.onEvent(AuthEvent.LoginClicked)
+        viewModel.onEvent(AuthEvent.RegisterClicked)
 
         val state = viewModel.uiState.value
-        assertFalse(state.isSuccess)
-        assertEquals(AuthErrorType.CREDENTIALS_ERROR, state.errorType)
+        assertEquals(AuthErrorType.ACCOUNT_ALREADY_EXISTS, state.errorType)
     }
 }
 

@@ -1,7 +1,7 @@
 package com.smartfood.app.ui.auth.login
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -31,13 +29,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -61,13 +57,16 @@ import com.smartfood.app.ui.components.SmartFoodTextField
 import com.smartfood.app.ui.components.SmartFoodTextLink
 import com.smartfood.app.ui.theme.SmartfoodTheme
 import com.smartfood.app.ui.theme.spacing
+import com.smartfood.app.utils.clearFocusOnTap
+import com.smartfood.app.utils.panelTopCorners
+import kotlinx.coroutines.launch
 
 /**
  * Nombre: LoginScreen.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
  * Descripción: Pantalla principal de Inicio de Sesión de la aplicación Smartfood.
- * Optimizado con [derivedStateOf] y lambdas estables para minimizar recomposiciones innecesarias.
+ * Reutiliza las funciones de extensión utilitarias de [clearFocusOnTap] y [panelTopCorners].
  *
  * @param state Objeto de estado inmutable [AuthUiState] proveniente del ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [AuthEvent] hacia el ViewModel.
@@ -85,21 +84,20 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
     val density = LocalDensity.current
     val imeInsets = WindowInsets.ime
 
-    val isImeVisible by remember(imeInsets, density) {
-        derivedStateOf { imeInsets.getBottom(density) > 0 }
-    }
-
     LaunchedEffect(imeInsets, density) {
-        var wasImeVisible = false
-        snapshotFlow { imeInsets.getBottom(density) > 0 }
-            .collect { visible ->
-                if (wasImeVisible && !visible) {
+        snapshotFlow { imeInsets.getBottom(density) }
+            .collect { bottom ->
+                if (bottom == 0) {
                     focusManager.clearFocus(force = true)
+                    if (scrollState.value != 0) {
+                        scrollState.scrollTo(0)
+                    }
                 }
-                wasImeVisible = visible
             }
     }
 
@@ -114,8 +112,8 @@ fun LoginScreen(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = { focusManager.clearFocus() })
+            .clearFocusOnTap(focusManager) {
+                coroutineScope.launch { scrollState.scrollTo(0) }
             }
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
     ) {
@@ -128,6 +126,7 @@ fun LoginScreen(
 
         LoginContentCard(
             state = state,
+            scrollState = scrollState,
             onEvent = onEvent,
             onNavigateToRegister = onNavigateToRegister,
             onNavigateToRecovery = onNavigateToRecovery
@@ -142,29 +141,17 @@ fun LoginScreen(
 @Composable
 private fun ColumnScope.LoginContentCard(
     state: AuthUiState,
+    scrollState: ScrollState,
     onEvent: (AuthEvent) -> Unit,
     onNavigateToRegister: () -> Unit,
     onNavigateToRecovery: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scrollState = rememberScrollState()
-    val isImeVisibleRaw = WindowInsets.isImeVisible
-    val isImeVisible by remember(isImeVisibleRaw) { derivedStateOf { isImeVisibleRaw } }
-
-    LaunchedEffect(isImeVisible) {
-        if (!isImeVisible) {
-            scrollState.scrollTo(0)
-        }
-    }
-
     Column(
         modifier = modifier
             .weight(1f)
             .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(topStart = 45.dp, topEnd = 45.dp),
-            )
+            .panelTopCorners(MaterialTheme.colorScheme.surface, 45.dp)
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
             .padding(top = 47.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -189,7 +176,7 @@ private fun ColumnScope.LoginContentCard(
                 .padding(horizontal = 34.dp)
                 .padding(bottom = 48.dp)
         ) {
-            LoginFormFields(state = state, onEvent = onEvent)
+            LoginFormFields(state = state, scrollState = scrollState, onEvent = onEvent)
             Spacer(Modifier.height(MaterialTheme.spacing.large))
 
             LoginOptionsRow(
@@ -234,6 +221,7 @@ private fun LoginWelcomeHeader(modifier: Modifier = Modifier) {
 @Composable
 private fun AuthUiState.loginErrorText(): String? = when (errorType) {
     AuthErrorType.CREDENTIALS_ERROR -> stringResource(id = R.string.error_invalid_credentials)
+    AuthErrorType.ACCOUNT_NOT_FOUND -> stringResource(id = R.string.error_account_not_found)
     AuthErrorType.EMPTY_FIELDS -> stringResource(id = R.string.error_empty_fields)
     AuthErrorType.INVALID_EMAIL -> stringResource(id = R.string.error_invalid_email)
     else -> errorMessage
@@ -245,10 +233,12 @@ private fun AuthUiState.loginErrorText(): String? = when (errorType) {
 @Composable
 private fun LoginFormFields(
     state: AuthUiState,
+    scrollState: ScrollState,
     onEvent: (AuthEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
+    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = modifier) {
         SmartFoodTextField(
@@ -278,6 +268,7 @@ private fun LoginFormFields(
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
+                    coroutineScope.launch { scrollState.scrollTo(0) }
                     onEvent(AuthEvent.LoginClicked)
                 }
             ),

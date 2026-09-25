@@ -4,10 +4,13 @@ package com.smartfood.app.ui.auth
  * Nombre: AuthEvent.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
- * Descripción: Contrato de eventos de usuario para la pantalla de Autenticación.
+ * Descripción: Contrato de eventos de usuario para las pantallas de Autenticación (Login y Registro).
  * Centraliza las acciones para desacoplar la UI de la lógica de negocio mediante UDF.
  */
 sealed interface AuthEvent {
+    /** Cambio en el campo de texto de nombre completo. */
+    data class FullNameChanged(val fullName: String) : AuthEvent
+
     /** Cambio en el campo de texto de correo electrónico. */
     data class EmailChanged(val email: String) : AuthEvent
 
@@ -19,6 +22,9 @@ sealed interface AuthEvent {
 
     /** Cambio en la opción "Recordarme". */
     data class RememberMeChanged(val isChecked: Boolean) : AuthEvent
+
+    /** Cambio en la casilla de aceptación de Términos y Condiciones. */
+    data class AcceptedTermsChanged(val isChecked: Boolean) : AuthEvent
 
     /** Clic en el botón principal de Iniciar Sesión. */
     data object LoginClicked : AuthEvent
