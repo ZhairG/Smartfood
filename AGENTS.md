@@ -1,0 +1,1 @@
+Revisa todos los comentarios tipo TODO en el proyecto y genera el código correspondiente aplicando patrones MVVM

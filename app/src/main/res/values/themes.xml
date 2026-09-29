@@ -2,7 +2,7 @@
 <resources>
 
     <style name="Theme.Smartfood" parent="android:Theme.Material.NoActionBar">
-        <item name="android:statusBarColor">#66000000</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

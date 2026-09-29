@@ -31,7 +31,8 @@ class RegisterScreenTest {
                 RegisterScreen(
                     state = AuthUiState(),
                     onEvent = {},
-                    onNavigateToLogin = {}
+                    onNavigateToLogin = {},
+                    onNavigateToSuccess = {}
                 )
             }
         }
@@ -51,7 +52,8 @@ class RegisterScreenTest {
                 RegisterScreen(
                     state = AuthUiState(),
                     onEvent = {},
-                    onNavigateToLogin = {}
+                    onNavigateToLogin = {},
+                    onNavigateToSuccess = {}
                 )
             }
         }
@@ -72,7 +74,8 @@ class RegisterScreenTest {
                 RegisterScreen(
                     state = AuthUiState(),
                     onEvent = { lastEvent = it },
-                    onNavigateToLogin = {}
+                    onNavigateToLogin = {},
+                    onNavigateToSuccess = {}
                 )
             }
         }
@@ -89,10 +92,11 @@ class RegisterScreenTest {
                 RegisterScreen(
                     state = AuthUiState(
                         errorType = AuthErrorType.ACCOUNT_ALREADY_EXISTS,
-                        emailHasError = true
+                        emailHasError = true,
                     ),
                     onEvent = {},
-                    onNavigateToLogin = {}
+                    onNavigateToLogin = {},
+                    onNavigateToSuccess = {}
                 )
             }
         }

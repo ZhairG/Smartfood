@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -17,8 +19,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.annotations.concurrent.Background
 import com.smartfood.app.R
+import com.smartfood.app.ui.theme.SmartfoodTheme
 
 /**
  * Nombre: Brand.kt
@@ -76,9 +81,22 @@ fun SmartFoodBrandHeader(
                 painter = painterResource(id = R.drawable.logo_smartfood_circle),
                 contentDescription = null,
                 tint = Color.Unspecified,
-                modifier = Modifier.size(64.dp),
+                modifier = Modifier.size(96.dp),
             )
         }
         SmartFoodWordmark(smartColor = smartColor)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SmartFoodBrandHeaderPreview() {
+    SmartfoodTheme {
+        SmartFoodBrandHeader(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 77.dp, bottom = 53.dp),
+            smartColor = MaterialTheme.colorScheme.onBackground
+        )
     }
 }

@@ -1,31 +1,14 @@
 package com.smartfood.app.ui.auth.register
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -54,9 +36,8 @@ import com.smartfood.app.ui.auth.AuthErrorType
 import com.smartfood.app.ui.auth.AuthEvent
 import com.smartfood.app.ui.auth.AuthUiState
 import com.smartfood.app.ui.auth.components.AuthErrorMessage
+import com.smartfood.app.ui.auth.components.AuthScreenScaffold
 import com.smartfood.app.ui.auth.components.PasswordRequirementChecklist
-import com.smartfood.app.ui.components.SmartFoodBrandHeader
-import com.smartfood.app.ui.components.SmartFoodOfflineDialog
 import com.smartfood.app.ui.components.SmartFoodPasswordField
 import com.smartfood.app.ui.components.SmartFoodPrimaryButton
 import com.smartfood.app.ui.components.SmartFoodPromptLink
@@ -64,8 +45,6 @@ import com.smartfood.app.ui.components.SmartFoodTermsCheckbox
 import com.smartfood.app.ui.components.SmartFoodTextField
 import com.smartfood.app.ui.theme.SmartfoodTheme
 import com.smartfood.app.ui.theme.spacing
-import com.smartfood.app.utils.clearFocusOnTap
-import com.smartfood.app.utils.panelTopCorners
 import kotlinx.coroutines.launch
 
 /**
@@ -73,7 +52,7 @@ import kotlinx.coroutines.launch
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
  * Descripción: Pantalla de Registro ("Crea tu cuenta") de la aplicación Smartfood.
- * Muestra el checklist de contraseña como una ventana emergente (Overlay / Popup) superpuesta sobre el campo de correo y contraseña al enfocar el campo de contraseña.
+ * Reutiliza [AuthScreenScaffold] para el layout base, insets y gestión de foco/teclado.
  *
  * @param state Objeto de estado inmutable [AuthUiState] proveniente del ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [AuthEvent] hacia el ViewModel.
@@ -81,7 +60,6 @@ import kotlinx.coroutines.launch
  * @param onNavigateToSuccess Callback notificado al completarse el registro exitosamente.
  * @param modifier Modificador opcional para la apariencia exterior.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RegisterScreen(
     state: AuthUiState,
@@ -90,119 +68,36 @@ fun RegisterScreen(
     onNavigateToSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusManager = LocalFocusManager.current
-    val coroutineScope = rememberCoroutineScope()
-    val scrollState = rememberScrollState()
-    val density = LocalDensity.current
-    val imeInsets = WindowInsets.ime
-
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
             onNavigateToSuccess()
         }
     }
 
-    LaunchedEffect(imeInsets, density) {
-        snapshotFlow { imeInsets.getBottom(density) }
-            .collect { bottom ->
-                if (bottom == 0) {
-                    focusManager.clearFocus(force = true)
-                    if (scrollState.value != 0) {
-                        scrollState.scrollTo(0)
-                    }
-                }
-            }
-    }
-
-    if (state.isOffline) {
-        SmartFoodOfflineDialog(
-            isReconnecting = state.isLoading,
-            onReconnect = remember(onEvent) { { onEvent(AuthEvent.RetryConnectionClicked) } }
-        )
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .clearFocusOnTap(focusManager) {
-                coroutineScope.launch { scrollState.scrollTo(0) }
-            }
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-    ) {
-        SmartFoodBrandHeader(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 77.dp, bottom = 53.dp),
-            smartColor = MaterialTheme.colorScheme.onBackground
-        )
-
-        RegisterContentCard(
-            state = state,
-            scrollState = scrollState,
-            onEvent = onEvent,
-            onNavigateToLogin = onNavigateToLogin
-        )
-    }
-}
-
-/**
- * Contenedor del panel de formulario de registro de usuario.
- */
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun ColumnScope.RegisterContentCard(
-    state: AuthUiState,
-    scrollState: ScrollState,
-    onEvent: (AuthEvent) -> Unit,
-    onNavigateToLogin: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .weight(1f)
-            .fillMaxWidth()
-            .panelTopCorners(MaterialTheme.colorScheme.surface, 45.dp)
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
-            .padding(top = 47.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Column(
-            modifier = Modifier
-                .widthIn(max = 480.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 34.dp),
-        ) {
+    AuthScreenScaffold(
+        state = state,
+        onEvent = onEvent,
+        headerContent = {
             RegisterWelcomeHeader()
             Spacer(Modifier.height(MaterialTheme.spacing.large))
-        }
+        },
+        modifier = modifier
+    ) { scrollState ->
+        RegisterFormFields(state = state, scrollState = scrollState, onEvent = onEvent)
+        Spacer(Modifier.height(20.dp))
 
-        Column(
-            modifier = Modifier
-                .widthIn(max = 480.dp)
-                .fillMaxWidth()
-                .weight(1f)
-                .imePadding()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 34.dp)
-                .padding(bottom = 48.dp)
-        ) {
-            RegisterFormFields(state = state, scrollState = scrollState, onEvent = onEvent)
-            Spacer(Modifier.height(20.dp))
+        SmartFoodTermsCheckbox(
+            checked = state.acceptedTerms,
+            onCheckedChange = remember(onEvent) { { checked -> onEvent(AuthEvent.AcceptedTermsChanged(checked)) } }
+        )
+        Spacer(Modifier.height(24.dp))
 
-            SmartFoodTermsCheckbox(
-                checked = state.acceptedTerms,
-                onCheckedChange = remember(onEvent) { { checked -> onEvent(AuthEvent.AcceptedTermsChanged(checked)) } }
-            )
-            Spacer(Modifier.height(24.dp))
-
-            RegisterActionButtons(
-                isLoading = state.isLoading,
-                enabled = state.acceptedTerms,
-                onRegisterClicked = remember(onEvent) { { onEvent(AuthEvent.RegisterClicked) } },
-                onNavigateToLogin = onNavigateToLogin
-            )
-        }
+        RegisterActionButtons(
+            isLoading = state.isLoading,
+            enabled = state.acceptedTerms,
+            onRegisterClicked = remember(onEvent) { { onEvent(AuthEvent.RegisterClicked) } },
+            onNavigateToLogin = onNavigateToLogin
+        )
     }
 }
 

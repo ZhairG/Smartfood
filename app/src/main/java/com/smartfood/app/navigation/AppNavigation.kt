@@ -84,6 +84,24 @@ fun AppNavigation(
                             easing = FastOutSlowInEasing
                         )
                     )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
                 }
             ) {
                 val authViewModel: AuthViewModel = hiltViewModel()
@@ -98,9 +116,27 @@ fun AppNavigation(
             }
 
             composable<Route.Register>(
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
+                },
                 exitTransition = {
                     slideOutOfContainer(
                         towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = tween(
                             durationMillis = 600,
                             easing = FastOutSlowInEasing
@@ -146,7 +182,26 @@ fun AppNavigation(
                 )
             }
 
-            composable<Route.PasswordRecovery> {
+            composable<Route.PasswordRecovery>(
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
+                }
+            ) {
                 PlaceholderScreen(
                     title = stringResource(id = R.string.title_recovery_screen),
                     onNavigate = { navController.popBackStack() },

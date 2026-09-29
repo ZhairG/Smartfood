@@ -5,7 +5,7 @@ package com.smartfood.app.ui.auth
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
  * Descripción: Contrato de eventos de usuario para las pantallas de Autenticación (Login y Registro).
- * Centraliza las acciones para desacoplar la UI de la lógica de negocio mediante UDF.
+ * Centraliza las acciones para desacoplar la UI de la lógica de negocio mediante Unidirectional Data Flow (UDF).
  */
 sealed interface AuthEvent {
     /** Cambio en el campo de texto de nombre completo. */

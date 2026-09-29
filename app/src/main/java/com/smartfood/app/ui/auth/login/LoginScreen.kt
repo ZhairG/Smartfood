@@ -1,40 +1,19 @@
 package com.smartfood.app.ui.auth.login
 
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -47,9 +26,8 @@ import com.smartfood.app.ui.auth.AuthErrorType
 import com.smartfood.app.ui.auth.AuthEvent
 import com.smartfood.app.ui.auth.AuthUiState
 import com.smartfood.app.ui.auth.components.AuthErrorMessage
-import com.smartfood.app.ui.components.SmartFoodBrandHeader
+import com.smartfood.app.ui.auth.components.AuthScreenScaffold
 import com.smartfood.app.ui.components.SmartFoodCheckbox
-import com.smartfood.app.ui.components.SmartFoodOfflineDialog
 import com.smartfood.app.ui.components.SmartFoodPasswordField
 import com.smartfood.app.ui.components.SmartFoodPrimaryButton
 import com.smartfood.app.ui.components.SmartFoodPromptLink
@@ -57,16 +35,13 @@ import com.smartfood.app.ui.components.SmartFoodTextField
 import com.smartfood.app.ui.components.SmartFoodTextLink
 import com.smartfood.app.ui.theme.SmartfoodTheme
 import com.smartfood.app.ui.theme.spacing
-import com.smartfood.app.utils.clearFocusOnTap
-import com.smartfood.app.utils.panelTopCorners
-import kotlinx.coroutines.launch
 
 /**
  * Nombre: LoginScreen.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
  * Descripción: Pantalla principal de Inicio de Sesión de la aplicación Smartfood.
- * Reutiliza las funciones de extensión utilitarias de [clearFocusOnTap] y [panelTopCorners].
+ * Reutiliza [AuthScreenScaffold] para el layout base, insets y gestión de foco/teclado.
  *
  * @param state Objeto de estado inmutable [AuthUiState] proveniente del ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [AuthEvent] hacia el ViewModel.
@@ -74,7 +49,6 @@ import kotlinx.coroutines.launch
  * @param onNavigateToRecovery Callback para navegar a la pantalla de Recuperación de Contraseña.
  * @param modifier Modificador opcional para configurar la apariencia exterior.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LoginScreen(
     state: AuthUiState,
@@ -83,115 +57,30 @@ fun LoginScreen(
     onNavigateToRecovery: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val focusManager = LocalFocusManager.current
-    val coroutineScope = rememberCoroutineScope()
-    val scrollState = rememberScrollState()
-    val density = LocalDensity.current
-    val imeInsets = WindowInsets.ime
-
-    LaunchedEffect(imeInsets, density) {
-        snapshotFlow { imeInsets.getBottom(density) }
-            .collect { bottom ->
-                if (bottom == 0) {
-                    focusManager.clearFocus(force = true)
-                    if (scrollState.value != 0) {
-                        scrollState.scrollTo(0)
-                    }
-                }
-            }
-    }
-
-    if (state.isOffline) {
-        SmartFoodOfflineDialog(
-            isReconnecting = state.isLoading,
-            onReconnect = remember(onEvent) { { onEvent(AuthEvent.RetryConnectionClicked) } }
-        )
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .clearFocusOnTap(focusManager) {
-                coroutineScope.launch { scrollState.scrollTo(0) }
-            }
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-    ) {
-        SmartFoodBrandHeader(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 77.dp, bottom = 53.dp),
-            smartColor = MaterialTheme.colorScheme.onBackground
-        )
-
-        LoginContentCard(
-            state = state,
-            scrollState = scrollState,
-            onEvent = onEvent,
-            onNavigateToRegister = onNavigateToRegister,
-            onNavigateToRecovery = onNavigateToRecovery
-        )
-    }
-}
-
-/**
- * Contenedor del panel de formulario de inicio de sesión.
- */
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun ColumnScope.LoginContentCard(
-    state: AuthUiState,
-    scrollState: ScrollState,
-    onEvent: (AuthEvent) -> Unit,
-    onNavigateToRegister: () -> Unit,
-    onNavigateToRecovery: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .weight(1f)
-            .fillMaxWidth()
-            .panelTopCorners(MaterialTheme.colorScheme.surface, 45.dp)
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
-            .padding(top = 47.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Column(
-            modifier = Modifier
-                .widthIn(max = 480.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 34.dp),
-        ) {
+    AuthScreenScaffold(
+        state = state,
+        onEvent = onEvent,
+        headerContent = {
             LoginWelcomeHeader()
             Spacer(Modifier.height(MaterialTheme.spacing.large))
-        }
+        },
+        modifier = modifier
+    ) {
+        LoginFormFields(state = state, onEvent = onEvent)
+        Spacer(Modifier.height(MaterialTheme.spacing.large))
 
-        Column(
-            modifier = Modifier
-                .widthIn(max = 480.dp)
-                .fillMaxWidth()
-                .weight(1f)
-                .imePadding()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 34.dp)
-                .padding(bottom = 48.dp)
-        ) {
-            LoginFormFields(state = state, scrollState = scrollState, onEvent = onEvent)
-            Spacer(Modifier.height(MaterialTheme.spacing.large))
+        LoginOptionsRow(
+            state = state,
+            onEvent = onEvent,
+            onNavigateToRecovery = onNavigateToRecovery
+        )
+        Spacer(Modifier.height(27.dp))
 
-            LoginOptionsRow(
-                state = state,
-                onEvent = onEvent,
-                onNavigateToRecovery = onNavigateToRecovery
-            )
-            Spacer(Modifier.height(27.dp))
-
-            LoginActionButtons(
-                isLoading = state.isLoading,
-                onLoginClicked = remember(onEvent) { { onEvent(AuthEvent.LoginClicked) } },
-                onNavigateToRegister = onNavigateToRegister
-            )
-        }
+        LoginActionButtons(
+            isLoading = state.isLoading,
+            onLoginClicked = remember(onEvent) { { onEvent(AuthEvent.LoginClicked) } },
+            onNavigateToRegister = onNavigateToRegister
+        )
     }
 }
 
@@ -233,12 +122,10 @@ private fun AuthUiState.loginErrorText(): String? = when (errorType) {
 @Composable
 private fun LoginFormFields(
     state: AuthUiState,
-    scrollState: ScrollState,
     onEvent: (AuthEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
-    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = modifier) {
         SmartFoodTextField(
@@ -268,7 +155,6 @@ private fun LoginFormFields(
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
-                    coroutineScope.launch { scrollState.scrollTo(0) }
                     onEvent(AuthEvent.LoginClicked)
                 }
             ),

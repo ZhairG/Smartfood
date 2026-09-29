@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 import com.smartfood.app.ui.theme.SmartfoodTheme
+import com.smartfood.app.utils.SystemBarEffect
 import kotlinx.coroutines.delay
 
 /**
@@ -34,6 +35,7 @@ fun SplashScreen(
     onNavigateNext: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    SystemBarEffect(isLightBackground = true)
     LaunchedEffect(key1 = true) {
         delay(2000)
         onNavigateNext()
