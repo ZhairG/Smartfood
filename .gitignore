@@ -18,3 +18,6 @@ local.properties
 Smartfood.zip
 *.zip
 TestResults/
+
+# Configuración de Firebase: cada integrante la descarga desde la consola (no se versiona)
+app/google-services.json

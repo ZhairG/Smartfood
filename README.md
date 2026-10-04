@@ -63,12 +63,15 @@ Firebase Authentication · Cloud Firestore · DataStore · JUnit4 · Compose UI 
 
 ## Puesta en marcha
 
-1. Abrir el proyecto en Android Studio y sincronizar Gradle.
-2. En la consola de Firebase (`smartfood-f62a1`):
+1. Descargar `google-services.json` desde la consola de Firebase (Configuración del proyecto → app Android
+   `com.smartfood.app`) y copiarlo en `app/`. **No se versiona**: está en `.gitignore` y se comparte solo
+   por canales privados.
+2. Abrir el proyecto en Android Studio y sincronizar Gradle.
+3. En la consola de Firebase (`smartfood-f62a1`):
    - **Authentication** → habilitar *Correo/contraseña*.
    - **Firestore Database** → crear la base de datos.
    - Publicar las reglas: `firebase deploy --only firestore:rules`.
-3. Ejecutar la configuración `app`.
+4. Ejecutar la configuración `app`.
 
 ## Datos de prueba: recuperación de contraseña (simulada)
 
