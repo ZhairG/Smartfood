@@ -8,14 +8,14 @@
 -keepclassmembers class * {
     @kotlinx.serialization.SerialName *;
 }
--keep class com.smartfood.app.navigation.Route** { *; }
+-keep class com.smartfood.app.core.navigation.Route** { *; }
 
 # === Dagger Hilt & ViewModel ===
 -keepclassmembers class * {
     @javax.inject.Inject <init>(...);
 }
 -keep class * extends androidx.lifecycle.ViewModel
--keep class com.smartfood.app.data.di.** { *; }
+-keep class com.smartfood.app.core.di.** { *; }
 
 # === Firebase Auth & Google Play Services ===
 -keep class com.google.firebase.auth.** { *; }

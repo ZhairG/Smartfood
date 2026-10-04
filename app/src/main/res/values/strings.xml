@@ -26,7 +26,7 @@
     <string name="register_name_placeholder">Ej. Pepito Perez</string>
     <string name="register_terms_accept">Acepto los </string>
     <string name="register_terms_link">Términos y condiciones</string>
-    <string name="register_terms_and"> y la </string>
+    <string name="register_terms_and">y la</string>
     <string name="register_privacy_link">Política de privacidad</string>
     <string name="register_button_text">Crear Cuenta</string>
     <string name="register_button_loading">Iniciando</string>
@@ -44,20 +44,51 @@
     <string name="password_req_special_char">Un número y carácter especial</string>
     <string name="password_req_match">¿Coinciden?</string>
 
-    <!-- Navigation & Placeholders -->
-    <string name="title_register_screen">Pantalla de Registro</string>
-    <string name="title_recovery_screen">Recuperar Contraseña</string>
-    <string name="title_home_screen">Pantalla de Home</string>
-    <string name="action_back_to_login">Volver al Login</string>
+    <!-- Home -->
+    <string name="home_greeting">Hola, %1$s</string>
+    <string name="home_greeting_generic">Hola</string>
+    <string name="home_subtitle">Muy pronto verás aquí tu inventario y las recetas que mejor aprovechan lo que tienes.</string>
     <string name="action_logout">Cerrar Sesión</string>
+
+    <!-- Password Recovery Flow -->
+    <string name="recovery_step1_title">¿Olvidaste tu contraseña?</string>
+    <string name="recovery_step1_subtitle">Recupera tu acceso y vuelve a disfrutar de tus recetas favoritas.</string>
+    <string name="recovery_step1_button">Enviar Código</string>
+    <string name="recovery_step1_back_prompt">Volver a</string>
+    <string name="recovery_step1_back_action">Iniciar sesión</string>
+
+    <string name="recovery_step2_title">Verifica tu correo</string>
+    <string name="recovery_step2_subtitle">Hemos enviado un código de verificación de 4 dígitos a:</string>
+    <string name="recovery_step2_wrong_email_link">¿Correo incorrecto? Haz click aqui para cambiarlo</string>
+    <string name="recovery_step2_button">Verificar Código</string>
+    <string name="recovery_step2_resend_prompt">¿No recibiste el código?</string>
+    <string name="recovery_step2_resend_action">Reenviar código</string>
+
+    <string name="recovery_step3_title">Crear Nueva Contraseña</string>
+    <string name="recovery_step3_subtitle">Elige una contraseña segura para proteger tu cuenta.</string>
+    <string name="recovery_step3_new_password_label">Nueva Contraseña</string>
+    <string name="recovery_step3_confirm_password_label">Confirmar Contraseña</string>
+    <string name="recovery_step3_button">Reestablecer Contraseña</string>
+
+    <string name="recovery_success_title">¡Contraseña actualizada!</string>
+    <string name="recovery_success_body">Tu contraseña ha sido cambiada exitosamente. Por seguridad, por favor inicia sesión nuevamente con tus nuevas credenciales.</string>
+    <string name="recovery_success_button">Continuar</string>
 
     <!-- Validations & Errors -->
     <string name="error_invalid_credentials">Correo o contraseña incorrectos</string>
     <string name="error_empty_fields">Los campos no pueden estar vacíos</string>
     <string name="error_invalid_email">Ingresa un correo electrónico válido</string>
     <string name="error_account_not_found">No existe una cuenta registrada con este correo electrónico</string>
+    <string name="error_account_not_found_recovery">No encontramos una cuenta con este correo</string>
+    <string name="error_empty_email">Correo no puede estar vacío</string>
+    <string name="error_empty_otp_code">Código no puede estar vacío</string>
+    <string name="error_invalid_otp_code">Código incorrecto, inténtalo de nuevo</string>
     <string name="error_account_already_exists">Ya existe una cuenta registrada con este correo electrónico</string>
     <string name="error_firebase_config_not_found">El servicio de autenticación no está habilitado en Firebase Console</string>
+    <string name="error_weak_password">La contraseña no cumple los requisitos de seguridad</string>
+    <string name="error_passwords_dont_match">Las contraseñas no coinciden</string>
+    <string name="error_terms_not_accepted">Debes aceptar los Términos y condiciones</string>
+    <string name="error_unknown">Ocurrió un error inesperado. Inténtalo de nuevo.</string>
 
     <!-- Offline Connection -->
     <string name="offline_dialog_title">Sin conexión a Internet</string>
