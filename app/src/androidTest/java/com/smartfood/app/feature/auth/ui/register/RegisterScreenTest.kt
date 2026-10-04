@@ -1,9 +1,12 @@
 package com.smartfood.app.feature.auth.ui.register
 
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -36,6 +39,10 @@ class RegisterScreenTest {
 
     private fun botonCrearCuenta() = composeTestRule.onNode(hasText("Crear Cuenta") and hasClickAction())
 
+    /** La etiqueta "Contraseña" es un texto aparte que no enfoca el campo; se toca el campo editable de tipo contraseña. */
+    private fun campoContrasena() =
+        composeTestRule.onNode(hasSetTextAction() and SemanticsMatcher.keyIsDefined(SemanticsProperties.Password))
+
     @Test
     fun pantallaRegistro_muestraEncabezadoYCampos() {
         mostrar()
@@ -51,7 +58,7 @@ class RegisterScreenTest {
     fun ca0103_cuandoCampoContrasenaEnfocado_muestraChecklistDeRequisitos() {
         mostrar()
 
-        composeTestRule.onNodeWithText("Contraseña").performClick()
+        campoContrasena().performClick()
 
         composeTestRule.onNodeWithText("Mínimo 8 caracteres").assertIsDisplayed()
         composeTestRule.onNodeWithText("Una letra mayúscula").assertIsDisplayed()
