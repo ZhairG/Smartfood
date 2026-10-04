@@ -57,7 +57,7 @@ fun AuthErrorMessage(
                     .graphicsLayer {
                         clip = false
                     }
-                    .padding(vertical = 10.dp)
+                    .padding(vertical = 6.dp)
                     .semantics { liveRegion = LiveRegionMode.Polite }
             ) {
                 Icon(

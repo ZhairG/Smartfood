@@ -26,14 +26,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -49,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
 
@@ -65,7 +67,7 @@ private val InputShape = RoundedCornerShape(10.dp)
 /**
  * Componente atómico de Campo de Texto genérico con estilo de SmartFood basado en el mockup inicial.
  *
- * @param label Texto descriptivo superior para el campo.
+ * @param label Texto descriptivo superior. Forma parte del área táctil y de la semántica del campo.
  * @param value Valor actual del texto ingresado.
  * @param onValueChange Callback notificado al modificar el texto.
  * @param modifier Modificador opcional.
@@ -75,7 +77,7 @@ private val InputShape = RoundedCornerShape(10.dp)
  * @param visualTransformation Transforma la representación visual del texto.
  * @param enabled Si es `false`, deshabilita la interacción con el campo.
  * @param isError Si es `true`, dibuja el borde con color de error (rojo).
- * @param onFocusChanged Callback para notificar cambios en el foco del campo.
+ * @param onFocusChanged Callback notificado en el mismo frame en que el campo gana o pierde el foco.
  * @param trailingContent Composable opcional al final del contenedor de texto.
  */
 @Composable
@@ -93,12 +95,10 @@ fun SmartFoodTextField(
     onFocusChanged: ((Boolean) -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
+    val metrics = LocalFormMetrics.current
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-
-    LaunchedEffect(isFocused) {
-        onFocusChanged?.invoke(isFocused)
-    }
+    val currentOnFocusChanged by rememberUpdatedState(onFocusChanged)
 
     val borderColor = when {
         isError -> MaterialTheme.colorScheme.error
@@ -107,35 +107,38 @@ fun SmartFoodTextField(
     }
     val borderWidth = if (isError) 2.dp else 1.dp
 
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(9.dp)) {
-        Text(
-            text = label,
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        enabled = enabled,
+        // El foco se notifica en el mismo frame (RNF-UI-04).
+        modifier = modifier
+            .fillMaxWidth()
+            .onFocusChanged { currentOnFocusChanged?.invoke(it.isFocused) },
+        textStyle = MaterialTheme.typography.bodyLarge.copy(
             fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface
-        )
-
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            enabled = enabled,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 15.sp,
-                color = MaterialTheme.colorScheme.onSurface
-            ),
-            singleLine = true,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            interactionSource = interactionSource,
-            visualTransformation = visualTransformation,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            decorationBox = { innerTextField ->
+        ),
+        singleLine = true,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        interactionSource = interactionSource,
+        visualTransformation = visualTransformation,
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        decorationBox = { innerTextField ->
+            // La etiqueta vive dentro del campo: tocarla lo enfoca y su texto forma parte de la
+            // semántica del campo, así que los lectores de pantalla la anuncian (CA-UI-02-01 y CA-UI-02-08).
+            Column(verticalArrangement = Arrangement.spacedBy(metrics.labelSpacing)) {
+                Text(
+                    text = label,
+                    fontSize = metrics.labelFontSize,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 Row(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
+                        .height(metrics.inputHeight)
                         .inputBorderAndBackground(
                             shape = InputShape,
                             borderWidth = borderWidth,
@@ -157,9 +160,9 @@ fun SmartFoodTextField(
                     }
                     trailingContent?.invoke()
                 }
-            },
-        )
-    }
+            }
+        },
+    )
 }
 
 /**

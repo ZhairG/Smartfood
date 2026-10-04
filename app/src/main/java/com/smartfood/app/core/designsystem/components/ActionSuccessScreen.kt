@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -26,6 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,9 +41,11 @@ import com.smartfood.app.core.designsystem.theme.GreenDark
 import com.smartfood.app.core.designsystem.theme.GreenDark2
 import com.smartfood.app.core.designsystem.theme.GreenLight
 import com.smartfood.app.core.designsystem.theme.GreenSymbol
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.OrangeMain
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.SurfaceDark
+import com.smartfood.app.core.designsystem.theme.formMetricsForWindow
 
 /**
  * Nombre: ActionSuccessScreen.kt
@@ -53,6 +58,7 @@ import com.smartfood.app.core.designsystem.theme.SurfaceDark
  * - Modo Claro: Fondo GreenLight (#F0FDF4), Título GreenDark (#14532D), Cuerpo OrangeMain (#FB923C).
  * - Modo Oscuro: Fondo GreenDark2 (#10271C), Título #4ADE80, Cuerpo OrangeMain (#FB923C).
  * - Símbolo de Verificación: Círculos concéntricos con color #22C55E.
+ * El tamaño del símbolo y los márgenes se adaptan al alto de la pantalla (CA-UI-01-02).
  *
  * @param title Título principal de la acción completada.
  * @param body Mensaje descriptivo o secundario.
@@ -74,60 +80,65 @@ fun ActionSuccessScreen(
     val titleColor = if (isDark) Color(0xFF4ADE80) else GreenDark
     val bodyColor = OrangeMain
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = backgroundColor,
-        contentWindowInsets = WindowInsets(0.dp)
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(backgroundColor)
-                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
-                .padding(horizontal = 34.dp, vertical = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Spacer(modifier = Modifier.height(20.dp))
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val metrics = formMetricsForWindow(maxHeight)
+        CompositionLocalProvider(LocalFormMetrics provides metrics) {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                containerColor = backgroundColor,
+                contentWindowInsets = WindowInsets(0.dp)
+            ) { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .background(backgroundColor)
+                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                        .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
+                        .padding(horizontal = 34.dp, vertical = metrics.panelPaddingBottom + metrics.sectionSpacing),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Spacer(modifier = Modifier.height(metrics.sectionSpacing))
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.widthIn(max = 380.dp)
-            ) {
-                ConcentricSuccessCheckIcon()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.widthIn(max = 380.dp)
+                    ) {
+                        ConcentricSuccessCheckIcon(size = metrics.successIconSize)
 
-                Spacer(modifier = Modifier.height(34.dp))
+                        Spacer(modifier = Modifier.height(metrics.sectionSpacing + 10.dp))
 
-                Text(
-                    text = title,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = titleColor,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 38.sp
-                )
+                        Text(
+                            text = title,
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = titleColor,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 38.sp
+                        )
 
-                Spacer(modifier = Modifier.height(18.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
 
-                Text(
-                    text = body,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = bodyColor,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 22.sp
-                )
+                        Text(
+                            text = body,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = bodyColor,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 22.sp
+                        )
+                    }
+
+                    SmartFoodPrimaryButton(
+                        text = buttonText,
+                        onClick = onButtonClick,
+                        modifier = Modifier
+                            .widthIn(max = 380.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
-
-            SmartFoodPrimaryButton(
-                text = buttonText,
-                onClick = onButtonClick,
-                modifier = Modifier
-                    .widthIn(max = 380.dp)
-                    .fillMaxWidth()
-            )
         }
     }
 }
@@ -136,22 +147,23 @@ fun ActionSuccessScreen(
  * Símbolo de verificación verde concéntrico según especificación de Figma (#22C55E).
  */
 @Composable
-private fun ConcentricSuccessCheckIcon(modifier: Modifier = Modifier) {
+private fun ConcentricSuccessCheckIcon(size: Dp, modifier: Modifier = Modifier) {
+    // Proporciones de Figma: anillos de 176, 132 y 88 dp y check de 48 dp.
     Box(
         modifier = modifier
-            .size(176.dp)
+            .size(size)
             .background(color = GreenSymbol.copy(alpha = 0.20f), shape = CircleShape),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
-                .size(132.dp)
+                .size(size * 0.75f)
                 .background(color = GreenSymbol.copy(alpha = 0.45f), shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Box(
                 modifier = Modifier
-                    .size(88.dp)
+                    .size(size * 0.5f)
                     .background(color = GreenSymbol, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -159,7 +171,7 @@ private fun ConcentricSuccessCheckIcon(modifier: Modifier = Modifier) {
                     imageVector = Icons.Rounded.Check,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(size * 0.27f)
                 )
             }
         }

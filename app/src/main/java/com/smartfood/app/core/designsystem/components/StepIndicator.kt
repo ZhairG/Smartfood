@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.OrangeMain
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
@@ -41,7 +42,7 @@ fun SmartFoodStepIndicator(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.padding(vertical = 12.dp),
+        modifier = modifier.padding(vertical = LocalFormMetrics.current.stepIndicatorPadding),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

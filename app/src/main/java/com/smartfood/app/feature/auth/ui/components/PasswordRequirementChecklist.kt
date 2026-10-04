@@ -34,9 +34,10 @@ import com.smartfood.app.core.designsystem.util.figmaShadow
 /**
  * Nombre: PasswordRequirementChecklist.kt
  * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Componente atómico de tarjeta que muestra los criterios de seguridad de contraseña
- * con indicadores visuales dinámicos basados en la especificación de Figma (nodo 572:1299).
+ * Fecha: Octubre 2026
+ * Descripción: Tarjeta compacta con los criterios de seguridad de la contraseña (Figma, nodo 572:1299).
+ * Se muestra como popup encima del campo de contraseña enfocado (spec 002, HU-UI-03), por eso es más baja
+ * que la versión inline original: unos 115 dp con 4 reglas.
  *
  * @param hasMinimumLength Indica si la contraseña tiene al menos 8 caracteres.
  * @param hasUppercase Indica si la contraseña contiene al menos una letra mayúscula.
@@ -72,9 +73,9 @@ fun PasswordRequirementChecklist(
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f),
                 shape = cardShape
             )
-            .padding(vertical = 18.dp, horizontal = 16.dp)
+            .padding(vertical = 12.dp, horizontal = 14.dp)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             RequirementItem(
                 text = stringResource(id = R.string.password_req_min_length),
                 isSatisfied = hasMinimumLength
@@ -113,17 +114,18 @@ private fun RequirementItem(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Icon(
             imageVector = if (isSatisfied) Icons.Rounded.CheckCircle else Icons.Rounded.Cancel,
             contentDescription = null,
             tint = if (isSatisfied) GreenMain else OrangeMain,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(18.dp)
         )
         Text(
             text = text,
-            fontSize = 15.sp,
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface
         )

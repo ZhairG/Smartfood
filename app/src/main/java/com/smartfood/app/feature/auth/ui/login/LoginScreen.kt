@@ -32,8 +32,9 @@ import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.components.SmartFoodPromptLink
 import com.smartfood.app.core.designsystem.components.SmartFoodTextField
 import com.smartfood.app.core.designsystem.components.SmartFoodTextLink
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.core.designsystem.theme.titleStyle
 
 /**
  * Nombre: LoginScreen.kt
@@ -63,19 +64,19 @@ fun LoginScreen(
         onRetryConnection = remember(onEvent) { { onEvent(LoginEvent.RetryConnectionClicked) } },
         headerContent = {
             LoginWelcomeHeader()
-            Spacer(Modifier.height(MaterialTheme.spacing.large))
+            Spacer(Modifier.height(LocalFormMetrics.current.sectionSpacing))
         },
         modifier = modifier
     ) {
         LoginFormFields(state = state, onEvent = onEvent)
-        Spacer(Modifier.height(MaterialTheme.spacing.large))
+        Spacer(Modifier.height(LocalFormMetrics.current.sectionSpacing))
 
         LoginOptionsRow(
             state = state,
             onEvent = onEvent,
             onNavigateToForgotPassword = onNavigateToForgotPassword
         )
-        Spacer(Modifier.height(27.dp))
+        Spacer(Modifier.height(LocalFormMetrics.current.sectionSpacing))
 
         LoginActionButtons(
             isLoading = state.isLoading,
@@ -93,7 +94,7 @@ private fun LoginWelcomeHeader(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Text(
             text = stringResource(id = R.string.login_welcome_title),
-            style = MaterialTheme.typography.headlineLarge,
+            style = LocalFormMetrics.current.titleStyle,
             color = MaterialTheme.colorScheme.primary
         )
         Spacer(Modifier.height(3.dp))
@@ -132,7 +133,7 @@ private fun LoginFormFields(
             ),
         )
 
-        Spacer(Modifier.height(MaterialTheme.spacing.small))
+        Spacer(Modifier.height(LocalFormMetrics.current.fieldSpacing))
 
         SmartFoodPasswordField(
             label = stringResource(id = R.string.login_password_label),
@@ -202,7 +203,7 @@ private fun LoginActionButtons(
             isLoading = isLoading
         )
 
-        Spacer(Modifier.height(26.dp))
+        Spacer(Modifier.height(LocalFormMetrics.current.sectionSpacing))
 
         SmartFoodPromptLink(
             prompt = stringResource(id = R.string.login_no_account_prompt),

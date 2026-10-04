@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
@@ -59,20 +60,19 @@ fun SmartFoodPrimaryButton(
 ) {
     val buttonShape = RoundedCornerShape(10.dp)
     
-    val infiniteTransition = rememberInfiniteTransition(label = "dots")
-    val dotCount by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 4f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "dots_count"
-    )
-
+    // La animación de los puntos solo existe mientras carga: en reposo el botón no recompone cada frame.
     val displayText = if (isLoading) {
-        val dots = ".".repeat(dotCount.toInt() % 4)
-        "$loadingText$dots"
+        val infiniteTransition = rememberInfiniteTransition(label = "dots")
+        val dotCount by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 4f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1000, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart
+            ),
+            label = "dots_count"
+        )
+        "$loadingText${".".repeat(dotCount.toInt() % 4)}"
     } else {
         text
     }
@@ -80,7 +80,7 @@ fun SmartFoodPrimaryButton(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(51.dp)
+            .height(LocalFormMetrics.current.buttonHeight)
             .figmaShadow(
                 color = Color(0x4D000000), // #000000 con 30% de opacidad (0x4D)
                 borderRadius = 10.dp,

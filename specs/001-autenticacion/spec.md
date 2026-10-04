@@ -132,7 +132,7 @@ celular compartido.
 | RNF-02 | Cada usuario solo puede leer y escribir su propio perfil (reglas de Firestore). |
 | RNF-03 | Todos los textos visibles están en `strings.xml`, en español. |
 | RNF-04 | Accesibilidad: los íconos informativos tienen `contentDescription` y los errores se anuncian con `liveRegion`. |
-| RNF-05 | Android 7.0 (API 24) o superior y orientación vertical. Los formularios se desplazan para no quedar tapados por el teclado. |
+| RNF-05 | Android 7.0 (API 24) o superior y orientación vertical. Los formularios se desplazan para no quedar tapados por el teclado. **Ampliado por la [spec 002](../002-adaptabilidad-ui/spec.md):** los formularios caben sin scroll desde 360×720 dp y el foco y el teclado responden sin retrasos. |
 | RNF-06 | Las pantallas respetan el diseño de Figma del equipo (colores, tipografía y transiciones de empuje de 600 ms). |
 
 ## 6. Fuera de alcance (v1)

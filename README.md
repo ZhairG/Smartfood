@@ -13,9 +13,10 @@ Aplicación Android para reducir el desperdicio de comida en los hogares. Une **
 | Módulo | Spec | Estado |
 |---|---|---|
 | 001 Autenticación | [`specs/001-autenticacion`](specs/001-autenticacion/spec.md) | ✅ Implementado (v1) |
-| 002 Inventario | — | Pendiente |
-| 003 Catálogo de recetas | — | Pendiente |
-| 004 Agente recomendador | — | Pendiente |
+| 002 Adaptabilidad de la UI | [`specs/002-adaptabilidad-ui`](specs/002-adaptabilidad-ui/spec.md) | ✅ Implementado |
+| 003 Inventario | — | Pendiente |
+| 004 Catálogo de recetas | — | Pendiente |
+| 005 Agente recomendador | — | Pendiente |
 
 ## Metodología: Spec Driven Development
 
@@ -40,7 +41,7 @@ Cada criterio de aceptación (p. ej. `CA-02-03`) tiene al menos una prueba que l
 com.smartfood.app/
 ├── core/
 │   ├── common/          safeRunCatching (coroutines seguras)
-│   ├── designsystem/    theme/ (tokens de Figma), components/ (SmartFood*), util/
+│   ├── designsystem/    theme/ (tokens de Figma y FormMetrics), components/ (SmartFood*, AnchoredPopup), util/
 │   ├── di/              CoreDataModule: FirebaseAuth, Firestore, DataStore
 │   └── navigation/      AppNavHost, Routes type-safe, NavTransitions, ObserveEffects
 └── feature/
