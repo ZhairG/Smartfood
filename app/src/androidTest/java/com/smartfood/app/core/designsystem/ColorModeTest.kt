@@ -14,7 +14,6 @@ import com.smartfood.app.core.designsystem.theme.GreenLight
 import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.SurfaceDark
-import com.smartfood.app.core.designsystem.theme.SurfaceLight
 import com.smartfood.app.core.designsystem.theme.ThemeMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -52,7 +51,7 @@ class ColorModeTest {
         }
 
         assertEquals(false, isDark)
-        assertEquals(SurfaceLight, surface)
+        assertEquals(GreenLight, surface)  // panel claro de Figma (CA-UI-07-02)
     }
 
     @Test

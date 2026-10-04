@@ -34,7 +34,8 @@ import org.junit.runners.Parameterized
  * Fecha: Octubre 2026
  * Descripción: Verifica que cada pantalla de formulario cabe sin scroll (spec 002, HU-UI-01): con el teclado
  * cerrado, ningún contenedor desplazable tiene rango de scroll y el botón principal es visible.
- * Se ejecuta en 360×720 dp (perfil compacto) y 384×857 dp (perfil medio, teléfono V2436).
+ * Se ejecuta en 360×720 dp (perfil compacto), 384×857 dp (perfil medio, teléfono V2436) y 412×917 dp (tamaño de los
+ * frames de Figma).
  */
 @RunWith(Parameterized::class)
 class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
@@ -45,7 +46,8 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
         @Parameterized.Parameters(name = "{0}x{1}dp")
         fun tamanos(): List<Array<Any>> = listOf(
             arrayOf(360, 720),
-            arrayOf(384, 857)
+            arrayOf(384, 857),
+            arrayOf(412, 917)  // tamaño de los frames de Figma (CA-UI-07-03)
         )
     }
 

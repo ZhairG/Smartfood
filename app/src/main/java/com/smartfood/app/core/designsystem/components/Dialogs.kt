@@ -8,9 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.SignalWifiOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,7 +55,9 @@ fun SmartFoodOfflineDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
             dismissOnBackPress = false,
-            dismissOnClickOutside = false
+            dismissOnClickOutside = false,
+            // Figma (nodo 585:4441): la tarjeta ocupa casi todo el ancho, a 6 dp de los bordes.
+            usePlatformDefaultWidth = false
         )
     ) {
         SmartFoodOfflineDialogContent(
@@ -83,8 +85,9 @@ private fun SmartFoodOfflineDialogContent(
 
     Box(
         modifier = modifier
+            .widthIn(max = 480.dp)
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(horizontal = 6.dp, vertical = 8.dp)
             .figmaShadow(
                 color = Color(0x80000000), // #000000 con 50% de opacidad (0x80)
                 borderRadius = 45.dp,
@@ -96,35 +99,30 @@ private fun SmartFoodOfflineDialogContent(
                 shape = dialogShape
             )
     ) {
+        // Medidas del frame "Mensaje_Claro" de Figma (nodo 700:1913): ícono a 6 dp del borde, título justo debajo
+        // y botón a 111 dp del borde superior.
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 28.dp, bottom = 20.dp),
+                .padding(top = 6.dp, bottom = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(bottom = 5.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.SignalWifiOff,
-                    contentDescription = stringResource(id = R.string.offline_dialog_title),
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(72.dp)
-                )
+            Icon(
+                painter = painterResource(id = R.drawable.ic_wifi_off),
+                contentDescription = stringResource(id = R.string.offline_dialog_title),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(72.dp)
+            )
 
-                Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = stringResource(id = R.string.offline_dialog_title),
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
 
-                Text(
-                    text = stringResource(id = R.string.offline_dialog_title),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             Column(
                 modifier = Modifier
@@ -132,7 +130,7 @@ private fun SmartFoodOfflineDialogContent(
                     .padding(start = 29.dp, end = 29.dp)
             ) {
                 SmartFoodPrimaryButton(
-                    text = if (isReconnecting) stringResource(id = R.string.offline_dialog_connecting) 
+                    text = if (isReconnecting) stringResource(id = R.string.offline_dialog_connecting)
                            else stringResource(id = R.string.offline_dialog_button),
                     onClick = onReconnect
                 )

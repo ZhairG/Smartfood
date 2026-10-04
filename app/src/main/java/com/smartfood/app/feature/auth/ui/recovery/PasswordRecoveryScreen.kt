@@ -33,10 +33,14 @@ import com.smartfood.app.core.designsystem.components.SmartFoodStepIndicator
 import com.smartfood.app.core.designsystem.components.SmartFoodTextField
 import com.smartfood.app.core.designsystem.components.SmartFoodTextLink
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.OrangeDark
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.titleStyle
 import com.smartfood.app.feature.auth.ui.components.AuthErrorMessage
 import com.smartfood.app.feature.auth.ui.components.AuthScreenScaffold
+import com.smartfood.app.feature.auth.ui.components.FlexibleGap
+import com.smartfood.app.feature.auth.ui.components.LocalFormViewport
+import com.smartfood.app.feature.auth.ui.components.fillFormViewport
 import com.smartfood.app.feature.auth.ui.components.PasswordFieldWithChecklist
 import com.smartfood.app.feature.auth.ui.recoveryMessageRes
 
@@ -140,7 +144,8 @@ private fun RecoveryHeader(
             SmartFoodTextLink(
                 text = stringResource(id = R.string.recovery_step2_wrong_email_link),
                 onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ChangeEmailClicked) } },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                color = OrangeDark  // Figma: #DE7D1C (nodo 585:4479)
             )
         }
     }
@@ -164,7 +169,11 @@ private fun ForgotPasswordStep(
     val focusManager = LocalFocusManager.current
     val metrics = LocalFormMetrics.current
 
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    // Cada paso llena el alto visible del formulario para repartir el sobrante con sus FlexibleGap (CA-UI-07-03).
+    Column(
+        modifier = modifier.fillFormViewport(LocalFormViewport.current),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         SmartFoodTextField(
             label = stringResource(id = R.string.login_email_label),
             value = state.email,
@@ -188,7 +197,7 @@ private fun ForgotPasswordStep(
 
         AuthErrorMessage(message = state.errorText(), modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.height(metrics.sectionSpacing))
+        FlexibleGap(minHeight = metrics.sectionSpacing, weight = 2f)  // Figma: nodo 585:4458
 
         SmartFoodPrimaryButton(
             text = stringResource(id = R.string.recovery_step1_button),
@@ -197,13 +206,16 @@ private fun ForgotPasswordStep(
             isLoading = state.isLoading
         )
 
-        Spacer(modifier = Modifier.height(metrics.sectionSpacing))
+        FlexibleGap(minHeight = metrics.sectionSpacing, weight = 2f)
 
         SmartFoodPromptLink(
             prompt = stringResource(id = R.string.recovery_step1_back_prompt),
             action = stringResource(id = R.string.recovery_step1_back_action),
-            onClick = onNavigateToLogin
+            onClick = onNavigateToLogin,
+            fontSize = 18.sp  // Figma: nodo 585:4465
         )
+
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -218,7 +230,11 @@ private fun VerifyCodeStep(
 ) {
     val metrics = LocalFormMetrics.current
 
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    // Cada paso llena el alto visible del formulario para repartir el sobrante con sus FlexibleGap (CA-UI-07-03).
+    Column(
+        modifier = modifier.fillFormViewport(LocalFormViewport.current),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         SmartFoodOtpCodeInput(
             code = state.otpCode,
             onCodeChanged = remember(onEvent) { { code -> onEvent(PasswordRecoveryEvent.OtpCodeChanged(code)) } },
@@ -229,7 +245,7 @@ private fun VerifyCodeStep(
 
         AuthErrorMessage(message = state.errorText(), modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.height(metrics.sectionSpacing))
+        FlexibleGap(minHeight = metrics.sectionSpacing, weight = 3f)  // Figma: nodo 585:4467
 
         SmartFoodPrimaryButton(
             text = stringResource(id = R.string.recovery_step2_button),
@@ -238,13 +254,16 @@ private fun VerifyCodeStep(
             isLoading = state.isLoading
         )
 
-        Spacer(modifier = Modifier.height(metrics.sectionSpacing))
+        FlexibleGap(minHeight = metrics.sectionSpacing)
 
         SmartFoodPromptLink(
             prompt = stringResource(id = R.string.recovery_step2_resend_prompt),
             action = stringResource(id = R.string.recovery_step2_resend_action),
-            onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ResendCodeClicked) } }
+            onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ResendCodeClicked) } },
+            fontSize = 16.sp  // Figma: nodo 585:4474
         )
+
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -261,7 +280,11 @@ private fun CreateNewPasswordStep(
     val focusManager = LocalFocusManager.current
     val metrics = LocalFormMetrics.current
 
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    // Cada paso llena el alto visible del formulario para repartir el sobrante con sus FlexibleGap (CA-UI-07-03).
+    Column(
+        modifier = modifier.fillFormViewport(LocalFormViewport.current),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         PasswordFieldWithChecklist(
             label = stringResource(id = R.string.recovery_step3_new_password_label),
             value = state.newPassword,
@@ -294,7 +317,8 @@ private fun CreateNewPasswordStep(
 
         AuthErrorMessage(message = state.errorText(), modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.height(metrics.sectionSpacing))
+        // Figma (nodo 585:4481): el botón queda al pie del panel.
+        FlexibleGap(minHeight = metrics.sectionSpacing)
 
         SmartFoodPrimaryButton(
             text = stringResource(id = R.string.recovery_step3_button),

@@ -38,19 +38,19 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 @Composable
 fun SmartFoodStepIndicator(
     currentStep: Int,
-    totalSteps: Int = 3,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    totalSteps: Int = 3
 ) {
     Row(
         modifier = modifier.padding(vertical = LocalFormMetrics.current.stepIndicatorPadding),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),  // Figma: 7–10 dp entre pasos
         verticalAlignment = Alignment.CenterVertically
     ) {
         repeat(totalSteps) { stepIndex ->
             val isActive = stepIndex == currentStep
 
             val animatedWidth by animateDpAsState(
-                targetValue = if (isActive) 38.dp else 12.dp,
+                targetValue = if (isActive) 60.dp else 20.dp,  // Figma: activo 60×20, inactivo 20×20
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessLow
@@ -59,14 +59,14 @@ fun SmartFoodStepIndicator(
             )
 
             val animatedColor by animateColorAsState(
-                targetValue = if (isActive) OrangeMain else OrangeMain.copy(alpha = 0.65f),
+                targetValue = OrangeMain,  // Figma: todos los pasos en naranja sólido
                 animationSpec = tween(durationMillis = 300),
                 label = "step_color_$stepIndex"
             )
 
             Box(
                 modifier = Modifier
-                    .height(12.dp)
+                    .height(20.dp)
                     .width(animatedWidth)
                     .background(
                         color = animatedColor,

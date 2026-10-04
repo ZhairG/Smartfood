@@ -48,12 +48,19 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 - **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 600 ms se declaran una sola vez (`NavTransitions`). `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
 - **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
 - **Design system (`core/designsystem`):** `theme/` (tokens), `components/` (prefijo `SmartFood`) y `util/` (modificadores, `SystemBarEffect`, `ClearFocusOnKeyboardDismiss`).
-- **Adaptabilidad (spec 002):** las medidas de los formularios salen de `theme/FormMetrics.kt`. `AuthScreenScaffold` elige el perfil `Compact`, `Medium` o `Regular` con `formMetricsForWindow(maxHeight)`, que usa el alto útil sin barras, y lo provee con `LocalFormMetrics`. Los componentes leen `LocalFormMetrics.current`; no se usan medidas fijas nuevas.
+- **Adaptabilidad (spec 002):** las medidas de los formularios salen de `theme/FormMetrics.kt`.
+  - `AuthScreenScaffold` toma el perfil inicial (`Compact`, `Medium` o `Regular`) con `formMetricsForWindow(maxHeight)`, que usa el alto útil sin barras.
+  - Si con el teclado cerrado el formulario no cabe, baja al perfil siguiente con `smaller()`. Lo provee con `LocalFormMetrics`, y los componentes leen `LocalFormMetrics.current`. No se usan medidas fijas nuevas.
+  - El alto sobrante se reparte con `FlexibleGap(minHeight, weight)`. Dentro de un `AnimatedContent`, el contenido usa `Modifier.fillFormViewport(LocalFormViewport.current)`.
 - **Modo de color (spec 002, HU-UI-05):**
   - El modo se decide **solo** con `ThemeMode` (`theme/ThemeMode.kt`, por defecto `LIGHT`): `SmartfoodTheme(themeMode)` provee `LocalIsDarkTheme`.
   - Los componentes leen `LocalIsDarkTheme.current`; **prohibido `isSystemInDarkTheme()` fuera de `ThemeMode.kt`**.
   - La paleta y los esquemas claro y oscuro no se tocan.
   - El tema XML es claro (`Base.Theme.Smartfood`, ventana `GreenLight`). `values-v31` hace que la pantalla de arranque de Android 12+ sea igual a la Splash (`splash_icon`).
+- **Fidelidad con Figma (spec 002, HU-UI-07):** referencia en los frames "_Claro" del archivo Figma `z1AoQvluQcmx98gjP4vHF6`.
+  - Tipografía Poppins empaquetada en `res/font` (licencia en `docs/licenses/OFL-Poppins.txt`).
+  - Para ajustar un color a Figma se cambia el **rol** en `LightColorScheme` (`Theme.kt`), nunca el valor de un token. El único token agregado es `GreenCheck`.
+- **Ícono (spec 002, HU-UI-06):** los `mipmap-*/ic_launcher*` y `ic_launcher-playstore.png` los genera `tools/generate_launcher_icon.py` desde `drawable-nodpi/logo_smartfood_circle.png`. Nunca se editan a mano; si cambia el logo, se vuelve a ejecutar el script.
 - **Foco y teclado (spec 002):**
   - **Prohibido el scroll programático** (`scrollTo`, `animateScrollTo`) en las pantallas. El panel aplica el inset del teclado fuera del `verticalScroll` y Compose mantiene visible el campo enfocado.
   - El encabezado de marca se colapsa leyendo `WindowInsets.ime` en la fase de layout.

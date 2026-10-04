@@ -2,20 +2,30 @@ package com.smartfood.app.core.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.smartfood.app.R
 
 /**
  * Nombre: Type.kt
  * Autor: SmartFood Team
- * Fecha: Septiembre 2026
+ * Fecha: Octubre 2026
  * Descripción: Sistema tipográfico de la aplicación Smartfood.
  * Mapea la jerarquía visual de Figma a la estructura de [Typography] de Material 3.
  */
 
-/** Familia tipográfica predeterminada. Fallback hasta incorporar archivos de fuentes personalizadas. */
-val Poppins = FontFamily.Default
+/**
+ * Poppins, la familia del diseño de Figma (spec 002, CA-UI-07-01). Va empaquetada en `res/font` (licencia OFL en
+ * `docs/licenses/OFL-Poppins.txt`), así que se ve igual en cualquier teléfono y sin conexión.
+ */
+val Poppins = FontFamily(
+    Font(R.font.poppins_regular, FontWeight.Normal),
+    Font(R.font.poppins_medium, FontWeight.Medium),
+    Font(R.font.poppins_semibold, FontWeight.SemiBold),
+    Font(R.font.poppins_bold, FontWeight.Bold)
+)
 
 /**
  * Configuración de la tipografía para la aplicación.

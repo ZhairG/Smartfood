@@ -10,11 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
@@ -27,25 +29,30 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
 /**
  * Componente atómico de Texto enlazable con el estilo del mockup inicial.
- * Aplica color secundario, peso [FontWeight.Bold] y rol semántico [Role.Button].
+ * Aplica color secundario, peso [FontWeight.SemiBold] (Figma) y rol semántico [Role.Button].
  *
  * @param text Texto visible del enlace.
  * @param onClick Callback ejecutado al presionar sobre el texto.
  * @param modifier Modificador opcional.
+ * @param textAlign Alineación del texto.
+ * @param fontSize Tamaño del texto; 15 sp por defecto.
+ * @param color Color del enlace; el secundario (naranja) por defecto.
  */
 @Composable
 fun SmartFoodTextLink(
     text: String,
     onClick: () -> Unit,
-    textAlign: TextAlign = TextAlign.Start,
     modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Start,
+    fontSize: TextUnit = 15.sp,
+    color: Color = MaterialTheme.colorScheme.secondary,
 ) {
     Text(
         text = text,
         textAlign = textAlign,
-        fontSize = 15.sp,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.secondary,
+        fontSize = fontSize,
+        fontWeight = FontWeight.SemiBold,
+        color = color,
         modifier = modifier.clickable(role = Role.Button, onClick = onClick),
     )
 }
@@ -57,6 +64,7 @@ fun SmartFoodTextLink(
  * @param action Texto clickeable para la acción (ej. "Regístrate").
  * @param onClick Callback ejecutado al presionar sobre el enlace de la acción.
  * @param modifier Modificador base para la fila.
+ * @param fontSize Tamaño de ambos textos; Figma usa 15, 16 o 18 sp según la pantalla.
  */
 @Composable
 fun SmartFoodPromptLink(
@@ -64,6 +72,7 @@ fun SmartFoodPromptLink(
     action: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    fontSize: TextUnit = 15.sp,
 ) {
     Row(
         modifier = modifier,
@@ -71,12 +80,12 @@ fun SmartFoodPromptLink(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = prompt, 
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
+            text = prompt,
+            fontSize = fontSize,
+            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        SmartFoodTextLink(text = action, onClick = onClick)
+        SmartFoodTextLink(text = action, onClick = onClick, fontSize = fontSize)
     }
 }
 

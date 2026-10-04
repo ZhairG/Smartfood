@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -62,12 +63,13 @@ class AbovePopupPositionProvider(
 }
 
 /**
- * Muestra [popupContent] flotando encima de [content] mientras [visible] sea `true`. El popup tiene el mismo
- * ancho que el ancla y **no** toma el foco, así que el teclado sigue abierto (CA-UI-03-03).
+ * Muestra [popupContent] flotando encima de [content] mientras [visible] sea `true`. El popup tiene el ancho del
+ * ancla (como máximo [maxPopupWidth]) y **no** toma el foco, así que el teclado sigue abierto (CA-UI-03-03).
  *
  * @param visible Si es `true`, el popup se muestra.
  * @param popupContent Contenido del popup.
  * @param modifier Modificador del ancla.
+ * @param maxPopupWidth Ancho máximo del popup (por ejemplo, los 283 dp del checklist de Figma); sin límite por defecto.
  * @param content Elemento al que se ancla el popup.
  */
 @Composable
@@ -75,6 +77,7 @@ fun AnchoredPopup(
     visible: Boolean,
     popupContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    maxPopupWidth: Dp = Dp.Infinity,
     content: @Composable () -> Unit
 ) {
     val density = LocalDensity.current
@@ -92,7 +95,8 @@ fun AnchoredPopup(
                 popupPositionProvider = positionProvider,
                 properties = PopupProperties(focusable = false)
             ) {
-                Box(modifier = Modifier.width(with(density) { anchorWidthPx.toDp() })) {
+                val popupWidth = with(density) { anchorWidthPx.toDp() }.coerceAtMost(maxPopupWidth)
+                Box(modifier = Modifier.width(popupWidth)) {
                     popupContent()
                 }
             }

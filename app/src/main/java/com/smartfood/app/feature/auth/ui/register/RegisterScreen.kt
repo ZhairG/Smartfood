@@ -1,6 +1,7 @@
 package com.smartfood.app.feature.auth.ui.register
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import com.smartfood.app.feature.auth.ui.inlineError
 import com.smartfood.app.feature.auth.ui.messageRes
 import com.smartfood.app.feature.auth.ui.components.AuthErrorMessage
 import com.smartfood.app.feature.auth.ui.components.AuthScreenScaffold
+import com.smartfood.app.feature.auth.ui.components.FlexibleGap
 import com.smartfood.app.feature.auth.ui.components.PasswordFieldWithChecklist
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.components.SmartFoodPromptLink
@@ -70,7 +72,8 @@ fun RegisterScreen(
             checked = state.acceptedTerms,
             onCheckedChange = remember(onEvent) { { checked -> onEvent(RegisterEvent.AcceptedTermsChanged(checked)) } }
         )
-        Spacer(Modifier.height(LocalFormMetrics.current.sectionSpacing))
+        // Con alto de sobra, el botón y el enlace bajan como en Figma (nodo 585:4447, CA-UI-07-03).
+        FlexibleGap(minHeight = LocalFormMetrics.current.sectionSpacing)
 
         RegisterActionButtons(
             isLoading = state.isLoading,
@@ -78,6 +81,7 @@ fun RegisterScreen(
             onRegisterClicked = remember(onEvent) { { onEvent(RegisterEvent.RegisterClicked) } },
             onNavigateToLogin = onNavigateToLogin
         )
+        Spacer(Modifier.weight(2f))
     }
 }
 
@@ -173,30 +177,28 @@ private fun RegisterFormFields(
  * Botones de acción principal (Crear Cuenta e Iniciar Sesión).
  */
 @Composable
-private fun RegisterActionButtons(
+private fun ColumnScope.RegisterActionButtons(
     isLoading: Boolean,
     enabled: Boolean,
     onRegisterClicked: () -> Unit,
-    onNavigateToLogin: () -> Unit,
-    modifier: Modifier = Modifier
+    onNavigateToLogin: () -> Unit
 ) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        SmartFoodPrimaryButton(
-            text = stringResource(id = R.string.register_button_text),
-            loadingText = stringResource(id = R.string.register_button_loading),
-            onClick = onRegisterClicked,
-            isLoading = isLoading,
-            enabled = enabled
-        )
+    SmartFoodPrimaryButton(
+        text = stringResource(id = R.string.register_button_text),
+        loadingText = stringResource(id = R.string.register_button_loading),
+        onClick = onRegisterClicked,
+        isLoading = isLoading,
+        enabled = enabled
+    )
 
-        Spacer(Modifier.height(LocalFormMetrics.current.sectionSpacing))
+    FlexibleGap(minHeight = LocalFormMetrics.current.sectionSpacing)
 
-        SmartFoodPromptLink(
-            prompt = stringResource(id = R.string.register_already_have_account_prompt),
-            action = stringResource(id = R.string.register_login_action),
-            onClick = onNavigateToLogin
-        )
-    }
+    SmartFoodPromptLink(
+        prompt = stringResource(id = R.string.register_already_have_account_prompt),
+        action = stringResource(id = R.string.register_login_action),
+        onClick = onNavigateToLogin,
+        modifier = Modifier.align(Alignment.CenterHorizontally)
+    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)

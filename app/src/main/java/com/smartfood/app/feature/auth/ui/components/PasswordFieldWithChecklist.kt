@@ -6,8 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
 import com.smartfood.app.core.designsystem.components.AnchoredPopup
 import com.smartfood.app.core.designsystem.components.SmartFoodPasswordField
 import com.smartfood.app.feature.auth.domain.usecase.PasswordValidationResult
@@ -48,12 +50,15 @@ fun PasswordFieldWithChecklist(
     AnchoredPopup(
         visible = isFocused,
         modifier = modifier,
+        maxPopupWidth = CHECKLIST_WIDTH,
         popupContent = {
             PasswordRequirementChecklist(
                 hasMinimumLength = validation.hasMinimumLength,
                 hasUppercase = validation.hasUppercase,
                 hasSpecialCharacter = validation.hasSpecialCharacter,
-                passwordsMatch = passwordsMatch
+                passwordsMatch = passwordsMatch,
+                // Margen para que la sombra de la tarjeta no quede recortada por la ventana del popup.
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
             )
         }
     ) {
@@ -69,3 +74,6 @@ fun PasswordFieldWithChecklist(
         )
     }
 }
+
+/** Ancho del checklist en Figma (componente "Checklist Crear contraseña", nodo 572:1299). */
+private val CHECKLIST_WIDTH = 283.dp

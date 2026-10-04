@@ -50,7 +50,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.White
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
 
@@ -240,15 +242,15 @@ fun SmartFoodCheckbox(
             onCheckedChange = null,
             modifier = Modifier.size(24.dp),
             colors = CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary,
-                checkmarkColor = MaterialTheme.colorScheme.surface,
+                checkedColor = GreenCheck,
+                checkmarkColor = White,
                 uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
         )
         Text(
             text = label,
             fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -281,8 +283,8 @@ fun SmartFoodTermsCheckbox(
             onCheckedChange = null,
             modifier = Modifier.size(24.dp),
             colors = CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary,
-                checkmarkColor = MaterialTheme.colorScheme.surface,
+                checkedColor = GreenCheck,
+                checkmarkColor = White,
                 uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
@@ -295,7 +297,7 @@ fun SmartFoodTermsCheckbox(
                 withStyle(
                     SpanStyle(
                         color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 ) {
                     append(stringResource(id = R.string.register_terms_link))
@@ -306,7 +308,7 @@ fun SmartFoodTermsCheckbox(
                 withStyle(
                     SpanStyle(
                         color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 ) {
                     append(stringResource(id = R.string.register_privacy_link))

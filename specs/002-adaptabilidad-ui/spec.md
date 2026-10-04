@@ -91,6 +91,30 @@ consistente con el diseño, aunque mi teléfono esté en modo oscuro.
 | CA-UI-05-03 | El modo de color se decide en **un solo lugar** (`ThemeMode`, por defecto CLARO). Las pantallas y componentes no consultan el modo del sistema directamente, de modo que un selector futuro (claro, oscuro o sistema) no exige tocarlos. |
 | CA-UI-05-04 | Los colores de cada modo y su asignación por pantalla no cambian: la paleta y los esquemas claro y oscuro quedan iguales. |
 
+### HU-UI-06: Ícono oficial
+**Como** usuario **quiero** reconocer la app por su logo en el launcher **para** encontrarla rápido.
+
+| Código | Criterio |
+|---|---|
+| CA-UI-06-01 | **Dado** el launcher, **entonces** el ícono muestra el logo de SmartFood (bombillo con zanahoria y tomate) sobre fondo `GreenLight`, tanto en Android 8+ (ícono adaptativo) como en Android 7.x. |
+| CA-UI-06-02 | **Dado** cualquier forma de máscara del launcher (círculo, cuadrado o gota), **entonces** el logo se ve completo, porque cabe dentro de la zona segura de 66 dp del ícono adaptativo. |
+| CA-UI-06-03 | **Dado** Android 13+ con íconos temáticos activados, **entonces** el ícono usa la silueta del logo. |
+| CA-UI-06-04 | El ícono se genera de forma reproducible desde el PNG original del logo; no se edita a mano. |
+
+### HU-UI-07: Fidelidad con el diseño de Figma
+**Como** equipo **queremos** que la app se vea como el diseño aprobado en Figma (frames "_Claro" del archivo
+`z1AoQvluQcmx98gjP4vHF6`), **sin perder** la adaptabilidad de esta spec.
+
+| Código | Criterio |
+|---|---|
+| CA-UI-07-01 | La tipografía es **Poppins**: Bold en títulos y en la marca, SemiBold en botones y enlaces, y Medium en etiquetas, campos y textos. |
+| CA-UI-07-02 | Los colores siguen los frames "_Claro": panel `#F0FDF4`, etiquetas y texto escrito en negro, subtítulos y placeholders en `#9AA39D`, borde de campo `#6F7C74` al 35 % y casilla `#16A34A`. Nodos `585:4420`, `585:4447`, `585:4458`, `585:4467`, `585:4494`, `585:4564` y `700:1913`. |
+| CA-UI-07-03 | Cada pantalla usa el perfil de medidas más grande que le cabe: con alto suficiente, las medidas replican Figma; en pantallas más bajas se reducen espaciados y tamaños de forma proporcional, sin cambiar jerarquía, orden ni colores, y se mantiene el cero scroll de HU-UI-01. El alto sobrante se reparte entre los bloques como en Figma (el botón y los enlaces bajan), en lugar de quedar vacío al pie del panel. |
+| CA-UI-07-04 | El checklist de contraseña tiene el estilo de Figma: tarjeta blanca de 283 dp con borde y sombra, ítems de 15 sp en negro, check verde si cumple y X naranja si no. Se muestra **encima** del campo (HU-UI-03). |
+| CA-UI-07-05 | Las casillas del código de verificación son rectangulares, con la proporción de Figma (50×70 dp). |
+| CA-UI-07-06 | Con el diálogo "Sin conexión a Internet" abierto, el fondo se desenfoca (Android 12+) y se atenúa en versiones anteriores. |
+| CA-UI-07-07 | El botón principal deshabilitado es gris (`#555555`); mientras carga, sigue naranja con el texto de carga. |
+
 ## 3. Requisitos no funcionales
 
 | Código | Requisito |

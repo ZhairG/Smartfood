@@ -39,7 +39,9 @@ import androidx.compose.ui.unit.sp
  * @property sectionSpacing Separación entre bloques (campos, opciones, botón, enlaces).
  * @property inputHeight Alto de la caja de texto.
  * @property buttonHeight Alto del botón principal.
- * @property otpBoxSize Lado de cada casilla del código de verificación.
+ * @property otpBoxWidth Ancho de cada casilla del código de verificación (proporción 50:70 de Figma).
+ * @property otpBoxHeight Alto de cada casilla del código de verificación.
+ * @property otpSpacing Separación entre casillas del código.
  * @property successIconSize Diámetro del ícono de las pantallas de éxito.
  * @property stepIndicatorPadding Margen vertical del indicador de pasos.
  */
@@ -62,7 +64,9 @@ data class FormMetrics(
     val sectionSpacing: Dp,
     val inputHeight: Dp,
     val buttonHeight: Dp,
-    val otpBoxSize: Dp,
+    val otpBoxWidth: Dp,
+    val otpBoxHeight: Dp,
+    val otpSpacing: Dp,
     val successIconSize: Dp,
     val stepIndicatorPadding: Dp
 ) {
@@ -74,19 +78,21 @@ data class FormMetrics(
             wordmarkFontSize = 40.sp,
             wordmarkLineHeight = 60.sp,
             headerPaddingTop = 40.dp,
-            headerPaddingBottom = 32.dp,
+            headerPaddingBottom = 53.dp,
             panelPaddingTop = 47.dp,
-            panelPaddingBottom = 48.dp,
+            panelPaddingBottom = 24.dp,
             formHorizontalPadding = 34.dp,
             titleFontSize = 35.sp,
             titleLineHeight = 52.5.sp,
             labelFontSize = 15.sp,
             labelSpacing = 9.dp,
-            fieldSpacing = 8.dp,
+            fieldSpacing = 11.dp,
             sectionSpacing = 24.dp,
             inputHeight = 50.dp,
             buttonHeight = 51.dp,
-            otpBoxSize = 60.dp,
+            otpBoxWidth = 50.dp,
+            otpBoxHeight = 70.dp,
+            otpSpacing = 18.dp,
             successIconSize = 176.dp,
             stepIndicatorPadding = 12.dp
         )
@@ -99,18 +105,20 @@ data class FormMetrics(
             wordmarkLineHeight = 40.sp,
             headerPaddingTop = 24.dp,
             headerPaddingBottom = 20.dp,
-            panelPaddingTop = 28.dp,
-            panelPaddingBottom = 16.dp,
+            panelPaddingTop = 24.dp,
+            panelPaddingBottom = 12.dp,
             formHorizontalPadding = 30.dp,
             titleFontSize = 30.sp,
             titleLineHeight = 40.sp,
             labelFontSize = 15.sp,
             labelSpacing = 6.dp,
             fieldSpacing = 8.dp,
-            sectionSpacing = 16.dp,
+            sectionSpacing = 12.dp,
             inputHeight = 50.dp,
             buttonHeight = 50.dp,
-            otpBoxSize = 56.dp,
+            otpBoxWidth = 46.dp,
+            otpBoxHeight = 64.dp,
+            otpSpacing = 16.dp,
             successIconSize = 150.dp,
             stepIndicatorPadding = 10.dp
         )
@@ -123,32 +131,45 @@ data class FormMetrics(
             wordmarkLineHeight = 36.sp,
             headerPaddingTop = 12.dp,
             headerPaddingBottom = 12.dp,
-            panelPaddingTop = 20.dp,
-            panelPaddingBottom = 12.dp,
+            panelPaddingTop = 16.dp,
+            panelPaddingBottom = 8.dp,
             formHorizontalPadding = 24.dp,
             titleFontSize = 26.sp,
             titleLineHeight = 32.sp,
             labelFontSize = 14.sp,
             labelSpacing = 4.dp,
             fieldSpacing = 8.dp,
-            sectionSpacing = 12.dp,
+            sectionSpacing = 10.dp,
             inputHeight = 46.dp,
             buttonHeight = 48.dp,
-            otpBoxSize = 52.dp,
+            otpBoxWidth = 42.dp,
+            otpBoxHeight = 58.dp,
+            otpSpacing = 14.dp,
             successIconSize = 120.dp,
             stepIndicatorPadding = 6.dp
         )
 
-        /** Alto útil mínimo para usar [Medium]. */
-        val MediumMinHeight = 760.dp
+        /** Alto útil a partir del cual se intenta [Medium] como perfil inicial. */
+        val MediumMinHeight = 620.dp
 
-        /** Alto útil mínimo para usar [Regular]. */
-        val RegularMinHeight = 1000.dp
+        /** Alto útil a partir del cual se intenta [Regular] (Figma) como perfil inicial. */
+        val RegularMinHeight = 720.dp
     }
 }
 
 /**
- * Elige el perfil de medidas según el alto útil.
+ * Perfil inmediatamente más pequeño, o `null` si ya es [FormMetrics.Compact]. `AuthScreenScaffold` baja de perfil
+ * cuando el formulario no cabe (CA-UI-07-03).
+ */
+fun FormMetrics.smaller(): FormMetrics? = when (this) {
+    FormMetrics.Regular -> FormMetrics.Medium
+    FormMetrics.Medium -> FormMetrics.Compact
+    else -> null
+}
+
+/**
+ * Perfil **inicial** según el alto útil. Es un punto de partida: si la pantalla concreta no cabe, el scaffold baja
+ * al perfil siguiente (`smaller`), así cada pantalla usa el perfil más grande (más cercano a Figma) que le cabe.
  *
  * @param availableHeight Alto útil de la pantalla, sin las barras del sistema.
  */

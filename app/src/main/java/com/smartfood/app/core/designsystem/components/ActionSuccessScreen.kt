@@ -113,13 +113,14 @@ fun ActionSuccessScreen(
 
                         Spacer(modifier = Modifier.height(metrics.sectionSpacing + 10.dp))
 
+                        // Figma (nodo 585:4571): Bold 35 centrado; se reduce con el perfil de medidas.
                         Text(
                             text = title,
-                            fontSize = 32.sp,
+                            fontSize = metrics.titleFontSize,
                             fontWeight = FontWeight.Bold,
                             color = titleColor,
                             textAlign = TextAlign.Center,
-                            lineHeight = 38.sp
+                            lineHeight = metrics.titleLineHeight
                         )
 
                         Spacer(modifier = Modifier.height(18.dp))

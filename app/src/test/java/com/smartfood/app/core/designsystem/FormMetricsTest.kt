@@ -3,6 +3,7 @@ package com.smartfood.app.core.designsystem
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.core.designsystem.theme.FormMetrics
 import com.smartfood.app.core.designsystem.theme.formMetricsFor
+import com.smartfood.app.core.designsystem.theme.smaller
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -17,23 +18,24 @@ import org.junit.Test
 class FormMetricsTest {
 
     @Test
-    fun `CA-UI-01-03 desde 1000 dp de alto util se usan las medidas de Figma`() {
-        assertEquals(FormMetrics.Regular, formMetricsFor(1000.dp))
+    fun `CA-UI-01-03 desde 720 dp de alto util se parte de las medidas de Figma`() {
+        assertEquals(FormMetrics.Regular, formMetricsFor(720.dp))
+        // V2436: 857 dp de pantalla menos ~57 dp de barras.
+        assertEquals(FormMetrics.Regular, formMetricsFor(800.dp))
         assertEquals(FormMetrics.Regular, formMetricsFor(1280.dp))
     }
 
     @Test
-    fun `CA-UI-01-04 entre 760 y 1000 dp de alto util se usa la version intermedia`() {
-        assertEquals(FormMetrics.Medium, formMetricsFor(760.dp))
-        // V2436: 857 dp de pantalla menos ~57 dp de barras.
-        assertEquals(FormMetrics.Medium, formMetricsFor(800.dp))
-        assertEquals(FormMetrics.Medium, formMetricsFor(999.dp))
+    fun `CA-UI-01-04 entre 620 y 720 dp de alto util se parte de la version intermedia`() {
+        assertEquals(FormMetrics.Medium, formMetricsFor(620.dp))
+        // Teléfono de 360×720 dp: ~660 dp útiles.
+        assertEquals(FormMetrics.Medium, formMetricsFor(660.dp))
+        assertEquals(FormMetrics.Medium, formMetricsFor(719.dp))
     }
 
     @Test
-    fun `CA-UI-01-05 por debajo de 760 dp de alto util se usa la version compacta con la marca en fila`() {
-        // Teléfono de 360×720 dp: ~660 dp útiles.
-        val metrics = formMetricsFor(660.dp)
+    fun `CA-UI-01-05 por debajo de 620 dp de alto util se parte de la version compacta con la marca en fila`() {
+        val metrics = formMetricsFor(600.dp)
 
         assertEquals(FormMetrics.Compact, metrics)
         assertTrue(metrics.inlineBrand)
@@ -51,5 +53,12 @@ class FormMetricsTest {
             assertTrue(menor.sectionSpacing <= mayor.sectionSpacing)
             assertTrue(menor.successIconSize <= mayor.successIconSize)
         }
+    }
+
+    @Test
+    fun `CA-UI-07-03 si una pantalla no cabe se baja de perfil hasta el compacto`() {
+        assertEquals(FormMetrics.Medium, FormMetrics.Regular.smaller())
+        assertEquals(FormMetrics.Compact, FormMetrics.Medium.smaller())
+        assertEquals(null, FormMetrics.Compact.smaller())
     }
 }

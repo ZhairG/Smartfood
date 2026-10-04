@@ -32,14 +32,28 @@
 - [x] T019 [P] `SplashScreen` y `MainActivity` usan tokens y estilos claros (CA-UI-05-04).
 - [x] T020 Pruebas `ThemeModeTest` (JVM) y `ColorModeTest` (instrumentada); documentación.
 
+## Fase 5: Ícono oficial (HU-UI-06)
+- [x] T021 `tools/generate_launcher_icon.py`: capas frontal y monocromática, íconos para Android 7.x y Play Store, con verificación de la zona segura (CA-UI-06-02, 04).
+- [x] T022 `mipmap-anydpi-v26` con fondo `GreenLight` y capas generadas; se eliminan las plantillas del robot (CA-UI-06-01, 03).
+- [x] T023 `LauncherIconTest` instrumentada y documentación.
+
+## Fase 6: Fidelidad con Figma (HU-UI-07)
+- [x] T024 Poppins en `res/font`, licencia y `Type.kt` (CA-UI-07-01).
+- [x] T025 Roles de color del esquema claro y token `GreenCheck` (CA-UI-07-02).
+- [x] T026 [P] Botón, enlaces, casilla, términos, código y diálogo según Figma (CA-UI-07-05, 06, 07).
+- [x] T027 [P] Checklist con estilo de Figma (CA-UI-07-04).
+- [x] T028 Espaciados de Login, Registro, Recuperación y Éxito por perfil; `AdaptiveLayoutTest` con 412×917 (CA-UI-07-03).
+- [x] T028b Perfil por pantalla (bajar si no cabe), separaciones flexibles (`FlexibleGap`, `fillFormViewport`) y `FormProfileFitTest` (CA-UI-07-03).
+- [x] T029 Comparación visual con Figma (capturas a 412×917) y documentación.
+
 ## Matriz de trazabilidad
 
 Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un V2436 con Android 16), **M** = revisión manual.
 
 | Criterio | Pruebas |
 |---|---|
-| CA-UI-01-01 | I `AdaptiveLayoutTest` (Login, Registro, Registro con error y recuperación pasos 1, 2 y 3, en 360×720 y 384×857) |
-| CA-UI-01-02 | I `AdaptiveLayoutTest.ca_ui_01_02_*` (360×720 y 384×857) |
+| CA-UI-01-01 | I `AdaptiveLayoutTest` (Login, Registro, Registro con error y recuperación pasos 1, 2 y 3, en 360×720, 384×857 y 412×917) |
+| CA-UI-01-02 | I `AdaptiveLayoutTest.ca_ui_01_02_*` (360×720, 384×857 y 412×917) |
 | CA-UI-01-03 | U `FormMetricsTest` |
 | CA-UI-01-04 | U `FormMetricsTest`, I `AdaptiveLayoutTest` (384×857) |
 | CA-UI-01-05 | U `FormMetricsTest`, I `AdaptiveLayoutTest` (360×720) |
@@ -64,6 +78,17 @@ Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un
 | CA-UI-05-02 | M (V2436 en modo oscuro: arranque en frío capturado cuadro a cuadro; el primer cuadro es `#F0FDF4` con el logo y ningún cuadro es oscuro) |
 | CA-UI-05-03 | U `ThemeModeTest`, I `ColorModeTest.ca_ui_05_03_*`; `isSystemInDarkTheme()` solo en `ThemeMode.kt` (RNF-UI-05) |
 | CA-UI-05-04 | Revisión de código: `Color.kt` y los esquemas de `Theme.kt` sin cambios; el `#F0FDF4` fijo de la Splash pasa al token `GreenLight` (mismo valor) |
+| CA-UI-06-01 | I `LauncherIconTest.ca_ui_06_01_*` (`AdaptiveIconDrawable` con fondo `#F0FDF4`, normal y redondo) |
+| CA-UI-06-02 | `tools/generate_launcher_icon.py` (aserción por densidad: ningún píxel visible fuera del círculo de 66 dp); vista previa con máscaras de círculo, squircle y cuadrado |
+| CA-UI-06-03 | I `LauncherIconTest.ca_ui_06_03_*` (ejecutada en Android 13) |
+| CA-UI-06-04 | `tools/generate_launcher_icon.py` versionado; README con el comando |
+| CA-UI-07-01 | M (capturas a 412×917 comparadas con los frames de Figma); revisión de código: `Poppins` en `Type.kt` |
+| CA-UI-07-02 | I `ColorModeTest` (píxel de fondo `GreenLight`); M (comparación con Figma); revisión de código: solo cambian roles en `LightColorScheme` |
+| CA-UI-07-03 | U `FormMetricsTest`, I `FormProfileFitTest`, I `AdaptiveLayoutTest` (412×917); M (comparación con Figma: Login, pasos 1, 2 y 3 y Éxito con el perfil `Regular`; Registro baja a `Medium` porque no cabe) |
+| CA-UI-07-04 | I `FormFocusTest.ca_ui_03_*` (el popup sigue encima); M (captura del checklist frente al nodo 572:1299) |
+| CA-UI-07-05 | M (captura del paso 2 frente al nodo 585:4467) |
+| CA-UI-07-06 | M (captura del diálogo frente al nodo 585:4441; desenfoque en Android 12+) |
+| CA-UI-07-07 | M (captura del paso 3 con el botón deshabilitado gris) |
 | RNF-UI-01..04 | Revisión de código: sin offsets fijos ni `scrollTo`/`animateScrollTo`, medidas en `FormMetrics`, foco con `onFocusChanged` |
 
 ### Hallazgos durante la verificación
@@ -85,12 +110,28 @@ verde del Login y, en la mayoría de los casos, también del Registro. Resultado
 | Ocultar y mostrar la barra de estado desde la app (en el mismo frame y con 300 ms de pausa) | Sin cambio. |
 | **Abrir y cerrar el panel de ajustes rápidos** (`cmd statusbar expand-settings` / `collapse`) | **Se corrige:** `mDarkIntensity` pasa de 1.0 a 0.0 y los íconos se ven blancos. Lo reportó el usuario y quedó verificado. |
 
-**Conclusión:** la app y Android coinciden (íconos claros). En la capa de vivo, `StatusBarTransitionsController` queda
+**Confirmado en un segundo dispositivo (moto g32, Android 13):** con el mismo APK, el Login muestra íconos **claros**
+sobre el verde y la Splash, íconos oscuros; System UI aplica `mDarkIntensity=0.0` en el Login. **El problema es
+exclusivo de OriginOS 6 (vivo).**
+
+En el moto, durante la animación de apertura de un arranque en frío lento (~2 s), los íconos se ven blancos sobre la
+pantalla de arranque clara. Sin embargo, esa ventana del sistema ("Splash Screen com.smartfood.app") **sí pide**
+íconos oscuros (`apr=LIGHT_STATUS_BARS`), gracias al tema claro de HU-UI-05. Es el comportamiento de System UI
+mientras termina la transición de apertura, y la app no lo controla.
+
+**Conclusión (vivo):** la app y Android coinciden (íconos claros). En la capa de vivo, `StatusBarTransitionsController` queda
 con `mPendingDarkIntensity=0.0` (el valor correcto) sin aplicarlo, y mantiene `mDarkIntensity=1.0` hasta que un
 evento propio de System UI, como abrir el panel de ajustes rápidos, lo fuerza. Las dos capturas con íconos blancos
 coinciden con momentos en que se había abierto ese panel. Ninguna API pública de la app reproduce ese evento. **Pendiente:** verificar en otro dispositivo o en un emulador para confirmar que ocurre solo en vivo.
 
-**2. Autoenfoque al abrir el Registro. No se reproduce.**
+**2. Margen insuficiente con mensaje de error en otro dispositivo (corregido).**
+
+En el moto g32 (1080×2400, 400 dpi, otra fuente del sistema), `AdaptiveLayoutTest` detectó que el Registro con
+mensaje de error se desbordaba 4,8 dp en 384×857 y 0,8 dp en 360×720; en el vivo cabía justo. Se ampliaron los
+márgenes de los perfiles Medio (separación entre secciones 16→12 dp, panel 28/16→24/12 dp) y Compacto (separación
+12→10 dp, panel 20/12→16/8 dp). Resultado: **51/51 instrumentadas en verde en el moto g32**.
+
+**3. Autoenfoque al abrir el Registro. No se reproduce.**
 
 Ocurrió una vez, justo después de ejecutar la suite instrumentada. Se descartó la hipótesis del "modo táctil": el
 teléfono sigue con `mInTouchMode=true` después de las pruebas. Tampoco se reprodujo con instalación limpia ni en

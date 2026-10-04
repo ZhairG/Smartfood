@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smartfood.app.core.designsystem.theme.GreyNeutral
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
@@ -57,7 +58,7 @@ fun SmartFoodOtpCodeInput(
     enabled: Boolean = true,
     onDone: () -> Unit = {}
 ) {
-    val boxSize = LocalFormMetrics.current.otpBoxSize
+    val metrics = LocalFormMetrics.current
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -85,9 +86,10 @@ fun SmartFoodOtpCodeInput(
         interactionSource = interactionSource,
         modifier = modifier.focusRequester(focusRequester),
         decorationBox = {
+            // Casillas rectangulares centradas, con la proporción y separación de Figma (CA-UI-07-05).
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(metrics.otpSpacing, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 repeat(length) { index ->
@@ -97,15 +99,15 @@ fun SmartFoodOtpCodeInput(
                     val borderColor = when {
                         isError -> MaterialTheme.colorScheme.error
                         isBoxFocused -> MaterialTheme.colorScheme.primary
-                        else -> MaterialTheme.colorScheme.outline
+                        else -> GreyNeutral
                     }
                     val borderWidth = if (isError) 2.dp else 1.dp
 
                     Box(
                         modifier = Modifier
-                            .size(boxSize)
+                            .size(width = metrics.otpBoxWidth, height = metrics.otpBoxHeight)
                             .inputBorderAndBackground(
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(10.dp),
                                 borderWidth = borderWidth,
                                 borderColor = borderColor,
                                 backgroundColor = MaterialTheme.colorScheme.surfaceVariant

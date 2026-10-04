@@ -32,12 +32,13 @@ private val LightColorScheme = lightColorScheme(
     background = GreenDark,
     onBackground = White,
 
-    surface = SurfaceLight,
-    onSurface = GreenDark,
+    // Roles alineados con los frames "_Claro" de Figma (spec 002, CA-UI-07-02); los tokens no cambian de valor.
+    surface = GreenLight,
+    onSurface = Black,
     surfaceVariant = White,
-    onSurfaceVariant = GreyNeutral,
+    onSurfaceVariant = GreyLight,
 
-    outline = GreyDivider,
+    outline = GreyNeutral35,
 
     error = ErrorRed,
     onError = White
