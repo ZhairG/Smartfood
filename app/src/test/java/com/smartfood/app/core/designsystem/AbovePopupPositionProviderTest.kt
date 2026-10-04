@@ -34,31 +34,30 @@ class AbovePopupPositionProviderTest {
     }
 
     @Test
-    fun `CA-UI-03-04 sin espacio arriba el popup se muestra debajo`() {
-        val anchor = IntRect(left = 60, top = 200, right = 660, bottom = 300)
-
-        val offset = posicion(anchor, IntSize(600, 300))
-
-        assertEquals(300 + 16, offset.y)
-    }
-
-    @Test
-    fun `CA-UI-03-04 el popup no invade la barra de estado`() {
+    fun `CA-UI-03-04 sin espacio suficiente sigue encima ajustado al borde superior`() {
         val anchor = IntRect(left = 60, top = 390, right = 660, bottom = 490)
 
-        // Arriba quedaría en y = 74, por encima del límite de 80: debe ir debajo.
+        // Encima quedaría en y = 74, por encima del límite de 80: se ajusta a 80 y no pasa debajo del campo.
         val offset = posicion(anchor, IntSize(600, 300))
 
-        assertEquals(490 + 16, offset.y)
+        assertEquals(80, offset.y)
+        assert(offset.y < anchor.bottom) { "El popup nunca debe quedar debajo del campo" }
     }
 
     @Test
-    fun `CA-UI-03-04 debajo nunca se sale de la ventana`() {
-        val anchor = IntRect(left = 60, top = 100, right = 660, bottom = 1500)
+    fun `CA-UI-03-04 el popup no invade la barra de estado aunque el campo este arriba del todo`() {
+        val anchor = IntRect(left = 60, top = 100, right = 660, bottom = 200)
 
         val offset = posicion(anchor, IntSize(600, 300))
 
-        assertEquals(window.height - 300, offset.y)
+        assertEquals(80, offset.y)
+    }
+
+    @Test
+    fun `CA-UI-03-04 el popup nunca se sale de la ventana`() {
+        val offset = posicion(IntRect(left = 60, top = 100, right = 660, bottom = 1500), IntSize(600, 1700))
+
+        assertEquals(0, offset.y)
     }
 
     @Test

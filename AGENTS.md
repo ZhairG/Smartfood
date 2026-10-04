@@ -50,7 +50,7 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 - **Design system (`core/designsystem`):** `theme/` (tokens), `components/` (prefijo `SmartFood`) y `util/` (modificadores, `SystemBarEffect`, `ClearFocusOnKeyboardDismiss`).
 - **Adaptabilidad (spec 002):** las medidas de los formularios salen de `theme/FormMetrics.kt`.
   - `AuthScreenScaffold` toma el perfil inicial (`Compact`, `Medium` o `Regular`) con `formMetricsForWindow(maxHeight)`, que usa el alto útil sin barras.
-  - Si con el teclado cerrado el formulario no cabe, baja al perfil siguiente con `smaller()`. Lo provee con `LocalFormMetrics`, y los componentes leen `LocalFormMetrics.current`. No se usan medidas fijas nuevas.
+  - Si con el teclado cerrado el formulario no cabe durante 400 ms, baja al perfil siguiente con `smaller()`. Los desbordes pasajeros, como el fundido entre pasos, no cuentan. En las pruebas, avanzar `mainClock` antes de comprobar el perfil. Lo provee con `LocalFormMetrics`, y los componentes leen `LocalFormMetrics.current`. No se usan medidas fijas nuevas.
   - El alto sobrante se reparte con `FlexibleGap(minHeight, weight)`. Dentro de un `AnimatedContent`, el contenido usa `Modifier.fillFormViewport(LocalFormViewport.current)`.
 - **Modo de color (spec 002, HU-UI-05):**
   - El modo se decide **solo** con `ThemeMode` (`theme/ThemeMode.kt`, por defecto `LIGHT`): `SmartfoodTheme(themeMode)` provee `LocalIsDarkTheme`.
@@ -65,7 +65,7 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
   - **Prohibido el scroll programático** (`scrollTo`, `animateScrollTo`) en las pantallas. El panel aplica el inset del teclado fuera del `verticalScroll` y Compose mantiene visible el campo enfocado.
   - El encabezado de marca se colapsa leyendo `WindowInsets.ime` en la fase de layout.
   - La etiqueta de `SmartFoodTextField` está dentro del `decorationBox`: tocarla enfoca el campo y forma parte de su semántica. En las pruebas, `onNodeWithText("<etiqueta>")` devuelve el campo editable.
-  - Elementos flotantes: `AnchoredPopup` con `AbovePopupPositionProvider`, sin offsets fijos. El checklist de contraseña es `PasswordFieldWithChecklist`.
+  - Elementos flotantes: `AnchoredPopup` con `AbovePopupPositionProvider`, sin offsets fijos. El popup va **siempre encima** del campo; si no cabe, se ajusta a la barra de estado, nunca debajo. El checklist de contraseña es `PasswordFieldWithChecklist`.
 
 ## Pruebas
 

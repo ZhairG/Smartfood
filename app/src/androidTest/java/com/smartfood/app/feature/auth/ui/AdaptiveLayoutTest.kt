@@ -62,6 +62,10 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
                 SmartfoodTheme { content() }
             }
         }
+        // El scaffold baja de perfil solo si el desborde se mantiene; el reloj de la prueba es virtual y waitForIdle
+        // no avanza esos delay, así que se deja pasar el tiempo para que cada pantalla use su perfil definitivo.
+        composeTestRule.mainClock.advanceTimeBy(3_000)
+        composeTestRule.waitForIdle()
     }
 
     /** Ningún contenedor desplazable puede tener rango de scroll y [buttonText] debe verse completo. */

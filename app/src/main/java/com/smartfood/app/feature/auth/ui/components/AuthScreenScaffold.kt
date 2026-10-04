@@ -50,7 +50,8 @@ import com.smartfood.app.core.designsystem.theme.FormMetrics
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.formMetricsForWindow
 import com.smartfood.app.core.designsystem.theme.smaller
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import com.smartfood.app.core.designsystem.util.ClearFocusOnKeyboardDismiss
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import com.smartfood.app.core.designsystem.util.clearFocusOnTap
@@ -104,7 +105,9 @@ fun AuthScreenScaffold(
     ) {
         // Perfil más grande que le cabe a ESTA pantalla (CA-UI-07-03): se parte del perfil que sugiere el alto útil
         // y, si con el teclado cerrado el formulario se desborda (p. ej. al aparecer un error), se baja al siguiente.
-        // Solo baja, nunca sube, así no hay oscilaciones; con el teclado abierto no se evalúa.
+        // Solo baja, nunca sube, así no hay oscilaciones; con el teclado abierto no se evalúa. El desborde debe
+        // mantenerse OVERFLOW_SETTLE_MS: los pasajeros no cuentan (p. ej. el fundido entre pasos de la recuperación,
+        // en el que el paso saliente conserva su alto un instante y llevaba el perfil al compacto sin motivo).
         val initialMetrics = formMetricsForWindow(maxHeight)
         var metrics by remember(initialMetrics) { mutableStateOf(initialMetrics) }
         val scrollState = rememberScrollState()
@@ -114,8 +117,13 @@ fun AuthScreenScaffold(
             // Antes del primer layout maxValue vale Int.MAX_VALUE y viewportSize 0: solo cuenta un desborde medido.
             snapshotFlow {
                 scrollState.viewportSize > 0 && scrollState.maxValue > 0 && imeInsets.getBottom(density) == 0
-            }.first { it }
-            metrics.smaller()?.let { metrics = it }
+            }.collectLatest { overflows ->
+                if (overflows) {
+                    // Si el desborde desaparece antes, collectLatest cancela la espera y no se baja de perfil.
+                    delay(OVERFLOW_SETTLE_MS)
+                    metrics.smaller()?.let { metrics = it }
+                }
+            }
         }
 
         CompositionLocalProvider(LocalFormMetrics provides metrics) {
@@ -275,6 +283,9 @@ fun ColumnScope.FlexibleGap(minHeight: Dp, weight: Float = 1f) {
     Spacer(Modifier.height(minHeight))
     Spacer(Modifier.weight(weight))
 }
+
+/** Tiempo que debe durar un desborde para bajar de perfil; cubre el fundido entre pasos de la recuperación. */
+private const val OVERFLOW_SETTLE_MS = 400L
 
 /** Desenfoque del fondo mientras se muestra el diálogo sin conexión. */
 private val OFFLINE_BLUR = 8.dp

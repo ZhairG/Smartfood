@@ -81,8 +81,9 @@ BoxWithConstraints ── provee LocalFormMetrics = formMetricsForWindow(maxHeig
 
 - `AbovePopupPositionProvider(gapPx, minTopPx)` es pura y se prueba en la JVM:
   - **x:** centrado sobre el ancla, ajustado para no salirse de la ventana.
-  - **y:** `anchor.top − gap − alto`. Si eso queda por encima de `minTopPx` (la barra de estado), el popup va a
-    `anchor.bottom + gap` (CA-UI-03-04).
+  - **y:** `anchor.top − gap − alto`, **siempre encima** del ancla. Si eso queda por encima de `minTopPx` (la barra
+    de estado), se ajusta a `minTopPx` y cubre la parte superior del ancla (la etiqueta), pero nunca pasa debajo
+    (CA-UI-03-04). Con el perfil correcto (sección 8) el checklist cabe encima en los pasos y pantallas actuales.
 - `AnchoredPopup(visible, popupContent) { ancla }`:
   - Mide el ancho del ancla para que el popup tenga el mismo ancho.
   - Usa `PopupProperties(focusable = false)`, así que no roba el foco y el teclado sigue abierto (CA-UI-03-03).
@@ -149,7 +150,10 @@ ThemeMode { LIGHT, DARK, SYSTEM }   Default = LIGHT
     720 dp, `Medium` desde 620 dp). Si con el teclado cerrado el formulario se desborda, `AuthScreenScaffold` baja al
     perfil siguiente (`FormMetrics.smaller()`). Solo baja, nunca sube, así que no oscila. El desborde solo cuenta
     cuando el scroll ya se midió (`viewportSize > 0`): antes del primer layout `maxValue` vale `Int.MAX_VALUE` y
-    bajaba de perfil sin motivo.
+    bajaba de perfil sin motivo. Además, el desborde debe durar `OVERFLOW_SETTLE_MS` (400 ms): los pasajeros no
+    cuentan. En el fundido entre pasos de la recuperación, el paso saliente conservaba su alto un instante y el perfil
+    terminaba en el compacto (logo en fila) en el V2436. Por eso el `AnimatedContent` de los pasos tampoco anima el
+    tamaño (`using(null)`).
   - **Separaciones flexibles.** `FlexibleGap(minHeight, weight)` es una separación con un mínimo fijo más una parte
     del alto sobrante. El contenido del scroll recibe como alto mínimo el del viewport, así que las separaciones
     crecen cuando sobra alto y vuelven a su mínimo cuando falta o con el teclado abierto. No hay medidas por pantalla.

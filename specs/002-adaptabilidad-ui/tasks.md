@@ -44,6 +44,7 @@
 - [x] T027 [P] Checklist con estilo de Figma (CA-UI-07-04).
 - [x] T028 Espaciados de Login, Registro, Recuperación y Éxito por perfil; `AdaptiveLayoutTest` con 412×917 (CA-UI-07-03).
 - [x] T028b Perfil por pantalla (bajar si no cabe), separaciones flexibles (`FlexibleGap`, `fillFormViewport`) y `FormProfileFitTest` (CA-UI-07-03).
+- [x] T029b Desborde pasajero entre pasos de la recuperación (perfil compacto por error) y checklist siempre encima (CA-UI-07-03, CA-UI-03-04).
 - [x] T029 Comparación visual con Figma (capturas a 412×917) y documentación.
 
 ## Matriz de trazabilidad
@@ -69,7 +70,7 @@ Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un
 | CA-UI-03-01 | U `AbovePopupPositionProviderTest`, I `FormFocusTest.ca_ui_03_01_*` |
 | CA-UI-03-02 | I `FormFocusTest.ca_ui_03_02_*` |
 | CA-UI-03-03 | Diseño: `PopupProperties(focusable = false)`; I `FormFocusTest.ca_ui_03_05_*` (el foco sigue en los campos) |
-| CA-UI-03-04 | U `AbovePopupPositionProviderTest` (3 casos) |
+| CA-UI-03-04 | U `AbovePopupPositionProviderTest` (3 casos), I `FormFocusTest.ca_ui_03_04_*` (paso 3 en 384×857, ambos campos) |
 | CA-UI-03-05 | I `FormFocusTest.ca_ui_03_05_*` |
 | CA-UI-03-06 | I `FormFocusTest.ca_ui_03_02_*` |
 | CA-UI-04-01 | Manifest `screenOrientation="portrait"`; M |
@@ -84,7 +85,7 @@ Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un
 | CA-UI-06-04 | `tools/generate_launcher_icon.py` versionado; README con el comando |
 | CA-UI-07-01 | M (capturas a 412×917 comparadas con los frames de Figma); revisión de código: `Poppins` en `Type.kt` |
 | CA-UI-07-02 | I `ColorModeTest` (píxel de fondo `GreenLight`); M (comparación con Figma); revisión de código: solo cambian roles en `LightColorScheme` |
-| CA-UI-07-03 | U `FormMetricsTest`, I `FormProfileFitTest`, I `AdaptiveLayoutTest` (412×917); M (comparación con Figma: Login, pasos 1, 2 y 3 y Éxito con el perfil `Regular`; Registro baja a `Medium` porque no cabe) |
+| CA-UI-07-03 | U `FormMetricsTest`, I `FormProfileFitTest` (incluye el cambio de paso en la recuperación), I `AdaptiveLayoutTest` (412×917); M (comparación con Figma: Login, pasos 1, 2 y 3 y Éxito con el perfil `Regular`; Registro baja a `Medium` porque no cabe) |
 | CA-UI-07-04 | I `FormFocusTest.ca_ui_03_*` (el popup sigue encima); M (captura del checklist frente al nodo 572:1299) |
 | CA-UI-07-05 | M (captura del paso 2 frente al nodo 585:4467) |
 | CA-UI-07-06 | M (captura del diálogo frente al nodo 585:4441; desenfoque en Android 12+) |

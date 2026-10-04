@@ -109,4 +109,34 @@ class FormFocusTest {
 
         composeTestRule.onAllNodesWithText("¿Coinciden?").assertCountEquals(1)
     }
+
+    @Test
+    fun ca_ui_03_04_enElPaso3ElChecklistQuedaEncimaDeAmbosCampos() {
+        // A pantalla completa del dispositivo (no con un tamaño forzado), con el teclado real abriéndose.
+        composeTestRule.setContent {
+            SmartfoodTheme {
+                PasswordRecoveryScreen(
+                    state = PasswordRecoveryUiState(step = RecoveryStep.NEW_PASSWORD),
+                    onEvent = {},
+                    onNavigateToLogin = {}
+                )
+            }
+        }
+        composeTestRule.mainClock.advanceTimeBy(2_000)  // deja que el scaffold confirme el perfil
+
+        listOf("Nueva Contraseña", "Confirmar Contraseña").forEach { etiqueta ->
+            val campo = hasText(etiqueta) and hasSetTextAction()
+            composeTestRule.onNode(campo).performClick()
+            composeTestRule.mainClock.advanceTimeBy(1_000)
+            composeTestRule.waitForIdle()
+
+            val popup = composeTestRule.onNodeWithText("Mínimo 8 caracteres").fetchSemanticsNode()
+            val nodoCampo = composeTestRule.onNode(campo).fetchSemanticsNode()
+            assertTrue(
+                "En \"$etiqueta\" el checklist debe quedar encima (popup=${popup.bottomOnScreen()}, " +
+                    "campo=${nodoCampo.positionOnScreen.y})",
+                popup.bottomOnScreen() <= nodoCampo.positionOnScreen.y
+            )
+        }
+    }
 }

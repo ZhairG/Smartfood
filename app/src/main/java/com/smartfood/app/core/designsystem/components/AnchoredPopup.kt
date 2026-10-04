@@ -31,8 +31,9 @@ import androidx.compose.ui.window.PopupProperties
  */
 
 /**
- * Coloca el popup encima del ancla, centrado horizontalmente. Si no cabe encima (por debajo de [minTopPx]),
- * lo coloca debajo (CA-UI-03-04). En ambos casos lo mantiene dentro de la ventana.
+ * Coloca el popup **siempre encima** del ancla, centrado horizontalmente. Si no cabe completo encima, lo ajusta al
+ * borde superior útil ([minTopPx]): cubre la parte superior del ancla (la etiqueta del campo), pero nunca pasa
+ * debajo de ella (CA-UI-03-04). Siempre queda dentro de la ventana.
  *
  * @param gapPx Separación entre el ancla y el popup.
  * @param minTopPx Borde superior utilizable de la ventana (por ejemplo, el alto de la barra de estado).
@@ -52,12 +53,8 @@ class AbovePopupPositionProvider(
         val x = (anchorBounds.left + (anchorBounds.width - popupContentSize.width) / 2).coerceIn(0, maxX)
 
         val aboveY = anchorBounds.top - gapPx - popupContentSize.height
-        val y = if (aboveY >= minTopPx) {
-            aboveY
-        } else {
-            val maxY = (windowSize.height - popupContentSize.height).coerceAtLeast(0)
-            (anchorBounds.bottom + gapPx).coerceAtMost(maxY)
-        }
+        val maxY = (windowSize.height - popupContentSize.height).coerceAtLeast(0)
+        val y = aboveY.coerceAtLeast(minTopPx).coerceAtMost(maxY)
         return IntOffset(x, y)
     }
 }

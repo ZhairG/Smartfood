@@ -70,7 +70,7 @@ el formulario.
 | CA-UI-03-01 | **Dado** el Registro, **cuando** enfoco el campo de contraseña, **entonces** aparece un popup con los requisitos **encima** del campo, sin taparlo. |
 | CA-UI-03-02 | **Dado** el paso 3 de la recuperación, **cuando** enfoco "Nueva Contraseña" o "Confirmar Contraseña", **entonces** aparece el popup encima del campo enfocado, incluyendo la regla "¿Coinciden?". |
 | CA-UI-03-03 | **Dado** el popup visible, **cuando** escribo, **entonces** cada requisito se marca en tiempo real y el teclado sigue abierto (el popup no roba el foco). |
-| CA-UI-03-04 | **Dado** que no hay espacio suficiente encima del campo, **entonces** el popup se muestra debajo, siempre dentro de la pantalla. |
+| CA-UI-03-04 | El popup se muestra **siempre encima** del campo, nunca debajo. **Dado** que no cabe completo encima, **entonces** se ajusta al borde superior útil (debajo de la barra de estado) y cubre como máximo la parte superior del campo (su etiqueta), siempre dentro de la pantalla. |
 | CA-UI-03-05 | **Dado** el popup visible, **cuando** el campo pierde el foco, **entonces** el popup desaparece. |
 | CA-UI-03-06 | El paso 3 de la recuperación ya no muestra la lista de requisitos fija dentro del formulario. |
 

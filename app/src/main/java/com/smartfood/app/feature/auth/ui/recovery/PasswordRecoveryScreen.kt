@@ -77,7 +77,9 @@ fun PasswordRecoveryScreen(
     ) {
         AnimatedContent(
             targetState = state.step,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            // Sin SizeTransform: cada paso ya llena el alto visible, así que animar el tamaño solo prolongaría el
+            // alto del paso anterior (CA-UI-07-03).
+            transitionSpec = { (fadeIn() togetherWith fadeOut()).using(null) },
             label = "recovery_step_transition"
         ) { targetStep ->
             when (targetStep) {
