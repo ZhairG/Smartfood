@@ -34,6 +34,7 @@ class RouteSerializationTest {
             Route.Register,
             Route.RegisterSuccess,
             Route.PasswordRecovery,
+            Route.PasswordRecoverySuccess,
             Route.Home,
             Route.OfflineConnection,
         )

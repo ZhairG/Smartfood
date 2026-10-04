@@ -3,8 +3,8 @@ package com.smartfood.app.ui.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartfood.app.domain.usecase.auth.LoginUseCase
-import com.smartfood.app.domain.usecase.auth.RecoverPasswordUseCase
 import com.smartfood.app.domain.usecase.auth.RegisterUseCase
+import com.smartfood.app.domain.usecase.auth.ResetPasswordUseCase
 import com.smartfood.app.domain.usecase.auth.ValidateEmailUseCase
 import com.smartfood.app.domain.usecase.auth.ValidatePasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,13 +19,13 @@ import javax.inject.Inject
  * Nombre: AuthViewModel.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
- * Descripción: ViewModel central para el flujo de autenticación (Login y Registro).
+ * Descripción: ViewModel central para el flujo de autenticación (Login, Registro y Recuperación de Contraseña).
  * Intercepta los eventos de usuario [AuthEvent], ejecuta la lógica mediante Casos de Uso
  * de la capa de Dominio y expone un [AuthUiState] inmutable a través de [StateFlow].
  *
  * @param loginUseCase Caso de uso para inicio de sesión.
  * @param registerUseCase Caso de uso para registro de usuarios.
- * @param recoverPasswordUseCase Caso de uso para recuperación de contraseña.
+ * @param resetPasswordUseCase Caso de uso para recuperación y restablecimiento de contraseña.
  * @param validatePasswordUseCase Caso de uso para validación de formato de contraseña.
  * @param validateEmailUseCase Caso de uso para validación de formato de correo electrónico.
  */
@@ -33,7 +33,7 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val registerUseCase: RegisterUseCase,
-    private val recoverPasswordUseCase: RecoverPasswordUseCase,
+    private val resetPasswordUseCase: ResetPasswordUseCase,
     private val validatePasswordUseCase: ValidatePasswordUseCase,
     private val validateEmailUseCase: ValidateEmailUseCase
 ) : ViewModel() {
@@ -86,9 +86,187 @@ class AuthViewModel @Inject constructor(
             }
             AuthEvent.LoginClicked -> login()
             AuthEvent.RegisterClicked -> register()
-            AuthEvent.RecoverPasswordClicked -> recoverPassword()
             AuthEvent.RetryConnectionClicked -> retryConnection()
             AuthEvent.DismissError -> _uiState.update { it.copy(errorMessage = null, errorType = null) }
+
+            // --- Eventos de Recuperación de Contraseña ---
+            is AuthEvent.OtpCodeChanged -> {
+                _uiState.update {
+                    it.copy(
+                        otpCode = event.code,
+                        otpCodeHasError = false,
+                        errorType = null,
+                        errorMessage = null
+                    )
+                }
+            }
+            AuthEvent.SendRecoveryCodeClicked -> sendRecoveryCode()
+            AuthEvent.VerifyOtpCodeClicked -> verifyOtpCode()
+            AuthEvent.ResendOtpCodeClicked -> sendRecoveryCode()
+            AuthEvent.ChangeEmailClicked -> {
+                _uiState.update {
+                    it.copy(
+                        recoveryStep = RecoveryStep.EMAIL_REQUEST,
+                        otpCode = "",
+                        otpCodeHasError = false,
+                        errorType = null,
+                        errorMessage = null
+                    )
+                }
+            }
+            AuthEvent.ResetPasswordClicked -> resetPassword()
+            AuthEvent.ResetRecoveryFlow -> {
+                _uiState.update {
+                    it.copy(
+                        recoveryStep = RecoveryStep.EMAIL_REQUEST,
+                        otpCode = "",
+                        password = "",
+                        confirmPassword = "",
+                        otpCodeHasError = false,
+                        isPasswordResetSuccess = false,
+                        errorType = null,
+                        errorMessage = null
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Envía la solicitud de código de recuperación para el primer paso vía Firebase Auth.
+     */
+    private fun sendRecoveryCode() {
+        val currentState = _uiState.value
+        val email = currentState.email.trim()
+
+        if (email.isBlank()) {
+            _uiState.update {
+                it.copy(
+                    errorType = AuthErrorType.EMPTY_EMAIL,
+                    emailHasError = true
+                )
+            }
+            return
+        }
+
+        if (!validateEmailUseCase.execute(email)) {
+            _uiState.update {
+                it.copy(
+                    errorType = AuthErrorType.INVALID_EMAIL,
+                    emailHasError = true
+                )
+            }
+            return
+        }
+
+        _uiState.update { it.copy(isLoading = true, emailHasError = false, errorType = null) }
+
+        viewModelScope.launch {
+            resetPasswordUseCase.sendResetCode(email)
+                .onSuccess { generatedOtp ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            generatedOtpCode = generatedOtp,
+                            recoveryStep = RecoveryStep.OTP_VERIFICATION,
+                            emailHasError = false,
+                            errorType = null
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    val message = error.message ?: ""
+                    val isNotFound = message.contains("not-found", ignoreCase = true) ||
+                            message.contains("user-not-found", ignoreCase = true)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            emailHasError = true,
+                            errorType = if (isNotFound) AuthErrorType.ACCOUNT_NOT_FOUND_RECOVERY else AuthErrorType.INVALID_EMAIL
+                        )
+                    }
+                }
+        }
+    }
+
+    /**
+     * Verifica el código de 4 dígitos ingresado en el segundo paso.
+     */
+    private fun verifyOtpCode() {
+        val currentState = _uiState.value
+        val code = currentState.otpCode
+
+        resetPasswordUseCase.verifyOtpCode(code, currentState.generatedOtpCode)
+            .onSuccess {
+                _uiState.update {
+                    it.copy(
+                        recoveryStep = RecoveryStep.NEW_PASSWORD,
+                        otpCodeHasError = false,
+                        errorType = null
+                    )
+                }
+            }
+            .onFailure { error ->
+                val errorType = when (error.message) {
+                    "EMPTY_OTP_CODE" -> AuthErrorType.EMPTY_OTP_CODE
+                    else -> AuthErrorType.INVALID_OTP_CODE
+                }
+                _uiState.update {
+                    it.copy(
+                        otpCodeHasError = true,
+                        errorType = errorType
+                    )
+                }
+            }
+    }
+
+    /**
+     * Actualiza la contraseña en Firebase Auth en el tercer paso.
+     */
+    private fun resetPassword() {
+        val currentState = _uiState.value
+        if (currentState.isLoading) return
+
+        val pass = currentState.password
+        val confirmPass = currentState.confirmPassword
+
+        val validation = validatePasswordUseCase.execute(pass)
+        if (!validation.isValid || pass != confirmPass) {
+            _uiState.update {
+                it.copy(
+                    passwordHasError = !validation.isValid,
+                    errorType = AuthErrorType.VALIDATION_ERROR
+                )
+            }
+            return
+        }
+
+        _uiState.update { it.copy(isLoading = true, errorType = null) }
+
+        viewModelScope.launch {
+            resetPasswordUseCase.resetPassword(
+                email = currentState.email,
+                code = currentState.otpCode,
+                newPass = pass,
+                confirmPass = confirmPass
+            )
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isPasswordResetSuccess = true
+                        )
+                    }
+                }
+                .onFailure {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            passwordHasError = true,
+                            errorType = AuthErrorType.VALIDATION_ERROR
+                        )
+                    }
+                }
         }
     }
 
@@ -190,24 +368,6 @@ class AuthViewModel @Inject constructor(
                 }
                 .onFailure { error ->
                     handleError(error, AuthErrorType.VALIDATION_ERROR)
-                }
-        }
-    }
-
-    /**
-     * Inicia el envío del correo de recuperación de contraseña delegando a [RecoverPasswordUseCase].
-     */
-    private fun recoverPassword() {
-        val currentState = _uiState.value
-
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null, errorType = null) }
-            recoverPasswordUseCase.execute(currentState.email)
-                .onSuccess {
-                    _uiState.update { it.copy(isLoading = false, isSuccess = true) }
-                }
-                .onFailure { error ->
-                    handleError(error, AuthErrorType.UNKNOWN_ERROR)
                 }
         }
     }

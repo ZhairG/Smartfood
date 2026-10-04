@@ -135,11 +135,11 @@ class AppNavigationTest {
         composeTestRule.onNodeWithText("¿Olvidaste tu contraseña?").performScrollTo().performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5000) {
-            composeTestRule.onAllNodesWithText("Recuperar Contraseña").fetchSemanticsNodes().isNotEmpty()
+            composeTestRule.onAllNodesWithText("Recupera tu acceso y vuelve a disfrutar de tus recetas favoritas.").fetchSemanticsNodes().isNotEmpty()
         }
 
-        // Verificación: PasswordRecoveryScreen está visible
-        composeTestRule.onNodeWithText("Recuperar Contraseña").assertIsDisplayed()
+        // Verificación: PasswordRecoveryScreen está visible con el subtítulo del Paso 1
+        composeTestRule.onNodeWithText("Recupera tu acceso y vuelve a disfrutar de tus recetas favoritas.").assertIsDisplayed()
     }
 
     @Test
@@ -167,11 +167,11 @@ class AppNavigationTest {
         composeTestRule.onNodeWithText("¿Olvidaste tu contraseña?").performScrollTo().performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5000) {
-            composeTestRule.onAllNodesWithText("Recuperar Contraseña").fetchSemanticsNodes().isNotEmpty()
+            composeTestRule.onAllNodesWithText("Recupera tu acceso y vuelve a disfrutar de tus recetas favoritas.").fetchSemanticsNodes().isNotEmpty()
         }
 
-        // Disparamos el retorno a Login mediante el botón "Volver al Login"
-        composeTestRule.onNodeWithText("Volver al Login").performClick()
+        // Disparamos el retorno a Login mediante el enlace "Iniciar sesión"
+        composeTestRule.onNodeWithText("Iniciar sesión").performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5000) {
             composeTestRule.onAllNodesWithText("Bienvenido").fetchSemanticsNodes().isNotEmpty()

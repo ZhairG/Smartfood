@@ -52,5 +52,11 @@ data class AuthUiState(
     val hasMinimumLength: Boolean = false,
     val hasUppercase: Boolean = false,
     val hasSpecialCharacter: Boolean = false,
-    val passwordsMatch: Boolean = false
+    val passwordsMatch: Boolean = false,
+
+    val recoveryStep: RecoveryStep = RecoveryStep.EMAIL_REQUEST,
+    val otpCode: String = "",
+    val generatedOtpCode: String = "",
+    val otpCodeHasError: Boolean = false,
+    val isPasswordResetSuccess: Boolean = false
 )

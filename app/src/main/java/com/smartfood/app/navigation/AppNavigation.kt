@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,8 +26,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.smartfood.app.R
+import com.smartfood.app.ui.auth.AuthEvent
 import com.smartfood.app.ui.auth.AuthViewModel
 import com.smartfood.app.ui.auth.login.LoginScreen
+import com.smartfood.app.ui.auth.recovery.PasswordRecoveryScreen
 import com.smartfood.app.ui.auth.register.RegisterScreen
 import com.smartfood.app.ui.components.ActionSuccessScreen
 import com.smartfood.app.ui.splash.SplashScreen
@@ -111,7 +115,7 @@ fun AppNavigation(
                     state = authState,
                     onEvent = authViewModel::onEvent,
                     onNavigateToRegister = { navController.navigate(Route.Register) },
-                    onNavigateToRecovery = { navController.navigate(Route.PasswordRecovery) }
+                    onNavigateToForgotPassword = { navController.navigate(Route.PasswordRecovery) }
                 )
             }
 
@@ -202,10 +206,44 @@ fun AppNavigation(
                     )
                 }
             ) {
-                PlaceholderScreen(
-                    title = stringResource(id = R.string.title_recovery_screen),
-                    onNavigate = { navController.popBackStack() },
-                    buttonText = stringResource(id = R.string.action_back_to_login)
+                val authViewModel: AuthViewModel = hiltViewModel()
+                val authState by authViewModel.uiState.collectAsStateWithLifecycle()
+
+                PasswordRecoveryScreen(
+                    state = authState,
+                    onEvent = authViewModel::onEvent,
+                    onNavigateToLogin = {
+                        authViewModel.onEvent(AuthEvent.ResetRecoveryFlow)
+                        navController.popBackStack()
+                    },
+                    onNavigateToSuccess = {
+                        navController.navigate(Route.PasswordRecoverySuccess) {
+                            popUpTo(Route.PasswordRecovery) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable<Route.PasswordRecoverySuccess>(
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
+                }
+            ) {
+                ActionSuccessScreen(
+                    title = stringResource(id = R.string.recovery_success_title),
+                    body = stringResource(id = R.string.recovery_success_body),
+                    buttonText = stringResource(id = R.string.recovery_success_button),
+                    onButtonClick = {
+                        navController.navigate(Route.Login) {
+                            popUpTo(Route.AuthGraph) { inclusive = false }
+                        }
+                    }
                 )
             }
         }
@@ -215,7 +253,7 @@ fun AppNavigation(
             composable<Route.Home> {
                 PlaceholderScreen(
                     title = stringResource(id = R.string.title_home_screen),
-                    onNavigate = { 
+                    onNavigate = {
                         navController.navigate(Route.AuthGraph) {
                             popUpTo(Route.MainGraph) { inclusive = true }
                         }
@@ -228,7 +266,7 @@ fun AppNavigation(
 }
 
 /**
- * Pantalla temporal utilizada para prototipar rutas antes de la implementación de la UI completa.
+ * Pantalla temporal estructurada con [Scaffold] utilizada para prototipar rutas.
  *
  * @param title Título visible de la pantalla.
  * @param onNavigate Callback al presionar el botón.
@@ -240,15 +278,21 @@ fun PlaceholderScreen(
     onNavigate: () -> Unit,
     buttonText: String
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = title)
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onNavigate) {
-                Text(text = buttonText)
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = title)
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = onNavigate) {
+                    Text(text = buttonText)
+                }
             }
         }
     }

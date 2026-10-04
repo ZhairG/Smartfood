@@ -2,9 +2,12 @@ package com.smartfood.app.ui.splash
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -25,7 +28,8 @@ import kotlinx.coroutines.delay
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
  * Descripción: Pantalla de carga inicial (Splash Screen) de la aplicación Smartfood.
- * Muestra el logotipo centrado y conmuta a la siguiente pantalla tras un tiempo de espera.
+ * Utiliza [Scaffold] para mantener el orden estructural del layout, muestra el logotipo centrado
+ * y conmuta a la siguiente pantalla tras un tiempo de espera.
  *
  * @param onNavigateNext Callback invocado tras finalizar la temporización inicial para navegar a la siguiente pantalla.
  * @param modifier Modificador opcional para la personalización del contenedor base.
@@ -41,20 +45,27 @@ fun SplashScreen(
         onNavigateNext()
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFFF0FDF4)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.logo_smartfood_circle),
-            contentDescription = stringResource(id = R.string.cd_smartfood_logo),
-            tint = Color.Unspecified,
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = Color(0xFFF0FDF4),
+        contentWindowInsets = WindowInsets(0.dp)
+    ) { paddingValues ->
+        Box(
             modifier = Modifier
-                .size(width = 128.dp, height = 135.dp)
-                .testTag("splash_logo")
-        )
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color(0xFFF0FDF4)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.logo_smartfood_circle),
+                contentDescription = stringResource(id = R.string.cd_smartfood_logo),
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .size(width = 128.dp, height = 135.dp)
+                    .testTag("splash_logo")
+            )
+        }
     }
 }
 

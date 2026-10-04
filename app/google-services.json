@@ -13,6 +13,7 @@
         }
       },
       "oauth_client": [],
+      "_comment": "TODO encriptar esta api key",
       "api_key": [
         {
           "current_key": "AIzaSyA-NxSdw2BQDYy9Rg7_yFghMB2E6x7YDcE"

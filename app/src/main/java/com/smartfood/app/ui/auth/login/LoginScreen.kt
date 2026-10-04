@@ -46,7 +46,7 @@ import com.smartfood.app.ui.theme.spacing
  * @param state Objeto de estado inmutable [AuthUiState] proveniente del ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [AuthEvent] hacia el ViewModel.
  * @param onNavigateToRegister Callback para navegar a la pantalla de Registro.
- * @param onNavigateToRecovery Callback para navegar a la pantalla de Recuperación de Contraseña.
+ * @param onNavigateToForgotPassword Callback para navegar a la pantalla de Recuperación de Contraseña.
  * @param modifier Modificador opcional para configurar la apariencia exterior.
  */
 @Composable
@@ -54,7 +54,7 @@ fun LoginScreen(
     state: AuthUiState,
     onEvent: (AuthEvent) -> Unit,
     onNavigateToRegister: () -> Unit,
-    onNavigateToRecovery: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     AuthScreenScaffold(
@@ -72,7 +72,7 @@ fun LoginScreen(
         LoginOptionsRow(
             state = state,
             onEvent = onEvent,
-            onNavigateToRecovery = onNavigateToRecovery
+            onNavigateToForgotPassword = onNavigateToForgotPassword
         )
         Spacer(Modifier.height(27.dp))
 
@@ -168,13 +168,13 @@ private fun LoginFormFields(
 }
 
 /**
- * Fila de opciones de inicio de sesión (Recordar cuenta y Olvidé contraseña).
+ * Fila de opciones de inicio de sesión (Recordar cuenta y ¿Olvidaste tu contraseña?).
  */
 @Composable
 private fun LoginOptionsRow(
     state: AuthUiState,
     onEvent: (AuthEvent) -> Unit,
-    onNavigateToRecovery: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -187,9 +187,10 @@ private fun LoginOptionsRow(
             checked = state.rememberMe,
             onCheckedChange = remember(onEvent) { { checked -> onEvent(AuthEvent.RememberMeChanged(checked)) } }
         )
+
         SmartFoodTextLink(
             text = stringResource(id = R.string.login_forgot_password),
-            onClick = onNavigateToRecovery
+            onClick = onNavigateToForgotPassword
         )
     }
 }
@@ -229,8 +230,7 @@ private fun LoginScreenPreview() {
         LoginScreen(
             state = AuthUiState(),
             onEvent = {},
-            onNavigateToRegister = {},
-            onNavigateToRecovery = {}
+            onNavigateToRegister = {}
         )
     }
 }

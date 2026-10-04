@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -43,7 +44,8 @@ import kotlinx.coroutines.launch
  * Nombre: AuthScreenScaffold.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
- * Descripción: Contenedor reutilizable de nivel superior para las pantallas del flujo de autenticación (Login, Registro).
+ * Descripción: Contenedor reutilizable de nivel superior respaldado por [Scaffold] de Material 3 para las pantallas
+ * del flujo de autenticación (Login, Registro, Recuperación de contraseña).
  * Unifica el manejo de insets del sistema, adaptación del Status Bar, scroll automático con IME, encabezado de marca
  * y diálogo de desconexión fuera de línea para eliminar duplicación de código.
  *
@@ -60,6 +62,7 @@ fun AuthScreenScaffold(
     onEvent: (AuthEvent) -> Unit,
     headerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
+    topHeaderContent: (@Composable ColumnScope.() -> Unit)? = null,
     formContent: @Composable ColumnScope.(ScrollState) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -89,51 +92,63 @@ fun AuthScreenScaffold(
         )
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .clearFocusOnTap(focusManager) {
-                coroutineScope.launch { scrollState.scrollTo(0) }
-            }
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-    ) {
-        SmartFoodBrandHeader(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 77.dp, bottom = 53.dp),
-            smartColor = MaterialTheme.colorScheme.onBackground
-        )
-
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0.dp)
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .panelTopCorners(MaterialTheme.colorScheme.surface, 45.dp)
-                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
-                .padding(top = 47.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
+                .clearFocusOnTap(focusManager) {
+                    coroutineScope.launch { scrollState.scrollTo(0) }
+                }
+                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
         ) {
             Column(
                 modifier = Modifier
-                    .widthIn(max = 480.dp)
                     .fillMaxWidth()
-                    .padding(horizontal = 34.dp)
+                    .padding(top = if (topHeaderContent != null) 20.dp else 40.dp, bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                headerContent()
+                topHeaderContent?.invoke(this)
+                SmartFoodBrandHeader(
+                    smartColor = MaterialTheme.colorScheme.onBackground
+                )
             }
 
             Column(
                 modifier = Modifier
-                    .widthIn(max = 480.dp)
-                    .fillMaxWidth()
                     .weight(1f)
-                    .imePadding()
-                    .verticalScroll(scrollState)
-                    .padding(horizontal = 34.dp)
-                    .padding(bottom = 48.dp)
+                    .fillMaxWidth()
+                    .panelTopCorners(MaterialTheme.colorScheme.surface, 45.dp)
+                    .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
+                    .padding(top = 47.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                formContent(scrollState)
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = 480.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = 34.dp)
+                ) {
+                    headerContent()
+                }
+
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = 480.dp)
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .imePadding()
+                        .verticalScroll(scrollState)
+                        .padding(horizontal = 34.dp)
+                        .padding(bottom = 48.dp)
+                ) {
+                    formContent(scrollState)
+                }
             }
         }
     }

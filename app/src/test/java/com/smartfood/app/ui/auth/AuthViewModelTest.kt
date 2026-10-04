@@ -2,8 +2,8 @@ package com.smartfood.app.ui.auth
 
 import com.smartfood.app.domain.usecase.auth.FakeAuthRepository
 import com.smartfood.app.domain.usecase.auth.LoginUseCase
-import com.smartfood.app.domain.usecase.auth.RecoverPasswordUseCase
 import com.smartfood.app.domain.usecase.auth.RegisterUseCase
+import com.smartfood.app.domain.usecase.auth.ResetPasswordUseCase
 import com.smartfood.app.domain.usecase.auth.ValidateEmailUseCase
 import com.smartfood.app.domain.usecase.auth.ValidatePasswordUseCase
 import kotlinx.coroutines.Dispatchers
@@ -45,12 +45,16 @@ class AuthViewModelTest {
         val validatePasswordUseCase = ValidatePasswordUseCase()
         val loginUseCase = LoginUseCase(fakeRepository)
         val registerUseCase = RegisterUseCase(fakeRepository, validatePasswordUseCase)
-        val recoverPasswordUseCase = RecoverPasswordUseCase(fakeRepository)
+        val resetPasswordUseCase = ResetPasswordUseCase(
+            authRepository = fakeRepository,
+            validateEmailUseCase = validateEmailUseCase,
+            validatePasswordUseCase = validatePasswordUseCase
+        )
 
         viewModel = AuthViewModel(
             loginUseCase = loginUseCase,
             registerUseCase = registerUseCase,
-            recoverPasswordUseCase = recoverPasswordUseCase,
+            resetPasswordUseCase = resetPasswordUseCase,
             validatePasswordUseCase = validatePasswordUseCase,
             validateEmailUseCase = validateEmailUseCase
         )
@@ -130,6 +134,54 @@ class AuthViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals(AuthErrorType.ACCOUNT_ALREADY_EXISTS, state.errorType)
+    }
+
+    @Test
+    fun `cuando se solicita codigo de recuperacion con correo valido, avanza al paso de verificacion OTP`() = runTest {
+        viewModel.onEvent(AuthEvent.EmailChanged("usuario@correo.com"))
+        viewModel.onEvent(AuthEvent.SendRecoveryCodeClicked)
+
+        val state = viewModel.uiState.value
+        assertEquals(RecoveryStep.OTP_VERIFICATION, state.recoveryStep)
+        assertFalse(state.emailHasError)
+    }
+
+    @Test
+    fun `cuando se solicita codigo de recuperacion con correo vacio, establece error EMPTY_EMAIL`() {
+        viewModel.onEvent(AuthEvent.EmailChanged(""))
+        viewModel.onEvent(AuthEvent.SendRecoveryCodeClicked)
+
+        val state = viewModel.uiState.value
+        assertEquals(AuthErrorType.EMPTY_EMAIL, state.errorType)
+        assertTrue(state.emailHasError)
+    }
+
+    @Test
+    fun `cuando se ingresa codigo OTP valido de 4 digitos, avanza al paso de nueva contrasena`() {
+        viewModel.onEvent(AuthEvent.EmailChanged("usuario@correo.com"))
+        viewModel.onEvent(AuthEvent.SendRecoveryCodeClicked)
+
+        viewModel.onEvent(AuthEvent.OtpCodeChanged("4422"))
+        viewModel.onEvent(AuthEvent.VerifyOtpCodeClicked)
+
+        val state = viewModel.uiState.value
+        assertEquals(RecoveryStep.NEW_PASSWORD, state.recoveryStep)
+        assertFalse(state.otpCodeHasError)
+    }
+
+    @Test
+    fun `cuando se restablece contrasena cumpliendo requisitos, establece isPasswordResetSuccess`() = runTest {
+        viewModel.onEvent(AuthEvent.EmailChanged("usuario@correo.com"))
+        viewModel.onEvent(AuthEvent.SendRecoveryCodeClicked)
+        viewModel.onEvent(AuthEvent.OtpCodeChanged("4422"))
+        viewModel.onEvent(AuthEvent.VerifyOtpCodeClicked)
+
+        viewModel.onEvent(AuthEvent.PasswordChanged("PpitoPrez24_"))
+        viewModel.onEvent(AuthEvent.ConfirmPasswordChanged("PpitoPrez24_"))
+        viewModel.onEvent(AuthEvent.ResetPasswordClicked)
+
+        val state = viewModel.uiState.value
+        assertTrue(state.isPasswordResetSuccess)
     }
 }
 

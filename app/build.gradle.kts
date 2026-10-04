@@ -63,13 +63,15 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // Corrutinas Kotlin
+    // Corrutinas Kotlin y OkHttp
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.okhttp)
 
-    // Firebase (BOM y Auth)
+    // Firebase (BOM, Auth y Functions)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.functions)
 
     // Testing
     testImplementation(libs.junit)

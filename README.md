@@ -22,28 +22,54 @@ com.smartfood.app/
 │   └── di/                               # INYECCIÓN DE DEPENDENCIAS DE DATOS
 │       └── DataModule.kt                 # Módulo Hilt que provee Firebase y el AuthRepository
 │
-├── ui/                                    # CAPA DE INTERFAZ (UI Layer)
-│   ├── auth/                              # Módulo de autenticación (Login, Registro, Recuperación)
-│   │   ├── AuthContract.kt               # AuthUiState y AuthEvent (UDF centralizado)
-│   │   └── AuthViewModel.kt              # Lógica de presentación y consumo del repositorio
-│   └── theme/
-│
 ├── domain/                                # CAPA DE DOMINIO (Domain Layer)
 │   └── usecase/
 │       └── auth/
-│           ├── ValidatePasswordUseCase.kt
-│           ├── LoginUseCase.kt
-│           ├── RegisterUseCase.kt
-│           └── RecoverPasswordUseCase.kt
+│           ├── ValidateEmailUseCase.kt   # Validación sintáctica de correo electrónico
+│           ├── ValidatePasswordUseCase.kt# Verificación de fortaleza y criterios de contraseña
+│           ├── LoginUseCase.kt           # Caso de uso para inicio de sesión
+│           └── RegisterUseCase.kt        # Caso de uso para registro de usuarios
+│
+├── ui/                                    # CAPA DE INTERFAZ (UI Layer)
+│   ├── auth/                              # Módulo de autenticación (Login y Registro)
+│   │   ├── AuthEnums.kt                  # Tipos de errores y enumeraciones del flujo de Auth
+│   │   ├── AuthEvent.kt                  # Jerarquía de eventos de UI para UDF
+│   │   ├── AuthUiState.kt                # Estado reactivo inmutable expuesto al usuario
+│   │   ├── AuthViewModel.kt              # Lógica de presentación y orquestación de UseCases
+│   │   ├── components/                   # Componentes específicos de la autenticación
+│   │   │   ├── AuthErrorMessage.kt
+│   │   │   ├── AuthScreenScaffold.kt
+│   │   │   └── PasswordRequirementChecklist.kt
+│   │   ├── login/
+│   │   │   └── LoginScreen.kt            # Pantalla de inicio de sesión
+│   │   └── register/
+│   │       └── RegisterScreen.kt         # Pantalla de registro
+│   ├── components/                        # Componentes UI reutilizables
+│   │   ├── ActionSuccessScreen.kt
+│   │   ├── Brand.kt
+│   │   ├── Buttons.kt
+│   │   ├── Dialogs.kt
+│   │   ├── Inputs.kt
+│   │   └── Links.kt
+│   ├── splash/
+│   │   └── SplashScreen.kt              # Pantalla de carga/bienvenida
+│   └── theme/                            # Sistema de diseño y temas (Material 3)
+│       ├── Color.kt
+│       ├── Spacing.kt
+│       ├── Theme.kt
+│       └── Type.kt
 │
 ├── navigation/                            # NAVEGACIÓN (Jetpack Navigation Compose)
 │   ├── Routes.kt                         # Clases/Objetos de rutas Type-Safe con @Serializable
+│   ├── ScreenRoute.kt                    # Mapeo de rutas a títulos
 │   └── AppNavigation.kt                  # NavHost y declaración de grafos de pantallas
 │
 ├── notifications/                         # Gestión de notificaciones push
-├── admin/                                 # Módulos de administración
 └── utils/                                 # Extensiones y utilidades
-    └── CoroutinesExt.kt                  # Manejo seguro de corrutinas (safeRunCatching)
+    ├── CoroutinesExt.kt                  # Manejo seguro de corrutinas (safeRunCatching)
+    ├── ModifierExt.kt                    # Modificadores de UI personalizados
+    ├── ShadowExt.kt                      # Sombreados de componentes
+    └── SystemBarEffect.kt                # Configuración de barras del sistema
 ```
 
 ---
@@ -62,8 +88,9 @@ com.smartfood.app/
 
 #### 3. Capa de Dominio (`domain/`)
 - Encapsula la lógica de negocio pura en **Casos de Uso (UseCases)** inyectables para evitar sobrecargar los ViewModels.
+- **[ValidateEmailUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/ValidateEmailUseCase.kt):** Valida si la estructura sintáctica de un correo es correcta mediante expresiones regulares.
 - **[ValidatePasswordUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/ValidatePasswordUseCase.kt):** Verifica si una contraseña cumple los requisitos (longitud, mayúsculas, caracteres especiales).
-- **[LoginUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/LoginUseCase.kt)**, **[RegisterUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/RegisterUseCase.kt)**, **[RecoverPasswordUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/RecoverPasswordUseCase.kt):** Orquestan las validaciones previas y la llamada al `AuthRepository`.
+- **[LoginUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/LoginUseCase.kt)** y **[RegisterUseCase.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/domain/usecase/auth/RegisterUseCase.kt):** Orquestan las validaciones previas y la llamada al `AuthRepository`.
 
 #### 4. Capa de Interfaz (`ui/auth/`)
 Sigue el patrón **UDF (Unidirectional Data Flow)** recomendado por Android:
@@ -71,12 +98,13 @@ Sigue el patrón **UDF (Unidirectional Data Flow)** recomendado por Android:
 - **Flujo hacia arriba (Events):** Los elementos UI emiten eventos a través de `onEvent(AuthEvent)`.
 
 - **Autenticación (Centralizada):**
-  - [AuthUiState.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/AuthUiState.kt) y [AuthEvent.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/AuthEvent.kt): Estado completo (campos, booleanos de validación, carga, errores) y eventos sellados.
+  - [AuthUiState.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/AuthUiState.kt), [AuthEvent.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/AuthEvent.kt) y [AuthEnums.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/AuthEnums.kt): Estado completo (campos, booleanos de validación, carga, errores) y eventos sellados.
   - [AuthViewModel.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/AuthViewModel.kt): Inyecta los UseCases correspondientes para controlar el flujo asíncrono y actualizar la UI de manera reactiva.
+  - [LoginScreen.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/login/LoginScreen.kt) y [RegisterScreen.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/ui/auth/register/RegisterScreen.kt): Pantallas de inicio de sesión y registro desarrolladas con Jetpack Compose.
 
 #### 5. Navegación Type-Safe (`navigation/`)
 - **[Routes.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/navigation/Routes.kt):** Objetos anotados con `@Serializable` para garantizar el tipado estricto de rutas.
-- **[AppNavigation.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/navigation/AppNavigation.kt):** Configuración central del `NavHost` con Jetpack Compose.
+- **[AppNavigation.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/navigation/AppNavigation.kt):** Configuración central del `NavHost` con Jetpack Compose y transiciones animadas.
 
 #### 6. Utilidades (`utils/`)
 - **[CoroutinesExt.kt](file:///C:/Users/Zhair/Documents/ZhairGomez/A_Importantes/Codigos/Kotlin/Smartfood/app/src/main/java/com/smartfood/app/utils/CoroutinesExt.kt):** Define la función `safeRunCatching` para evitar atrapar `CancellationException`, garantizando la correcta cancelación estructurada de las corrutinas de Kotlin.
@@ -98,11 +126,11 @@ Sigue el patrón **UDF (Unidirectional Data Flow)** recomendado por Android:
 
 ### 1. Base del Proyecto
 * Configuración de la clase `SmartfoodApp.kt` con la anotación `@HiltAndroidApp`.
-* Estructura limpia para `MainActivity.kt` decorada con `@AndroidEntryPoint`, inicializando el contenedor de Compose con un marcador de posición listo para la navegación.
+* Estructura limpia para `MainActivity.kt` decorada con `@AndroidEntryPoint`, inicializando el contenedor de Compose con el grafo de navegación.
 * Creación de la estructura de directorios y paquetes solicitados.
 
 ### 2. Módulo de Autenticación (Auth)
-Se ha configurado la capa lógica de autenticación siguiendo las mejores prácticas:
+Se ha configurado la capa lógica y de interfaz de autenticación siguiendo las mejores prácticas:
 
 * **Data Layer:**
   * `AuthRepository.kt`: Interfaz que abstrae las operaciones de sesión (`login`, `register`, `sendPasswordReset`).
@@ -111,10 +139,10 @@ Se ha configurado la capa lógica de autenticación siguiendo las mejores práct
   * `DataModule.kt`: Módulo de Hilt que enlaza (`@Binds`) la interfaz del repositorio con su implementación y provee (`@Provides`) la instancia de `FirebaseAuth`.
 
 * **UI Layer (UDF):**
-  * `AuthUiState.kt` y `AuthEvent.kt`: Estado inmutable (con validaciones dinámicas) y jerarquía de eventos `AuthEvent` para comunicar acciones de la vista al ViewModel.
+  * `AuthUiState.kt`, `AuthEvent.kt` y `AuthEnums.kt`: Estado inmutable (con validaciones dinámicas) y jerarquía de eventos `AuthEvent` para comunicar acciones de la vista al ViewModel.
   * `AuthViewModel.kt`: ViewModel (`@HiltViewModel`) que inyecta UseCases y gestiona el flujo unidireccional de datos de forma asíncrona.
+  * `LoginScreen.kt` y `RegisterScreen.kt`: Vistas desacopladas mediante Compose.
 
 ### 3. Refactorización a Clean Architecture y Corrutinas Seguras
-* **Domain Layer:** Extracción de toda la lógica de negocio pura desde el ViewModel hacia Casos de Uso independientes (`ValidatePasswordUseCase`, `LoginUseCase`, `RegisterUseCase`, `RecoverPasswordUseCase`).
-* **UI Layer Cleanup:** Limpieza de carpetas obsoletas (`login/`, `register/`, `recovery/`) en favor de una gestión de autenticación centralizada.
+* **Domain Layer:** Lógica de negocio pura representada en Casos de Uso independientes (`ValidateEmailUseCase`, `ValidatePasswordUseCase`, `LoginUseCase`, `RegisterUseCase`).
 * **Seguridad Asíncrona:** Implementación de la extensión `safeRunCatching` para asegurar el respeto a la cancelación estructurada (`CancellationException`) de Kotlin Coroutines en el Data Layer.

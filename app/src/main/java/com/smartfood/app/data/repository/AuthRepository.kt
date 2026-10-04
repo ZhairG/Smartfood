@@ -33,12 +33,22 @@ interface AuthRepository {
     suspend fun register(email: String, pass: String): Result<Unit>
 
     /**
-     * Envía un correo de restablecimiento de contraseña.
+     * Envía una solicitud de restablecimiento de contraseña vía Firebase Auth y genera un código OTP real.
      *
      * @param email Correo electrónico registrado.
+     * @return [Result] que encapsula el código OTP de 4 dígitos generado.
+     */
+    suspend fun sendPasswordReset(email: String): Result<String>
+
+    /**
+     * Confirma el restablecimiento de contraseña con el código de verificación y actualiza las credenciales en Firebase Auth.
+     *
+     * @param email Correo electrónico del usuario.
+     * @param code Código de verificación OTP o acción de Firebase.
+     * @param newPass Nueva contraseña.
      * @return [Result] que encapsula el resultado de la operación.
      */
-    suspend fun sendPasswordReset(email: String): Result<Unit>
+    suspend fun confirmPasswordReset(email: String, code: String, newPass: String): Result<Unit>
 
     /**
      * Cierra la sesión activa del usuario.

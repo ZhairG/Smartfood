@@ -64,6 +64,12 @@ sealed interface Route {
         override val screenRoute: ScreenRoute = ScreenRoute.PASSWORD_RECOVERY
     }
 
+    /** Pantalla de confirmación de restablecimiento exitoso de contraseña. */
+    @Serializable
+    data object PasswordRecoverySuccess : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.PASSWORD_RECOVERY_SUCCESS
+    }
+
     /** Pantalla principal (Home) de la aplicación. */
     @Serializable
     data object Home : Route {

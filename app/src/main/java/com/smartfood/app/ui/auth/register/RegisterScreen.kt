@@ -88,7 +88,15 @@ fun RegisterScreen(
 
         SmartFoodTermsCheckbox(
             checked = state.acceptedTerms,
-            onCheckedChange = remember(onEvent) { { checked -> onEvent(AuthEvent.AcceptedTermsChanged(checked)) } }
+            onCheckedChange = remember(onEvent) {
+                { checked ->
+                    onEvent(
+                        AuthEvent.AcceptedTermsChanged(
+                            checked
+                        )
+                    )
+                }
+            }
         )
         Spacer(Modifier.height(24.dp))
 

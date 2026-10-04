@@ -32,12 +32,31 @@ sealed interface AuthEvent {
     /** Clic en el botón o enlace de Registro. */
     data object RegisterClicked : AuthEvent
 
-    /** Clic en el enlace de Recuperación de Contraseña. */
-    data object RecoverPasswordClicked : AuthEvent
-
     /** Clic en el botón de reintento de conexión desde el diálogo modal. */
     data object RetryConnectionClicked : AuthEvent
 
     /** Clic para descartar el mensaje de error visible. */
     data object DismissError : AuthEvent
+
+    // --- Eventos de Recuperación de Contraseña ---
+    /** Cambio en el código OTP de 4 dígitos. */
+    data class OtpCodeChanged(val code: String) : AuthEvent
+
+    /** Clic en "Enviar Código" (Paso 1). */
+    data object SendRecoveryCodeClicked : AuthEvent
+
+    /** Clic en "Verificar Código" (Paso 2). */
+    data object VerifyOtpCodeClicked : AuthEvent
+
+    /** Clic en "Reenviar código" (Paso 2). */
+    data object ResendOtpCodeClicked : AuthEvent
+
+    /** Clic en "¿Correo incorrecto? Haz click aqui para cambiarlo" (Paso 2). */
+    data object ChangeEmailClicked : AuthEvent
+
+    /** Clic en "Reestablecer Contraseña" (Paso 3). */
+    data object ResetPasswordClicked : AuthEvent
+
+    /** Reinicia el estado del flujo de recuperación de contraseña. */
+    data object ResetRecoveryFlow : AuthEvent
 }

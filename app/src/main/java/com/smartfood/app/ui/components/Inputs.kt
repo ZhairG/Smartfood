@@ -60,6 +60,8 @@ import com.smartfood.app.utils.inputBorderAndBackground
  * Reutiliza las extensiones utilitarias de [inputBorderAndBackground].
  */
 
+private val InputShape = RoundedCornerShape(10.dp)
+
 /**
  * Componente atómico de Campo de Texto genérico con estilo de SmartFood basado en el mockup inicial.
  *
@@ -91,14 +93,13 @@ fun SmartFoodTextField(
     onFocusChanged: ((Boolean) -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
-    val inputShape = RoundedCornerShape(10.dp)
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
     LaunchedEffect(isFocused) {
         onFocusChanged?.invoke(isFocused)
     }
-    
+
     val borderColor = when {
         isError -> MaterialTheme.colorScheme.error
         isFocused -> MaterialTheme.colorScheme.primary
@@ -136,7 +137,7 @@ fun SmartFoodTextField(
                     modifier = Modifier
                         .fillMaxSize()
                         .inputBorderAndBackground(
-                            shape = inputShape,
+                            shape = InputShape,
                             borderWidth = borderWidth,
                             borderColor = borderColor,
                             backgroundColor = MaterialTheme.colorScheme.surfaceVariant
@@ -186,7 +187,10 @@ fun SmartFoodPasswordField(
         onValueChange = onValueChange,
         modifier = modifier,
         placeholder = placeholder,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = imeAction),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = imeAction
+        ),
         keyboardActions = keyboardActions,
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
         enabled = enabled,
@@ -283,15 +287,25 @@ fun SmartFoodTermsCheckbox(
         Text(
             text = buildAnnotatedString {
                 withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                    append(stringResource(id = R.string.register_terms_accept))
+                    append(stringResource(id = R.string.register_terms_accept).trimEnd() + " ")
                 }
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)) {
+                withStyle(
+                    SpanStyle(
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
                     append(stringResource(id = R.string.register_terms_link))
                 }
                 withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                    append(stringResource(id = R.string.register_terms_and))
+                    append(" " + stringResource(id = R.string.register_terms_and).trim() + " ")
                 }
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)) {
+                withStyle(
+                    SpanStyle(
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
                     append(stringResource(id = R.string.register_privacy_link))
                 }
             },
@@ -305,7 +319,10 @@ fun SmartFoodTermsCheckbox(
 @Composable
 private fun SmartFoodTextFieldPreview() {
     SmartfoodTheme {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             SmartFoodTextField(
                 label = "Correo electrónico",
                 value = "",

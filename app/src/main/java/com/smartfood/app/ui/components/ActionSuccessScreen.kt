@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -73,54 +74,61 @@ fun ActionSuccessScreen(
     val titleColor = if (isDark) Color(0xFF4ADE80) else GreenDark
     val bodyColor = OrangeMain
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
-            .padding(horizontal = 34.dp, vertical = 48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Spacer(modifier = Modifier.height(20.dp))
-
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = backgroundColor,
+        contentWindowInsets = WindowInsets(0.dp)
+    ) { paddingValues ->
         Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(backgroundColor)
+                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
+                .padding(horizontal = 34.dp, vertical = 48.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.widthIn(max = 380.dp)
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            ConcentricSuccessCheckIcon()
+            Spacer(modifier = Modifier.height(20.dp))
 
-            Spacer(modifier = Modifier.height(34.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.widthIn(max = 380.dp)
+            ) {
+                ConcentricSuccessCheckIcon()
 
-            Text(
-                text = title,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = titleColor,
-                textAlign = TextAlign.Center,
-                lineHeight = 38.sp
-            )
+                Spacer(modifier = Modifier.height(34.dp))
 
-            Spacer(modifier = Modifier.height(18.dp))
+                Text(
+                    text = title,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = titleColor,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 38.sp
+                )
 
-            Text(
-                text = body,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = bodyColor,
-                textAlign = TextAlign.Center,
-                lineHeight = 22.sp
+                Spacer(modifier = Modifier.height(18.dp))
+
+                Text(
+                    text = body,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = bodyColor,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 22.sp
+                )
+            }
+
+            SmartFoodPrimaryButton(
+                text = buttonText,
+                onClick = onButtonClick,
+                modifier = Modifier
+                    .widthIn(max = 380.dp)
+                    .fillMaxWidth()
             )
         }
-
-        SmartFoodPrimaryButton(
-            text = buttonText,
-            onClick = onButtonClick,
-            modifier = Modifier
-                .widthIn(max = 380.dp)
-                .fillMaxWidth()
-        )
     }
 }
 
