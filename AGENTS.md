@@ -49,6 +49,11 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 - **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
 - **Design system (`core/designsystem`):** `theme/` (tokens), `components/` (prefijo `SmartFood`) y `util/` (modificadores, `SystemBarEffect`, `ClearFocusOnKeyboardDismiss`).
 - **Adaptabilidad (spec 002):** las medidas de los formularios salen de `theme/FormMetrics.kt`. `AuthScreenScaffold` elige el perfil `Compact`, `Medium` o `Regular` con `formMetricsForWindow(maxHeight)`, que usa el alto útil sin barras, y lo provee con `LocalFormMetrics`. Los componentes leen `LocalFormMetrics.current`; no se usan medidas fijas nuevas.
+- **Modo de color (spec 002, HU-UI-05):**
+  - El modo se decide **solo** con `ThemeMode` (`theme/ThemeMode.kt`, por defecto `LIGHT`): `SmartfoodTheme(themeMode)` provee `LocalIsDarkTheme`.
+  - Los componentes leen `LocalIsDarkTheme.current`; **prohibido `isSystemInDarkTheme()` fuera de `ThemeMode.kt`**.
+  - La paleta y los esquemas claro y oscuro no se tocan.
+  - El tema XML es claro (`Base.Theme.Smartfood`, ventana `GreenLight`). `values-v31` hace que la pantalla de arranque de Android 12+ sea igual a la Splash (`splash_icon`).
 - **Foco y teclado (spec 002):**
   - **Prohibido el scroll programático** (`scrollTo`, `animateScrollTo`) en las pantallas. El panel aplica el inset del teclado fuera del `verticalScroll` y Compose mantiene visible el campo enfocado.
   - El encabezado de marca se colapsa leyendo `WindowInsets.ime` en la fase de layout.

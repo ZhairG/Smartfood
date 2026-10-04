@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Mismo valor que el token GreenLight (theme/Color.kt): fondo de la ventana antes de Compose (spec 002, CA-UI-05-02). -->
+    <color name="smartfood_green_light">#FFF0FDF4</color>
 </resources>

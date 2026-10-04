@@ -1,7 +1,6 @@
 package com.smartfood.app.core.designsystem.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -42,9 +41,11 @@ import com.smartfood.app.core.designsystem.theme.GreenDark2
 import com.smartfood.app.core.designsystem.theme.GreenLight
 import com.smartfood.app.core.designsystem.theme.GreenSymbol
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
 import com.smartfood.app.core.designsystem.theme.OrangeMain
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.SurfaceDark
+import com.smartfood.app.core.designsystem.theme.ThemeMode
+import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import com.smartfood.app.core.designsystem.theme.formMetricsForWindow
 
 /**
@@ -58,7 +59,8 @@ import com.smartfood.app.core.designsystem.theme.formMetricsForWindow
  * - Modo Claro: Fondo GreenLight (#F0FDF4), Título GreenDark (#14532D), Cuerpo OrangeMain (#FB923C).
  * - Modo Oscuro: Fondo GreenDark2 (#10271C), Título #4ADE80, Cuerpo OrangeMain (#FB923C).
  * - Símbolo de Verificación: Círculos concéntricos con color #22C55E.
- * El tamaño del símbolo y los márgenes se adaptan al alto de la pantalla (CA-UI-01-02).
+ * El tamaño del símbolo y los márgenes se adaptan al alto de la pantalla (CA-UI-01-02). El modo lo decide el tema de
+ * la app ([LocalIsDarkTheme], claro por defecto), no el del sistema (CA-UI-05-01).
  *
  * @param title Título principal de la acción completada.
  * @param body Mensaje descriptivo o secundario.
@@ -74,11 +76,13 @@ fun ActionSuccessScreen(
     onButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme() || MaterialTheme.colorScheme.surface == SurfaceDark
+    val isDark = LocalIsDarkTheme.current
 
     val backgroundColor = if (isDark) GreenDark2 else GreenLight
     val titleColor = if (isDark) Color(0xFF4ADE80) else GreenDark
     val bodyColor = OrangeMain
+
+    SystemBarEffect(isLightBackground = !isDark)
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val metrics = formMetricsForWindow(maxHeight)
@@ -181,7 +185,7 @@ private fun ConcentricSuccessCheckIcon(size: Dp, modifier: Modifier = Modifier) 
 @Preview(showBackground = true, name = "Modo Claro")
 @Composable
 private fun ActionSuccessScreenLightPreview() {
-    SmartfoodTheme(darkTheme = false) {
+    SmartfoodTheme(themeMode = ThemeMode.LIGHT) {
         ActionSuccessScreen(
             title = "¡Cuenta creada con éxito!",
             body = "Ya puedes acceder a todas nuestras funciones. Te enviamos un correo de confirmación.",
@@ -194,7 +198,7 @@ private fun ActionSuccessScreenLightPreview() {
 @Preview(showBackground = true, name = "Modo Oscuro")
 @Composable
 private fun ActionSuccessScreenDarkPreview() {
-    SmartfoodTheme(darkTheme = true) {
+    SmartfoodTheme(themeMode = ThemeMode.DARK) {
         ActionSuccessScreen(
             title = "¡Cuenta creada con éxito!",
             body = "Ya puedes acceder a todas nuestras funciones. Te enviamos un correo de confirmación.",

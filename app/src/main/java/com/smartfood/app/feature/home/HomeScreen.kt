@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodBrandHeader
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
+import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
@@ -44,7 +45,7 @@ fun HomeScreen(
     onEvent: (HomeEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    SystemBarEffect(isLightBackground = true)
+    SystemBarEffect(isLightBackground = !LocalIsDarkTheme.current)
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

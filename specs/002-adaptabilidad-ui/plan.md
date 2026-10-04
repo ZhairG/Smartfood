@@ -91,7 +91,24 @@ BoxWithConstraints ── provee LocalFormMetrics = formMetricsForWindow(maxHeig
 El popup es visible mientras el campo tiene el foco (CA-UI-03-01, 02 y 05). `PasswordRequirementChecklist` pasa a
 un estilo compacto: unos 115 dp con 4 reglas.
 
-## 6. Decisiones (ADR)
+## 6. Modo de color (HU-UI-05)
+
+```
+ThemeMode { LIGHT, DARK, SYSTEM }   Default = LIGHT
+   └─ ThemeMode.isDark()            único lugar con isSystemInDarkTheme()
+        └─ SmartfoodTheme(themeMode) ── provee LocalIsDarkTheme + LightColorScheme/DarkColorScheme (sin cambios)
+             ├─ ActionSuccessScreen lee LocalIsDarkTheme (ya no el sistema)
+             └─ HomeScreen / ActionSuccessScreen ajustan los íconos de las barras según LocalIsDarkTheme
+```
+
+- **Antes de Compose:** el tema XML pasa a `Theme.Material.Light.NoActionBar` con `windowBackground = GreenLight`
+  (`@color/smartfood_green_light`, el mismo valor que el token) e íconos oscuros en las barras.
+- **Android 12+:** `values-v31/themes.xml` define `windowSplashScreenBackground = GreenLight` y
+  `windowSplashScreenAnimatedIcon = @drawable/splash_icon`: un `layer-list` de 240 dp con el logo a 128×135 dp, el
+  mismo tamaño que la Splash de Compose. Así la pantalla del sistema y la Splash se ven iguales.
+- No existe `values-night/`, así que el tema XML es claro en ambos modos del sistema.
+
+## 7. Decisiones (ADR)
 
 | # | Decisión | Alternativa descartada | Motivo |
 |---|---|---|---|
@@ -100,8 +117,10 @@ un estilo compacto: unos 115 dp con 4 reglas.
 | ADR-UI-03 | Tres perfiles de medidas según el alto | Un solo diseño compacto | Conserva Figma en tablets y una versión intermedia en teléfonos altos. |
 | ADR-UI-04 | Etiqueta dentro del `decorationBox` | `FocusRequester` en un `Text` clicable | Menos código; la accesibilidad y el foco quedan correctos por construcción. |
 | ADR-UI-05 | Orientación vertical bloqueada en el manifest | Diseño de dos paneles en horizontal | Coherente con RNF-05 de la spec 001 y con el plazo. Las tablets usan el ancho máximo existente. |
+| ADR-UI-06 | `ThemeMode` (claro, oscuro o sistema) con claro por defecto | Forzar claro y borrar el modo oscuro | Mismo resultado visual hoy. El esquema oscuro ya diseñado queda listo para un selector futuro sin tocar pantallas. |
+| ADR-UI-07 | Pantalla de arranque del sistema con atributos del tema (`windowSplashScreen*`) | Librería `androidx.core:core-splashscreen` | Cero dependencias nuevas. La Splash propia de Compose ya maneja la sesión y el tiempo mínimo. |
 
-## 7. Pruebas
+## 8. Pruebas
 
 - **JVM:** `formMetricsFor` (umbrales) y `AbovePopupPositionProvider` (arriba, abajo y límites).
 - **Instrumentadas:**

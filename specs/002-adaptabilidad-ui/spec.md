@@ -80,6 +80,17 @@ el formulario.
 | CA-UI-04-01 | **Dado** un teléfono, **entonces** la app se muestra siempre en vertical. |
 | CA-UI-04-02 | **Dado** una tablet (desde Android 16 el sistema puede ignorar el bloqueo de orientación en pantallas grandes), **entonces** el formulario se centra con un ancho máximo y sigue siendo usable en cualquier orientación. |
 
+### HU-UI-05: Modo de color claro por defecto
+**Como** usuario **quiero** que la app se vea siempre clara y sin destellos oscuros **para** tener una experiencia
+consistente con el diseño, aunque mi teléfono esté en modo oscuro.
+
+| Código | Criterio |
+|---|---|
+| CA-UI-05-01 | **Dado** un teléfono en modo oscuro, **entonces** toda la app se ve en modo claro, incluidas las pantallas de éxito ("¡Cuenta creada con éxito!" y "¡Contraseña actualizada!"). |
+| CA-UI-05-02 | **Dado** un arranque en frío, **entonces** antes de la Splash no aparece ningún fondo oscuro. En Android 12+, la pantalla del sistema usa el mismo fondo (`GreenLight`) y el mismo logo que la Splash; en versiones anteriores, la ventana se pinta con ese fondo. |
+| CA-UI-05-03 | El modo de color se decide en **un solo lugar** (`ThemeMode`, por defecto CLARO). Las pantallas y componentes no consultan el modo del sistema directamente, de modo que un selector futuro (claro, oscuro o sistema) no exige tocarlos. |
+| CA-UI-05-04 | Los colores de cada modo y su asignación por pantalla no cambian: la paleta y los esquemas claro y oscuro quedan iguales. |
+
 ## 3. Requisitos no funcionales
 
 | Código | Requisito |
@@ -88,6 +99,7 @@ el formulario.
 | RNF-UI-02 | No hay scroll programático (`scrollTo`, `animateScrollTo`) en las pantallas. Llevar el campo enfocado a la vista es responsabilidad del sistema de foco. |
 | RNF-UI-03 | Las medidas compactas y regulares viven en un único lugar del design system. |
 | RNF-UI-04 | El cambio de foco no espera a un frame adicional: los indicadores de foco y el popup reaccionan en el mismo frame. |
+| RNF-UI-05 | `isSystemInDarkTheme()` solo se usa dentro de `ThemeMode.kt`. |
 
 ## 4. Fuera de alcance
 

@@ -25,6 +25,13 @@
 - [x] T014 Pruebas instrumentadas de foco y popup; ajuste de las pruebas existentes.
 - [x] T015 Documentación (`AGENTS.md`, `README.md`, nota en la spec 001) y matriz de trazabilidad.
 
+## Fase 4: Modo de color (HU-UI-05)
+- [x] T016 `ThemeMode` + `LocalIsDarkTheme`; `SmartfoodTheme(themeMode)` con claro por defecto (CA-UI-05-03, RNF-UI-05).
+- [x] T017 [P] `ActionSuccessScreen` lee `LocalIsDarkTheme`; `HomeScreen` y `ActionSuccessScreen` ajustan los íconos de las barras (CA-UI-05-01).
+- [x] T018 [P] Tema XML claro, `values-v31` con `windowSplashScreen*` y `splash_icon` (CA-UI-05-02).
+- [x] T019 [P] `SplashScreen` y `MainActivity` usan tokens y estilos claros (CA-UI-05-04).
+- [x] T020 Pruebas `ThemeModeTest` (JVM) y `ColorModeTest` (instrumentada); documentación.
+
 ## Matriz de trazabilidad
 
 Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un V2436 con Android 16), **M** = revisión manual.
@@ -53,6 +60,10 @@ Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un
 | CA-UI-03-06 | I `FormFocusTest.ca_ui_03_02_*` |
 | CA-UI-04-01 | Manifest `screenOrientation="portrait"`; M |
 | CA-UI-04-02 | Diseño: ancho máximo de 480 dp en el formulario |
+| CA-UI-05-01 | U `ThemeModeTest`, I `ColorModeTest.ca_ui_05_01_*` (tema y pantalla de éxito con el teléfono en modo oscuro; se comprueba el píxel de fondo `GreenLight`) |
+| CA-UI-05-02 | M (V2436 en modo oscuro: arranque en frío capturado cuadro a cuadro; el primer cuadro es `#F0FDF4` con el logo y ningún cuadro es oscuro) |
+| CA-UI-05-03 | U `ThemeModeTest`, I `ColorModeTest.ca_ui_05_03_*`; `isSystemInDarkTheme()` solo en `ThemeMode.kt` (RNF-UI-05) |
+| CA-UI-05-04 | Revisión de código: `Color.kt` y los esquemas de `Theme.kt` sin cambios; el `#F0FDF4` fijo de la Splash pasa al token `GreenLight` (mismo valor) |
 | RNF-UI-01..04 | Revisión de código: sin offsets fijos ni `scrollTo`/`animateScrollTo`, medidas en `FormMetrics`, foco con `onFocusChanged` |
 
 ### Hallazgos durante la verificación

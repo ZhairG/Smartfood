@@ -1,7 +1,6 @@
 package com.smartfood.app.core.designsystem.theme
 
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -14,8 +13,9 @@ import androidx.compose.ui.platform.LocalContext
 /**
  * Nombre: Theme.kt
  * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Configuración del Tema de Material 3 para la aplicación Smartfood.
+ * Fecha: Octubre 2026
+ * Descripción: Configuración del Tema de Material 3 para la aplicación Smartfood. El modo de color lo decide
+ * [ThemeMode] (claro por defecto, spec 002 HU-UI-05); los esquemas de color no cambian.
  */
 
 private val LightColorScheme = lightColorScheme(
@@ -71,16 +71,17 @@ private val DarkColorScheme = darkColorScheme(
 /**
  * Tema principal de la aplicación Smartfood.
  *
- * @param darkTheme Indica si se debe aplicar el esquema de colores en modo oscuro.
+ * @param themeMode Modo de color; por defecto [ThemeMode.Default] (claro), aunque el teléfono esté en modo oscuro.
  * @param dynamicColor Indica si se deben utilizar colores dinámicos (Android 12+).
  * @param content Contenido Composable que será renderizado dentro del tema.
  */
 @Composable
 fun SmartfoodTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeMode: ThemeMode = ThemeMode.Default,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    val darkTheme = themeMode.isDark()
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -92,7 +93,8 @@ fun SmartfoodTheme(
     }
 
     CompositionLocalProvider(
-        LocalSpacing provides Spacing()
+        LocalSpacing provides Spacing(),
+        LocalIsDarkTheme provides darkTheme
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
