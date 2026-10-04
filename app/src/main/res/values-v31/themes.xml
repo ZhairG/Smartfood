@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Android 12+: la pantalla de arranque del sistema se ve igual que la Splash de Compose (spec 002, CA-UI-05-02):
+        mismo fondo GreenLight y mismo logo, centrado y al mismo tamaño.
+    -->
+    <style name="Theme.Smartfood" parent="Base.Theme.Smartfood">
+        <item name="android:windowSplashScreenBackground">@color/smartfood_green_light</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+    </style>
+</resources>

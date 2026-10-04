@@ -28,6 +28,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smartfood.app.core.designsystem.theme.GreyNeutral
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
 
@@ -44,6 +46,7 @@ import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
  * @param length Longitud del código (por defecto 4 dígitos).
  * @param isError Si es `true`, aplica resaltado de error con borde rojo en las casillas.
  * @param enabled Habilita o deshabilita la edición del código.
+ * @param onDone Acción de la tecla "Listo": oculta el teclado y luego se ejecuta (CA-UI-02-03).
  */
 @Composable
 fun SmartFoodOtpCodeInput(
@@ -52,8 +55,10 @@ fun SmartFoodOtpCodeInput(
     modifier: Modifier = Modifier,
     length: Int = 4,
     isError: Boolean = false,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    onDone: () -> Unit = {}
 ) {
+    val metrics = LocalFormMetrics.current
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -71,16 +76,20 @@ fun SmartFoodOtpCodeInput(
             imeAction = ImeAction.Done
         ),
         keyboardActions = KeyboardActions(
-            onDone = { focusManager.clearFocus() }
+            onDone = {
+                focusManager.clearFocus()
+                onDone()
+            }
         ),
         enabled = enabled,
         singleLine = true,
         interactionSource = interactionSource,
         modifier = modifier.focusRequester(focusRequester),
         decorationBox = {
+            // Casillas rectangulares centradas, con la proporción y separación de Figma (CA-UI-07-05).
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(metrics.otpSpacing, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 repeat(length) { index ->
@@ -90,15 +99,15 @@ fun SmartFoodOtpCodeInput(
                     val borderColor = when {
                         isError -> MaterialTheme.colorScheme.error
                         isBoxFocused -> MaterialTheme.colorScheme.primary
-                        else -> MaterialTheme.colorScheme.outline
+                        else -> GreyNeutral
                     }
                     val borderWidth = if (isError) 2.dp else 1.dp
 
                     Box(
                         modifier = Modifier
-                            .size(60.dp)
+                            .size(width = metrics.otpBoxWidth, height = metrics.otpBoxHeight)
                             .inputBorderAndBackground(
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(10.dp),
                                 borderWidth = borderWidth,
                                 borderColor = borderColor,
                                 backgroundColor = MaterialTheme.colorScheme.surfaceVariant

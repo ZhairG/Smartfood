@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.Smartfood" parent="android:Theme.Material.NoActionBar">
+    <!--
+        Tema base claro (spec 002, HU-UI-05). Pinta la ventana con el fondo de la Splash antes de que Compose dibuje,
+        así no hay destello oscuro aunque el teléfono esté en modo oscuro. No existe values-night: el tema XML es claro
+        en ambos modos; el modo de color del contenido lo decide ThemeMode en Compose.
+    -->
+    <style name="Base.Theme.Smartfood" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/smartfood_green_light</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
     </style>
+
+    <style name="Theme.Smartfood" parent="Base.Theme.Smartfood" />
 </resources>

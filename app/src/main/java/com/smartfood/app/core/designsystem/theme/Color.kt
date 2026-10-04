@@ -33,6 +33,9 @@ val GreenDark = Color(0xFF14532D)
 /** Verde más oscuro usado en fondos y contenedores del modo oscuro. */
 val GreenDark2 = Color(0xFF10271C)
 
+/** Verde de la casilla de verificación y del check de requisitos cumplidos (base de [GreenMain50] y [GreenMain20]). */
+val GreenCheck = Color(0xFF16A34A)
+
 /** Verde claro suave para fondos de tarjetas y contenedores claros. */
 val GreenLight = Color(0xFFF0FDF4)
 

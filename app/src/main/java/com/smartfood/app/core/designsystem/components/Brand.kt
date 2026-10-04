@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,9 +21,10 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.google.firebase.annotations.concurrent.Background
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
 /**
@@ -38,25 +40,30 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
  *
  * @param modifier Modificador opcional para personalizar el diseño.
  * @param smartColor Color para la palabra "Smart". Por defecto toma el valor de `onPrimaryContainer`.
+ * @param fontSize Tamaño del texto; por defecto el de `displayLarge` (Figma).
+ * @param lineHeight Alto de línea; por defecto el de `displayLarge` (Figma).
  */
 @Composable
 fun SmartFoodWordmark(
     modifier: Modifier = Modifier,
     smartColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    fontSize: TextUnit = MaterialTheme.typography.displayLarge.fontSize,
+    lineHeight: TextUnit = MaterialTheme.typography.displayLarge.lineHeight,
 ) {
     Text(
         text = buildAnnotatedString {
             withStyle(SpanStyle(color = smartColor)) { append("Smart") }
             withStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary)) { append("Food") }
         },
-        style = MaterialTheme.typography.displayLarge,
+        style = MaterialTheme.typography.displayLarge.copy(fontSize = fontSize, lineHeight = lineHeight),
         modifier = modifier,
     )
 }
 
 /**
  * Encabezado de marca de la aplicación.
- * Muestra el ícono del logo dentro de un contenedor circular blanco y el isotipo [SmartFoodWordmark] debajo.
+ * Muestra el ícono del logo dentro de un contenedor circular blanco y el isotipo [SmartFoodWordmark].
+ * Su tamaño y disposición (columna o fila) salen de [LocalFormMetrics].
  *
  * @param modifier Modificador opcional para ajustar el diseño.
  * @param smartColor Color para el segmento "Smart" del isotipo.
@@ -66,14 +73,11 @@ fun SmartFoodBrandHeader(
     modifier: Modifier = Modifier,
     smartColor: Color = MaterialTheme.colorScheme.onPrimaryContainer
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
+    val metrics = LocalFormMetrics.current
+    val logo: @Composable () -> Unit = {
         Box(
             modifier = Modifier
-                .size(100.dp)
+                .size(metrics.logoSize)
                 .background(color = Color.White, shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -81,12 +85,42 @@ fun SmartFoodBrandHeader(
                 painter = painterResource(id = R.drawable.logo_smartfood_circle),
                 contentDescription = null,
                 tint = Color.Unspecified,
-                modifier = Modifier.size(96.dp),
+                modifier = Modifier.size(metrics.logoSize * LOGO_ICON_RATIO),
             )
         }
-        SmartFoodWordmark(smartColor = smartColor)
+    }
+    val wordmark: @Composable () -> Unit = {
+        SmartFoodWordmark(
+            smartColor = smartColor,
+            fontSize = metrics.wordmarkFontSize,
+            lineHeight = metrics.wordmarkLineHeight
+        )
+    }
+
+    // En pantallas bajas el logo y el nombre van en una fila para ahorrar alto (CA-UI-01-05).
+    if (metrics.inlineBrand) {
+        Row(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            logo()
+            wordmark()
+        }
+    } else {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            logo()
+            wordmark()
+        }
     }
 }
+
+/** Proporción del ícono respecto al círculo blanco que lo contiene (96/100 en Figma). */
+private const val LOGO_ICON_RATIO = 0.96f
 
 @Preview(showBackground = true)
 @Composable

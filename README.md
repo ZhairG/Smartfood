@@ -13,9 +13,10 @@ Aplicación Android para reducir el desperdicio de comida en los hogares. Une **
 | Módulo | Spec | Estado |
 |---|---|---|
 | 001 Autenticación | [`specs/001-autenticacion`](specs/001-autenticacion/spec.md) | ✅ Implementado (v1) |
-| 002 Inventario | — | Pendiente |
-| 003 Catálogo de recetas | — | Pendiente |
-| 004 Agente recomendador | — | Pendiente |
+| 002 Adaptabilidad de la UI | [`specs/002-adaptabilidad-ui`](specs/002-adaptabilidad-ui/spec.md) | ✅ Implementado |
+| 003 Inventario | — | Pendiente |
+| 004 Catálogo de recetas | — | Pendiente |
+| 005 Agente recomendador | — | Pendiente |
 
 ## Metodología: Spec Driven Development
 
@@ -40,7 +41,7 @@ Cada criterio de aceptación (p. ej. `CA-02-03`) tiene al menos una prueba que l
 com.smartfood.app/
 ├── core/
 │   ├── common/          safeRunCatching (coroutines seguras)
-│   ├── designsystem/    theme/ (tokens de Figma), components/ (SmartFood*), util/
+│   ├── designsystem/    theme/ (tokens de Figma y FormMetrics), components/ (SmartFood*, AnchoredPopup), util/
 │   ├── di/              CoreDataModule: FirebaseAuth, Firestore, DataStore
 │   └── navigation/      AppNavHost, Routes type-safe, NavTransitions, ObserveEffects
 └── feature/
@@ -61,6 +62,9 @@ com.smartfood.app/
 Kotlin · Jetpack Compose (Material 3) · Hilt · Navigation Compose type-safe · Coroutines/Flow ·
 Firebase Authentication · Cloud Firestore · DataStore · JUnit4 · Compose UI Test
 
+El diseño de referencia está en Figma (archivo `z1AoQvluQcmx98gjP4vHF6`, frames "_Claro"). La app usa la
+tipografía Poppins, incluida en el APK con licencia OFL (`docs/licenses/OFL-Poppins.txt`).
+
 ## Puesta en marcha
 
 1. Descargar `google-services.json` desde la consola de Firebase (Configuración del proyecto → app Android
@@ -72,6 +76,18 @@ Firebase Authentication · Cloud Firestore · DataStore · JUnit4 · Compose UI 
    - **Firestore Database** → crear la base de datos.
    - Publicar las reglas: `firebase deploy --only firestore:rules`.
 4. Ejecutar la configuración `app`.
+
+## Ícono de la app
+
+El ícono oficial (adaptativo, monocromático, Android 7.x y Play Store) se genera desde
+`app/src/main/res/drawable-nodpi/logo_smartfood_circle.png`. Si cambia el logo, regenéralo:
+
+```bash
+pip install pillow
+python tools/generate_launcher_icon.py
+```
+
+El script verifica que el logo quede dentro de la zona segura de 66 dp. No edites los `mipmap-*` a mano.
 
 ## Datos de prueba: recuperación de contraseña (simulada)
 

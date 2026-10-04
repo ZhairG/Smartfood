@@ -39,6 +39,9 @@ y después el código.
 | `RNF-NN` | Requisito no funcional | `RNF-01` |
 | `TNNN` | Tarea de implementación | `T012` |
 
+A partir de la spec 002, los códigos llevan un prefijo corto de la spec para no repetirse (por ejemplo,
+`CA-UI-01-02` en la spec 002). La spec 001 conserva sus códigos sin prefijo.
+
 ## 3. Arquitectura (no negociable)
 
 - **Un módulo Gradle (`:app`) con paquetes por feature**: `feature/<nombre>/{domain,data,ui}` más `core/`
@@ -108,3 +111,4 @@ Una tarea está terminada cuando se cumple todo esto:
 | Fecha | Cambio | Motivo |
 |---|---|---|
 | 2026-10-04 | Versión 1.0 | Adopción de SDD para el módulo 1 |
+| 2026-10-04 | Códigos con prefijo por spec | Evitar choques de códigos entre la spec 001 y la 002 |

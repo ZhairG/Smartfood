@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Ícono de la pantalla de arranque del sistema (Android 12+). Lienzo de 240 dp, como pide el sistema, con el logo
+    centrado a 128×135 dp: el mismo tamaño que en la Splash de Compose, y dentro del círculo de 160 dp que recorta el
+    sistema (spec 002, CA-UI-05-02).
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="240dp"
+        android:height="240dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+    <item
+        android:width="128dp"
+        android:height="135dp"
+        android:gravity="center"
+        android:drawable="@drawable/logo_smartfood_circle" />
+</layer-list>

@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -28,28 +26,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.feature.auth.ui.recoveryMessageRes
-import com.smartfood.app.feature.auth.ui.components.AuthErrorMessage
-import com.smartfood.app.feature.auth.ui.components.AuthScreenScaffold
-import com.smartfood.app.feature.auth.ui.components.PasswordRequirementChecklist
 import com.smartfood.app.core.designsystem.components.SmartFoodOtpCodeInput
-import com.smartfood.app.core.designsystem.components.SmartFoodPasswordField
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.components.SmartFoodPromptLink
 import com.smartfood.app.core.designsystem.components.SmartFoodStepIndicator
 import com.smartfood.app.core.designsystem.components.SmartFoodTextField
 import com.smartfood.app.core.designsystem.components.SmartFoodTextLink
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.OrangeDark
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import kotlinx.coroutines.launch
+import com.smartfood.app.core.designsystem.theme.titleStyle
+import com.smartfood.app.feature.auth.ui.components.AuthErrorMessage
+import com.smartfood.app.feature.auth.ui.components.AuthScreenScaffold
+import com.smartfood.app.feature.auth.ui.components.FlexibleGap
+import com.smartfood.app.feature.auth.ui.components.LocalFormViewport
+import com.smartfood.app.feature.auth.ui.components.fillFormViewport
+import com.smartfood.app.feature.auth.ui.components.PasswordFieldWithChecklist
+import com.smartfood.app.feature.auth.ui.recoveryMessageRes
 
 /**
  * Nombre: PasswordRecoveryScreen.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pantalla stateless del flujo de Recuperación de Contraseña (HU-04, **simulado** en la v1).
- * Gestiona de forma unificada las 3 etapas (Paso 1: Solicitud de código, Paso 2: Verificación OTP,
- * Paso 3: Definición de nueva contraseña) con el indicador de pasos animado [SmartFoodStepIndicator]
- * y desplazamiento automático sobre el teclado mediante [ScrollState].
+ * Gestiona las 3 etapas (correo, código de 4 dígitos y nueva contraseña) con el indicador de pasos
+ * [SmartFoodStepIndicator]. Cada paso cabe sin scroll y el campo enfocado queda visible sin scroll programático
+ * (spec 002); en el paso 3 los requisitos aparecen en un popup encima del campo enfocado (CA-UI-03-02).
  *
  * @param state Objeto de estado inmutable [PasswordRecoveryUiState] expuesto por el ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [PasswordRecoveryEvent] al ViewModel.
@@ -69,40 +71,27 @@ fun PasswordRecoveryScreen(
         },
         headerContent = {
             RecoveryHeader(step = state.step, email = state.email, onEvent = onEvent)
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(LocalFormMetrics.current.sectionSpacing))
         },
         modifier = modifier
-    ) { scrollState ->
+    ) {
         AnimatedContent(
             targetState = state.step,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            // Sin SizeTransform: cada paso ya llena el alto visible, así que animar el tamaño solo prolongaría el
+            // alto del paso anterior (CA-UI-07-03).
+            transitionSpec = { (fadeIn() togetherWith fadeOut()).using(null) },
             label = "recovery_step_transition"
         ) { targetStep ->
             when (targetStep) {
-                RecoveryStep.EMAIL_REQUEST -> {
-                    ForgotPasswordStep(
-                        state = state,
-                        scrollState = scrollState,
-                        onEvent = onEvent,
-                        onNavigateToLogin = onNavigateToLogin
-                    )
-                }
+                RecoveryStep.EMAIL_REQUEST -> ForgotPasswordStep(
+                    state = state,
+                    onEvent = onEvent,
+                    onNavigateToLogin = onNavigateToLogin
+                )
 
-                RecoveryStep.OTP_VERIFICATION -> {
-                    VerifyCodeStep(
-                        state = state,
-                        scrollState = scrollState,
-                        onEvent = onEvent
-                    )
-                }
+                RecoveryStep.OTP_VERIFICATION -> VerifyCodeStep(state = state, onEvent = onEvent)
 
-                RecoveryStep.NEW_PASSWORD -> {
-                    CreateNewPasswordStep(
-                        state = state,
-                        scrollState = scrollState,
-                        onEvent = onEvent
-                    )
-                }
+                RecoveryStep.NEW_PASSWORD -> CreateNewPasswordStep(state = state, onEvent = onEvent)
             }
         }
     }
@@ -133,7 +122,7 @@ private fun RecoveryHeader(
 
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineLarge,
+            style = LocalFormMetrics.current.titleStyle,
             color = MaterialTheme.colorScheme.primary
         )
 
@@ -146,19 +135,19 @@ private fun RecoveryHeader(
         )
 
         if (step == RecoveryStep.OTP_VERIFICATION) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = email.ifBlank { "nombre@correo.com" },
+                text = email.ifBlank { stringResource(id = R.string.login_email_placeholder) },
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(4.dp))
             SmartFoodTextLink(
                 text = stringResource(id = R.string.recovery_step2_wrong_email_link),
                 onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ChangeEmailClicked) } },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                color = OrangeDark  // Figma: #DE7D1C (nodo 585:4479)
             )
         }
     }
@@ -175,15 +164,18 @@ private fun PasswordRecoveryUiState.errorText(): String? =
 @Composable
 private fun ForgotPasswordStep(
     state: PasswordRecoveryUiState,
-    scrollState: ScrollState,
     onEvent: (PasswordRecoveryEvent) -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
-    val coroutineScope = rememberCoroutineScope()
+    val metrics = LocalFormMetrics.current
 
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    // Cada paso llena el alto visible del formulario para repartir el sobrante con sus FlexibleGap (CA-UI-07-03).
+    Column(
+        modifier = modifier.fillFormViewport(LocalFormViewport.current),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         SmartFoodTextField(
             label = stringResource(id = R.string.login_email_label),
             value = state.email,
@@ -191,11 +183,6 @@ private fun ForgotPasswordStep(
             placeholder = stringResource(id = R.string.login_email_placeholder),
             enabled = !state.isLoading,
             isError = state.emailHasError,
-            onFocusChanged = { focused ->
-                if (focused) {
-                    coroutineScope.launch { scrollState.animateScrollTo(scrollState.maxValue) }
-                }
-            },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
                 autoCorrectEnabled = false,
@@ -210,12 +197,9 @@ private fun ForgotPasswordStep(
             )
         )
 
-        AuthErrorMessage(
-            message = state.errorText(),
-            modifier = Modifier.fillMaxWidth()
-        )
+        AuthErrorMessage(message = state.errorText(), modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.height(28.dp))
+        FlexibleGap(minHeight = metrics.sectionSpacing, weight = 2f)  // Figma: nodo 585:4458
 
         SmartFoodPrimaryButton(
             text = stringResource(id = R.string.recovery_step1_button),
@@ -224,13 +208,16 @@ private fun ForgotPasswordStep(
             isLoading = state.isLoading
         )
 
-        Spacer(modifier = Modifier.height(26.dp))
+        FlexibleGap(minHeight = metrics.sectionSpacing, weight = 2f)
 
         SmartFoodPromptLink(
             prompt = stringResource(id = R.string.recovery_step1_back_prompt),
             action = stringResource(id = R.string.recovery_step1_back_action),
-            onClick = onNavigateToLogin
+            onClick = onNavigateToLogin,
+            fontSize = 18.sp  // Figma: nodo 585:4465
         )
+
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -240,31 +227,27 @@ private fun ForgotPasswordStep(
 @Composable
 private fun VerifyCodeStep(
     state: PasswordRecoveryUiState,
-    scrollState: ScrollState,
     onEvent: (PasswordRecoveryEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    val metrics = LocalFormMetrics.current
 
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    // Cada paso llena el alto visible del formulario para repartir el sobrante con sus FlexibleGap (CA-UI-07-03).
+    Column(
+        modifier = modifier.fillFormViewport(LocalFormViewport.current),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         SmartFoodOtpCodeInput(
             code = state.otpCode,
-            onCodeChanged = remember(onEvent) {
-                { code ->
-                    onEvent(PasswordRecoveryEvent.OtpCodeChanged(code))
-                    coroutineScope.launch { scrollState.animateScrollTo(scrollState.maxValue) }
-                }
-            },
+            onCodeChanged = remember(onEvent) { { code -> onEvent(PasswordRecoveryEvent.OtpCodeChanged(code)) } },
             isError = state.otpCodeHasError,
-            enabled = !state.isLoading
+            enabled = !state.isLoading,
+            onDone = remember(onEvent) { { onEvent(PasswordRecoveryEvent.VerifyCodeClicked) } }
         )
 
-        AuthErrorMessage(
-            message = state.errorText(),
-            modifier = Modifier.fillMaxWidth()
-        )
+        AuthErrorMessage(message = state.errorText(), modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.height(28.dp))
+        FlexibleGap(minHeight = metrics.sectionSpacing, weight = 3f)  // Figma: nodo 585:4467
 
         SmartFoodPrimaryButton(
             text = stringResource(id = R.string.recovery_step2_button),
@@ -273,90 +256,77 @@ private fun VerifyCodeStep(
             isLoading = state.isLoading
         )
 
-        Spacer(modifier = Modifier.height(26.dp))
+        FlexibleGap(minHeight = metrics.sectionSpacing)
 
         SmartFoodPromptLink(
             prompt = stringResource(id = R.string.recovery_step2_resend_prompt),
             action = stringResource(id = R.string.recovery_step2_resend_action),
-            onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ResendCodeClicked) } }
+            onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ResendCodeClicked) } },
+            fontSize = 16.sp  // Figma: nodo 585:4474
         )
+
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
 /**
- * Formulario del Paso 3: Creación de nueva contraseña.
+ * Formulario del Paso 3: Creación de nueva contraseña. Los requisitos se muestran en un popup encima del campo
+ * enfocado, incluida la regla "¿Coinciden?" (CA-UI-03-02 y CA-UI-03-06).
  */
 @Composable
 private fun CreateNewPasswordStep(
     state: PasswordRecoveryUiState,
-    scrollState: ScrollState,
     onEvent: (PasswordRecoveryEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
-    val coroutineScope = rememberCoroutineScope()
-    val isFormValid = state.canResetPassword
+    val metrics = LocalFormMetrics.current
 
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        SmartFoodPasswordField(
+    // Cada paso llena el alto visible del formulario para repartir el sobrante con sus FlexibleGap (CA-UI-07-03).
+    Column(
+        modifier = modifier.fillFormViewport(LocalFormViewport.current),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        PasswordFieldWithChecklist(
             label = stringResource(id = R.string.recovery_step3_new_password_label),
             value = state.newPassword,
             onValueChange = remember(onEvent) { { pass -> onEvent(PasswordRecoveryEvent.NewPasswordChanged(pass)) } },
+            validation = state.passwordValidation,
+            passwordsMatch = state.passwordsMatch,
             enabled = !state.isLoading,
             isError = state.passwordHasError,
-            onFocusChanged = { focused ->
-                if (focused) {
-                    coroutineScope.launch { scrollState.animateScrollTo(scrollState.maxValue) }
-                }
-            },
             imeAction = ImeAction.Next
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(metrics.fieldSpacing))
 
-        SmartFoodPasswordField(
+        PasswordFieldWithChecklist(
             label = stringResource(id = R.string.recovery_step3_confirm_password_label),
             value = state.confirmPassword,
             onValueChange = remember(onEvent) { { pass -> onEvent(PasswordRecoveryEvent.ConfirmPasswordChanged(pass)) } },
+            validation = state.passwordValidation,
+            passwordsMatch = state.passwordsMatch,
             enabled = !state.isLoading,
             isError = state.passwordHasError,
-            onFocusChanged = { focused ->
-                if (focused) {
-                    coroutineScope.launch { scrollState.animateScrollTo(scrollState.maxValue) }
-                }
-            },
             imeAction = ImeAction.Done,
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
-                    if (isFormValid) {
-                        onEvent(PasswordRecoveryEvent.ResetPasswordClicked)
-                    }
+                    if (state.canResetPassword) onEvent(PasswordRecoveryEvent.ResetPasswordClicked)
                 }
             )
         )
 
-        Spacer(modifier = Modifier.height(18.dp))
+        AuthErrorMessage(message = state.errorText(), modifier = Modifier.fillMaxWidth())
 
-        PasswordRequirementChecklist(
-            hasMinimumLength = state.passwordValidation.hasMinimumLength,
-            hasUppercase = state.passwordValidation.hasUppercase,
-            hasSpecialCharacter = state.passwordValidation.hasSpecialCharacter,
-            passwordsMatch = state.passwordsMatch
-        )
-
-        AuthErrorMessage(
-            message = state.errorText(),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(28.dp))
+        // Figma (nodo 585:4481): el botón queda al pie del panel.
+        FlexibleGap(minHeight = metrics.sectionSpacing)
 
         SmartFoodPrimaryButton(
             text = stringResource(id = R.string.recovery_step3_button),
             loadingText = stringResource(id = R.string.login_button_loading),
             onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ResetPasswordClicked) } },
-            enabled = isFormValid,
+            enabled = state.canResetPassword,
             isLoading = state.isLoading
         )
     }
