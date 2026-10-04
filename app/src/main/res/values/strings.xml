@@ -44,11 +44,10 @@
     <string name="password_req_special_char">Un número y carácter especial</string>
     <string name="password_req_match">¿Coinciden?</string>
 
-    <!-- Navigation & Placeholders -->
-    <string name="title_register_screen">Pantalla de Registro</string>
-    <string name="title_recovery_screen">Recuperar Contraseña</string>
-    <string name="title_home_screen">Pantalla de Home</string>
-    <string name="action_back_to_login">Volver al Login</string>
+    <!-- Home -->
+    <string name="home_greeting">Hola, %1$s</string>
+    <string name="home_greeting_generic">Hola</string>
+    <string name="home_subtitle">Muy pronto verás aquí tu inventario y las recetas que mejor aprovechan lo que tienes.</string>
     <string name="action_logout">Cerrar Sesión</string>
 
     <!-- Password Recovery Flow -->
@@ -86,6 +85,10 @@
     <string name="error_invalid_otp_code">Código incorrecto, inténtalo de nuevo</string>
     <string name="error_account_already_exists">Ya existe una cuenta registrada con este correo electrónico</string>
     <string name="error_firebase_config_not_found">El servicio de autenticación no está habilitado en Firebase Console</string>
+    <string name="error_weak_password">La contraseña no cumple los requisitos de seguridad</string>
+    <string name="error_passwords_dont_match">Las contraseñas no coinciden</string>
+    <string name="error_terms_not_accepted">Debes aceptar los Términos y condiciones</string>
+    <string name="error_unknown">Ocurrió un error inesperado. Inténtalo de nuevo.</string>
 
     <!-- Offline Connection -->
     <string name="offline_dialog_title">Sin conexión a Internet</string>
