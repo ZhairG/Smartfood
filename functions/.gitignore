@@ -1,0 +1,7 @@
+# Dependencias y código compilado
+node_modules/
+lib/
+
+# Secretos locales del emulador (nunca se versionan, RNF-REC-01)
+.secret.local
+*.local
