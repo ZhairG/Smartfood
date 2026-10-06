@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
@@ -184,6 +185,7 @@ private fun LoginOptionsRow(
 
         SmartFoodTextLink(
             text = stringResource(id = R.string.login_forgot_password),
+            textAlign = TextAlign.Center,
             onClick = onNavigateToForgotPassword
         )
     }
