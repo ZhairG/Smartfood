@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Nombre: DemoPasswordRecoveryRepositoryTest.kt
@@ -30,6 +31,11 @@ class DemoPasswordRecoveryRepositoryTest {
     @Test
     fun `CA-REC-01-02 correo sin cuenta responde igual que uno registrado`() = runTest {
         assertTrue(repository.requestCode("otro@correo.com").isSuccess)
+    }
+
+    @Test
+    fun `CA-REC-04-01 informa la misma espera de 60 segundos que el servidor`() = runTest {
+        assertEquals(60.seconds, repository.requestCode(demoEmail).getOrThrow())
     }
 
     @Test

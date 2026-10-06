@@ -39,6 +39,13 @@
   - Política de limpieza de Artifact Registry de 1 día.
 - [ ] T021 Checklist en producción con un correo real (punto 7).
 
+## Fase 4: Cuenta regresiva y envíos fallidos (HU-REC-04, CA-REC-03-07)
+- [x] T022 Servidor: `resendAfterSeconds` al enviar, `retryAfterSeconds` al rechazar y restauración del registro si falla el envío.
+- [x] T023 Dominio y datos: `requestCode` devuelve `Result<Duration>` y `TooManyRequests(retryAfter)`. Se actualizan el mapper, el repositorio remoto, el demo y los fakes.
+- [x] T024 `PasswordRecoveryViewModel`: cuenta regresiva con `Job` y bloqueo de reenvíos para el mismo correo.
+- [x] T025 `SmartFoodCountdownChip` y `formatCountdown`, en el paso 2 (enlace) y el paso 1 (botón).
+- [x] T026 Pruebas del servidor, unitarias e instrumentadas, y redespliegue.
+
 ## Matriz de trazabilidad
 
 Leyenda: **S** = prueba del servidor (`functions/src/test/recoveryService.test.ts`), **U** = prueba unitaria de la app
@@ -61,6 +68,11 @@ Leyenda: **S** = prueba del servidor (`functions/src/test/recoveryService.test.t
 | CA-REC-03-04 | S, U `PasswordRecoveryViewModelTest` |
 | CA-REC-03-05 | S |
 | CA-REC-03-06 | U `PasswordRecoveryViewModelTest` |
+| CA-REC-03-07 | S (2) |
+| CA-REC-04-01 | U `PasswordRecoveryViewModelTest` (2), I `PasswordRecoveryScreenTest.caRec0401_*` |
+| CA-REC-04-02 | S (2), U `FirebaseErrorMapperTest`, U `PasswordRecoveryViewModelTest`, U `CountdownFormatTest` |
+| CA-REC-04-03 | U `PasswordRecoveryViewModelTest` (2), I `PasswordRecoveryScreenTest.caRec0403_*` |
+| CA-REC-04-04 | I `AdaptiveLayoutTest` (paso 2 con cuenta regresiva), M |
 | RNF-REC-02 | M |
 
 ### Checklist de verificación manual

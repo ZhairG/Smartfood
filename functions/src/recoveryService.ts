@@ -20,9 +20,17 @@ export type RecoveryErrorReason =
   | "TOO_MANY_REQUESTS"
   | "WEAK_PASSWORD";
 
-/** Falla de negocio del flujo de recuperación. */
+/**
+ * Falla de negocio del flujo de recuperación.
+ *
+ * @param reason Razón del contrato (plan §3).
+ * @param retryAfterSeconds Solo en `TOO_MANY_REQUESTS`: segundos que faltan para poder pedir otro código.
+ */
 export class RecoveryError extends Error {
-  constructor(readonly reason: RecoveryErrorReason) {
+  constructor(
+    readonly reason: RecoveryErrorReason,
+    readonly retryAfterSeconds?: number,
+  ) {
     super(reason);
     this.name = "RecoveryError";
   }
@@ -57,8 +65,12 @@ export class RecoveryService {
     private readonly generateCode: () => string = randomCode,
   ) {}
 
-  /** Paso 1: genera y envía un código si la cuenta existe; la respuesta es igual si no existe (CA-REC-01-02). */
-  async requestCode(rawEmail: string): Promise<void> {
+  /**
+   * Paso 1: genera y envía un código si la cuenta existe; la respuesta es igual si no existe (CA-REC-01-02).
+   *
+   * @return Segundos que faltan para poder pedir otro código (RF-REC-07).
+   */
+  async requestCode(rawEmail: string): Promise<number> {
     const email = normalizeEmail(rawEmail);
     if (!EMAIL_REGEX.test(email)) throw new RecoveryError("INVALID_EMAIL");
 
@@ -66,14 +78,15 @@ export class RecoveryService {
     const code = this.generateCode();
     const salt = randomBytes(16).toString("hex");
     const now = this.now();
+    const key = recordKey(email);
 
-    const allowed = await this.store.update(recordKey(email), (current) => {
-      if (current && now - current.lastSentAt < RecoveryLimits.RESEND_COOLDOWN_MS) return { result: false };
+    const outcome = await this.store.update<CodeRequest>(key, (current) => {
+      // El límite se aplica igual exista o no la cuenta (CA-REC-03-05).
+      const waitMs = waitBeforeNextCode(current, now);
+      if (waitMs > 0) return { result: { retryAfterMs: waitMs } };
 
       const sameWindow = current !== null && now - current.windowStart < RecoveryLimits.WINDOW_MS;
       const sentInWindow = sameWindow ? current.sentInWindow : 0;
-      if (sentInWindow >= RecoveryLimits.MAX_CODES_PER_WINDOW) return { result: false };
-
       const next: ResetRecord = {
         uid,
         codeHash: hashCode(salt, code),
@@ -84,12 +97,29 @@ export class RecoveryService {
         windowStart: sameWindow ? current.windowStart : now,
         sentInWindow: sentInWindow + 1,
       };
-      return { next, result: true };
+      return { next, result: { previous: current, written: next } };
     });
 
-    // El límite se aplica igual exista o no la cuenta (CA-REC-03-05).
-    if (!allowed) throw new RecoveryError("TOO_MANY_REQUESTS");
-    if (uid !== null) await this.mailer.sendRecoveryCode(email, code);
+    if ("retryAfterMs" in outcome) throw new RecoveryError("TOO_MANY_REQUESTS", toSeconds(outcome.retryAfterMs));
+    if (uid !== null) await this.send(key, email, code, outcome);
+    return toSeconds(waitBeforeNextCode(outcome.written, now));
+  }
+
+  /**
+   * Envía el código. Si el envío falla, restaura el registro anterior para que el intento no cuente para los
+   * límites (CA-REC-03-07), salvo que otra solicitud lo haya cambiado entretanto.
+   */
+  private async send(key: string, email: string, code: string, request: CodeWritten): Promise<void> {
+    try {
+      await this.mailer.sendRecoveryCode(email, code);
+    } catch (error) {
+      await this.store.update(key, (current) =>
+        current?.codeHash === request.written.codeHash
+          ? { next: request.previous, result: undefined }
+          : { result: undefined },
+      );
+      throw error;
+    }
   }
 
   /** Paso 2: comprueba el código; si falla, descuenta un intento. */
@@ -137,6 +167,27 @@ export class RecoveryService {
     if ("error" in outcome) throw new RecoveryError(outcome.error);
     return outcome.uid;
   }
+}
+
+/** Resultado de pedir un código: el registro escrito (y el anterior, para restaurarlo) o la espera pendiente. */
+type CodeWritten = { previous: ResetRecord | null; written: ResetRecord };
+type CodeRequest = CodeWritten | { retryAfterMs: number };
+
+/**
+ * Milisegundos que faltan para poder enviar otro código: el mayor entre el fin de la espera de 60 s y, si la
+ * ventana de 1 h ya tiene el máximo de envíos, el fin de esa ventana (plan §5).
+ */
+function waitBeforeNextCode(record: ResetRecord | null, now: number): number {
+  if (!record) return 0;
+  const cooldownEnd = record.lastSentAt + RecoveryLimits.RESEND_COOLDOWN_MS;
+  const windowFull =
+    now - record.windowStart < RecoveryLimits.WINDOW_MS && record.sentInWindow >= RecoveryLimits.MAX_CODES_PER_WINDOW;
+  const windowEnd = windowFull ? record.windowStart + RecoveryLimits.WINDOW_MS : 0;
+  return Math.max(0, cooldownEnd - now, windowEnd - now);
+}
+
+function toSeconds(ms: number): number {
+  return Math.ceil(ms / 1000);
 }
 
 /** Resultado de comprobar un código: el `uid` de la cuenta o la razón del rechazo. */

@@ -54,6 +54,7 @@
     <string name="recovery_step1_title">¿Olvidaste tu contraseña?</string>
     <string name="recovery_step1_subtitle">Recupera tu acceso y vuelve a disfrutar de tus recetas favoritas.</string>
     <string name="recovery_step1_button">Enviar Código</string>
+    <string name="recovery_step1_button_countdown">Enviar Código en %1$s</string>
     <string name="recovery_step1_back_prompt">Volver a</string>
     <string name="recovery_step1_back_action">Iniciar sesión</string>
 
@@ -63,6 +64,12 @@
     <string name="recovery_step2_button">Verificar Código</string>
     <string name="recovery_step2_resend_prompt">¿No recibiste el código?</string>
     <string name="recovery_step2_resend_action">Reenviar código</string>
+    <string name="recovery_step2_resend_countdown">Reenviar en %1$s</string>
+    <plurals name="recovery_resend_countdown_a11y">
+        <item quantity="one">Podrás pedir otro código en %d segundo</item>
+        <item quantity="many">Podrás pedir otro código en %d segundos</item>
+        <item quantity="other">Podrás pedir otro código en %d segundos</item>
+    </plurals>
 
     <string name="recovery_step3_title">Crear Nueva Contraseña</string>
     <string name="recovery_step3_subtitle">Elige una contraseña segura para proteger tu cuenta.</string>

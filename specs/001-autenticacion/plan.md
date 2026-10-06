@@ -95,7 +95,7 @@ interface UserRepository {
 }
 
 interface PasswordRecoveryRepository {
-    suspend fun requestCode(email: String): Result<Unit>
+    suspend fun requestCode(email: String): Result<Duration>   // espera antes de otro código (spec 003)
     suspend fun verifyCode(email: String, code: String): Result<Unit>
     suspend fun resetPassword(email: String, code: String, newPassword: String): Result<Unit>
 }

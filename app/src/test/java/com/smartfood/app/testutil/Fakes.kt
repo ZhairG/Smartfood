@@ -8,6 +8,8 @@ import com.smartfood.app.feature.auth.domain.repository.PasswordRecoveryReposito
 import com.smartfood.app.feature.auth.domain.repository.SessionPreferences
 import com.smartfood.app.feature.auth.domain.repository.UserRepository
 import kotlinx.coroutines.delay
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Nombre: Fakes.kt
@@ -101,7 +103,7 @@ class FakeSessionPreferences(var rememberMe: Boolean = true) : SessionPreference
 
 /** Fake de [PasswordRecoveryRepository] con resultados configurables por paso. */
 class FakePasswordRecoveryRepository : PasswordRecoveryRepository {
-    var requestCodeResult: Result<Unit> = Result.success(Unit)
+    var requestCodeResult: Result<Duration> = Result.success(60.seconds)
     var verifyCodeResult: Result<Unit> = Result.success(Unit)
     var resetPasswordResult: Result<Unit> = Result.success(Unit)
 
@@ -109,7 +111,7 @@ class FakePasswordRecoveryRepository : PasswordRecoveryRepository {
     var verifyCodeCalls = 0
     var resetPasswordCalls = 0
 
-    override suspend fun requestCode(email: String): Result<Unit> {
+    override suspend fun requestCode(email: String): Result<Duration> {
         requestCodeCalls++
         return requestCodeResult
     }

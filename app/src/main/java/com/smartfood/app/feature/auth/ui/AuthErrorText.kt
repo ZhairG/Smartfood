@@ -27,7 +27,7 @@ fun AuthError.messageRes(): Int = when (this) {
     AuthError.InvalidOtpCode -> R.string.error_invalid_otp_code
     AuthError.OtpCodeExpired -> R.string.error_otp_code_expired
     AuthError.TooManyAttempts -> R.string.error_too_many_attempts
-    AuthError.TooManyRequests -> R.string.error_too_many_requests
+    is AuthError.TooManyRequests -> R.string.error_too_many_requests
     AuthError.Network -> R.string.offline_dialog_title
     AuthError.ServiceUnavailable -> R.string.error_firebase_config_not_found
     is AuthError.Unknown -> R.string.error_unknown

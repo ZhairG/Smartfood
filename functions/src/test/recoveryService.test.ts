@@ -49,8 +49,14 @@ class FakeUserDirectory implements UserDirectory {
 
 class FakeMailer implements Mailer {
   readonly sent: { email: string; code: string }[] = [];
+  /** Si es `true`, el próximo envío falla como si Gmail rechazara las credenciales. */
+  failNext = false;
 
   async sendRecoveryCode(email: string, code: string): Promise<void> {
+    if (this.failNext) {
+      this.failNext = false;
+      throw new Error("535 BadCredentials");
+    }
     this.sent.push({ email, code });
   }
 }
@@ -79,6 +85,17 @@ beforeEach(() => {
 /** Comprueba que la promesa falla con la razón esperada. */
 async function rejectsWith(promise: Promise<unknown>, reason: RecoveryErrorReason): Promise<void> {
   await assert.rejects(promise, (error: unknown) => error instanceof RecoveryError && error.reason === reason);
+}
+
+/** Comprueba que la solicitud se rechaza por los límites e informa los segundos de espera esperados. */
+async function rejectsWithWait(promise: Promise<unknown>, retryAfterSeconds: number): Promise<void> {
+  await assert.rejects(
+    promise,
+    (error: unknown) =>
+      error instanceof RecoveryError &&
+      error.reason === "TOO_MANY_REQUESTS" &&
+      error.retryAfterSeconds === retryAfterSeconds,
+  );
 }
 
 function lastSentCode(): string {
@@ -268,5 +285,59 @@ describe("Credenciales de Gmail", () => {
       user: "equipo@gmail.com",
       pass: "abcdefghijklmnop",
     });
+  });
+});
+
+describe("HU-REC-04: tiempo de espera para pedir otro código", () => {
+  const SECOND = 1000;
+
+  it("CA-REC-04-01 al enviar un codigo informa 60 segundos de espera", async () => {
+    assert.equal(await service.requestCode(EMAIL), 60);
+  });
+
+  it("CA-REC-04-01 un correo sin cuenta informa la misma espera", async () => {
+    assert.equal(await service.requestCode(UNKNOWN_EMAIL), 60);
+  });
+
+  it("CA-REC-04-02 el rechazo por la espera de 60 segundos informa lo que falta", async () => {
+    await service.requestCode(EMAIL);
+    now += 20 * SECOND + 1;
+
+    await rejectsWithWait(service.requestCode(EMAIL), 40);
+  });
+
+  it("CA-REC-04-02 el quinto codigo de la hora informa la espera hasta el fin de la ventana", async () => {
+    let wait = 0;
+    for (let request = 0; request < RecoveryLimits.MAX_CODES_PER_WINDOW; request++) {
+      wait = await service.requestCode(EMAIL);
+      now += RecoveryLimits.RESEND_COOLDOWN_MS;
+    }
+
+    assert.equal(wait, 3600 - 4 * 60);
+    await rejectsWithWait(service.requestCode(EMAIL), 3600 - 5 * 60);
+  });
+});
+
+describe("CA-REC-03-07: envíos fallidos", () => {
+  it("CA-REC-03-07 si el correo no se envia el intento no cuenta y se puede pedir enseguida", async () => {
+    mailer.failNext = true;
+
+    await assert.rejects(service.requestCode(EMAIL), /BadCredentials/);
+    assert.equal(store.records.has(recordKey(EMAIL)), false);
+
+    assert.equal(await service.requestCode(EMAIL), 60);
+    assert.equal(mailer.sent.length, 1);
+  });
+
+  it("CA-REC-03-07 un envio fallido conserva el codigo anterior y su contador", async () => {
+    await service.requestCode(EMAIL);
+    const firstCode = lastSentCode();
+    now += RecoveryLimits.RESEND_COOLDOWN_MS;
+    mailer.failNext = true;
+
+    await assert.rejects(service.requestCode(EMAIL));
+
+    assert.equal(store.records.get(recordKey(EMAIL))?.sentInWindow, 1);
+    await service.verifyCode(EMAIL, firstCode);
   });
 });

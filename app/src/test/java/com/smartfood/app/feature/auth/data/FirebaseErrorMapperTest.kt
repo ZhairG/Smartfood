@@ -15,6 +15,7 @@ import com.smartfood.app.testutil.authError
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Nombre: FirebaseErrorMapperTest.kt
@@ -99,8 +100,16 @@ class FirebaseErrorMapperTest {
     }
 
     @Test
-    fun `CA-REC-03-03 la razon TOO_MANY_REQUESTS se clasifica como TooManyRequests`() {
-        assertEquals(AuthError.TooManyRequests, functionsError(Code.RESOURCE_EXHAUSTED, "TOO_MANY_REQUESTS"))
+    fun `CA-REC-04-02 la razon TOO_MANY_REQUESTS conserva la espera informada por el servidor`() {
+        assertEquals(
+            AuthError.TooManyRequests(2_232.seconds),
+            functionsError(Code.RESOURCE_EXHAUSTED, "TOO_MANY_REQUESTS", retryAfterSeconds = 2_232)
+        )
+    }
+
+    @Test
+    fun `CA-REC-03-03 TOO_MANY_REQUESTS sin espera informada usa 60 segundos`() {
+        assertEquals(AuthError.TooManyRequests(60.seconds), functionsError(Code.RESOURCE_EXHAUSTED, "TOO_MANY_REQUESTS"))
     }
 
     @Test
@@ -130,6 +139,10 @@ class FirebaseErrorMapperTest {
         assertEquals(AuthError.Unknown("INTERNAL"), functionsError(Code.INTERNAL, reason = null))
     }
 
-    private fun functionsError(code: Code, reason: String?, isNetworkFailure: Boolean = false): AuthError =
-        FirebaseErrorMapper.mapFunctionsError(code, reason, isNetworkFailure)
+    private fun functionsError(
+        code: Code,
+        reason: String?,
+        retryAfterSeconds: Long? = null,
+        isNetworkFailure: Boolean = false
+    ): AuthError = FirebaseErrorMapper.mapFunctionsError(code, reason, retryAfterSeconds, isNetworkFailure)
 }

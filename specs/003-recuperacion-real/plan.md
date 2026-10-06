@@ -39,11 +39,13 @@ con fakes, sin librería de mocks.
 
 | Función | Entrada | Éxito | Razones de error |
 |---|---|---|---|
-| `requestPasswordResetCode` | `{ email }` | `{}` (igual exista o no la cuenta) | `INVALID_EMAIL`, `TOO_MANY_REQUESTS` |
+| `requestPasswordResetCode` | `{ email }` | `{ resendAfterSeconds }` (igual exista o no la cuenta) | `INVALID_EMAIL`, `TOO_MANY_REQUESTS` (con `retryAfterSeconds`) |
 | `verifyPasswordResetCode` | `{ email, code }` | `{}` | `INVALID_CODE`, `CODE_EXPIRED`, `TOO_MANY_ATTEMPTS` |
 | `resetPasswordWithCode` | `{ email, code, newPassword }` | `{}` | `WEAK_PASSWORD`, `INVALID_CODE`, `CODE_EXPIRED`, `TOO_MANY_ATTEMPTS` |
 
 Cada error sale como `HttpsError(code, mensaje, { reason })`. La app clasifica por `reason`, nunca por el mensaje.
+`TOO_MANY_REQUESTS` agrega `retryAfterSeconds` en `details`. El servidor es la única fuente del tiempo de espera:
+la app solo lo cuenta hacia atrás (RF-REC-07, ADR-REC-06).
 
 | `reason` | Código HTTPS | `AuthError` |
 |---|---|---|
@@ -52,7 +54,7 @@ Cada error sale como `HttpsError(code, mensaje, { reason })`. La app clasifica p
 | `WEAK_PASSWORD` | `invalid-argument` | `WeakPassword` |
 | `CODE_EXPIRED` | `failed-precondition` | `OtpCodeExpired` (nuevo) |
 | `TOO_MANY_ATTEMPTS` | `resource-exhausted` | `TooManyAttempts` (nuevo) |
-| `TOO_MANY_REQUESTS` | `resource-exhausted` | `TooManyRequests` (nuevo) |
+| `TOO_MANY_REQUESTS` | `resource-exhausted` | `TooManyRequests(retryAfter)` (nuevo) |
 | *(sin `reason`)* `unavailable`, `deadline-exceeded` | | `Network` |
 | *(sin `reason`)* `not-found` (función no desplegada) | | `ServiceUnavailable` |
 | *(sin `reason`)* cualquier otro | | `Unknown` |
@@ -85,6 +87,11 @@ passwordResets/{sha256(correo en minúsculas)}
    Si no, genera el código (`crypto.randomInt(0, 10000)` con relleno a 4 dígitos) y una sal nueva, y guarda el
    registro con 5 intentos y vencimiento a 10 min. Así, el código anterior deja de valer (CA-REC-01-05).
 4. Si hay `uid`, envía el correo. Sin cuenta no se envía nada, pero la respuesta es idéntica.
+5. Si el envío falla, restaura el registro anterior (si nadie lo cambió entretanto), para que el intento no cuente
+   para los límites (CA-REC-03-07), y responde `internal`.
+6. Responde `resendAfterSeconds`: lo que falta para el próximo envío permitido, es decir, el mayor entre el fin de los
+   60 s y, si la ventana ya tiene 5 envíos, el fin de la ventana de 1 h. Un rechazo `TOO_MANY_REQUESTS` lleva el
+   mismo cálculo en `retryAfterSeconds` (CA-REC-04-02).
 
 **`verifyCode(email, code)`** (también lo usa `resetPassword`)
 1. Formato distinto de 4 dígitos, sin registro o sin `codeHash` → `INVALID_CODE`.
@@ -111,7 +118,10 @@ passwordResets/{sha256(correo en minúsculas)}
 | `feature/auth/ui/AuthErrorText.kt`, `strings.xml` | Textos nuevos y subtítulo neutro del paso 2. Se elimina `error_account_not_found_recovery`. |
 | `feature/auth/ui/recovery/PasswordRecoveryContract.kt` | Las casillas se marcan con los 3 errores de código (CA-REC-03-06). |
 | `feature/auth/ui/recovery/PasswordRecoveryViewModel.kt` | Si el paso 3 falla por un error de código, vuelve al paso 2 con el código borrado (CA-REC-02-03). |
-| `feature/auth/data/demo/DemoPasswordRecoveryRepository.kt` | Respuesta neutra, igual que la real (RF-REC-06). |
+| `feature/auth/data/demo/DemoPasswordRecoveryRepository.kt` | Respuesta neutra, igual que la real (RF-REC-06). Informa 60 s de espera. |
+| `feature/auth/domain/repository/PasswordRecoveryRepository.kt` | `requestCode` devuelve `Result<Duration>`: la espera antes de poder pedir otro código (RF-REC-07). |
+| `feature/auth/ui/recovery/PasswordRecoveryViewModel.kt` (HU-REC-04) | `resendCooldownSeconds` y `cooldownEmail` en el estado. Un `Job` descuenta un segundo con `delay`; arranca al enviar o al recibir `TooManyRequests`. Mientras corre, ignora "Reenviar" y "Enviar Código" para ese correo. |
+| `core/designsystem/components/Countdown.kt` | `SmartFoodCountdownChip`: píldora con ícono de reloj y dígitos tabulares, en `secondaryContainer`/`onSecondaryContainer` (naranja claro u oscuro según el modo). Tiene el alto de la fila de texto (CA-REC-04-04). `formatCountdown` da el formato `m:ss`. |
 
 **Propiedades de Gradle (solo afectan al build debug; release siempre usa la versión real y Firebase real):**
 
@@ -150,6 +160,7 @@ firebase functions:artifacts:setpolicy --location southamerica-east1 --force   #
 | ADR-REC-03 | Código guardado como sha256 con sal, con 10 min y 5 intentos | Guardarlo en claro | Si se filtrara la base, los códigos vigentes no quedan expuestos. Los intentos limitan la fuerza bruta a 5/10 000 por código. |
 | ADR-REC-04 | Gmail SMTP | Brevo | Gratis, sin verificar dominio y suficiente (unos 500 correos al día) para el proyecto. |
 | ADR-REC-05 | Modo demo seleccionable por Gradle | Eliminarlo | Permite hacer demos sin backend y sirve de respaldo si vence la prueba de Blaze. |
+| ADR-REC-06 | El servidor informa la espera y la app la cuenta hacia atrás | Fijar 60 s en la app | Una sola fuente de verdad: cubre también el límite de 5 por hora y no se desincroniza si cambian los límites. |
 
 ## 9. Estrategia de pruebas
 

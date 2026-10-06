@@ -5,6 +5,8 @@ import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.feature.auth.domain.repository.PasswordRecoveryRepository
 import kotlinx.coroutines.delay
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Nombre: DemoPasswordRecoveryRepository.kt
@@ -17,10 +19,10 @@ import javax.inject.Inject
  */
 class DemoPasswordRecoveryRepository @Inject constructor() : PasswordRecoveryRepository {
 
-    override suspend fun requestCode(email: String): Result<Unit> {
+    override suspend fun requestCode(email: String): Result<Duration> {
         delay(DemoRecoveryData.SIMULATED_LATENCY_MS)
-        // Respuesta neutra: no revela si el correo tiene cuenta.
-        return Result.success(Unit)
+        // Respuesta neutra: no revela si el correo tiene cuenta. Informa la misma espera que el servidor.
+        return Result.success(DemoRecoveryData.RESEND_WAIT)
     }
 
     override suspend fun verifyCode(email: String, code: String): Result<Unit> {
@@ -50,4 +52,7 @@ object DemoRecoveryData {
 
     /** Latencia artificial para que la UI muestre el estado de carga. */
     const val SIMULATED_LATENCY_MS = 800L
+
+    /** Espera antes de poder pedir otro código, igual que en el servidor (HU-REC-04). */
+    val RESEND_WAIT = 60.seconds
 }

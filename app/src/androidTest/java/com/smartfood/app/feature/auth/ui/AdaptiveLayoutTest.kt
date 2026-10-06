@@ -9,6 +9,11 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.text.TextLayoutResult
+import org.junit.Assert.assertFalse
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.core.designsystem.components.ActionSuccessScreen
@@ -115,6 +120,33 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
             )
         }
         assertCabeSinScroll("Verificar Código")
+    }
+
+    /**
+     * CA-REC-04-04: con la cuenta regresiva más larga ("37:12", límite de 5 por hora) el paso 2 sigue cabiendo y la
+     * píldora se ve completa, sin recortarse.
+     */
+    @Test
+    fun ca_rec_04_04_recuperacionPaso2ConCuentaRegresiva_cabeSinScroll() {
+        mostrar {
+            PasswordRecoveryScreen(
+                PasswordRecoveryUiState(
+                    step = RecoveryStep.OTP_VERIFICATION,
+                    email = "demo@smartfood.com",
+                    resendCooldownSeconds = 2_232,
+                    cooldownEmail = "demo@smartfood.com"
+                ),
+                {},
+                {}
+            )
+        }
+        assertCabeSinScroll("Verificar Código")
+
+        val pildora = composeTestRule.onNodeWithText("Reenviar en 37:12", useUnmergedTree = true)
+        pildora.assertIsDisplayed()
+        val layouts = mutableListOf<TextLayoutResult>()
+        pildora.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        assertFalse("La píldora no debe recortarse en $screenSize", layouts.first().hasVisualOverflow)
     }
 
     @Test

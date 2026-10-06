@@ -38,6 +38,8 @@ enum class RecoveryStep(val stepIndex: Int) {
  * @property passwordValidation Cumplimiento en tiempo real de la política de contraseña (CA-04-10).
  * @property isLoading Hay una operación en curso.
  * @property error Último error de negocio, o `null`.
+ * @property resendCooldownSeconds Segundos que faltan para poder pedir otro código; 0 si ya se puede (HU-REC-04).
+ * @property cooldownEmail Correo al que aplica la espera.
  */
 @Immutable
 data class PasswordRecoveryUiState(
@@ -48,8 +50,17 @@ data class PasswordRecoveryUiState(
     val confirmPassword: String = "",
     val passwordValidation: PasswordValidationResult = PasswordValidationResult.NONE,
     val isLoading: Boolean = false,
-    val error: AuthError? = null
+    val error: AuthError? = null,
+    val resendCooldownSeconds: Int = 0,
+    val cooldownEmail: String = ""
 ) {
+    /**
+     * La espera aplica al correo escrito: "Reenviar código" y "Enviar Código" muestran la cuenta regresiva y no
+     * se pueden usar (CA-REC-04-01 y CA-REC-04-03). Otro correo no tiene espera.
+     */
+    val isEmailInCooldown: Boolean
+        get() = resendCooldownSeconds > 0 && email.trim().equals(cooldownEmail, ignoreCase = true)
+
     val emailHasError: Boolean
         get() = error.marksEmpty(AuthField.EMAIL) || error == AuthError.InvalidEmail
 

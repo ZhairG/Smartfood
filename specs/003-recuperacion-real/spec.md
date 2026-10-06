@@ -66,6 +66,18 @@ siga siendo mía.
 | CA-REC-03-04 | **Dado** que se pidieron 5 códigos para el mismo correo en la última hora, **cuando** pido otro, **entonces** veo "Espera un momento antes de pedir otro código". |
 | CA-REC-03-05 | Los límites de CA-REC-03-03 y CA-REC-03-04 se aplican igual exista o no la cuenta, para no revelar nada. |
 | CA-REC-03-06 | **Dado** el paso 2, **cuando** el error es de código (incorrecto, vencido o con los intentos agotados), **entonces** las casillas se marcan en rojo. |
+| CA-REC-03-07 | **Dado** que el correo con el código no se pudo enviar, **entonces** ese intento no cuenta para los límites de CA-REC-03-03 y CA-REC-03-04 y puedo volver a pedirlo enseguida. |
+
+### HU-REC-04: Ver cuánto falta para pedir otro código
+**Como** visitante **quiero** ver cuánto tiempo falta para poder pedir otro código **para** no tocar "Reenviar" sin
+saber por qué no pasa nada.
+
+| Código | Criterio |
+|---|---|
+| CA-REC-04-01 | **Dado** que se envió un código, **entonces** en el paso 2, en lugar del enlace "Reenviar código", veo una cuenta regresiva "Reenviar en 0:59" que baja cada segundo y no se puede tocar. Al llegar a cero vuelve el enlace "Reenviar código". |
+| CA-REC-04-02 | **Dado** que el servidor rechaza la solicitud por los límites de HU-REC-03, **entonces** la cuenta regresiva muestra el tiempo real que falta, en minutos y segundos (por ejemplo, "Reenviar en 37:12"). |
+| CA-REC-04-03 | **Dado** que vuelvo al paso 1 con el mismo correo mientras corre la espera, **entonces** el botón dice "Enviar Código en 0:42" y está deshabilitado. Si escribo otro correo, el botón se habilita. |
+| CA-REC-04-04 | La cuenta regresiva usa los colores de acento de la app en modo claro y oscuro, y no cambia el alto del formulario: cada paso sigue cabiendo sin scroll (spec 002). |
 
 ## 4. Requisitos funcionales
 
@@ -77,6 +89,7 @@ siga siendo mía.
 | RF-REC-04 | Cambiar la contraseña de la cuenta, cerrar sus otras sesiones e invalidar el código. | HU-REC-02 |
 | RF-REC-05 | Responder igual exista o no la cuenta, en los tres pasos. | HU-REC-01, HU-REC-03 |
 | RF-REC-06 | La recuperación simulada de la v1 se conserva como **modo demo** opcional, solo para builds de depuración, y se comporta igual que la real ante un correo sin cuenta. | HU-REC-01 |
+| RF-REC-07 | El servidor informa cuánto falta para poder pedir otro código, tanto al enviarlo como al rechazar una solicitud por los límites. | HU-REC-04 |
 
 ## 5. Requisitos no funcionales
 
@@ -90,7 +103,6 @@ siga siendo mía.
 ## 6. Fuera de alcance
 
 - Verificar que las peticiones vienen de la app oficial (atestación del dispositivo).
-- Contador visible de los 60 segundos antes de "Reenviar código".
 - Cambiar la contraseña con la sesión iniciada (sigue fuera de alcance, como en la 001).
 - Marcar el correo como verificado al recuperar la contraseña.
 

@@ -11,6 +11,7 @@ import com.google.firebase.functions.FirebaseFunctionsException
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthException
 import java.io.IOException
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Nombre: FirebaseErrorMapper.kt
@@ -34,11 +35,14 @@ object FirebaseErrorMapper {
         throwable is FirebaseFirestoreException &&
             throwable.code == FirebaseFirestoreException.Code.UNAVAILABLE -> AuthError.Network
         // Va antes que FirebaseException, de la que hereda.
-        throwable is FirebaseFunctionsException -> mapFunctionsError(
-            code = throwable.code,
-            reason = (throwable.details as? Map<*, *>)?.get(REASON_KEY) as? String,
-            isNetworkFailure = throwable.cause is IOException
-        )
+        throwable is FirebaseFunctionsException -> (throwable.details as? Map<*, *>).let { details ->
+            mapFunctionsError(
+                code = throwable.code,
+                reason = details?.get(REASON_KEY) as? String,
+                retryAfterSeconds = (details?.get(RETRY_AFTER_KEY) as? Number)?.toLong(),
+                isNetworkFailure = throwable.cause is IOException
+            )
+        }
         throwable is FirebaseException &&
             throwable.message.orEmpty().contains(CONFIGURATION_NOT_FOUND) -> AuthError.ServiceUnavailable
         else -> AuthError.Unknown(throwable.message)
@@ -50,11 +54,13 @@ object FirebaseErrorMapper {
      *
      * @param code Código HTTPS de la función.
      * @param reason Razón de negocio enviada por el servidor en `details.reason`, si la hay.
+     * @param retryAfterSeconds Espera informada en `details.retryAfterSeconds` con `TOO_MANY_REQUESTS`.
      * @param isNetworkFailure `true` si la llamada no llegó al servidor (el SDK lo reporta como `INTERNAL`).
      */
     internal fun mapFunctionsError(
         code: FirebaseFunctionsException.Code,
         reason: String?,
+        retryAfterSeconds: Long?,
         isNetworkFailure: Boolean
     ): AuthError = when (reason) {
         "INVALID_EMAIL" -> AuthError.InvalidEmail
@@ -62,7 +68,7 @@ object FirebaseErrorMapper {
         "WEAK_PASSWORD" -> AuthError.WeakPassword
         "CODE_EXPIRED" -> AuthError.OtpCodeExpired
         "TOO_MANY_ATTEMPTS" -> AuthError.TooManyAttempts
-        "TOO_MANY_REQUESTS" -> AuthError.TooManyRequests
+        "TOO_MANY_REQUESTS" -> AuthError.TooManyRequests((retryAfterSeconds ?: DEFAULT_RETRY_AFTER_SECONDS).seconds)
         else -> when {
             isNetworkFailure -> AuthError.Network
             code == FirebaseFunctionsException.Code.UNAVAILABLE ||
@@ -79,6 +85,10 @@ object FirebaseErrorMapper {
 
     private const val CONFIGURATION_NOT_FOUND = "CONFIGURATION_NOT_FOUND"
     private const val REASON_KEY = "reason"
+    private const val RETRY_AFTER_KEY = "retryAfterSeconds"
+
+    /** Espera si el servidor no la informa: la de 60 s entre envíos. */
+    private const val DEFAULT_RETRY_AFTER_SECONDS = 60L
 }
 
 /** Convierte cualquier fallo de este [Result] en un [AuthException] clasificado. */

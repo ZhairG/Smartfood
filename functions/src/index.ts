@@ -38,23 +38,27 @@ const HTTPS_CODES: Record<RecoveryErrorReason, FunctionsErrorCode> = {
 
 /** Paso 1: `{ email }`. */
 export const requestPasswordResetCode = onCall({ secrets: [smtpUser, smtpPass] }, (request) =>
-  run(() => recoveryService().requestCode(stringField(request.data, "email"))),
+  run(async () => ({ resendAfterSeconds: await recoveryService().requestCode(stringField(request.data, "email")) })),
 );
 
 /** Paso 2: `{ email, code }`. */
 export const verifyPasswordResetCode = onCall((request) =>
-  run(() => recoveryService().verifyCode(stringField(request.data, "email"), stringField(request.data, "code"))),
+  run(async () => {
+    await recoveryService().verifyCode(stringField(request.data, "email"), stringField(request.data, "code"));
+    return {};
+  }),
 );
 
 /** Paso 3: `{ email, code, newPassword }`. */
 export const resetPasswordWithCode = onCall((request) =>
-  run(() =>
-    recoveryService().resetPassword(
+  run(async () => {
+    await recoveryService().resetPassword(
       stringField(request.data, "email"),
       stringField(request.data, "code"),
       stringField(request.data, "newPassword"),
-    ),
-  ),
+    );
+    return {};
+  }),
 );
 
 function recoveryService(): RecoveryService {
@@ -73,14 +77,20 @@ const lazyMailer: Mailer = {
   },
 };
 
-/** Ejecuta un paso y traduce sus fallas. Las inesperadas se registran y salen como `internal`, sin detalles. */
-async function run(step: () => Promise<void>): Promise<Record<string, never>> {
+/**
+ * Ejecuta un paso y traduce sus fallas. `TOO_MANY_REQUESTS` incluye `retryAfterSeconds` (RF-REC-07). Las fallas
+ * inesperadas se registran y salen como `internal`, sin detalles.
+ */
+async function run<T extends object>(step: () => Promise<T>): Promise<T> {
   try {
-    await step();
-    return {};
+    return await step();
   } catch (error) {
     if (error instanceof RecoveryError) {
-      throw new HttpsError(HTTPS_CODES[error.reason], error.reason, { reason: error.reason });
+      const details =
+        error.retryAfterSeconds === undefined
+          ? { reason: error.reason }
+          : { reason: error.reason, retryAfterSeconds: error.retryAfterSeconds };
+      throw new HttpsError(HTTPS_CODES[error.reason], error.reason, details);
     }
     logger.error("Fallo inesperado en la recuperación de contraseña", error);
     throw new HttpsError("internal", "INTERNAL");

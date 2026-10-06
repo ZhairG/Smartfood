@@ -74,6 +74,27 @@ fun SmartFoodPromptLink(
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 15.sp,
 ) {
+    SmartFoodPromptRow(prompt = prompt, modifier = modifier, fontSize = fontSize) {
+        SmartFoodTextLink(text = action, onClick = onClick, fontSize = fontSize)
+    }
+}
+
+/**
+ * Fila con un texto informativo (prompt) seguido de un elemento de acción, con el estilo de Figma. La comparten
+ * [SmartFoodPromptLink] y [SmartFoodPromptCountdown].
+ *
+ * @param prompt Texto informativo.
+ * @param modifier Modificador base para la fila.
+ * @param fontSize Tamaño del texto informativo.
+ * @param action Elemento que va después del texto.
+ */
+@Composable
+internal fun SmartFoodPromptRow(
+    prompt: String,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = 15.sp,
+    action: @Composable () -> Unit,
+) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(11.dp),
@@ -85,7 +106,7 @@ fun SmartFoodPromptLink(
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        SmartFoodTextLink(text = action, onClick = onClick, fontSize = fontSize)
+        action()
     }
 }
 
