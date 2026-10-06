@@ -14,7 +14,7 @@ Aplicación Android para reducir el desperdicio de comida en los hogares. Une **
 |---|---|---|
 | 001 Autenticación | [`specs/001-autenticacion`](specs/001-autenticacion/spec.md) | ✅ Implementado (v1) |
 | 002 Adaptabilidad de la UI | [`specs/002-adaptabilidad-ui`](specs/002-adaptabilidad-ui/spec.md) | ✅ Implementado |
-| 003 Recuperación de contraseña real | [`specs/003-recuperacion-real`](specs/003-recuperacion-real/spec.md) | ✅ Implementado (pendiente de desplegar) |
+| 003 Recuperación de contraseña real | [`specs/003-recuperacion-real`](specs/003-recuperacion-real/spec.md) | ✅ Implementado y desplegado |
 | 004 Inventario | — | Pendiente |
 | 005 Catálogo de recetas | — | Pendiente |
 | 006 Agente recomendador | — | Pendiente |
@@ -112,7 +112,7 @@ Las credenciales de Gmail viven en Secret Manager, nunca en el repositorio ni en
    ```bash
    cd functions && npm ci && cd ..
    firebase deploy --only functions,firestore:rules
-   firebase functions:artifacts:setpolicy
+   firebase functions:artifacts:setpolicy --location southamerica-east1 --force
    ```
 4. Recomendado: una alerta de presupuesto de 1 USD en Google Cloud Billing. La prueba gratuita de Blaze vence el
    4 de enero de 2027 (ver [plan 001 §6.5](specs/001-autenticacion/plan.md#65-ruta-a-una-recuperación-real-post-entrega)).

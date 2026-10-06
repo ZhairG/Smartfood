@@ -33,7 +33,11 @@
   - `npm test` (21 pruebas) y `testDebugUnitTest` (113 pruebas) en verde.
   - `assembleDebug`, `assembleRelease` (R8) y `lintDebug` sin errores.
   - Recorrido completo contra los emuladores, llamando a las funciones por HTTP con el protocolo callable (equivale a los puntos 1 a 6 del checklist, sin la UI).
-- [ ] T020 Despliegue en `smartfood-f62a1` (secretos, `firebase deploy` y política de Artifact Registry) y checklist con un correo real. Lo ejecuta el equipo.
+- [x] T020 Despliegue en `smartfood-f62a1` (2026-10-05):
+  - Secretos `SMTP_USER` y `SMTP_PASS` configurados por el equipo.
+  - Las 3 funciones están en `southamerica-east1` (Node 22), con las reglas publicadas.
+  - Política de limpieza de Artifact Registry de 1 día.
+- [ ] T021 Checklist en producción con un correo real (punto 7).
 
 ## Matriz de trazabilidad
 

@@ -133,7 +133,7 @@ firebase emulators:start --only auth,firestore,functions
 firebase functions:secrets:set SMTP_USER              # correo de Gmail del equipo
 firebase functions:secrets:set SMTP_PASS              # contraseña de aplicación (16 caracteres)
 firebase deploy --only functions,firestore:rules
-firebase functions:artifacts:setpolicy                # limpieza de imágenes antiguas (evita cobros)
+firebase functions:artifacts:setpolicy --location southamerica-east1 --force   # limpieza de imágenes (evita cobros)
 ```
 
 - En el emulador, el código se escribe en el log de Functions y no se envía. `functions/.secret.local` (ignorado

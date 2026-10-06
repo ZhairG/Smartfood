@@ -29,3 +29,6 @@ functions/.secret.local
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+
+# Configuración local de Claude Code (permisos personales)
+.claude/settings.local.json
