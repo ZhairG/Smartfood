@@ -79,7 +79,7 @@ Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada 
 | CA-03-04 | I `AppNavigationTest.transicionSplashALogin_*` |
 | CA-04-01 | U `PasswordRecoveryUseCasesTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest.ca0401_*` |
 | CA-04-02 | U `PasswordRecoveryUseCasesTest` |
-| CA-04-03 | U `DemoPasswordRecoveryRepositoryTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest.ca0403_*` |
+| ~~CA-04-03~~ | Reemplazado por CA-REC-01-02 ([tasks 003](../003-recuperacion-real/tasks.md#matriz-de-trazabilidad)) |
 | CA-04-04 | U `PasswordRecoveryUseCasesTest`, U `DemoPasswordRecoveryRepositoryTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest.ca0404_*` |
 | CA-04-05 | U `PasswordRecoveryUseCasesTest` |
 | CA-04-06 | U `PasswordRecoveryUseCasesTest`, U `DemoPasswordRecoveryRepositoryTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest.ca0406_*` |
@@ -101,6 +101,6 @@ Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada 
 1. Registro con datos válidos → aparece `users/{uid}` en la consola de Firestore → pantalla de éxito → "Continuar" lleva al login y "atrás" no vuelve al formulario (CA-01-07, CA-01-08).
 2. Login con esa cuenta → Home dice "Hola, <nombre>" y "atrás" cierra la app (CA-02-05, CA-05-01).
 3. Cerrar y volver a abrir la app → Home (CA-03-01). Repetir el login sin "Recuérdame" → al reabrir, Login (CA-03-02).
-4. Recuperación con `demo@smartfood.com` + `1234` → nueva contraseña → éxito → login (CA-04-11). Volver desde el paso 2 y reentrar → empieza en el paso 1 (CA-04-12).
+4. Recuperación en modo demo (`-PrecoveryDemo=true`) con `demo@smartfood.com` + `1234` → nueva contraseña → éxito → login (CA-04-11). La recuperación real se verifica con el checklist de la [spec 003](../003-recuperacion-real/tasks.md#checklist-de-verificación-manual). Volver desde el paso 2 y reentrar → empieza en el paso 1 (CA-04-12).
 5. "Cerrar Sesión" en Home → Login y "atrás" no vuelve a Home (CA-05-03).
 6. Modo avión → intentar login → diálogo "Sin conexión" → desactivar modo avión → "Reconectar" (CA-06-01, CA-06-02).
