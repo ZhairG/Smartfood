@@ -108,7 +108,8 @@ class PasswordRecoveryScreenTest {
             )
         )
 
-        composeTestRule.onNodeWithText("Reenviar en 0:42").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Reenviar código en").assertIsDisplayed()
+        composeTestRule.onNodeWithText("0:42", useUnmergedTree = true).assertIsDisplayed()
         composeTestRule.onNodeWithText("Reenviar código").assertDoesNotExist()
     }
 

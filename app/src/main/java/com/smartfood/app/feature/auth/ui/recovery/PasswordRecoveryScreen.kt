@@ -273,13 +273,11 @@ private fun VerifyCodeStep(
         FlexibleGap(minHeight = metrics.sectionSpacing)
 
         if (state.isEmailInCooldown) {
-            // Mientras corre la espera, el enlace se reemplaza por la cuenta regresiva (CA-REC-04-01).
+            // Mientras corre la espera, la fila dice "Reenviar código en" y el tiempo va en la píldora; así cabe en una
+            // línea desde 360 dp de ancho (CA-REC-04-01 y CA-REC-04-04).
             SmartFoodPromptCountdown(
-                prompt = stringResource(id = R.string.recovery_step2_resend_prompt),
-                countdown = stringResource(
-                    id = R.string.recovery_step2_resend_countdown,
-                    formatCountdown(state.resendCooldownSeconds)
-                ),
+                prompt = stringResource(id = R.string.recovery_step2_resend_countdown_prompt),
+                countdown = formatCountdown(state.resendCooldownSeconds),
                 fontSize = 16.sp,  // Figma: nodo 585:4474
                 contentDescription = pluralStringResource(
                     id = R.plurals.recovery_resend_countdown_a11y,

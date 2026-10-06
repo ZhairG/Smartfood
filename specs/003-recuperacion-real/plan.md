@@ -121,7 +121,7 @@ passwordResets/{sha256(correo en minúsculas)}
 | `feature/auth/data/demo/DemoPasswordRecoveryRepository.kt` | Respuesta neutra, igual que la real (RF-REC-06). Informa 60 s de espera. |
 | `feature/auth/domain/repository/PasswordRecoveryRepository.kt` | `requestCode` devuelve `Result<Duration>`: la espera antes de poder pedir otro código (RF-REC-07). |
 | `feature/auth/ui/recovery/PasswordRecoveryViewModel.kt` (HU-REC-04) | `resendCooldownSeconds` y `cooldownEmail` en el estado. Un `Job` descuenta un segundo con `delay`; arranca al enviar o al recibir `TooManyRequests`. Mientras corre, ignora "Reenviar" y "Enviar Código" para ese correo. |
-| `core/designsystem/components/Countdown.kt` | `SmartFoodCountdownChip`: píldora con ícono de reloj y dígitos tabulares, en `secondaryContainer`/`onSecondaryContainer` (naranja claro u oscuro según el modo). Tiene el alto de la fila de texto (CA-REC-04-04). `formatCountdown` da el formato `m:ss`. |
+| `core/designsystem/components/Countdown.kt` | La fila dice "Reenviar código en" y la píldora lleva solo el tiempo, para que la fila quepa en una línea desde 360 dp incluso con "37:12" (`AdaptiveLayoutTest`). `SmartFoodCountdownChip`: píldora con ícono de reloj y dígitos tabulares, en `secondaryContainer`/`onSecondaryContainer` (naranja claro u oscuro según el modo). Tiene el alto de la fila de texto (CA-REC-04-04). `formatCountdown` da el formato `m:ss`. |
 
 **Propiedades de Gradle (solo afectan al build debug; release siempre usa la versión real y Firebase real):**
 

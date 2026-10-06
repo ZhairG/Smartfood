@@ -64,7 +64,7 @@
     <string name="recovery_step2_button">Verificar Código</string>
     <string name="recovery_step2_resend_prompt">¿No recibiste el código?</string>
     <string name="recovery_step2_resend_action">Reenviar código</string>
-    <string name="recovery_step2_resend_countdown">Reenviar en %1$s</string>
+    <string name="recovery_step2_resend_countdown_prompt">Reenviar código en</string>
     <plurals name="recovery_resend_countdown_a11y">
         <item quantity="one">Podrás pedir otro código en %d segundo</item>
         <item quantity="many">Podrás pedir otro código en %d segundos</item>

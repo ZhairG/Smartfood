@@ -74,10 +74,10 @@ saber por qué no pasa nada.
 
 | Código | Criterio |
 |---|---|
-| CA-REC-04-01 | **Dado** que se envió un código, **entonces** en el paso 2, en lugar del enlace "Reenviar código", veo una cuenta regresiva "Reenviar en 0:59" que baja cada segundo y no se puede tocar. Al llegar a cero vuelve el enlace "Reenviar código". |
-| CA-REC-04-02 | **Dado** que el servidor rechaza la solicitud por los límites de HU-REC-03, **entonces** la cuenta regresiva muestra el tiempo real que falta, en minutos y segundos (por ejemplo, "Reenviar en 37:12"). |
+| CA-REC-04-01 | **Dado** que se envió un código, **entonces** en el paso 2, en lugar del enlace "Reenviar código", veo "Reenviar código en ⏱ 0:59": el tiempo va en una píldora que baja cada segundo y no se puede tocar. Al llegar a cero vuelve el enlace "Reenviar código". |
+| CA-REC-04-02 | **Dado** que el servidor rechaza la solicitud por los límites de HU-REC-03, **entonces** la cuenta regresiva muestra el tiempo real que falta, en minutos y segundos (por ejemplo, "Reenviar código en ⏱ 37:12"). |
 | CA-REC-04-03 | **Dado** que vuelvo al paso 1 con el mismo correo mientras corre la espera, **entonces** el botón dice "Enviar Código en 0:42" y está deshabilitado. Si escribo otro correo, el botón se habilita. |
-| CA-REC-04-04 | La cuenta regresiva usa los colores de acento de la app en modo claro y oscuro, y no cambia el alto del formulario: cada paso sigue cabiendo sin scroll (spec 002). |
+| CA-REC-04-04 | La cuenta regresiva usa los colores de acento de la app en modo claro y oscuro, y no cambia el alto del formulario: cada paso sigue cabiendo sin scroll (spec 002). La fila completa cabe en una línea desde 360 dp de ancho, sin recortar el tiempo. |
 
 ## 4. Requisitos funcionales
 

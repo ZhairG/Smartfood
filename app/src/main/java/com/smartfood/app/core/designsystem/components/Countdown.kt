@@ -48,7 +48,7 @@ fun formatCountdown(seconds: Int): String {
 /**
  * Píldora de cuenta regresiva con ícono de reloj.
  *
- * @param text Texto visible, por ejemplo "Reenviar en 0:42".
+ * @param text Texto visible, por ejemplo "0:42".
  * @param modifier Modificador opcional.
  * @param fontSize Tamaño del texto; el ícono usa el mismo tamaño.
  * @param contentDescription Descripción para lectores de pantalla; por defecto se lee [text].
@@ -94,8 +94,8 @@ fun SmartFoodCountdownChip(
  * Variante de [SmartFoodPromptLink] mientras la acción no está disponible: el enlace se reemplaza por una
  * [SmartFoodCountdownChip] con el mismo tamaño de texto.
  *
- * @param prompt Texto informativo (ej. "¿No recibiste el código?").
- * @param countdown Texto de la píldora (ej. "Reenviar en 0:42").
+ * @param prompt Texto informativo (ej. "Reenviar código en").
+ * @param countdown Texto de la píldora (ej. "0:42").
  * @param modifier Modificador base para la fila.
  * @param fontSize Tamaño de ambos textos.
  * @param contentDescription Descripción de la píldora para lectores de pantalla.
@@ -125,8 +125,8 @@ private fun SmartFoodCountdownPreview() {
                         .padding(16.dp)
                 ) {
                     SmartFoodPromptCountdown(
-                        prompt = "¿No recibiste el código?",
-                        countdown = "Reenviar en ${formatCountdown(42)}",
+                        prompt = "Reenviar código en",
+                        countdown = formatCountdown(42),
                         fontSize = 16.sp
                     )
                 }
