@@ -14,9 +14,10 @@ Aplicación Android para reducir el desperdicio de comida en los hogares. Une **
 |---|---|---|
 | 001 Autenticación | [`specs/001-autenticacion`](specs/001-autenticacion/spec.md) | ✅ Implementado (v1) |
 | 002 Adaptabilidad de la UI | [`specs/002-adaptabilidad-ui`](specs/002-adaptabilidad-ui/spec.md) | ✅ Implementado |
-| 003 Inventario | — | Pendiente |
-| 004 Catálogo de recetas | — | Pendiente |
-| 005 Agente recomendador | — | Pendiente |
+| 003 Recuperación de contraseña real | [`specs/003-recuperacion-real`](specs/003-recuperacion-real/spec.md) | ✅ Implementado (pendiente de desplegar) |
+| 004 Inventario | — | Pendiente |
+| 005 Catálogo de recetas | — | Pendiente |
+| 006 Agente recomendador | — | Pendiente |
 
 ## Metodología: Spec Driven Development
 
@@ -42,14 +43,14 @@ com.smartfood.app/
 ├── core/
 │   ├── common/          safeRunCatching (coroutines seguras)
 │   ├── designsystem/    theme/ (tokens de Figma y FormMetrics), components/ (SmartFood*, AnchoredPopup), util/
-│   ├── di/              CoreDataModule: FirebaseAuth, Firestore, DataStore
+│   ├── di/              CoreDataModule: FirebaseAuth, Firestore, Functions, DataStore (y emuladores en debug)
 │   └── navigation/      AppNavHost, Routes type-safe, NavTransitions, ObserveEffects
 └── feature/
     ├── splash/          Decide el destino inicial según la sesión
     ├── home/            Saludo y cierre de sesión (punto de entrada de las próximas features)
     └── auth/
         ├── domain/      model/ (User, AuthError), repository/ (interfaces), usecase/
-        ├── data/        repository/ (Firebase), mapper/, local/ (DataStore), demo/, di/
+        ├── data/        repository/ (Firebase y Cloud Functions), mapper/, local/ (DataStore), demo/, di/
         └── ui/          login/, register/, recovery/, components/, AuthErrorText, AuthNavGraph
 ```
 
@@ -60,7 +61,7 @@ com.smartfood.app/
 ## Tecnologías
 
 Kotlin · Jetpack Compose (Material 3) · Hilt · Navigation Compose type-safe · Coroutines/Flow ·
-Firebase Authentication · Cloud Firestore · DataStore · JUnit4 · Compose UI Test
+Firebase Authentication · Cloud Firestore · Cloud Functions (TypeScript) · DataStore · JUnit4 · Compose UI Test
 
 El diseño de referencia está en Figma (archivo `z1AoQvluQcmx98gjP4vHF6`, frames "_Claro"). La app usa la
 tipografía Poppins, incluida en el APK con licencia OFL (`docs/licenses/OFL-Poppins.txt`).
@@ -77,6 +78,9 @@ tipografía Poppins, incluida en el APK con licencia OFL (`docs/licenses/OFL-Pop
    - Publicar las reglas: `firebase deploy --only firestore:rules`.
 4. Ejecutar la configuración `app`.
 
+La recuperación de contraseña necesita además las Cloud Functions desplegadas (ver la sección siguiente). Sin ellas,
+usa el modo demo o los emuladores.
+
 ## Ícono de la app
 
 El ícono oficial (adaptativo, monocromático, Android 7.x y Play Store) se genera desde
@@ -89,10 +93,50 @@ python tools/generate_launcher_icon.py
 
 El script verifica que el logo quede dentro de la zona segura de 66 dp. No edites los `mipmap-*` a mano.
 
-## Datos de prueba: recuperación de contraseña (simulada)
+## Recuperación de contraseña (Cloud Functions)
 
-En la v1, la recuperación de contraseña es una **simulación** de interfaz: no envía correos ni cambia la contraseña real
-(ver [ADR-01](specs/001-autenticacion/plan.md#8-decisiones-adr)).
+La recuperación es **real** ([spec 003](specs/003-recuperacion-real/spec.md)): tres funciones en `functions/`
+(región `southamerica-east1`) envían un código de 4 dígitos por Gmail y cambian la contraseña con el Admin SDK.
+Las credenciales de Gmail viven en Secret Manager, nunca en el repositorio ni en el APK.
+
+### Despliegue (una vez por proyecto, requiere el plan Blaze)
+
+1. En la cuenta de Gmail del equipo, activar la verificación en 2 pasos y crear una **contraseña de aplicación**
+   (Cuenta de Google → Seguridad → Contraseñas de aplicaciones).
+2. Guardar los secretos (los pide por consola, no quedan en ningún archivo):
+   ```bash
+   firebase functions:secrets:set SMTP_USER   # correo de Gmail, p. ej. smartfood.equipo@gmail.com
+   firebase functions:secrets:set SMTP_PASS   # contraseña de aplicación de 16 caracteres
+   ```
+3. Desplegar las funciones y las reglas, y configurar la limpieza de imágenes antiguas (evita pequeños cobros):
+   ```bash
+   cd functions && npm ci && cd ..
+   firebase deploy --only functions,firestore:rules
+   firebase functions:artifacts:setpolicy
+   ```
+4. Recomendado: una alerta de presupuesto de 1 USD en Google Cloud Billing. La prueba gratuita de Blaze vence el
+   4 de enero de 2027 (ver [plan 001 §6.5](specs/001-autenticacion/plan.md#65-ruta-a-una-recuperación-real-post-entrega)).
+
+### Desarrollo local con la Emulator Suite
+
+```bash
+cd functions && npm ci && npm test            # pruebas del servidor
+firebase emulators:start --only auth,firestore,functions
+./gradlew :app:installDebug -PuseFirebaseEmulator=true
+```
+
+- El código de recuperación **no se envía**: aparece en la consola de los emuladores como
+  `[EMULADOR] Código de recuperación para …`.
+- Crea `functions/.secret.local` (ignorado por git) con `SMTP_USER=x` y `SMTP_PASS=x` para que el emulador no
+  consulte Secret Manager.
+- En un teléfono físico: `adb reverse tcp:9099 tcp:9099`, lo mismo para los puertos 8080 y 5001, y
+  `-PfirebaseEmulatorHost=127.0.0.1`.
+- Las cuentas que crees en el emulador no existen en el proyecto real.
+
+### Modo demo (sin backend)
+
+`./gradlew :app:installDebug -PrecoveryDemo=true` usa la recuperación simulada de la v1: no envía correos ni cambia la
+contraseña. Solo existe en debug; release usa siempre la versión real.
 
 | Dato | Valor |
 |---|---|
@@ -106,4 +150,5 @@ En la v1, la recuperación de contraseña es una **simulación** de interfaz: no
 ./gradlew :app:testDebugUnitTest          # Pruebas unitarias
 ./gradlew :app:connectedDebugAndroidTest  # Pruebas instrumentadas (requiere emulador)
 ./gradlew :app:lintDebug                  # Android Lint
+npm --prefix functions test               # Pruebas de las Cloud Functions
 ```

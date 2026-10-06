@@ -12,7 +12,7 @@ App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, pa
 
 Antes de escribir código, leer **`specs/constitution.md`** (principios no negociables) y la spec de la feature.
 
-- Specs actuales: `001-autenticacion` y `002-adaptabilidad-ui`. A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`).
+- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui` y `003-recuperacion-real`. A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`).
 - Cada feature vive en `specs/NNN-nombre/` con `spec.md` (QUÉ: historias, criterios Dado/Cuando/Entonces), `plan.md` (CÓMO: contratos, decisiones) y `tasks.md` (tareas + matriz CA → test).
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
 - Códigos de trazabilidad: `HU-NN`, `CA-NN-MM`, `RF-XXX-NN`, `RNF-NN`. Los nombres de los tests citan el CA que cubren.
@@ -31,6 +31,9 @@ En Windows usar `gradlew.bat` (o `./gradlew` desde Git Bash).
 ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.smartfood.app.feature.auth.ui.login.LoginScreenTest
 ./gradlew :app:lintDebug                     # Android Lint (no hay ktlint/detekt configurados)
 firebase deploy --only firestore:rules       # Publicar firestore.rules
+npm --prefix functions test                  # Compilar y probar las Cloud Functions (node:test)
+firebase emulators:start --only auth,firestore,functions   # Emulator Suite; la app con -PuseFirebaseEmulator=true
+firebase deploy --only functions             # Desplegar las funciones (requiere los secretos SMTP_USER y SMTP_PASS)
 ```
 
 El build `release` usa R8 en modo completo; los cambios con reflexión/serialización deben revisarse contra `app/proguard-rules.pro`.
@@ -42,11 +45,17 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 - **`domain`** es Kotlin puro: modelos (`User`, `AuthError` sealed, `AuthField`) e **interfaces** de repositorio (`AuthRepository`, `UserRepository`, `PasswordRecoveryRepository`, `SessionPreferences`). Las validaciones de negocio viven **solo** en los UseCases; los ViewModels no las repiten.
 - **Errores tipados:** todo devuelve `Result<T>`; un fallo lleva `AuthException(AuthError)` y se lee con `Throwable.toAuthError()`. `data/mapper/FirebaseErrorMapper` es el único lugar que conoce excepciones de Firebase. `ui/AuthErrorText.kt` es el único lugar que traduce `AuthError` a `strings.xml`. Para agregar un error: nuevo caso en `AuthError` → mapper (si viene de Firebase) → `AuthErrorText` → `strings.xml`.
 - **`data`**: `FirebaseAuthRepository`, `FirestoreUserRepository` (perfil en `users/{uid}`, escrito con `Map` para no depender de reflexión) y `DataStoreSessionPreferences` ("Recuérdame"). Usar `safeRunCatching` (`core/common`) + `.mapFirebaseError()`, nunca `runCatching` (se traga `CancellationException`).
-- **Recuperación de contraseña SIMULADA (ADR-01):** `data/demo/DemoPasswordRecoveryRepository` valida contra `DemoRecoveryData` (correos `demo@smartfood.com`, `prueba@smartfood.com`; código `1234`). No envía correos ni cambia contraseñas. Para hacerlo real, cambiar solo el `@Binds` en `AuthDataModule`.
+- **Recuperación de contraseña real (spec 003):** `data/repository/RemotePasswordRecoveryRepository` llama a 3 funciones callable de `functions/` (TypeScript, región `southamerica-east1`): `requestPasswordResetCode`, `verifyPasswordResetCode` y `resetPasswordWithCode`.
+  - Los datos viajan como `Map`. Los errores llegan con `details.reason` y `FirebaseErrorMapper.mapFunctionsError` los clasifica.
+  - Responde igual exista o no la cuenta: no hay error de "cuenta no encontrada" en la recuperación.
+  - En el servidor, la lógica vive en `functions/src/recoveryService.ts`, sin Firebase y probada con fakes. Firebase y Gmail solo aparecen en `adapters.ts`. Los secretos `SMTP_USER` y `SMTP_PASS` están en Secret Manager.
+  - La colección `passwordResets` es solo del servidor; las reglas niegan todo acceso a los clientes.
+  - **Modo demo:** con `-PrecoveryDemo=true` (solo debug), `AuthDataModule` enlaza `data/demo/DemoPasswordRecoveryRepository` (correos `demo@smartfood.com` y `prueba@smartfood.com`; código `1234`).
+  - Con `-PuseFirebaseEmulator=true` (solo debug), `CoreDataModule` conecta Auth, Firestore y Functions a la Emulator Suite. En el emulador, el código se lee en el log.
 - **Orquestación del registro** en `RegisterUseCase`: crear cuenta → perfil Firestore (si falla, rollback con `deleteCurrentAccount`) → verificación por correo → `logout`.
 - **UI (MVVM + UDF):** un ViewModel por pantalla. Cada pantalla tiene un `XContract.kt` con `XUiState` (los campos en rojo se **derivan** de `error`), `XEvent` y `XEffect`. Los efectos de un solo uso (navegación) salen por `Channel` → `Flow` y se recolectan con `ObserveEffects`. Patrón Route/Screen: los `*NavGraph.kt` obtienen el ViewModel con `hiltViewModel()` y llaman a la `XScreen` **stateless**, que es la que se prueba.
 - **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 600 ms se declaran una sola vez (`NavTransitions`). `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
-- **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
+- **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore`, `FirebaseFunctions` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
 - **Design system (`core/designsystem`):** `theme/` (tokens), `components/` (prefijo `SmartFood`) y `util/` (modificadores, `SystemBarEffect`, `ClearFocusOnKeyboardDismiss`).
 - **Adaptabilidad (spec 002):** las medidas de los formularios salen de `theme/FormMetrics.kt`.
   - `AuthScreenScaffold` toma el perfil inicial (`Compact`, `Medium` o `Regular`) con `formMetricsForWindow(maxHeight)`, que usa el alto útil sin barras.
@@ -81,4 +90,4 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 
 ## Configuración externa
 
-Firebase (`smartfood-f62a1`): Authentication con correo/contraseña y Cloud Firestore habilitados; reglas en `firestore.rules` (cada usuario solo accede a `users/{su uid}`).
+Firebase (`smartfood-f62a1`, plan Blaze): Authentication con correo/contraseña, Cloud Firestore (`southamerica-east1`) y Cloud Functions. Reglas en `firestore.rules`: cada usuario solo accede a `users/{su uid}` y `passwordResets` está cerrado a los clientes. Los secretos de Gmail se configuran con `firebase functions:secrets:set` (ver README).
