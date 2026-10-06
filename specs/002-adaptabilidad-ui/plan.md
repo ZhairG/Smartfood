@@ -154,6 +154,12 @@ ThemeMode { LIGHT, DARK, SYSTEM }   Default = LIGHT
     cuentan. En el fundido entre pasos de la recuperación, el paso saliente conservaba su alto un instante y el perfil
     terminaba en el compacto (logo en fila) en el V2436. Por eso el `AnimatedContent` de los pasos tampoco anima el
     tamaño (`using(null)`).
+  - **Asentamiento inicial (CA-UI-07-08).** La espera de 400 ms solo aplica *después* de que la pantalla se asentó.
+    Al entrar, un desborde baja de perfil en el frame siguiente, sin esperar. Mientras tanto la pantalla se dibuja
+    con `alpha = 0`: son 2 o 3 frames dentro de la transición de 600 ms. Antes se veía hasta 800 ms la versión grande
+    (`Regular` → `Medium` → `Compact`) en cada entrada y regreso. Si el teclado se abría durante esa espera, la bajada
+    se cancelaba y el perfil quedaba grande. El estado se recuerda por `maxHeight`, no por el perfil inicial, para
+    que un cambio en los insets de las barras no lo reinicie.
   - **Separaciones flexibles.** `FlexibleGap(minHeight, weight)` es una separación con un mínimo fijo más una parte
     del alto sobrante. El contenido del scroll recibe como alto mínimo el del viewport, así que las separaciones
     crecen cuando sobra alto y vuelven a su mínimo cuando falta o con el teclado abierto. No hay medidas por pantalla.

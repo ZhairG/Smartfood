@@ -114,6 +114,7 @@ consistente con el diseño, aunque mi teléfono esté en modo oscuro.
 | CA-UI-07-05 | Las casillas del código de verificación son rectangulares, con la proporción de Figma (50×70 dp). |
 | CA-UI-07-06 | Con el diálogo "Sin conexión a Internet" abierto, el fondo se desenfoca (Android 12+) y se atenúa en versiones anteriores. |
 | CA-UI-07-07 | El botón principal deshabilitado es gris (`#555555`); mientras carga, sigue naranja con el texto de carga. |
+| CA-UI-07-08 | **Dado** que entro o vuelvo a una pantalla, **entonces** se ve directamente con su perfil definitivo: no aparece primero una versión más grande que luego se encoge, y los campos no se pueden usar antes de que el perfil sea el definitivo. |
 
 ## 3. Requisitos no funcionales
 
