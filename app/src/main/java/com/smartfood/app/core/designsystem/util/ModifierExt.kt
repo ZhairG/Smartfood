@@ -14,10 +14,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Nombre: ModifierExt.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Funciones de extensión utilitarias para [Modifier] reutilizables en toda la capa de UI.
+ * <build>
+ * <b>Nombre:</b> ModifierExt.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 24/09/2026<br>
+ * <b>Descripción:</b> Funciones de extensión utilitarias para [Modifier] reutilizables en toda la capa de UI.<br>
+ * </build>
  */
 
 /**

@@ -1,10 +1,12 @@
 /**
- * Nombre: index.ts
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Funciones callable de la recuperación de contraseña real (spec 003, plan §3). Cada una arma el
- * `RecoveryService` con sus adaptadores y traduce `RecoveryError` a `HttpsError` con `details.reason`, que la app
- * clasifica en `FirebaseErrorMapper`.
+ * <build>
+ * <b>Nombre:</b> index.ts<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 05/10/2026<br>
+ * <b>Descripción:</b> Funciones callable de la recuperación de contraseña real (spec 003, plan §3). Cada una arma<br>
+ * el `RecoveryService` con sus adaptadores y traduce `RecoveryError` a `HttpsError` con `details.reason`, que la<br>
+ * app clasifica en `FirebaseErrorMapper`.<br>
+ * </build>
  */
 
 import { initializeApp } from "firebase-admin/app";

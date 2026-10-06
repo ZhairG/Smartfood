@@ -31,10 +31,12 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
 /**
- * Nombre: Dialogs.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Componentes modales reutilizables para el flujo de la aplicación.
+ * <build>
+ * <b>Nombre:</b> Dialogs.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 24/09/2026<br>
+ * <b>Descripción:</b> Componentes modales reutilizables para el flujo de la aplicación.<br>
+ * </build>
  */
 
 /**

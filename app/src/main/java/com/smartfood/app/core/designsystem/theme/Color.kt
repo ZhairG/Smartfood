@@ -3,11 +3,13 @@ package com.smartfood.app.core.designsystem.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Nombre: Color.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Paleta de colores centralizada para la aplicación Smartfood.
- * Define la identidad visual del Design System en base a las especificaciones de Figma.
+ * <build>
+ * <b>Nombre:</b> Color.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 19/09/2026<br>
+ * <b>Descripción:</b> Paleta de colores centralizada para la aplicación Smartfood. Define la identidad visual del<br>
+ * Design System en base a las especificaciones de Figma.<br>
+ * </build>
  */
 
 // === Colores Base ===

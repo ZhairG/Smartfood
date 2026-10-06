@@ -21,11 +21,13 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Nombre: StatusBarAdaptabilityTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas instrumentadas para verificar la adaptabilidad dinámica del Status Bar
- * e íconos de la barra de estado según el fondo de pantalla activo.
+ * <build>
+ * <b>Nombre:</b> StatusBarAdaptabilityTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 28/09/2026<br>
+ * <b>Descripción:</b> Pruebas instrumentadas para verificar la adaptabilidad dinámica del Status Bar e íconos de la<br>
+ * barra de estado según el fondo de pantalla activo.<br>
+ * </build>
  */
 @HiltAndroidTest
 class StatusBarAdaptabilityTest {

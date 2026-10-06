@@ -11,11 +11,13 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * Nombre: MainActivity.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Actividad principal de la aplicación Smartfood.
- * Habilita el diseño de borde a borde (Edge-to-Edge) y renderiza el árbol de navegación.
+ * <build>
+ * <b>Nombre:</b> MainActivity.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 19/09/2026<br>
+ * <b>Descripción:</b> Actividad principal de la aplicación Smartfood. Habilita el diseño de borde a borde<br>
+ * (Edge-to-Edge) y renderiza el árbol de navegación.<br>
+ * </build>
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

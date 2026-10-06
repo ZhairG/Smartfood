@@ -15,11 +15,13 @@ import com.smartfood.app.core.designsystem.components.SmartFoodPasswordField
 import com.smartfood.app.feature.auth.domain.usecase.PasswordValidationResult
 
 /**
- * Nombre: PasswordFieldWithChecklist.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Campo de contraseña que, mientras está enfocado, muestra los requisitos en un popup encima del
- * campo (spec 002, HU-UI-03). El popup no ocupa espacio en el formulario ni roba el foco.
+ * <build>
+ * <b>Nombre:</b> PasswordFieldWithChecklist.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Campo de contraseña que, mientras está enfocado, muestra los requisitos en un popup encima<br>
+ * del campo (spec 002, HU-UI-03). El popup no ocupa espacio en el formulario ni roba el foco.<br>
+ * </build>
  *
  * @param label Etiqueta del campo.
  * @param value Contraseña escrita.

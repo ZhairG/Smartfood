@@ -3,10 +3,12 @@ package com.smartfood.app.feature.auth.domain.usecase
 import javax.inject.Inject
 
 /**
- * Nombre: ValidatePasswordUseCase.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Caso de uso que evalúa las reglas de seguridad mínimas para las contraseñas.
+ * <build>
+ * <b>Nombre:</b> ValidatePasswordUseCase.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 19/09/2026<br>
+ * <b>Descripción:</b> Caso de uso que evalúa las reglas de seguridad mínimas para las contraseñas.<br>
+ * </build>
  */
 class ValidatePasswordUseCase @Inject constructor() {
 

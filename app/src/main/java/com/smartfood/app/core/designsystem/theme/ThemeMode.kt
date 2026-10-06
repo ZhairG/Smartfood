@@ -5,12 +5,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 
 /**
- * Nombre: ThemeMode.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Fuente única del modo de color de la app (spec 002, HU-UI-05). Por defecto la app es clara aunque el
- * teléfono esté en modo oscuro (CA-UI-05-01). Este es el único archivo que consulta el modo del sistema (RNF-UI-05),
- * así que un selector futuro solo tiene que cambiar el [ThemeMode] que recibe `SmartfoodTheme`.
+ * <build>
+ * <b>Nombre:</b> ThemeMode.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Fuente única del modo de color de la app (spec 002, HU-UI-05). Por defecto la app es clara<br>
+ * aunque el teléfono esté en modo oscuro (CA-UI-05-01). Este es el único archivo que consulta el modo del sistema<br>
+ * (RNF-UI-05), así que un selector futuro solo tiene que cambiar el [ThemeMode] que recibe `SmartfoodTheme`.<br>
+ * </build>
  */
 enum class ThemeMode {
     /** Siempre claro. */

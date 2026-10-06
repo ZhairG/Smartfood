@@ -9,10 +9,12 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Nombre: SplashViewModelTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [SplashViewModel] (HU-03).
+ * <build>
+ * <b>Nombre:</b> SplashViewModelTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Pruebas unitarias de [SplashViewModel] (HU-03).<br>
+ * </build>
  */
 class SplashViewModelTest {
 

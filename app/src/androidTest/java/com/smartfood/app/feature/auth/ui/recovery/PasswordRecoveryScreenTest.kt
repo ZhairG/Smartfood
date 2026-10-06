@@ -18,10 +18,12 @@ import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Nombre: PasswordRecoveryScreenTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas de UI de la pantalla stateless [PasswordRecoveryScreen] (HU-04 y spec 003).
+ * <build>
+ * <b>Nombre:</b> PasswordRecoveryScreenTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Pruebas de UI de la pantalla stateless [PasswordRecoveryScreen] (HU-04 y spec 003).<br>
+ * </build>
  */
 class PasswordRecoveryScreenTest {
 

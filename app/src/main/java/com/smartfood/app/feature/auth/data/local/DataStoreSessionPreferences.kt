@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Nombre: DataStoreSessionPreferences.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Implementación de [SessionPreferences] con Jetpack DataStore (RF-AUTH-06, ADR-06).
+ * <build>
+ * <b>Nombre:</b> DataStoreSessionPreferences.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Implementación de [SessionPreferences] con Jetpack DataStore (RF-AUTH-06, ADR-06).<br>
+ * </build>
  *
  * @param dataStore Almacén de preferencias `session_prefs` provisto por Hilt.
  */

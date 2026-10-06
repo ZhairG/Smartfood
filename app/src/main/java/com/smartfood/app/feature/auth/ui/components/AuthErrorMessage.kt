@@ -28,11 +28,13 @@ import androidx.compose.ui.unit.dp
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
 /**
- * Nombre: AuthErrorMessage.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Componente animado para la notificación de errores en los formularios de autenticación.
- * Optimizado con [graphicsLayer] para renderizar las animaciones de aparición en la capa de dibujo GPU.
+ * <build>
+ * <b>Nombre:</b> AuthErrorMessage.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 24/09/2026<br>
+ * <b>Descripción:</b> Componente animado para la notificación de errores en los formularios de autenticación.<br>
+ * Optimizado con [graphicsLayer] para renderizar las animaciones de aparición en la capa de dibujo GPU.<br>
+ * </build>
  *
  * @param message Texto del mensaje de error a mostrar. Si es nulo o vacío, se oculta animadamente.
  * @param modifier Modificador opcional para personalizar el diseño.

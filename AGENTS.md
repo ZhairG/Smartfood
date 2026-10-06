@@ -85,7 +85,10 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 ## Convenciones
 
 - Código, KDoc, comentarios, commits y nombres de test en español.
-- Cada archivo Kotlin abre con la cabecera KDoc que exige el curso: `Nombre`, `Autor: SmartFood Team`, `Fecha`, `Descripción` (y `@param` cuando aplica).
+- Cada archivo Kotlin (y TypeScript del servidor) lleva la cabecera que exige el curso dentro de un bloque `<build>…</build>`:
+  - Campos: `<b>Nombre:</b>`, `<b>Autor:</b> SmartFood Team`, `<b>Fecha:</b>` (creación, `dd/MM/aaaa`) y `<b>Descripción:</b>`.
+  - Cada línea termina en `<br>`.
+  - `@param` y `@property` van después del bloque. Plantilla en la constitución §5.
 - Ningún secreto en el código ni en el APK (RNF-01).
 
 ## Configuración externa

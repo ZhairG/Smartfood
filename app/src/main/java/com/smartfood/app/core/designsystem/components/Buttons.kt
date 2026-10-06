@@ -31,10 +31,12 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
 /**
- * Nombre: Buttons.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Componentes atómicos de botones de acción de Smartfood.
+ * <build>
+ * <b>Nombre:</b> Buttons.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 23/09/2026<br>
+ * <b>Descripción:</b> Componentes atómicos de botones de acción de Smartfood.<br>
+ * </build>
  */
 
 /**

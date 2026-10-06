@@ -29,13 +29,14 @@ import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import kotlinx.coroutines.delay
 
 /**
- * Nombre: SplashScreen.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pantalla de carga inicial (Splash Screen) de la aplicación Smartfood.
- * Utiliza [Scaffold] para mantener el orden estructural del layout, muestra el logotipo centrado
- * y navega al [destination] resuelto por [SplashViewModel] cuando han pasado al menos
- * [MIN_SPLASH_DURATION_MS] (CA-03-04).
+ * <build>
+ * <b>Nombre:</b> SplashScreen.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 23/09/2026<br>
+ * <b>Descripción:</b> Pantalla de carga inicial (Splash Screen) de la aplicación Smartfood. Utiliza [Scaffold] para<br>
+ * mantener el orden estructural del layout, muestra el logotipo centrado y navega al [destination] resuelto por<br>
+ * [SplashViewModel] cuando han pasado al menos [MIN_SPLASH_DURATION_MS] (CA-03-04).<br>
+ * </build>
  *
  * @param destination Destino resuelto según la sesión, o `null` si aún se está consultando.
  * @param onNavigate Callback invocado una sola vez con el destino final.

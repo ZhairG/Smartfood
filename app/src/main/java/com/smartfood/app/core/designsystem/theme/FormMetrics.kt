@@ -15,12 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * Nombre: FormMetrics.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Medidas de los formularios según el alto útil de la pantalla, es decir, sin las barras del
- * sistema (spec 002, RNF-UI-03). Hay tres perfiles: [Regular] (Figma, tablets), [Medium] (teléfonos altos) y
- * [Compact] (teléfonos desde 360×720 dp), para que Login, Registro y Recuperación quepan sin scroll (CA-UI-01-01).
+ * <build>
+ * <b>Nombre:</b> FormMetrics.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Medidas de los formularios según el alto útil de la pantalla, es decir, sin las barras del<br>
+ * sistema (spec 002, RNF-UI-03). Hay tres perfiles: [Regular] (Figma, tablets), [Medium] (teléfonos altos) y<br>
+ * [Compact] (teléfonos desde 360×720 dp), para que Login, Registro y Recuperación quepan sin scroll (CA-UI-01-01).<br>
+ * </build>
  *
  * @property inlineBrand Si es `true`, el logo y el nombre van en una fila en lugar de una columna.
  * @property logoSize Diámetro del logo en el encabezado.

@@ -57,11 +57,13 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
 
 /**
- * Nombre: Inputs.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Componentes atómicos de entrada de datos (TextField, PasswordField, Checkbox y Términos).
- * Reutiliza las extensiones utilitarias de [inputBorderAndBackground].
+ * <build>
+ * <b>Nombre:</b> Inputs.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 23/09/2026<br>
+ * <b>Descripción:</b> Componentes atómicos de entrada de datos (TextField, PasswordField, Checkbox y Términos).<br>
+ * Reutiliza las extensiones utilitarias de [inputBorderAndBackground].<br>
+ * </build>
  */
 
 private val InputShape = RoundedCornerShape(10.dp)

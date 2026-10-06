@@ -19,11 +19,14 @@ import javax.inject.Provider
 import javax.inject.Singleton
 
 /**
- * Nombre: AuthDataModule.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Enlaza los contratos del dominio de autenticación con sus implementaciones de la capa de datos.
- * La recuperación es la real (spec 003); con `-PrecoveryDemo=true` el build debug usa la simulada (RF-REC-06).
+ * <build>
+ * <b>Nombre:</b> AuthDataModule.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Enlaza los contratos del dominio de autenticación con sus implementaciones de la capa de<br>
+ * datos. La recuperación es la real (spec 003); con `-PrecoveryDemo=true` el build debug usa la simulada<br>
+ * (RF-REC-06).<br>
+ * </build>
  */
 @Module
 @InstallIn(SingletonComponent::class)

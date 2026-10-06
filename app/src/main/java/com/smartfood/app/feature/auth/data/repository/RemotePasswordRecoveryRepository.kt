@@ -10,13 +10,15 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Nombre: RemotePasswordRecoveryRepository.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Implementación **real** de [PasswordRecoveryRepository] (spec 003). Llama a las Cloud Functions de
- * `functions/`, que envían el código por correo y cambian la contraseña con el Admin SDK. Los datos viajan como
- * `Map` para no depender de reflexión con R8, y cada fallo se clasifica con
- * [com.smartfood.app.feature.auth.data.mapper.FirebaseErrorMapper] según su `details.reason`.
+ * <build>
+ * <b>Nombre:</b> RemotePasswordRecoveryRepository.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 05/10/2026<br>
+ * <b>Descripción:</b> Implementación **real** de [PasswordRecoveryRepository] (spec 003). Llama a las Cloud<br>
+ * Functions de `functions/`, que envían el código por correo y cambian la contraseña con el Admin SDK. Los datos<br>
+ * viajan como `Map` para no depender de reflexión con R8, y cada fallo se clasifica con<br>
+ * [com.smartfood.app.feature.auth.data.mapper.FirebaseErrorMapper] según su `details.reason`.<br>
+ * </build>
  *
  * @param functions Instancia de [FirebaseFunctions] en la región de las funciones, provista por Hilt.
  */

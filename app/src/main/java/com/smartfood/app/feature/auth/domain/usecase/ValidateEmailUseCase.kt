@@ -3,11 +3,13 @@ package com.smartfood.app.feature.auth.domain.usecase
 import javax.inject.Inject
 
 /**
- * Nombre: ValidateEmailUseCase.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Caso de uso responsable de validar la estructura sintáctica de un correo electrónico.
- * Previene llamadas de red innecesarias ante entradas mal formateadas.
+ * <build>
+ * <b>Nombre:</b> ValidateEmailUseCase.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 24/09/2026<br>
+ * <b>Descripción:</b> Caso de uso responsable de validar la estructura sintáctica de un correo electrónico.<br>
+ * Previene llamadas de red innecesarias ante entradas mal formateadas.<br>
+ * </build>
  */
 class ValidateEmailUseCase @Inject constructor() {
 

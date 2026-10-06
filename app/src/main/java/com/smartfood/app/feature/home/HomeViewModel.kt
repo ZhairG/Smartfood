@@ -17,11 +17,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Nombre: HomeViewModel.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: ViewModel de la pantalla de inicio (HU-05). Lee el perfil del usuario para saludarlo
- * y gestiona el cierre de sesión. Es el punto de entrada de las próximas features (inventario y recetas).
+ * <build>
+ * <b>Nombre:</b> HomeViewModel.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> ViewModel de la pantalla de inicio (HU-05). Lee el perfil del usuario para saludarlo y<br>
+ * gestiona el cierre de sesión. Es el punto de entrada de las próximas features (inventario y recetas).<br>
+ * </build>
  *
  * @param getCurrentUser Caso de uso que obtiene el perfil del usuario actual.
  * @param logout Caso de uso de cierre de sesión.

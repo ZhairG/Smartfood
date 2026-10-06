@@ -15,11 +15,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Nombre: SessionUseCasesTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [ResolveSessionUseCase], [GetCurrentUserUseCase] y [LogoutUseCase]
- * (HU-03 y HU-05).
+ * <build>
+ * <b>Nombre:</b> SessionUseCasesTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Pruebas unitarias de [ResolveSessionUseCase], [GetCurrentUserUseCase] y [LogoutUseCase]<br>
+ * (HU-03 y HU-05).<br>
+ * </build>
  */
 class SessionUseCasesTest {
 

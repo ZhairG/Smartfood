@@ -3,10 +3,12 @@ package com.smartfood.app.feature.auth.domain.repository
 import com.smartfood.app.feature.auth.domain.model.User
 
 /**
- * Nombre: UserRepository.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Contrato para guardar y leer el perfil del usuario (RF-AUTH-02).
+ * <build>
+ * <b>Nombre:</b> UserRepository.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Contrato para guardar y leer el perfil del usuario (RF-AUTH-02).<br>
+ * </build>
  */
 interface UserRepository {
 

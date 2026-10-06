@@ -74,13 +74,19 @@ A partir de la spec 002, los códigos llevan un prefijo corto de la spec para no
 
 - Idioma: código, KDoc, comentarios, commits y nombres de tests en **español**. Los identificadores siguen
   las convenciones de Kotlin.
-- Cada archivo `.kt` empieza con la cabecera KDoc que exige el curso:
+- Cada archivo `.kt` (y `.ts` del servidor) lleva la cabecera que exige el curso, dentro de un bloque `<build>`.
+  Cada línea termina en `<br>`, y la fecha es la de creación del archivo (`dd/MM/aaaa`). Las etiquetas KDoc
+  (`@param`, `@property`) van después del bloque:
   ```kotlin
   /**
-   * Nombre: Archivo.kt
-   * Autor: SmartFood Team
-   * Fecha: Mes Año
-   * Descripción: …
+   * <build>
+   * <b>Nombre:</b> Archivo.kt<br>
+   * <b>Autor:</b> SmartFood Team<br>
+   * <b>Fecha:</b> 06/10/2026<br>
+   * <b>Descripción:</b> …<br>
+   * </build>
+   *
+   * @param …
    */
   ```
 - Todo texto visible va en `res/values/strings.xml`. El mapeo de un error de dominio a su texto vive en un
@@ -112,3 +118,4 @@ Una tarea está terminada cuando se cumple todo esto:
 |---|---|---|
 | 2026-10-04 | Versión 1.0 | Adopción de SDD para el módulo 1 |
 | 2026-10-04 | Códigos con prefijo por spec | Evitar choques de códigos entre la spec 001 y la 002 |
+| 2026-10-06 | Cabecera con bloque `<build>` y fecha `dd/MM/aaaa` | Cabeceras más legibles y con la fecha real de creación |

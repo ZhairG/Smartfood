@@ -59,17 +59,19 @@ import com.smartfood.app.core.designsystem.util.panelTopCorners
 import kotlin.math.roundToInt
 
 /**
- * Nombre: AuthScreenScaffold.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Contenedor común de las pantallas de autenticación (spec 002, plan §3).
- * - Elige las medidas según el alto útil ([formMetricsForWindow]) para que el formulario quepa sin scroll.
- * - Encoge el encabezado de marca al mismo ritmo que sube el teclado (CA-UI-02-05).
- * - Reduce el panel con el inset del teclado; el sistema de foco de Compose mantiene visible el campo
- *   enfocado, sin scroll programático (CA-UI-02-04, RNF-UI-02).
- * - Quita el foco al tocar fuera de los campos o al cerrar el teclado (CA-UI-02-06 y CA-UI-02-07).
- * - Si sobra alto, las [FlexibleGap] del formulario lo reparten como en Figma; si falta, se encogen a su mínimo
- *   (CA-UI-07-03).
+ * <build>
+ * <b>Nombre:</b> AuthScreenScaffold.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 28/09/2026<br>
+ * <b>Descripción:</b> Contenedor común de las pantallas de autenticación (spec 002, plan §3).<br>
+ * - Elige las medidas según el alto útil ([formMetricsForWindow]) para que el formulario quepa sin scroll.<br>
+ * - Encoge el encabezado de marca al mismo ritmo que sube el teclado (CA-UI-02-05).<br>
+ * - Reduce el panel con el inset del teclado; el sistema de foco de Compose mantiene visible el campo enfocado, sin<br>
+ *   scroll programático (CA-UI-02-04, RNF-UI-02).<br>
+ * - Quita el foco al tocar fuera de los campos o al cerrar el teclado (CA-UI-02-06 y CA-UI-02-07).<br>
+ * - Si sobra alto, las [FlexibleGap] del formulario lo reparten como en Figma; si falta, se encogen a su mínimo<br>
+ *   (CA-UI-07-03).<br>
+ * </build>
  *
  * @param headerContent Título y subtítulo, en la parte superior del panel.
  * @param modifier Modificador del contenedor.

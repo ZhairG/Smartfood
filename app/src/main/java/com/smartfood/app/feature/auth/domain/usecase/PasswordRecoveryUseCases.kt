@@ -8,11 +8,13 @@ import javax.inject.Inject
 import kotlin.time.Duration
 
 /**
- * Nombre: PasswordRecoveryUseCases.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Casos de uso de los 3 pasos de la recuperación de contraseña (HU-04).
- * Las validaciones de formato viven aquí; la verificación del código la hace el [PasswordRecoveryRepository].
+ * <build>
+ * <b>Nombre:</b> PasswordRecoveryUseCases.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Casos de uso de los 3 pasos de la recuperación de contraseña (HU-04). Las validaciones de<br>
+ * formato viven aquí; la verificación del código la hace el [PasswordRecoveryRepository].<br>
+ * </build>
  */
 
 /**

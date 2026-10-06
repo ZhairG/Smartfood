@@ -23,10 +23,12 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Nombre: PasswordRecoveryViewModelTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [PasswordRecoveryViewModel] (HU-04 y spec 003).
+ * <build>
+ * <b>Nombre:</b> PasswordRecoveryViewModelTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Pruebas unitarias de [PasswordRecoveryViewModel] (HU-04 y spec 003).<br>
+ * </build>
  */
 class PasswordRecoveryViewModelTest {
 

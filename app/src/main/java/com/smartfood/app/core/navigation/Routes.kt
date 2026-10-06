@@ -3,10 +3,13 @@ package com.smartfood.app.core.navigation
 import kotlinx.serialization.Serializable
 
 /**
- * Nombre: Routes.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Definición de rutas type-safe respaldadas por [ScreenRoute] para la navegación con Kotlin Serialization.
+ * <build>
+ * <b>Nombre:</b> Routes.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 19/09/2026<br>
+ * <b>Descripción:</b> Definición de rutas type-safe respaldadas por [ScreenRoute] para la navegación con Kotlin<br>
+ * Serialization.<br>
+ * </build>
  */
 @Serializable
 sealed interface Route {

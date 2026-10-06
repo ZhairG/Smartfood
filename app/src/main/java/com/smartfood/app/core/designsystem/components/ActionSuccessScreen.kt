@@ -49,18 +49,20 @@ import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import com.smartfood.app.core.designsystem.theme.formMetricsForWindow
 
 /**
- * Nombre: ActionSuccessScreen.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Componente de pantalla atómico y reutilizable para acciones exitosas en Smartfood
- * ("Acción Exitosa" según los nodos 585:4564 y 223:1142 de Figma).
- *
- * Configura los esquemas de color exactos pedidos por el diseño:
- * - Modo Claro: Fondo GreenLight (#F0FDF4), Título GreenDark (#14532D), Cuerpo OrangeMain (#FB923C).
- * - Modo Oscuro: Fondo GreenDark2 (#10271C), Título #4ADE80, Cuerpo OrangeMain (#FB923C).
- * - Símbolo de Verificación: Círculos concéntricos con color #22C55E.
- * El tamaño del símbolo y los márgenes se adaptan al alto de la pantalla (CA-UI-01-02). El modo lo decide el tema de
- * la app ([LocalIsDarkTheme], claro por defecto), no el del sistema (CA-UI-05-01).
+ * <build>
+ * <b>Nombre:</b> ActionSuccessScreen.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 24/09/2026<br>
+ * <b>Descripción:</b> Componente de pantalla atómico y reutilizable para acciones exitosas en Smartfood ("Acción<br>
+ * Exitosa" según los nodos 585:4564 y 223:1142 de Figma).<br>
+ * <br>
+ * Configura los esquemas de color exactos pedidos por el diseño:<br>
+ * - Modo Claro: Fondo GreenLight (#F0FDF4), Título GreenDark (#14532D), Cuerpo OrangeMain (#FB923C).<br>
+ * - Modo Oscuro: Fondo GreenDark2 (#10271C), Título #4ADE80, Cuerpo OrangeMain (#FB923C).<br>
+ * - Símbolo de Verificación: Círculos concéntricos con color #22C55E. El tamaño del símbolo y los márgenes se<br>
+ *   adaptan al alto de la pantalla (CA-UI-01-02). El modo lo decide el tema de la app ([LocalIsDarkTheme], claro<br>
+ *   por defecto), no el del sistema (CA-UI-05-01).<br>
+ * </build>
  *
  * @param title Título principal de la acción completada.
  * @param body Mensaje descriptivo o secundario.

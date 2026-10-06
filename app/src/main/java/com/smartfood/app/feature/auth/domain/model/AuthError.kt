@@ -3,12 +3,14 @@ package com.smartfood.app.feature.auth.domain.model
 import kotlin.time.Duration
 
 /**
- * Nombre: AuthError.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Errores de negocio tipados del módulo de autenticación (RF-AUTH-08).
- * Reemplazan la comparación de mensajes de texto: la capa de datos traduce cada falla técnica a un [AuthError]
- * y la UI decide qué texto mostrar.
+ * <build>
+ * <b>Nombre:</b> AuthError.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Errores de negocio tipados del módulo de autenticación (RF-AUTH-08). Reemplazan la<br>
+ * comparación de mensajes de texto: la capa de datos traduce cada falla técnica a un [AuthError] y la UI decide qué<br>
+ * texto mostrar.<br>
+ * </build>
  */
 
 /** Campos de formulario que un error puede señalar. */

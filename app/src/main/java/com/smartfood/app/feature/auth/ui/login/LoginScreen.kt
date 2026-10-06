@@ -39,12 +39,14 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.titleStyle
 
 /**
- * Nombre: LoginScreen.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pantalla stateless de Inicio de Sesión (HU-02). El estado y la navegación los gestiona
- * [LoginViewModel] a través de la ruta declarada en `AuthNavGraph`.
- * Reutiliza [AuthScreenScaffold] para el layout base, insets y gestión de foco/teclado.
+ * <build>
+ * <b>Nombre:</b> LoginScreen.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 23/09/2026<br>
+ * <b>Descripción:</b> Pantalla stateless de Inicio de Sesión (HU-02). El estado y la navegación los gestiona<br>
+ * [LoginViewModel] a través de la ruta declarada en `AuthNavGraph`. Reutiliza [AuthScreenScaffold] para el layout<br>
+ * base, insets y gestión de foco/teclado.<br>
+ * </build>
  *
  * @param state Objeto de estado inmutable [LoginUiState] proveniente del ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [LoginEvent] hacia el ViewModel.

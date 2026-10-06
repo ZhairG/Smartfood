@@ -10,11 +10,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavBackStackEntry
 
 /**
- * Nombre: NavTransitions.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Transiciones de empuje (push) de 600 ms con interpolación Ease in and out (RNF-06).
- * Se declaran una sola vez en el `NavHost` en lugar de repetirse en cada destino.
+ * <build>
+ * <b>Nombre:</b> NavTransitions.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Transiciones de empuje (push) de 600 ms con interpolación Ease in and out (RNF-06). Se<br>
+ * declaran una sola vez en el `NavHost` en lugar de repetirse en cada destino.<br>
+ * </build>
  */
 object NavTransitions {
 

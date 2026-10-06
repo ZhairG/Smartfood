@@ -25,11 +25,13 @@ import com.smartfood.app.feature.auth.ui.register.RegisterScreen
 import com.smartfood.app.feature.auth.ui.register.RegisterViewModel
 
 /**
- * Nombre: AuthNavGraph.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Grafo de navegación del módulo de autenticación. Cada destino obtiene su ViewModel,
- * recolecta estado y efectos, y delega en una pantalla stateless (patrón Route/Screen, plan.md §2).
+ * <build>
+ * <b>Nombre:</b> AuthNavGraph.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Grafo de navegación del módulo de autenticación. Cada destino obtiene su ViewModel, recolecta<br>
+ * estado y efectos, y delega en una pantalla stateless (patrón Route/Screen, plan.md §2).<br>
+ * </build>
  *
  * @param navController Controlador de navegación de la app.
  */

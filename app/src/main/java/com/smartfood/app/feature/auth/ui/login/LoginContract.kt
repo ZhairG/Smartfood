@@ -6,10 +6,12 @@ import com.smartfood.app.feature.auth.domain.model.AuthField
 import com.smartfood.app.feature.auth.ui.marksEmpty
 
 /**
- * Nombre: LoginContract.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Contrato UDF de la pantalla de inicio de sesión (HU-02): estado, eventos y efectos.
+ * <build>
+ * <b>Nombre:</b> LoginContract.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Contrato UDF de la pantalla de inicio de sesión (HU-02): estado, eventos y efectos.<br>
+ * </build>
  */
 
 /**

@@ -23,11 +23,13 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 
 /**
- * Nombre: AnchoredPopup.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Popup flotante anclado a un elemento, que se coloca encima de él (spec 002, HU-UI-03).
- * Se posiciona respecto a los límites reales del ancla, sin desplazamientos fijos (RNF-UI-01).
+ * <build>
+ * <b>Nombre:</b> AnchoredPopup.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Popup flotante anclado a un elemento, que se coloca encima de él (spec 002, HU-UI-03). Se<br>
+ * posiciona respecto a los límites reales del ancla, sin desplazamientos fijos (RNF-UI-01).<br>
+ * </build>
  */
 
 /**

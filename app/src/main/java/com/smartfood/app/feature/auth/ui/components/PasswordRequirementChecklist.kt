@@ -31,13 +31,15 @@ import com.smartfood.app.core.designsystem.theme.White
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
 /**
- * Nombre: PasswordRequirementChecklist.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Tarjeta con los criterios de seguridad de la contraseña, con el estilo del componente
- * "Checklist Crear contraseña" de Figma (nodo 572:1299, spec 002 CA-UI-07-04): tarjeta blanca con borde y sombra,
- * ítems de 15 sp en negro, círculo con check verde si se cumple y X naranja si no. Se muestra como popup
- * encima del campo de contraseña enfocado (HU-UI-03).
+ * <build>
+ * <b>Nombre:</b> PasswordRequirementChecklist.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 24/09/2026<br>
+ * <b>Descripción:</b> Tarjeta con los criterios de seguridad de la contraseña, con el estilo del componente<br>
+ * "Checklist Crear contraseña" de Figma (nodo 572:1299, spec 002 CA-UI-07-04): tarjeta blanca con borde y sombra,<br>
+ * ítems de 15 sp en negro, círculo con check verde si se cumple y X naranja si no. Se muestra como popup encima del<br>
+ * campo de contraseña enfocado (HU-UI-03).<br>
+ * </build>
  *
  * @param hasMinimumLength Indica si la contraseña tiene al menos 8 caracteres.
  * @param hasUppercase Indica si la contraseña contiene al menos una letra mayúscula.

@@ -10,11 +10,13 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 /**
- * Nombre: MainDispatcherRule.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Regla JUnit que reemplaza `Dispatchers.Main` por un dispatcher de prueba, para que
- * `viewModelScope` funcione en pruebas JVM.
+ * <build>
+ * <b>Nombre:</b> MainDispatcherRule.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Regla JUnit que reemplaza `Dispatchers.Main` por un dispatcher de prueba, para que<br>
+ * `viewModelScope` funcione en pruebas JVM.<br>
+ * </build>
  *
  * @property testDispatcher Dispatcher que reemplaza a Main durante la prueba.
  */

@@ -19,10 +19,12 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Nombre: RegisterScreenTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas de UI de la pantalla stateless [RegisterScreen] (HU-01).
+ * <build>
+ * <b>Nombre:</b> RegisterScreenTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Pruebas de UI de la pantalla stateless [RegisterScreen] (HU-01).<br>
+ * </build>
  */
 class RegisterScreenTest {
 

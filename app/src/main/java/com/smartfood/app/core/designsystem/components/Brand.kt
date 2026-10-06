@@ -28,10 +28,12 @@ import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
 /**
- * Nombre: Brand.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Componentes de identidad de marca (Wordmark y Encabezado de marca).
+ * <build>
+ * <b>Nombre:</b> Brand.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 23/09/2026<br>
+ * <b>Descripción:</b> Componentes de identidad de marca (Wordmark y Encabezado de marca).<br>
+ * </build>
  */
 
 /**

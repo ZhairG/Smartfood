@@ -12,10 +12,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Nombre: ShadowExt.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Función de extensión de [Modifier] para aplicar sombras difuminadas personalizadas estilo Figma optimizadas con caché.
+ * <build>
+ * <b>Nombre:</b> ShadowExt.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 24/09/2026<br>
+ * <b>Descripción:</b> Función de extensión de [Modifier] para aplicar sombras difuminadas personalizadas estilo<br>
+ * Figma optimizadas con caché.<br>
+ * </build>
  */
 
 /**

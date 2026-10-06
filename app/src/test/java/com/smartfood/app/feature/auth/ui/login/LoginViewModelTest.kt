@@ -20,10 +20,12 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Nombre: LoginViewModelTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [LoginViewModel] (HU-02 y HU-06).
+ * <build>
+ * <b>Nombre:</b> LoginViewModelTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Pruebas unitarias de [LoginViewModel] (HU-02 y HU-06).<br>
+ * </build>
  */
 class LoginViewModelTest {
 

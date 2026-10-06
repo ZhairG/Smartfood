@@ -11,11 +11,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Nombre: SplashViewModel.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Resuelve el destino inicial de la app según la sesión guardada (HU-03).
- * El tiempo mínimo del splash (CA-03-04) lo controla [SplashScreen], no este ViewModel.
+ * <build>
+ * <b>Nombre:</b> SplashViewModel.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Resuelve el destino inicial de la app según la sesión guardada (HU-03). El tiempo mínimo del<br>
+ * splash (CA-03-04) lo controla [SplashScreen], no este ViewModel.<br>
+ * </build>
  *
  * @param resolveSession Caso de uso que decide si se abre directamente Home.
  */

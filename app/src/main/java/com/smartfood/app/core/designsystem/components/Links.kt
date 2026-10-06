@@ -21,10 +21,12 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
 /**
- * Nombre: Links.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Componentes atómicos para enlaces interactivos y llamadas a la acción en texto.
+ * <build>
+ * <b>Nombre:</b> Links.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 20/09/2026<br>
+ * <b>Descripción:</b> Componentes atómicos para enlaces interactivos y llamadas a la acción en texto.<br>
+ * </build>
  */
 
 /**

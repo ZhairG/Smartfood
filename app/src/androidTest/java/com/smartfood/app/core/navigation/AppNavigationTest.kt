@@ -16,11 +16,13 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Nombre: AppNavigationTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas instrumentadas de integración para verificar el árbol de navegación
- * type-safe [AppNavHost], validando la ejecución automática de animaciones y navegación de empuje en todos los enlaces.
+ * <build>
+ * <b>Nombre:</b> AppNavigationTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 24/09/2026<br>
+ * <b>Descripción:</b> Pruebas instrumentadas de integración para verificar el árbol de navegación type-safe<br>
+ * [AppNavHost], validando la ejecución automática de animaciones y navegación de empuje en todos los enlaces.<br>
+ * </build>
  */
 @HiltAndroidTest
 class AppNavigationTest {

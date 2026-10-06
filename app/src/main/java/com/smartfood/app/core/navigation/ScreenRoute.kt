@@ -3,10 +3,13 @@ package com.smartfood.app.core.navigation
 import androidx.annotation.Keep
 
 /**
- * Nombre: ScreenRoute.kt
- * Autor: SmartFood Team
- * Fecha: Septiembre 2026
- * Descripción: Enumeración independiente que identifica unívocamente cada pantalla y grafo del sistema de navegación.
+ * <build>
+ * <b>Nombre:</b> ScreenRoute.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 28/09/2026<br>
+ * <b>Descripción:</b> Enumeración independiente que identifica unívocamente cada pantalla y grafo del sistema de<br>
+ * navegación.<br>
+ * </build>
  *
  * @property routeName Identificador en cadena de texto de la ruta.
  */

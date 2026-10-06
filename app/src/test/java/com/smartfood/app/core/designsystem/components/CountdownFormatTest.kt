@@ -4,10 +4,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
- * Nombre: CountdownFormatTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [formatCountdown], el formato `m:ss` de la cuenta regresiva (spec 003, HU-REC-04).
+ * <build>
+ * <b>Nombre:</b> CountdownFormatTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 06/10/2026<br>
+ * <b>Descripción:</b> Pruebas unitarias de [formatCountdown], el formato `m:ss` de la cuenta regresiva (spec 003,<br>
+ * HU-REC-04).<br>
+ * </build>
  */
 class CountdownFormatTest {
 

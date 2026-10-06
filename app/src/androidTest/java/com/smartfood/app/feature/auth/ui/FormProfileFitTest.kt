@@ -28,11 +28,14 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Nombre: FormProfileFitTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Verifica la elección del perfil de medidas según lo que cabe en la pantalla (spec 002, CA-UI-07-03):
- * un formulario que cabe conserva el perfil de Figma ([FormMetrics.Regular]) y uno que no cabe baja de perfil.
+ * <build>
+ * <b>Nombre:</b> FormProfileFitTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Verifica la elección del perfil de medidas según lo que cabe en la pantalla (spec 002,<br>
+ * CA-UI-07-03): un formulario que cabe conserva el perfil de Figma ([FormMetrics.Regular]) y uno que no cabe baja<br>
+ * de perfil.<br>
+ * </build>
  */
 class FormProfileFitTest {
 

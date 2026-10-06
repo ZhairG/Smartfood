@@ -13,11 +13,13 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 /**
- * Nombre: LauncherIconTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Verifica la configuración del ícono oficial (spec 002, HU-UI-06): ícono adaptativo con fondo
- * GreenLight, capa frontal generada desde el logo y capa monocromática para íconos temáticos.
+ * <build>
+ * <b>Nombre:</b> LauncherIconTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Verifica la configuración del ícono oficial (spec 002, HU-UI-06): ícono adaptativo con fondo<br>
+ * GreenLight, capa frontal generada desde el logo y capa monocromática para íconos temáticos.<br>
+ * </build>
  */
 class LauncherIconTest {
 

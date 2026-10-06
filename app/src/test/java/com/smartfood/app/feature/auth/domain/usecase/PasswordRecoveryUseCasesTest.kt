@@ -10,10 +10,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Nombre: PasswordRecoveryUseCasesTest.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de las validaciones de los 3 pasos de la recuperación (HU-04).
+ * <build>
+ * <b>Nombre:</b> PasswordRecoveryUseCasesTest.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Pruebas unitarias de las validaciones de los 3 pasos de la recuperación (HU-04).<br>
+ * </build>
  */
 class PasswordRecoveryUseCasesTest {
 

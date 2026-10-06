@@ -6,11 +6,13 @@ import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthField
 
 /**
- * Nombre: AuthErrorText.kt
- * Autor: SmartFood Team
- * Fecha: Octubre 2026
- * Descripción: Único punto de traducción de [AuthError] a textos de `strings.xml` (RNF-03) y a campos
- * resaltados en rojo. Las pantallas no deciden mensajes por su cuenta.
+ * <build>
+ * <b>Nombre:</b> AuthErrorText.kt<br>
+ * <b>Autor:</b> SmartFood Team<br>
+ * <b>Fecha:</b> 04/10/2026<br>
+ * <b>Descripción:</b> Único punto de traducción de [AuthError] a textos de `strings.xml` (RNF-03) y a campos<br>
+ * resaltados en rojo. Las pantallas no deciden mensajes por su cuenta.<br>
+ * </build>
  */
 
 /** Mensaje para los formularios de inicio de sesión y registro. */
