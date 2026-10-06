@@ -8,6 +8,7 @@
 
 import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
+import { gmailCredentials } from "../adapters.js";
 import { isStrongPassword } from "../passwordPolicy.js";
 import { Mailer, ResetRecord, ResetStore, StoreUpdate, UserDirectory } from "../ports.js";
 import { RecoveryError, RecoveryErrorReason, RecoveryLimits, RecoveryService, recordKey } from "../recoveryService.js";
@@ -258,5 +259,14 @@ describe("HU-REC-03: protección contra abuso", () => {
       await rejectsWith(service.verifyCode(UNKNOWN_EMAIL, "4821"), "INVALID_CODE");
     }
     await rejectsWith(service.verifyCode(UNKNOWN_EMAIL, "4821"), "TOO_MANY_ATTEMPTS");
+  });
+});
+
+describe("Credenciales de Gmail", () => {
+  it("CA-REC-01-01 la contrasena de aplicacion se usa sin espacios ni saltos de linea", () => {
+    assert.deepEqual(gmailCredentials(" equipo@gmail.com\n", "abcd efgh ijkl mnop\r\n"), {
+      user: "equipo@gmail.com",
+      pass: "abcdefghijklmnop",
+    });
   });
 });

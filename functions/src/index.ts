@@ -15,6 +15,7 @@ import { defineSecret } from "firebase-functions/params";
 import { setGlobalOptions } from "firebase-functions/v2";
 import { FunctionsErrorCode, HttpsError, onCall } from "firebase-functions/v2/https";
 import { AdminUserDirectory, FirestoreResetStore, GmailMailer, LoggingMailer } from "./adapters.js";
+import { Mailer } from "./ports.js";
 import { RecoveryError, RecoveryErrorReason, RecoveryService } from "./recoveryService.js";
 
 initializeApp();
@@ -57,10 +58,20 @@ export const resetPasswordWithCode = onCall((request) =>
 );
 
 function recoveryService(): RecoveryService {
-  const mailer =
-    process.env.FUNCTIONS_EMULATOR === "true" ? new LoggingMailer() : new GmailMailer(smtpUser.value(), smtpPass.value());
-  return new RecoveryService(new FirestoreResetStore(getFirestore()), new AdminUserDirectory(getAuth()), mailer);
+  return new RecoveryService(new FirestoreResetStore(getFirestore()), new AdminUserDirectory(getAuth()), lazyMailer);
 }
+
+/**
+ * Crea el cliente de correo solo al enviar. Solo `requestPasswordResetCode` declara los secretos, así que las
+ * otras funciones nunca los leen.
+ */
+const lazyMailer: Mailer = {
+  sendRecoveryCode: (email, code) => {
+    const mailer =
+      process.env.FUNCTIONS_EMULATOR === "true" ? new LoggingMailer() : new GmailMailer(smtpUser.value(), smtpPass.value());
+    return mailer.sendRecoveryCode(email, code);
+  },
+};
 
 /** Ejecuta un paso y traduce sus fallas. Las inesperadas se registran y salen como `internal`, sin detalles. */
 async function run(step: () => Promise<void>): Promise<Record<string, never>> {

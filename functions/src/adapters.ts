@@ -57,20 +57,27 @@ export class AdminUserDirectory implements UserDirectory {
   }
 }
 
+/**
+ * Limpia las credenciales de Gmail tal como se guardaron en Secret Manager. Google muestra la contraseña de
+ * aplicación en grupos ("abcd efgh ijkl mnop") y al copiarla se cuelan espacios o saltos de línea, que Gmail
+ * rechaza con `535 BadCredentials`.
+ */
+export function gmailCredentials(user: string, appPassword: string): { user: string; pass: string } {
+  return { user: user.trim(), pass: appPassword.replace(/\s+/g, "") };
+}
+
 /** Envío por Gmail SMTP con una contraseña de aplicación (ADR-REC-04). */
 export class GmailMailer implements Mailer {
-  constructor(
-    private readonly user: string,
-    private readonly appPassword: string,
-  ) {}
+  private readonly auth: { user: string; pass: string };
+
+  constructor(user: string, appPassword: string) {
+    this.auth = gmailCredentials(user, appPassword);
+  }
 
   async sendRecoveryCode(email: string, code: string): Promise<void> {
-    const transport = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: this.user, pass: this.appPassword },
-    });
+    const transport = nodemailer.createTransport({ service: "gmail", auth: this.auth });
     await transport.sendMail({
-      from: `"SmartFood" <${this.user}>`,
+      from: `"SmartFood" <${this.auth.user}>`,
       to: email,
       subject: `Tu código de SmartFood es ${code}`,
       text:
