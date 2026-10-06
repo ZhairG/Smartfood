@@ -1,12 +1,10 @@
 /**
- * <build>
- * <b>Nombre:</b> recoveryService.ts<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 05/10/2026<br>
- * <b>Descripción:</b> Reglas de la recuperación de contraseña real (spec 003, plan §5). No conoce Firebase: recibe<br>
- * sus dependencias como puertos (`ports.ts`) y lanza `RecoveryError` con una razón que `index.ts` traduce a<br>
- * `HttpsError`. Responde igual exista o no la cuenta (RF-REC-05).<br>
- * </build>
+ * Nombre: recoveryService.ts
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Reglas de la recuperación de contraseña real (spec 003, plan §5). No conoce Firebase: recibe sus
+ * dependencias como puertos (`ports.ts`) y lanza `RecoveryError` con una razón que `index.ts` traduce a
+ * `HttpsError`. Responde igual exista o no la cuenta (RF-REC-05).
  */
 
 import { createHash, randomBytes, randomInt, timingSafeEqual } from "node:crypto";

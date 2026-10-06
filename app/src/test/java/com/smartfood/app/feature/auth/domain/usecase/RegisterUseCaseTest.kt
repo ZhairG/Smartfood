@@ -16,12 +16,10 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> RegisterUseCaseTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pruebas unitarias de [RegisterUseCase] (HU-01), incluido el rollback de CA-01-09.<br>
- * </build>
+ * Nombre: RegisterUseCaseTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas unitarias de [RegisterUseCase] (HU-01), incluido el rollback de CA-01-09.
  */
 class RegisterUseCaseTest {
 

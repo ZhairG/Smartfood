@@ -3,12 +3,10 @@ package com.smartfood.app.core.common
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * <build>
- * <b>Nombre:</b> CoroutinesExt.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 19/09/2026<br>
- * <b>Descripción:</b> Funciones de extensión utilitarias para el manejo seguro de corrutinas en Kotlin.<br>
- * </build>
+ * Nombre: CoroutinesExt.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Funciones de extensión utilitarias para el manejo seguro de corrutinas en Kotlin.
  */
 
 /**

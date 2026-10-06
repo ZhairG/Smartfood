@@ -10,12 +10,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> FormMetricsTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pruebas unitarias de la selección de medidas por alto disponible (spec 002, HU-UI-01).<br>
- * </build>
+ * Nombre: FormMetricsTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas unitarias de la selección de medidas por alto disponible (spec 002, HU-UI-01).
  */
 class FormMetricsTest {
 

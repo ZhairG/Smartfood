@@ -14,12 +14,10 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> LoginUseCaseTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pruebas unitarias de [LoginUseCase] (HU-02 y HU-03).<br>
- * </build>
+ * Nombre: LoginUseCaseTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas unitarias de [LoginUseCase] (HU-02 y HU-03).
  */
 class LoginUseCaseTest {
 

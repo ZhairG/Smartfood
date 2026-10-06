@@ -6,13 +6,10 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> ValidateEmailUseCaseTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 24/09/2026<br>
- * <b>Descripción:</b> Pruebas unitarias para verificar la validación de formato de correo electrónico en<br>
- * [ValidateEmailUseCase].<br>
- * </build>
+ * Nombre: ValidateEmailUseCaseTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Pruebas unitarias para verificar la validación de formato de correo electrónico en [ValidateEmailUseCase].
  */
 class ValidateEmailUseCaseTest {
 

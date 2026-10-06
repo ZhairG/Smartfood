@@ -9,13 +9,11 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 
 /**
- * <build>
- * <b>Nombre:</b> Type.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 19/09/2026<br>
- * <b>Descripción:</b> Sistema tipográfico de la aplicación Smartfood. Mapea la jerarquía visual de Figma a la<br>
- * estructura de [Typography] de Material 3.<br>
- * </build>
+ * Nombre: Type.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Sistema tipográfico de la aplicación Smartfood.
+ * Mapea la jerarquía visual de Figma a la estructura de [Typography] de Material 3.
  */
 
 /**

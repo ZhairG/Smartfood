@@ -17,13 +17,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * <build>
- * <b>Nombre:</b> LoginViewModel.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> ViewModel de la pantalla de inicio de sesión (HU-02 y HU-06). Las reglas de validación viven<br>
- * en [LoginUseCase]; este ViewModel solo traduce eventos a estado.<br>
- * </build>
+ * Nombre: LoginViewModel.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: ViewModel de la pantalla de inicio de sesión (HU-02 y HU-06). Las reglas de validación
+ * viven en [LoginUseCase]; este ViewModel solo traduce eventos a estado.
  *
  * @param login Caso de uso de inicio de sesión.
  */

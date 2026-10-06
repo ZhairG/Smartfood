@@ -34,13 +34,11 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
 
 /**
- * <build>
- * <b>Nombre:</b> OtpCodeInput.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Componente atómico para ingreso de código OTP de 4 dígitos según Figma. Muestra 4 casillas<br>
- * independientes con borde de foco, borde de error y transferencia fluida de datos.<br>
- * </build>
+ * Nombre: OtpCodeInput.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Componente atómico para ingreso de código OTP de 4 dígitos según Figma.
+ * Muestra 4 casillas independientes con borde de foco, borde de error y transferencia fluida de datos.
  *
  * @param code Valor actual del código de 4 dígitos.
  * @param onCodeChanged Callback notificado al modificar el valor del código.

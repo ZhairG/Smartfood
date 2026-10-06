@@ -7,13 +7,11 @@ import com.smartfood.app.feature.auth.domain.usecase.PasswordValidationResult
 import com.smartfood.app.feature.auth.ui.marksEmpty
 
 /**
- * <build>
- * <b>Nombre:</b> PasswordRecoveryContract.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Contrato UDF del flujo de recuperación de contraseña (HU-04 y spec 003): pasos, estado,<br>
- * eventos y efectos.<br>
- * </build>
+ * Nombre: PasswordRecoveryContract.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Contrato UDF del flujo de recuperación de contraseña (HU-04 y spec 003): pasos, estado, eventos
+ * y efectos.
  */
 
 /** Pasos del flujo, en el orden del indicador de pasos. */

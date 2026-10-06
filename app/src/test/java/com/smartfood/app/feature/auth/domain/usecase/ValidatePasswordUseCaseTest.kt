@@ -6,13 +6,10 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> ValidatePasswordUseCaseTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 24/09/2026<br>
- * <b>Descripción:</b> Pruebas unitarias para verificar los criterios de fortaleza de contraseña en<br>
- * [ValidatePasswordUseCase].<br>
- * </build>
+ * Nombre: ValidatePasswordUseCaseTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Pruebas unitarias para verificar los criterios de fortaleza de contraseña en [ValidatePasswordUseCase].
  */
 class ValidatePasswordUseCaseTest {
 

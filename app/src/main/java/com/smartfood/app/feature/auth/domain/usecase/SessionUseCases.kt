@@ -9,13 +9,11 @@ import com.smartfood.app.feature.auth.domain.repository.UserRepository
 import javax.inject.Inject
 
 /**
- * <build>
- * <b>Nombre:</b> SessionUseCases.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Casos de uso de la sesión activa: decidir el destino inicial (HU-03), leer el perfil del<br>
- * usuario actual (HU-05) y cerrar sesión (CA-05-03).<br>
- * </build>
+ * Nombre: SessionUseCases.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Casos de uso de la sesión activa: decidir el destino inicial (HU-03), leer el perfil del
+ * usuario actual (HU-05) y cerrar sesión (CA-05-03).
  */
 
 /**

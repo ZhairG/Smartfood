@@ -4,12 +4,10 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 /**
- * <build>
- * <b>Nombre:</b> SmartfoodApp.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 19/09/2026<br>
- * <b>Descripción:</b> Clase [Application] principal anotada con [HiltAndroidApp] para inicializar el grafo de Hilt.<br>
- * </build>
+ * Nombre: SmartfoodApp.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Clase [Application] principal anotada con [HiltAndroidApp] para inicializar el grafo de Hilt.
  */
 @HiltAndroidApp
 class SmartfoodApp : Application()

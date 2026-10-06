@@ -21,13 +21,10 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> ColorModeTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Verifica que, con el teléfono en modo oscuro, la app se ve clara por defecto (spec 002,<br>
- * HU-UI-05).<br>
- * </build>
+ * Nombre: ColorModeTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Verifica que, con el teléfono en modo oscuro, la app se ve clara por defecto (spec 002, HU-UI-05).
  */
 class ColorModeTest {
 

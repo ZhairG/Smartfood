@@ -9,14 +9,12 @@ import com.smartfood.app.feature.auth.domain.repository.UserRepository
 import javax.inject.Inject
 
 /**
- * <build>
- * <b>Nombre:</b> RegisterUseCase.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Caso de uso del registro (HU-01). Valida los datos y orquesta la creación de la cuenta, el<br>
- * guardado del perfil (con rollback si falla, CA-01-09), el envío del correo de verificación y el cierre de sesión<br>
- * final (CA-01-07).<br>
- * </build>
+ * Nombre: RegisterUseCase.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Caso de uso del registro (HU-01). Valida los datos y orquesta la creación de la cuenta,
+ * el guardado del perfil (con rollback si falla, CA-01-09), el envío del correo de verificación y
+ * el cierre de sesión final (CA-01-07).
  *
  * @param authRepository Repositorio de cuenta y sesión.
  * @param userRepository Repositorio del perfil del usuario.

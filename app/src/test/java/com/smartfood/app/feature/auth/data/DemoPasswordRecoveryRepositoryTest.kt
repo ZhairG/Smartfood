@@ -11,13 +11,11 @@ import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * <build>
- * <b>Nombre:</b> DemoPasswordRecoveryRepositoryTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pruebas unitarias del modo demo de la recuperación con los datos de prueba de la spec<br>
- * (HU-04), que responde de forma neutra como la versión real (spec 003, RF-REC-06).<br>
- * </build>
+ * Nombre: DemoPasswordRecoveryRepositoryTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas unitarias del modo demo de la recuperación con los datos de prueba de la spec (HU-04),
+ * que responde de forma neutra como la versión real (spec 003, RF-REC-06).
  */
 class DemoPasswordRecoveryRepositoryTest {
 

@@ -1,12 +1,10 @@
 /**
- * <build>
- * <b>Nombre:</b> ports.ts<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 05/10/2026<br>
- * <b>Descripción:</b> Contratos que necesita el servicio de recuperación (spec 003, plan §2). La lógica de<br>
- * `recoveryService.ts` solo conoce estas interfaces; `adapters.ts` las implementa con Firebase y nodemailer, y las<br>
- * pruebas las implementan en memoria.<br>
- * </build>
+ * Nombre: ports.ts
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Contratos que necesita el servicio de recuperación (spec 003, plan §2). La lógica de
+ * `recoveryService.ts` solo conoce estas interfaces; `adapters.ts` las implementa con Firebase y nodemailer,
+ * y las pruebas las implementan en memoria.
  */
 
 /** Registro de `passwordResets/{sha256(correo)}` (plan §4). Las fechas son epoch en milisegundos. */

@@ -8,13 +8,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * <build>
- * <b>Nombre:</b> Spacing.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 24/09/2026<br>
- * <b>Descripción:</b> Define el Design System de espaciados estandarizados para la aplicación. Garantiza<br>
- * proporciones visuales consistentes en todas las pantallas.<br>
- * </build>
+ * Nombre: Spacing.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Define el Design System de espaciados estandarizados para la aplicación.
+ * Garantiza proporciones visuales consistentes en todas las pantallas.
  *
  * @property extraSmall Espaciado de 4dp para márgenes mínimos.
  * @property small Espaciado de 8dp para separación pequeña.

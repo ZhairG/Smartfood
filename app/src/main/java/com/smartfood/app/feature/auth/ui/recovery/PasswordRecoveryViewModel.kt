@@ -24,15 +24,13 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * <build>
- * <b>Nombre:</b> PasswordRecoveryViewModel.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> ViewModel del flujo de recuperación de contraseña en 3 pasos (HU-04). Al salir de la pantalla<br>
- * el ViewModel se destruye, por lo que el flujo siempre vuelve a empezar en el paso 1 (CA-04-12). Si el paso 3<br>
- * falla porque el código ya no vale, regresa al paso 2 (CA-REC-02-03). Cuenta hacia atrás la espera que informa el<br>
- * servidor antes de poder pedir otro código (HU-REC-04).<br>
- * </build>
+ * Nombre: PasswordRecoveryViewModel.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: ViewModel del flujo de recuperación de contraseña en 3 pasos (HU-04).
+ * Al salir de la pantalla el ViewModel se destruye, por lo que el flujo siempre vuelve a empezar en el
+ * paso 1 (CA-04-12). Si el paso 3 falla porque el código ya no vale, regresa al paso 2 (CA-REC-02-03).
+ * Cuenta hacia atrás la espera que informa el servidor antes de poder pedir otro código (HU-REC-04).
  *
  * @param requestCode Caso de uso del paso 1.
  * @param verifyCode Caso de uso del paso 2.

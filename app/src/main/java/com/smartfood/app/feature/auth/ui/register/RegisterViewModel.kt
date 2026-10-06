@@ -18,13 +18,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * <build>
- * <b>Nombre:</b> RegisterViewModel.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> ViewModel de la pantalla de registro (HU-01 y HU-06). La orquestación (cuenta, perfil,<br>
- * verificación y rollback) vive en [RegisterUseCase].<br>
- * </build>
+ * Nombre: RegisterViewModel.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: ViewModel de la pantalla de registro (HU-01 y HU-06). La orquestación (cuenta, perfil,
+ * verificación y rollback) vive en [RegisterUseCase].
  *
  * @param register Caso de uso de registro.
  * @param validatePassword Validador usado para la lista de requisitos en tiempo real.

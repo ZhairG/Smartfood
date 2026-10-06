@@ -10,12 +10,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
 
 /**
- * <build>
- * <b>Nombre:</b> KeyboardExt.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Efectos de teclado compartidos por los formularios (spec 002, HU-UI-02).<br>
- * </build>
+ * Nombre: KeyboardExt.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Efectos de teclado compartidos por los formularios (spec 002, HU-UI-02).
  */
 
 /**

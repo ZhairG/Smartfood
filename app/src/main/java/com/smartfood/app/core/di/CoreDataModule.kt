@@ -16,15 +16,13 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * <build>
- * <b>Nombre:</b> CoreDataModule.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Módulo Hilt que provee los SDK compartidos por todas las features: Firebase Authentication,<br>
- * Cloud Firestore, Cloud Functions y el DataStore de preferencias de sesión. Las instancias se inyectan siempre no<br>
- * nulas; las pruebas usan fakes de las interfaces del dominio. Con `-PuseFirebaseEmulator=true` (solo debug), los<br>
- * SDK apuntan a la Emulator Suite (spec 003, plan §6).<br>
- * </build>
+ * Nombre: CoreDataModule.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Módulo Hilt que provee los SDK compartidos por todas las features:
+ * Firebase Authentication, Cloud Firestore, Cloud Functions y el DataStore de preferencias de sesión.
+ * Las instancias se inyectan siempre no nulas; las pruebas usan fakes de las interfaces del dominio.
+ * Con `-PuseFirebaseEmulator=true` (solo debug), los SDK apuntan a la Emulator Suite (spec 003, plan §6).
  */
 @Module
 @InstallIn(SingletonComponent::class)

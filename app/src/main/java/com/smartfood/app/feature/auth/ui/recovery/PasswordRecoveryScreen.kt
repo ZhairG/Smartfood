@@ -48,16 +48,15 @@ import com.smartfood.app.feature.auth.ui.components.PasswordFieldWithChecklist
 import com.smartfood.app.feature.auth.ui.recoveryMessageRes
 
 /**
- * <build>
- * <b>Nombre:</b> PasswordRecoveryScreen.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pantalla stateless del flujo de Recuperación de Contraseña (HU-04 y spec 003). Gestiona las 3<br>
- * etapas (correo, código de 4 dígitos y nueva contraseña) con el indicador de pasos [SmartFoodStepIndicator]. Cada<br>
- * paso cabe sin scroll y el campo enfocado queda visible sin scroll programático (spec 002); en el paso 3 los<br>
- * requisitos aparecen en un popup encima del campo enfocado (CA-UI-03-02). Mientras hay que esperar para pedir otro<br>
- * código, el enlace "Reenviar código" y el botón "Enviar Código" muestran la cuenta regresiva (HU-REC-04).<br>
- * </build>
+ * Nombre: PasswordRecoveryScreen.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pantalla stateless del flujo de Recuperación de Contraseña (HU-04 y spec 003).
+ * Gestiona las 3 etapas (correo, código de 4 dígitos y nueva contraseña) con el indicador de pasos
+ * [SmartFoodStepIndicator]. Cada paso cabe sin scroll y el campo enfocado queda visible sin scroll programático
+ * (spec 002); en el paso 3 los requisitos aparecen en un popup encima del campo enfocado (CA-UI-03-02).
+ * Mientras hay que esperar para pedir otro código, el enlace "Reenviar código" y el botón "Enviar Código" muestran la
+ * cuenta regresiva (HU-REC-04).
  *
  * @param state Objeto de estado inmutable [PasswordRecoveryUiState] expuesto por el ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [PasswordRecoveryEvent] al ViewModel.

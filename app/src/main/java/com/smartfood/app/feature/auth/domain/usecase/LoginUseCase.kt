@@ -8,13 +8,11 @@ import com.smartfood.app.feature.auth.domain.repository.SessionPreferences
 import javax.inject.Inject
 
 /**
- * <build>
- * <b>Nombre:</b> LoginUseCase.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Caso de uso del inicio de sesión (HU-02). Valida los datos, inicia sesión y guarda la<br>
- * preferencia "Recuérdame" (HU-03).<br>
- * </build>
+ * Nombre: LoginUseCase.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Caso de uso del inicio de sesión (HU-02). Valida los datos, inicia sesión y guarda
+ * la preferencia "Recuérdame" (HU-03).
  *
  * @param authRepository Repositorio de cuenta y sesión.
  * @param sessionPreferences Preferencias locales de sesión.

@@ -23,12 +23,10 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> FormFocusTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pruebas de foco y del popup de requisitos de la contraseña (spec 002, HU-UI-02 y HU-UI-03).<br>
- * </build>
+ * Nombre: FormFocusTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas de foco y del popup de requisitos de la contraseña (spec 002, HU-UI-02 y HU-UI-03).
  */
 class FormFocusTest {
 

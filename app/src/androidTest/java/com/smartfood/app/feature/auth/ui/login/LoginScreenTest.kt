@@ -13,12 +13,10 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> LoginScreenTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pruebas de UI de la pantalla stateless [LoginScreen] (HU-02).<br>
- * </build>
+ * Nombre: LoginScreenTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas de UI de la pantalla stateless [LoginScreen] (HU-02).
  */
 class LoginScreenTest {
 

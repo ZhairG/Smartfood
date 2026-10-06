@@ -7,12 +7,10 @@ import com.smartfood.app.feature.auth.domain.usecase.PasswordValidationResult
 import com.smartfood.app.feature.auth.ui.marksEmpty
 
 /**
- * <build>
- * <b>Nombre:</b> RegisterContract.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Contrato UDF de la pantalla de registro (HU-01): estado, eventos y efectos.<br>
- * </build>
+ * Nombre: RegisterContract.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Contrato UDF de la pantalla de registro (HU-01): estado, eventos y efectos.
  */
 
 /**

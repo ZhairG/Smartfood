@@ -14,14 +14,12 @@ import java.io.IOException
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * <build>
- * <b>Nombre:</b> FirebaseErrorMapper.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Traduce las excepciones de Firebase a errores de negocio [AuthError] (RF-AUTH-08). Es el<br>
- * único lugar del proyecto que conoce los tipos de excepción de Firebase (ver plan.md §6.1). Los errores de Cloud<br>
- * Functions se clasifican por su `details.reason` (spec 003, plan §3).<br>
- * </build>
+ * Nombre: FirebaseErrorMapper.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Traduce las excepciones de Firebase a errores de negocio [AuthError] (RF-AUTH-08).
+ * Es el único lugar del proyecto que conoce los tipos de excepción de Firebase (ver plan.md §6.1).
+ * Los errores de Cloud Functions se clasifican por su `details.reason` (spec 003, plan §3).
  */
 object FirebaseErrorMapper {
 

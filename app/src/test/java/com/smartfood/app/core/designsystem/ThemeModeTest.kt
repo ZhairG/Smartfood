@@ -8,12 +8,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> ThemeModeTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pruebas unitarias de la resolución del modo de color (spec 002, HU-UI-05).<br>
- * </build>
+ * Nombre: ThemeModeTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas unitarias de la resolución del modo de color (spec 002, HU-UI-05).
  */
 class ThemeModeTest {
 

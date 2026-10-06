@@ -12,13 +12,11 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * <build>
- * <b>Nombre:</b> Fakes.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Implementaciones fake de los contratos del dominio, compartidas por todas las pruebas<br>
- * unitarias. Registran las llamadas recibidas y devuelven resultados configurables.<br>
- * </build>
+ * Nombre: Fakes.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Implementaciones fake de los contratos del dominio, compartidas por todas las pruebas
+ * unitarias. Registran las llamadas recibidas y devuelven resultados configurables.
  */
 
 /** Fake de [AuthRepository]. Por defecto todas las operaciones tienen éxito. */

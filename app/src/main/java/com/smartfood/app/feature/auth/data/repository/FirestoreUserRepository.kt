@@ -12,14 +12,12 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 /**
- * <build>
- * <b>Nombre:</b> FirestoreUserRepository.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Implementación de [UserRepository] sobre Cloud Firestore (RF-AUTH-02). Cada perfil vive en<br>
- * `users/{uid}` y se protege con `firestore.rules` (RNF-02). Se escribe y se lee con mapas para no depender de<br>
- * reflexión con R8.<br>
- * </build>
+ * Nombre: FirestoreUserRepository.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Implementación de [UserRepository] sobre Cloud Firestore (RF-AUTH-02).
+ * Cada perfil vive en `users/{uid}` y se protege con `firestore.rules` (RNF-02).
+ * Se escribe y se lee con mapas para no depender de reflexión con R8.
  *
  * @param firestore Instancia de [FirebaseFirestore] provista por Hilt.
  */

@@ -36,14 +36,12 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.titleStyle
 
 /**
- * <build>
- * <b>Nombre:</b> RegisterScreen.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 23/09/2026<br>
- * <b>Descripción:</b> Pantalla stateless de Registro ("Crea tu cuenta", HU-01). El estado y la navegación los<br>
- * gestiona [RegisterViewModel] a través de la ruta declarada en `AuthNavGraph`. Reutiliza [AuthScreenScaffold] para<br>
- * el layout base, insets y gestión de foco/teclado.<br>
- * </build>
+ * Nombre: RegisterScreen.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pantalla stateless de Registro ("Crea tu cuenta", HU-01). El estado y la navegación los gestiona
+ * [RegisterViewModel] a través de la ruta declarada en `AuthNavGraph`.
+ * Reutiliza [AuthScreenScaffold] para el layout base, insets y gestión de foco/teclado.
  *
  * @param state Objeto de estado inmutable [RegisterUiState] proveniente del ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [RegisterEvent] hacia el ViewModel.

@@ -29,13 +29,11 @@ import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
 
 /**
- * <build>
- * <b>Nombre:</b> HomeScreen.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pantalla de inicio provisional (HU-05). Saluda al usuario por su nombre y permite cerrar<br>
- * sesión. Aquí se integrarán el inventario y las recetas recomendadas en las próximas features.<br>
- * </build>
+ * Nombre: HomeScreen.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pantalla de inicio provisional (HU-05). Saluda al usuario por su nombre y permite cerrar sesión.
+ * Aquí se integrarán el inventario y las recetas recomendadas en las próximas features.
  *
  * @param state Estado inmutable [HomeUiState].
  * @param onEvent Callback para despachar eventos [HomeEvent].

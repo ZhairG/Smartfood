@@ -9,15 +9,13 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * <build>
- * <b>Nombre:</b> DemoPasswordRecoveryRepository.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Implementación **simulada** de [PasswordRecoveryRepository], el modo demo de la spec 003<br>
- * (RF-REC-06). No envía correos ni cambia contraseñas reales: valida contra los datos fijos de [DemoRecoveryData]<br>
- * para demostrar el flujo de 3 pasos sin backend. Responde igual que la versión real ante un correo sin cuenta<br>
- * (CA-REC-01-02). Solo se usa con `-PrecoveryDemo=true` en debug (ver `AuthDataModule`).<br>
- * </build>
+ * Nombre: DemoPasswordRecoveryRepository.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Implementación **simulada** de [PasswordRecoveryRepository], el modo demo de la spec 003
+ * (RF-REC-06). No envía correos ni cambia contraseñas reales: valida contra los datos fijos de [DemoRecoveryData]
+ * para demostrar el flujo de 3 pasos sin backend. Responde igual que la versión real ante un correo sin cuenta
+ * (CA-REC-01-02). Solo se usa con `-PrecoveryDemo=true` en debug (ver `AuthDataModule`).
  */
 class DemoPasswordRecoveryRepository @Inject constructor() : PasswordRecoveryRepository {
 

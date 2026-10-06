@@ -11,13 +11,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 
 /**
- * <build>
- * <b>Nombre:</b> Theme.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 19/09/2026<br>
- * <b>Descripción:</b> Configuración del Tema de Material 3 para la aplicación Smartfood. El modo de color lo decide<br>
- * [ThemeMode] (claro por defecto, spec 002 HU-UI-05); los esquemas de color no cambian.<br>
- * </build>
+ * Nombre: Theme.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Configuración del Tema de Material 3 para la aplicación Smartfood. El modo de color lo decide
+ * [ThemeMode] (claro por defecto, spec 002 HU-UI-05); los esquemas de color no cambian.
  */
 
 private val LightColorScheme = lightColorScheme(

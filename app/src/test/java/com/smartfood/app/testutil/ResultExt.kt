@@ -4,12 +4,10 @@ import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.toAuthError
 
 /**
- * <build>
- * <b>Nombre:</b> ResultExt.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Utilidades de aserción para resultados del dominio.<br>
- * </build>
+ * Nombre: ResultExt.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Utilidades de aserción para resultados del dominio.
  */
 
 /** Error de negocio de un `Result` fallido, o `null` si fue exitoso. */

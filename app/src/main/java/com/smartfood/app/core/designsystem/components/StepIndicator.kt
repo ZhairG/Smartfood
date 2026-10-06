@@ -24,14 +24,12 @@ import com.smartfood.app.core.designsystem.theme.OrangeMain
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
 /**
- * <build>
- * <b>Nombre:</b> StepIndicator.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Componente atómico de indicador de pasos animado según diseño de Figma ("Indicador de<br>
- * pasos"). Transiciona de forma fluida mediante resortes (spring physics) entre puntos circulares e indicadores de<br>
- * píldora cuando el usuario navega entre los pasos del flujo de recuperación de contraseña.<br>
- * </build>
+ * Nombre: StepIndicator.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Componente atómico de indicador de pasos animado según diseño de Figma ("Indicador de pasos").
+ * Transiciona de forma fluida mediante resortes (spring physics) entre puntos circulares e indicadores de píldora
+ * cuando el usuario navega entre los pasos del flujo de recuperación de contraseña.
  *
  * @param currentStep Índice del paso activo actual (0-indexed).
  * @param totalSteps Cantidad total de pasos en la secuencia (por defecto 3).

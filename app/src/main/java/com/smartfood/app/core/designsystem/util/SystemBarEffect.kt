@@ -12,13 +12,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 
 /**
- * <build>
- * <b>Nombre:</b> SystemBarEffect.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 28/09/2026<br>
- * <b>Descripción:</b> Composable utilitario para adaptar dinámicamente el estilo y la apariencia de los íconos del<br>
- * Status Bar según el fondo (claro u oscuro) de la pantalla activa.<br>
- * </build>
+ * Nombre: SystemBarEffect.kt
+ * Autor: SmartFood Team
+ * Fecha: Septiembre 2026
+ * Descripción: Composable utilitario para adaptar dinámicamente el estilo y la apariencia de los íconos del Status Bar
+ * según el fondo (claro u oscuro) de la pantalla activa.
  */
 
 /**

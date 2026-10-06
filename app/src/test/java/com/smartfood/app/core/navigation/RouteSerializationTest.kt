@@ -6,13 +6,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
- * <build>
- * <b>Nombre:</b> RouteSerializationTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 28/09/2026<br>
- * <b>Descripción:</b> Pruebas unitarias para verificar la serializabilidad y deserializabilidad de las rutas<br>
- * type-safe [Route] definidas con Kotlin Serialization.<br>
- * </build>
+ * Nombre: RouteSerializationTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas unitarias para verificar la serializabilidad y deserializabilidad de las rutas
+ * type-safe [Route] definidas con Kotlin Serialization.
  */
 class RouteSerializationTest {
 

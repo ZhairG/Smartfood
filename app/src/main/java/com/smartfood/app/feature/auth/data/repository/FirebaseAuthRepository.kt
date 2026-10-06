@@ -10,13 +10,11 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 /**
- * <build>
- * <b>Nombre:</b> FirebaseAuthRepository.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Implementación de [AuthRepository] sobre Firebase Authentication (RF-AUTH-01, 03 y 05). Cada<br>
- * fallo se clasifica con [com.smartfood.app.feature.auth.data.mapper.FirebaseErrorMapper].<br>
- * </build>
+ * Nombre: FirebaseAuthRepository.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Implementación de [AuthRepository] sobre Firebase Authentication (RF-AUTH-01, 03 y 05).
+ * Cada fallo se clasifica con [com.smartfood.app.feature.auth.data.mapper.FirebaseErrorMapper].
  *
  * @param firebaseAuth Instancia de [FirebaseAuth] provista por Hilt.
  */

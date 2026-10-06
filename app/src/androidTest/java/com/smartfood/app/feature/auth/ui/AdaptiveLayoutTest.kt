@@ -34,15 +34,13 @@ import org.junit.runners.Parameterized
 import kotlin.math.ceil
 
 /**
- * <build>
- * <b>Nombre:</b> AdaptiveLayoutTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Verifica que cada pantalla de formulario cabe sin scroll (spec 002, HU-UI-01): con el teclado<br>
- * cerrado, ningún contenedor desplazable tiene rango de scroll y el botón principal es visible. Se ejecuta en<br>
- * 360×720 dp (perfil compacto), 384×857 dp (perfil medio, teléfono V2436) y 412×917 dp (tamaño de los frames de<br>
- * Figma).<br>
- * </build>
+ * Nombre: AdaptiveLayoutTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Verifica que cada pantalla de formulario cabe sin scroll (spec 002, HU-UI-01): con el teclado
+ * cerrado, ningún contenedor desplazable tiene rango de scroll y el botón principal es visible.
+ * Se ejecuta en 360×720 dp (perfil compacto), 384×857 dp (perfil medio, teléfono V2436) y 412×917 dp (tamaño de los
+ * frames de Figma).
  */
 @RunWith(Parameterized::class)
 class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {

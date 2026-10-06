@@ -16,13 +16,11 @@ import com.smartfood.app.feature.splash.SplashScreen
 import com.smartfood.app.feature.splash.SplashViewModel
 
 /**
- * <build>
- * <b>Nombre:</b> AppNavHost.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Raíz del árbol de navegación type-safe (plan.md §7). Splash decide el destino inicial<br>
- * (HU-03); cada feature declara su propio grafo anidado.<br>
- * </build>
+ * Nombre: AppNavHost.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Raíz del árbol de navegación type-safe (plan.md §7).
+ * Splash decide el destino inicial (HU-03); cada feature declara su propio grafo anidado.
  *
  * @param modifier Modificador opcional para el [NavHost].
  * @param navController Controlador de navegación.

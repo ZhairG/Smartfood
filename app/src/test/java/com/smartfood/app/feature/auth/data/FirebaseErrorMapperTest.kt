@@ -18,13 +18,11 @@ import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * <build>
- * <b>Nombre:</b> FirebaseErrorMapperTest.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Pruebas unitarias de [FirebaseErrorMapper] (RF-AUTH-08, plan.md §6.1) y de la clasificación<br>
- * de los errores de Cloud Functions (spec 003, plan §3).<br>
- * </build>
+ * Nombre: FirebaseErrorMapperTest.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas unitarias de [FirebaseErrorMapper] (RF-AUTH-08, plan.md §6.1) y de la clasificación de los
+ * errores de Cloud Functions (spec 003, plan §3).
  */
 class FirebaseErrorMapperTest {
 

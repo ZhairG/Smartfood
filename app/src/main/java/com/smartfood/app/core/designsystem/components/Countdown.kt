@@ -30,15 +30,13 @@ import com.smartfood.app.core.designsystem.theme.ThemeMode
 import java.util.Locale
 
 /**
- * <build>
- * <b>Nombre:</b> Countdown.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 06/10/2026<br>
- * <b>Descripción:</b> Componentes de cuenta regresiva (spec 003, HU-REC-04). Una píldora con ícono de reloj y<br>
- * dígitos tabulares en los colores de acento (`secondaryContainer`/`onSecondaryContainer`: naranja claro en modo<br>
- * claro y naranja oscuro en modo oscuro). Ocupa el alto de una línea de texto, así que no cambia el alto del<br>
- * formulario (CA-REC-04-04).<br>
- * </build>
+ * Nombre: Countdown.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Componentes de cuenta regresiva (spec 003, HU-REC-04). Una píldora con ícono de reloj y dígitos
+ * tabulares en los colores de acento (`secondaryContainer`/`onSecondaryContainer`: naranja claro en modo claro y
+ * naranja oscuro en modo oscuro). Ocupa el alto de una línea de texto, así que no cambia el alto del formulario
+ * (CA-REC-04-04).
  */
 
 /** Formatea [seconds] como `m:ss` (por ejemplo, `0:42` o `37:12`). Los valores negativos se muestran como `0:00`. */

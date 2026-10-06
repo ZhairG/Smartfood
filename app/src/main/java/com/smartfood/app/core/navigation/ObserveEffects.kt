@@ -10,13 +10,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.Flow
 
 /**
- * <build>
- * <b>Nombre:</b> ObserveEffects.kt<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 04/10/2026<br>
- * <b>Descripción:</b> Recolecta los efectos de un solo uso de un ViewModel (por ejemplo, la navegación) solo<br>
- * mientras la pantalla está visible, para no navegar desde segundo plano.<br>
- * </build>
+ * Nombre: ObserveEffects.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Recolecta los efectos de un solo uso de un ViewModel (por ejemplo, la navegación) solo mientras
+ * la pantalla está visible, para no navegar desde segundo plano.
  *
  * @param effects Flujo de efectos expuesto por el ViewModel.
  * @param onEffect Acción a ejecutar por cada efecto recibido.

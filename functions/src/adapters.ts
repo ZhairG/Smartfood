@@ -1,11 +1,9 @@
 /**
- * <build>
- * <b>Nombre:</b> adapters.ts<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 05/10/2026<br>
- * <b>Descripción:</b> Implementaciones de los puertos de `ports.ts` con Firebase y nodemailer (spec 003, plan §2).<br>
- * Es el único archivo del servidor que conoce Firestore, el Admin SDK de Auth y el SMTP de Gmail.<br>
- * </build>
+ * Nombre: adapters.ts
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Implementaciones de los puertos de `ports.ts` con Firebase y nodemailer (spec 003, plan §2).
+ * Es el único archivo del servidor que conoce Firestore, el Admin SDK de Auth y el SMTP de Gmail.
  */
 
 import * as logger from "firebase-functions/logger";

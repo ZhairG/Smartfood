@@ -1,11 +1,9 @@
 /**
- * <build>
- * <b>Nombre:</b> recoveryService.test.ts<br>
- * <b>Autor:</b> SmartFood Team<br>
- * <b>Fecha:</b> 05/10/2026<br>
- * <b>Descripción:</b> Pruebas de `RecoveryService` (spec 003) con fakes en memoria, sin Firebase ni librería de<br>
- * mocks. Cada nombre cita el criterio de aceptación que cubre.<br>
- * </build>
+ * Nombre: recoveryService.test.ts
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: Pruebas de `RecoveryService` (spec 003) con fakes en memoria, sin Firebase ni librería de mocks.
+ * Cada nombre cita el criterio de aceptación que cubre.
  */
 
 import assert from "node:assert/strict";
