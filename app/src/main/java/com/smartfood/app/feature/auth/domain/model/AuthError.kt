@@ -41,6 +41,15 @@ sealed interface AuthError {
     /** El código de verificación es incorrecto o está incompleto. */
     data object InvalidOtpCode : AuthError
 
+    /** El código de verificación venció; hay que pedir uno nuevo (spec 003, CA-REC-03-01). */
+    data object OtpCodeExpired : AuthError
+
+    /** Se agotaron los intentos del código y quedó invalidado (spec 003, CA-REC-03-02). */
+    data object TooManyAttempts : AuthError
+
+    /** Se pidieron demasiados códigos seguidos; hay que esperar (spec 003, CA-REC-03-03 y CA-REC-03-04). */
+    data object TooManyRequests : AuthError
+
     /** No hay conexión a internet. */
     data object Network : AuthError
 

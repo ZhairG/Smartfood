@@ -10,7 +10,8 @@ import com.smartfood.app.feature.auth.ui.marksEmpty
  * Nombre: PasswordRecoveryContract.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Contrato UDF del flujo de recuperación de contraseña (HU-04): pasos, estado, eventos y efectos.
+ * Descripción: Contrato UDF del flujo de recuperación de contraseña (HU-04 y spec 003): pasos, estado, eventos
+ * y efectos.
  */
 
 /** Pasos del flujo, en el orden del indicador de pasos. */
@@ -50,11 +51,11 @@ data class PasswordRecoveryUiState(
     val error: AuthError? = null
 ) {
     val emailHasError: Boolean
-        get() = error.marksEmpty(AuthField.EMAIL) || error == AuthError.InvalidEmail ||
-            error == AuthError.AccountNotFound
+        get() = error.marksEmpty(AuthField.EMAIL) || error == AuthError.InvalidEmail
 
+    /** Las casillas se marcan con cualquier error del código (CA-04-06, CA-REC-03-06). */
     val otpCodeHasError: Boolean
-        get() = error.marksEmpty(AuthField.OTP_CODE) || error == AuthError.InvalidOtpCode
+        get() = error.marksEmpty(AuthField.OTP_CODE) || error.isOtpCodeError
 
     val passwordHasError: Boolean
         get() = error == AuthError.WeakPassword || error == AuthError.PasswordsDontMatch
@@ -64,6 +65,10 @@ data class PasswordRecoveryUiState(
     /** El botón del paso 3 solo se habilita con una contraseña válida y confirmada (CA-04-10). */
     val canResetPassword: Boolean get() = passwordValidation.isValid && passwordsMatch
 }
+
+/** Errores que invalidan el código escrito: incorrecto, vencido o con los intentos agotados (spec 003). */
+val AuthError?.isOtpCodeError: Boolean
+    get() = this == AuthError.InvalidOtpCode || this == AuthError.OtpCodeExpired || this == AuthError.TooManyAttempts
 
 /** Acciones del usuario en [PasswordRecoveryScreen]. */
 sealed interface PasswordRecoveryEvent {

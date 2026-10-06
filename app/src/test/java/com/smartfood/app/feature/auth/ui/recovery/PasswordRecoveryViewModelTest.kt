@@ -24,7 +24,7 @@ import org.junit.Test
  * Nombre: PasswordRecoveryViewModelTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [PasswordRecoveryViewModel] (HU-04).
+ * Descripción: Pruebas unitarias de [PasswordRecoveryViewModel] (HU-04 y spec 003).
  */
 class PasswordRecoveryViewModelTest {
 
@@ -68,12 +68,42 @@ class PasswordRecoveryViewModelTest {
     }
 
     @Test
-    fun `CA-04-03 correo sin cuenta muestra AccountNotFound`() {
-        repository.requestCodeResult = authFailure(AuthError.AccountNotFound)
+    fun `CA-REC-03-03 pedir codigos muy seguido muestra el error y sigue en el paso 1`() {
+        repository.requestCodeResult = authFailure(AuthError.TooManyRequests)
         avanzarAlPaso2()
 
-        assertEquals(AuthError.AccountNotFound, viewModel.uiState.value.error)
-        assertEquals(RecoveryStep.EMAIL_REQUEST, viewModel.uiState.value.step)
+        val state = viewModel.uiState.value
+        assertEquals(AuthError.TooManyRequests, state.error)
+        assertEquals(RecoveryStep.EMAIL_REQUEST, state.step)
+        assertFalse(state.emailHasError)
+    }
+
+    @Test
+    fun `CA-REC-03-04 reenviar al superar el limite muestra el error y conserva el paso 2`() {
+        avanzarAlPaso2()
+        repository.requestCodeResult = authFailure(AuthError.TooManyRequests)
+        viewModel.onEvent(PasswordRecoveryEvent.ResendCodeClicked)
+
+        val state = viewModel.uiState.value
+        assertEquals(AuthError.TooManyRequests, state.error)
+        assertEquals(RecoveryStep.OTP_VERIFICATION, state.step)
+        assertFalse(state.otpCodeHasError)
+    }
+
+    @Test
+    fun `CA-REC-03-06 codigo vencido o agotado marca las casillas en el paso 2`() {
+        avanzarAlPaso2()
+        viewModel.onEvent(PasswordRecoveryEvent.OtpCodeChanged("1234"))
+
+        listOf(AuthError.OtpCodeExpired, AuthError.TooManyAttempts).forEach { error ->
+            repository.verifyCodeResult = authFailure(error)
+            viewModel.onEvent(PasswordRecoveryEvent.VerifyCodeClicked)
+
+            val state = viewModel.uiState.value
+            assertEquals(error, state.error)
+            assertTrue(state.otpCodeHasError)
+            assertEquals(RecoveryStep.OTP_VERIFICATION, state.step)
+        }
     }
 
     @Test
@@ -137,6 +167,39 @@ class PasswordRecoveryViewModelTest {
 
         viewModel.onEvent(PasswordRecoveryEvent.NewPasswordChanged("debil"))
         assertFalse(viewModel.uiState.value.canResetPassword)
+    }
+
+    @Test
+    fun `CA-REC-02-03 si el codigo vencio en el paso 3 vuelve al paso 2 con el codigo borrado`() {
+        listOf(AuthError.OtpCodeExpired, AuthError.TooManyAttempts, AuthError.InvalidOtpCode).forEach { error ->
+            prepararEntornoTest()
+            repository.resetPasswordResult = authFailure(error)
+            restablecerConContrasenaValida()
+
+            val state = viewModel.uiState.value
+            assertEquals(error, state.error)
+            assertEquals(RecoveryStep.OTP_VERIFICATION, state.step)
+            assertEquals("", state.otpCode)
+            assertTrue(state.otpCodeHasError)
+        }
+    }
+
+    @Test
+    fun `CA-REC-02-04 contrasena rechazada por el servidor sigue en el paso 3`() {
+        repository.resetPasswordResult = authFailure(AuthError.WeakPassword)
+        restablecerConContrasenaValida()
+
+        val state = viewModel.uiState.value
+        assertEquals(AuthError.WeakPassword, state.error)
+        assertEquals(RecoveryStep.NEW_PASSWORD, state.step)
+        assertEquals("1234", state.otpCode)
+    }
+
+    private fun restablecerConContrasenaValida() {
+        avanzarAlPaso3()
+        viewModel.onEvent(PasswordRecoveryEvent.NewPasswordChanged("Secreta#1"))
+        viewModel.onEvent(PasswordRecoveryEvent.ConfirmPasswordChanged("Secreta#1"))
+        viewModel.onEvent(PasswordRecoveryEvent.ResetPasswordClicked)
     }
 
     @Test

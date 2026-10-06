@@ -24,7 +24,20 @@ android {
     }
 
     buildTypes {
+        // Opciones de desarrollo (spec 003, plan §6): solo el build debug las lee de Gradle.
+        debug {
+            buildConfigField("boolean", "USE_DEMO_RECOVERY", "${booleanProperty("recoveryDemo")}")
+            buildConfigField("boolean", "USE_FIREBASE_EMULATOR", "${booleanProperty("useFirebaseEmulator")}")
+            buildConfigField(
+                "String",
+                "FIREBASE_EMULATOR_HOST",
+                "\"${providers.gradleProperty("firebaseEmulatorHost").getOrElse("10.0.2.2")}\""
+            )
+        }
         release {
+            buildConfigField("boolean", "USE_DEMO_RECOVERY", "false")
+            buildConfigField("boolean", "USE_FIREBASE_EMULATOR", "false")
+            buildConfigField("String", "FIREBASE_EMULATOR_HOST", "\"\"")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -39,6 +52,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         // Las excepciones de Firebase usan android.text.TextUtils en su constructor; en la JVM devuelve valores por defecto.
@@ -71,10 +85,11 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Firebase (BOM, Auth y Firestore)
+    // Firebase (BOM, Auth, Firestore y Functions)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.functions)
 
     // Preferencias locales ("Recuérdame")
     implementation(libs.androidx.datastore.preferences)
@@ -91,3 +106,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
+
+/** Lee una propiedad booleana de Gradle (`-Pnombre=true`); por defecto `false`. */
+fun booleanProperty(name: String): Boolean =
+    providers.gradleProperty(name).map { it.toBoolean() }.getOrElse(false)

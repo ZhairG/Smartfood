@@ -25,17 +25,22 @@ fun AuthError.messageRes(): Int = when (this) {
     AuthError.AccountNotFound -> R.string.error_account_not_found
     AuthError.EmailAlreadyInUse -> R.string.error_account_already_exists
     AuthError.InvalidOtpCode -> R.string.error_invalid_otp_code
+    AuthError.OtpCodeExpired -> R.string.error_otp_code_expired
+    AuthError.TooManyAttempts -> R.string.error_too_many_attempts
+    AuthError.TooManyRequests -> R.string.error_too_many_requests
     AuthError.Network -> R.string.offline_dialog_title
     AuthError.ServiceUnavailable -> R.string.error_firebase_config_not_found
     is AuthError.Unknown -> R.string.error_unknown
 }
 
-/** Mensaje para el flujo de recuperación, que tiene textos propios para los campos vacíos y el correo inexistente. */
+/**
+ * Mensaje para el flujo de recuperación, que tiene textos propios para los campos vacíos. No hay mensaje de
+ * "cuenta no encontrada": la recuperación responde igual exista o no la cuenta (spec 003, CA-REC-01-02).
+ */
 @StringRes
 fun AuthError.recoveryMessageRes(): Int = when {
     this is AuthError.EmptyFields && AuthField.OTP_CODE in fields -> R.string.error_empty_otp_code
     this is AuthError.EmptyFields -> R.string.error_empty_email
-    this == AuthError.AccountNotFound -> R.string.error_account_not_found_recovery
     else -> messageRes()
 }
 

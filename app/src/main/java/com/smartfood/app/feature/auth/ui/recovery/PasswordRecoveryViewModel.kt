@@ -2,6 +2,7 @@ package com.smartfood.app.feature.auth.ui.recovery
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.toAuthError
 import com.smartfood.app.feature.auth.domain.usecase.RequestRecoveryCodeUseCase
 import com.smartfood.app.feature.auth.domain.usecase.ResetPasswordUseCase
@@ -24,7 +25,7 @@ import javax.inject.Inject
  * Fecha: Octubre 2026
  * Descripción: ViewModel del flujo de recuperación de contraseña en 3 pasos (HU-04).
  * Al salir de la pantalla el ViewModel se destruye, por lo que el flujo siempre vuelve a empezar en el
- * paso 1 (CA-04-12).
+ * paso 1 (CA-04-12). Si el paso 3 falla porque el código ya no vale, regresa al paso 2 (CA-REC-02-03).
  *
  * @param requestCode Caso de uso del paso 1.
  * @param verifyCode Caso de uso del paso 2.
@@ -87,6 +88,10 @@ class PasswordRecoveryViewModel @Inject constructor(
     private fun reset() = runStep(
         action = { resetPassword(it.email, it.otpCode, it.newPassword, it.confirmPassword) },
         onSuccess = { it },
+        onFailure = { state, error ->
+            // El servidor vuelve a validar el código: si venció o se agotó, hay que escribir uno nuevo.
+            if (error.isOtpCodeError) state.copy(step = RecoveryStep.OTP_VERIFICATION, otpCode = "") else state
+        },
         effect = PasswordRecoveryEffect.NavigateToSuccess
     )
 
@@ -95,11 +100,13 @@ class PasswordRecoveryViewModel @Inject constructor(
      *
      * @param action Operación del caso de uso, que recibe el estado vigente.
      * @param onSuccess Transformación del estado si la operación tiene éxito.
+     * @param onFailure Transformación opcional del estado según el error, además de mostrarlo.
      * @param effect Efecto opcional a emitir tras el éxito.
      */
     private fun runStep(
         action: suspend (PasswordRecoveryUiState) -> Result<Unit>,
         onSuccess: (PasswordRecoveryUiState) -> PasswordRecoveryUiState,
+        onFailure: (PasswordRecoveryUiState, AuthError) -> PasswordRecoveryUiState = { state, _ -> state },
         effect: PasswordRecoveryEffect? = null
     ) {
         val state = _uiState.value
@@ -113,7 +120,8 @@ class PasswordRecoveryViewModel @Inject constructor(
                     effect?.let { _effects.send(it) }
                 }
                 .onFailure { throwable ->
-                    _uiState.update { it.copy(isLoading = false, error = throwable.toAuthError()) }
+                    val error = throwable.toAuthError()
+                    _uiState.update { onFailure(it, error).copy(isLoading = false, error = error) }
                 }
         }
     }

@@ -20,7 +20,7 @@ import org.junit.Test
  * Nombre: PasswordRecoveryScreenTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pruebas de UI de la pantalla stateless [PasswordRecoveryScreen] (HU-04).
+ * Descripción: Pruebas de UI de la pantalla stateless [PasswordRecoveryScreen] (HU-04 y spec 003).
  */
 class PasswordRecoveryScreenTest {
 
@@ -57,18 +57,34 @@ class PasswordRecoveryScreenTest {
     }
 
     @Test
-    fun ca0403_correoSinCuenta_muestraMensajeDeRecuperacion() {
-        mostrar(PasswordRecoveryUiState(error = AuthError.AccountNotFound))
-
-        composeTestRule.onNodeWithText("No encontramos una cuenta con este correo").assertIsDisplayed()
-    }
-
-    @Test
-    fun ca0404_paso2_muestraElCorreoIngresado() {
+    fun ca0404_caRec0103_paso2_muestraSubtituloNeutroYElCorreoIngresado() {
         mostrar(PasswordRecoveryUiState(step = RecoveryStep.OTP_VERIFICATION, email = "demo@smartfood.com"))
 
         composeTestRule.onNodeWithText("Verifica tu correo").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Si el correo tiene una cuenta, te enviamos un código de 4 dígitos a:")
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText("demo@smartfood.com").assertIsDisplayed()
+    }
+
+    @Test
+    fun caRec0301_codigoVencido_muestraMensaje() {
+        mostrar(PasswordRecoveryUiState(step = RecoveryStep.OTP_VERIFICATION, error = AuthError.OtpCodeExpired))
+
+        composeTestRule.onNodeWithText("El código venció. Solicita uno nuevo").assertIsDisplayed()
+    }
+
+    @Test
+    fun caRec0302_intentosAgotados_muestraMensaje() {
+        mostrar(PasswordRecoveryUiState(step = RecoveryStep.OTP_VERIFICATION, error = AuthError.TooManyAttempts))
+
+        composeTestRule.onNodeWithText("Demasiados intentos. Solicita un código nuevo").assertIsDisplayed()
+    }
+
+    @Test
+    fun caRec0303_demasiadasSolicitudes_muestraMensaje() {
+        mostrar(PasswordRecoveryUiState(step = RecoveryStep.OTP_VERIFICATION, error = AuthError.TooManyRequests))
+
+        composeTestRule.onNodeWithText("Espera un momento antes de pedir otro código").assertIsDisplayed()
     }
 
     @Test

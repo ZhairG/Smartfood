@@ -1,17 +1,21 @@
 package com.smartfood.app.feature.auth.data.di
 
+import com.smartfood.app.BuildConfig
 import com.smartfood.app.feature.auth.data.demo.DemoPasswordRecoveryRepository
 import com.smartfood.app.feature.auth.data.local.DataStoreSessionPreferences
 import com.smartfood.app.feature.auth.data.repository.FirebaseAuthRepository
 import com.smartfood.app.feature.auth.data.repository.FirestoreUserRepository
+import com.smartfood.app.feature.auth.data.repository.RemotePasswordRecoveryRepository
 import com.smartfood.app.feature.auth.domain.repository.AuthRepository
 import com.smartfood.app.feature.auth.domain.repository.PasswordRecoveryRepository
 import com.smartfood.app.feature.auth.domain.repository.SessionPreferences
 import com.smartfood.app.feature.auth.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Provider
 import javax.inject.Singleton
 
 /**
@@ -19,7 +23,7 @@ import javax.inject.Singleton
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Enlaza los contratos del dominio de autenticación con sus implementaciones de la capa de datos.
- * Para reemplazar la recuperación simulada por una real, solo cambia [bindPasswordRecoveryRepository].
+ * La recuperación es la real (spec 003); con `-PrecoveryDemo=true` el build debug usa la simulada (RF-REC-06).
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -37,8 +41,17 @@ abstract class AuthDataModule {
     @Singleton
     abstract fun bindSessionPreferences(impl: DataStoreSessionPreferences): SessionPreferences
 
-    /** Recuperación **simulada** (ADR-01). */
-    @Binds
-    @Singleton
-    abstract fun bindPasswordRecoveryRepository(impl: DemoPasswordRecoveryRepository): PasswordRecoveryRepository
+    companion object {
+
+        /**
+         * Recuperación real con Cloud Functions o, en modo demo, la simulada con datos fijos.
+         * Los [Provider] evitan construir la implementación que no se usa.
+         */
+        @Provides
+        @Singleton
+        fun providePasswordRecoveryRepository(
+            remote: Provider<RemotePasswordRecoveryRepository>,
+            demo: Provider<DemoPasswordRecoveryRepository>
+        ): PasswordRecoveryRepository = if (BuildConfig.USE_DEMO_RECOVERY) demo.get() else remote.get()
+    }
 }
