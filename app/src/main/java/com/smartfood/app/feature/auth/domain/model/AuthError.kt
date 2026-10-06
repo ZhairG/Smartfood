@@ -1,5 +1,7 @@
 package com.smartfood.app.feature.auth.domain.model
 
+import kotlin.time.Duration
+
 /**
  * Nombre: AuthError.kt
  * Autor: SmartFood Team
@@ -40,6 +42,19 @@ sealed interface AuthError {
 
     /** El código de verificación es incorrecto o está incompleto. */
     data object InvalidOtpCode : AuthError
+
+    /** El código de verificación venció; hay que pedir uno nuevo (spec 003, CA-REC-03-01). */
+    data object OtpCodeExpired : AuthError
+
+    /** Se agotaron los intentos del código y quedó invalidado (spec 003, CA-REC-03-02). */
+    data object TooManyAttempts : AuthError
+
+    /**
+     * Se pidieron demasiados códigos seguidos; hay que esperar (spec 003, CA-REC-03-03 y CA-REC-03-04).
+     *
+     * @property retryAfter Tiempo que falta para poder pedir otro código, informado por el servidor (CA-REC-04-02).
+     */
+    data class TooManyRequests(val retryAfter: Duration) : AuthError
 
     /** No hay conexión a internet. */
     data object Network : AuthError

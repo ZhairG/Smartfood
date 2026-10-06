@@ -5,6 +5,7 @@ import com.smartfood.app.feature.auth.domain.model.AuthField
 import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.feature.auth.domain.repository.PasswordRecoveryRepository
 import javax.inject.Inject
+import kotlin.time.Duration
 
 /**
  * Nombre: PasswordRecoveryUseCases.kt
@@ -15,7 +16,8 @@ import javax.inject.Inject
  */
 
 /**
- * Paso 1: valida el correo y solicita el código (CA-04-01 a CA-04-04).
+ * Paso 1: valida el correo y solicita el código (CA-04-01 a CA-04-04). Devuelve el tiempo que falta para poder
+ * pedir otro código (spec 003, HU-REC-04).
  *
  * @param recoveryRepository Repositorio de recuperación.
  * @param validateEmailUseCase Validador del formato de correo.
@@ -24,7 +26,7 @@ class RequestRecoveryCodeUseCase @Inject constructor(
     private val recoveryRepository: PasswordRecoveryRepository,
     private val validateEmailUseCase: ValidateEmailUseCase
 ) {
-    suspend operator fun invoke(email: String): Result<Unit> {
+    suspend operator fun invoke(email: String): Result<Duration> {
         val trimmedEmail = email.trim()
         if (trimmedEmail.isBlank()) return authFailure(AuthError.EmptyFields(setOf(AuthField.EMAIL)))
         if (!validateEmailUseCase.execute(trimmedEmail)) return authFailure(AuthError.InvalidEmail)

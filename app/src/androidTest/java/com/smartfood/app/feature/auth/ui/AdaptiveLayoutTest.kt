@@ -9,6 +9,10 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.core.designsystem.components.ActionSuccessScreen
@@ -27,6 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import kotlin.math.ceil
 
 /**
  * Nombre: AdaptiveLayoutTest.kt
@@ -115,6 +120,47 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
             )
         }
         assertCabeSinScroll("Verificar Código")
+    }
+
+    /**
+     * CA-REC-04-04: con la cuenta regresiva más larga ("37:12", límite de 5 por hora) el paso 2 sigue cabiendo y la
+     * fila cabe en una línea y la píldora no se recorta.
+     */
+    @Test
+    fun ca_rec_04_04_recuperacionPaso2ConCuentaRegresiva_cabeSinScroll() {
+        mostrar {
+            PasswordRecoveryScreen(
+                PasswordRecoveryUiState(
+                    step = RecoveryStep.OTP_VERIFICATION,
+                    email = "demo@smartfood.com",
+                    resendCooldownSeconds = 2_232,
+                    cooldownEmail = "demo@smartfood.com"
+                ),
+                {},
+                {}
+            )
+        }
+        assertCabeSinScroll("Verificar Código")
+
+        val texto = textLayout("Reenviar código en")
+        assertEquals("El texto debe quedar en una línea en $screenSize", 1, texto.lineCount)
+        val pildora = textLayout("37:12")
+        // hasVisualOverflow no sirve aquí: la semántica rearma el texto con el ancho máximo disponible y no con el
+        // que recibió. Se compara el ancho que el texto necesita con el que ocupa.
+        assertEquals("La píldora debe quedar en una línea en $screenSize", 1, pildora.lineCount)
+        assertTrue(
+            "La píldora no debe recortarse en $screenSize",
+            ceil(pildora.multiParagraph.maxIntrinsicWidth) <= pildora.size.width
+        )
+    }
+
+    /** Resultado del layout del texto visible [text], para comprobar líneas y recortes. */
+    private fun textLayout(text: String): TextLayoutResult {
+        val node = composeTestRule.onNodeWithText(text, useUnmergedTree = true)
+        node.assertIsDisplayed()
+        val layouts = mutableListOf<TextLayoutResult>()
+        node.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        return layouts.first()
     }
 
     @Test

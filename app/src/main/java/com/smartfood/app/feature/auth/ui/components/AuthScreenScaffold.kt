@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -105,24 +106,33 @@ fun AuthScreenScaffold(
     ) {
         // Perfil más grande que le cabe a ESTA pantalla (CA-UI-07-03): se parte del perfil que sugiere el alto útil
         // y, si con el teclado cerrado el formulario se desborda (p. ej. al aparecer un error), se baja al siguiente.
-        // Solo baja, nunca sube, así no hay oscilaciones; con el teclado abierto no se evalúa. El desborde debe
-        // mantenerse OVERFLOW_SETTLE_MS: los pasajeros no cuentan (p. ej. el fundido entre pasos de la recuperación,
-        // en el que el paso saliente conserva su alto un instante y llevaba el perfil al compacto sin motivo).
+        // Solo baja, nunca sube, así no hay oscilaciones; con el teclado abierto no se evalúa.
+        // Al entrar, la bajada es inmediata y la pantalla no se dibuja hasta asentarse (CA-UI-07-08): así nunca se ve
+        // una versión más grande que luego se encoge. Ya asentada, un desborde debe mantenerse OVERFLOW_SETTLE_MS: los
+        // pasajeros no cuentan (p. ej. el fundido entre pasos de la recuperación, en el que el paso saliente conserva
+        // su alto un instante y llevaba el perfil al compacto sin motivo).
         val initialMetrics = formMetricsForWindow(maxHeight)
-        var metrics by remember(initialMetrics) { mutableStateOf(initialMetrics) }
+        // Se recuerda por el alto de la ventana, no por el perfil inicial: un cambio de insets no reinicia el perfil.
+        var metrics by remember(maxHeight) { mutableStateOf(initialMetrics) }
+        var settled by remember(maxHeight) { mutableStateOf(false) }
         val scrollState = rememberScrollState()
         val imeInsets = WindowInsets.ime
         val density = LocalDensity.current
         LaunchedEffect(metrics) {
-            // Antes del primer layout maxValue vale Int.MAX_VALUE y viewportSize 0: solo cuenta un desborde medido.
             snapshotFlow {
-                scrollState.viewportSize > 0 && scrollState.maxValue > 0 && imeInsets.getBottom(density) == 0
-            }.collectLatest { overflows ->
-                if (overflows) {
-                    // Si el desborde desaparece antes, collectLatest cancela la espera y no se baja de perfil.
-                    delay(OVERFLOW_SETTLE_MS)
-                    metrics.smaller()?.let { metrics = it }
+                // Antes del primer layout maxValue vale Int.MAX_VALUE y viewportSize 0: solo cuenta un desborde medido.
+                val measured = scrollState.viewportSize > 0
+                measured to (measured && scrollState.maxValue > 0 && imeInsets.getBottom(density) == 0)
+            }.collectLatest { (measured, overflows) ->
+                if (!measured) return@collectLatest
+                val next = if (overflows) metrics.smaller() else null
+                if (next == null) {
+                    settled = true
+                    return@collectLatest
                 }
+                // Si el desborde desaparece antes, collectLatest cancela la espera y no se baja de perfil.
+                if (settled) delay(OVERFLOW_SETTLE_MS)
+                metrics = next
             }
         }
 
@@ -130,6 +140,8 @@ fun AuthScreenScaffold(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    // Invisible mientras se elige el perfil al entrar: son pocos frames dentro de la transición.
+                    .graphicsLayer { alpha = if (settled) 1f else 0f }
                     // Figma (CA-UI-07-06): con el diálogo sin conexión, el fondo se desenfoca. En Android 11 o
                     // anterior blur no tiene efecto y queda la atenuación propia del Dialog.
                     .blur(if (isOffline) OFFLINE_BLUR else 0.dp)

@@ -1,5 +1,7 @@
 package com.smartfood.app.feature.auth.domain.repository
 
+import kotlin.time.Duration
+
 /**
  * Nombre: PasswordRecoveryRepository.kt
  * Autor: SmartFood Team
@@ -10,8 +12,12 @@ package com.smartfood.app.feature.auth.domain.repository
  */
 interface PasswordRecoveryRepository {
 
-    /** Paso 1: solicita el envío de un código de verificación al [email]. */
-    suspend fun requestCode(email: String): Result<Unit>
+    /**
+     * Paso 1: solicita el envío de un código de verificación al [email].
+     *
+     * @return El tiempo que falta para poder pedir otro código (spec 003, RF-REC-07).
+     */
+    suspend fun requestCode(email: String): Result<Duration>
 
     /** Paso 2: verifica que el [code] corresponda al [email]. */
     suspend fun verifyCode(email: String, code: String): Result<Unit>

@@ -8,12 +8,14 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Nombre: DemoPasswordRecoveryRepositoryTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de la recuperación **simulada** con los datos de prueba de la spec (HU-04).
+ * Descripción: Pruebas unitarias del modo demo de la recuperación con los datos de prueba de la spec (HU-04),
+ * que responde de forma neutra como la versión real (spec 003, RF-REC-06).
  */
 class DemoPasswordRecoveryRepositoryTest {
 
@@ -27,8 +29,21 @@ class DemoPasswordRecoveryRepositoryTest {
     }
 
     @Test
-    fun `CA-04-03 correo sin cuenta falla con AccountNotFound`() = runTest {
-        assertEquals(AuthError.AccountNotFound, repository.requestCode("otro@correo.com").authError)
+    fun `CA-REC-01-02 correo sin cuenta responde igual que uno registrado`() = runTest {
+        assertTrue(repository.requestCode("otro@correo.com").isSuccess)
+    }
+
+    @Test
+    fun `CA-REC-04-01 informa la misma espera de 60 segundos que el servidor`() = runTest {
+        assertEquals(60.seconds, repository.requestCode(demoEmail).getOrThrow())
+    }
+
+    @Test
+    fun `CA-REC-01-04 con correo sin cuenta el codigo de prueba es incorrecto`() = runTest {
+        assertEquals(
+            AuthError.InvalidOtpCode,
+            repository.verifyCode("otro@correo.com", DemoRecoveryData.VALID_CODE).authError
+        )
     }
 
     @Test

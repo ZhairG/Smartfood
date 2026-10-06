@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -28,10 +29,12 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodOtpCodeInput
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
+import com.smartfood.app.core.designsystem.components.SmartFoodPromptCountdown
 import com.smartfood.app.core.designsystem.components.SmartFoodPromptLink
 import com.smartfood.app.core.designsystem.components.SmartFoodStepIndicator
 import com.smartfood.app.core.designsystem.components.SmartFoodTextField
 import com.smartfood.app.core.designsystem.components.SmartFoodTextLink
+import com.smartfood.app.core.designsystem.components.formatCountdown
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.OrangeDark
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
@@ -48,10 +51,12 @@ import com.smartfood.app.feature.auth.ui.recoveryMessageRes
  * Nombre: PasswordRecoveryScreen.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pantalla stateless del flujo de Recuperación de Contraseña (HU-04, **simulado** en la v1).
+ * Descripción: Pantalla stateless del flujo de Recuperación de Contraseña (HU-04 y spec 003).
  * Gestiona las 3 etapas (correo, código de 4 dígitos y nueva contraseña) con el indicador de pasos
  * [SmartFoodStepIndicator]. Cada paso cabe sin scroll y el campo enfocado queda visible sin scroll programático
  * (spec 002); en el paso 3 los requisitos aparecen en un popup encima del campo enfocado (CA-UI-03-02).
+ * Mientras hay que esperar para pedir otro código, el enlace "Reenviar código" y el botón "Enviar Código" muestran la
+ * cuenta regresiva (HU-REC-04).
  *
  * @param state Objeto de estado inmutable [PasswordRecoveryUiState] expuesto por el ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [PasswordRecoveryEvent] al ViewModel.
@@ -201,10 +206,19 @@ private fun ForgotPasswordStep(
 
         FlexibleGap(minHeight = metrics.sectionSpacing, weight = 2f)  // Figma: nodo 585:4458
 
+        // Con la espera activa para este correo, el botón muestra la cuenta regresiva y se deshabilita (CA-REC-04-03).
         SmartFoodPrimaryButton(
-            text = stringResource(id = R.string.recovery_step1_button),
+            text = if (state.isEmailInCooldown) {
+                stringResource(
+                    id = R.string.recovery_step1_button_countdown,
+                    formatCountdown(state.resendCooldownSeconds)
+                )
+            } else {
+                stringResource(id = R.string.recovery_step1_button)
+            },
             loadingText = stringResource(id = R.string.login_button_loading),
             onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.SendCodeClicked) } },
+            enabled = !state.isEmailInCooldown,
             isLoading = state.isLoading
         )
 
@@ -258,12 +272,27 @@ private fun VerifyCodeStep(
 
         FlexibleGap(minHeight = metrics.sectionSpacing)
 
-        SmartFoodPromptLink(
-            prompt = stringResource(id = R.string.recovery_step2_resend_prompt),
-            action = stringResource(id = R.string.recovery_step2_resend_action),
-            onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ResendCodeClicked) } },
-            fontSize = 16.sp  // Figma: nodo 585:4474
-        )
+        if (state.isEmailInCooldown) {
+            // Mientras corre la espera, la fila dice "Reenviar código en" y el tiempo va en la píldora; así cabe en una
+            // línea desde 360 dp de ancho (CA-REC-04-01 y CA-REC-04-04).
+            SmartFoodPromptCountdown(
+                prompt = stringResource(id = R.string.recovery_step2_resend_countdown_prompt),
+                countdown = formatCountdown(state.resendCooldownSeconds),
+                fontSize = 16.sp,  // Figma: nodo 585:4474
+                contentDescription = pluralStringResource(
+                    id = R.plurals.recovery_resend_countdown_a11y,
+                    count = state.resendCooldownSeconds,
+                    state.resendCooldownSeconds
+                )
+            )
+        } else {
+            SmartFoodPromptLink(
+                prompt = stringResource(id = R.string.recovery_step2_resend_prompt),
+                action = stringResource(id = R.string.recovery_step2_resend_action),
+                onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ResendCodeClicked) } },
+                fontSize = 16.sp  // Figma: nodo 585:4474
+            )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
     }
@@ -352,7 +381,9 @@ private fun PasswordRecoveryStep2Preview() {
             state = PasswordRecoveryUiState(
                 step = RecoveryStep.OTP_VERIFICATION,
                 email = "nombre@correo.com",
-                otpCode = "442"
+                otpCode = "442",
+                resendCooldownSeconds = 42,
+                cooldownEmail = "nombre@correo.com"
             ),
             onEvent = {},
             onNavigateToLogin = {}

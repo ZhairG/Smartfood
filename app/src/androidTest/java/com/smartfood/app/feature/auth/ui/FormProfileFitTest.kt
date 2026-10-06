@@ -33,14 +33,18 @@ import org.junit.Test
  * Fecha: Octubre 2026
  * Descripción: Verifica la elección del perfil de medidas según lo que cabe en la pantalla (spec 002, CA-UI-07-03):
  * un formulario que cabe conserva el perfil de Figma ([FormMetrics.Regular]) y uno que no cabe baja de perfil.
+ * Al entrar, el perfil definitivo se elige sin esperas (CA-UI-07-08).
  */
 class FormProfileFitTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    /** Muestra un formulario de [alto] en una ventana de 412×917 dp y devuelve el último perfil usado. */
-    private fun perfilCon(alto: Dp): FormMetrics {
+    /**
+     * Muestra un formulario de [alto] en una ventana de 412×917 dp y devuelve el perfil usado tras [esperaMs] de
+     * reloj virtual (por defecto, lo suficiente para asentarse con cualquier espera).
+     */
+    private fun perfilCon(alto: Dp, esperaMs: Long = 3_000): FormMetrics {
         var perfil: FormMetrics? = null
         composeTestRule.setContent {
             DeviceConfigurationOverride(DeviceConfigurationOverride.ForcedSize(DpSize(412.dp, 917.dp))) {
@@ -52,7 +56,8 @@ class FormProfileFitTest {
                 }
             }
         }
-        asentar()
+        composeTestRule.mainClock.advanceTimeBy(esperaMs)
+        composeTestRule.waitForIdle()
         return checkNotNull(perfil)
     }
 
@@ -98,5 +103,16 @@ class FormProfileFitTest {
     @Test
     fun ca_ui_07_03_siElFormularioNoCabe_bajaHastaElPerfilCompacto() {
         assertEquals(FormMetrics.Compact, perfilCon(2000.dp))
+    }
+
+    @Test
+    fun ca_ui_07_08_alEntrar_llegaAlPerfilDefinitivoSinEsperas() {
+        // Regresión: cada bajada esperaba 400 ms, así que al entrar se veía hasta 800 ms la versión grande.
+        assertEquals(FormMetrics.Compact, perfilCon(2000.dp, esperaMs = 100))
+    }
+
+    @Test
+    fun ca_ui_07_08_siCabeConElPerfilInicial_seMuestraSinEsperas() {
+        assertEquals(FormMetrics.Regular, perfilCon(100.dp, esperaMs = 100))
     }
 }

@@ -64,16 +64,15 @@ inventario y mis recetas de forma privada.
 | CA-03-03 | **Dado** que no hay sesión, **cuando** abro la app, **entonces** después del splash llego al inicio de sesión. |
 | CA-03-04 | El splash se muestra al menos 2 segundos, aunque la sesión se resuelva antes. |
 
-### HU-04: Recuperación de contraseña (**SIMULADA**)
+### HU-04: Recuperación de contraseña
 **Como** usuario que olvidó su contraseña **quiero** recuperar el acceso con un código enviado a mi correo
 **para** no perder mi cuenta.
 
-> ⚠️ **Alcance v1: el flujo es una simulación de interfaz con datos de prueba fijos.** No se envía ningún correo
-> y la contraseña real **no cambia**. La razón es que generar y validar un código OTP de forma segura exige un
-> backend (ver `plan.md`, ADR-01). La pantalla, la navegación y las validaciones son definitivas, así que
-> pasar a la versión real solo requiere cambiar la implementación del repositorio.
+> **Desde la [spec 003](../003-recuperacion-real/spec.md), el flujo es real:** el código llega por correo y la
+> contraseña cambia de verdad. La v1 lo entregó como simulación con datos fijos (ADR-01), que hoy se conserva
+> como **modo demo** opcional en debug (`-PrecoveryDemo=true`). CA-04-03 quedó reemplazado por CA-REC-01-02.
 
-**Datos de prueba**
+**Datos de prueba del modo demo**
 
 | Dato | Valor |
 |---|---|
@@ -84,7 +83,7 @@ inventario y mis recetas de forma privada.
 |---|---|
 | CA-04-01 | **Dado** el paso 1 (correo), **cuando** presiono "Enviar Código" con el correo vacío, **entonces** veo "Correo no puede estar vacío". |
 | CA-04-02 | **Dado** el paso 1, **cuando** el correo tiene formato inválido, **entonces** veo "Ingresa un correo electrónico válido". |
-| CA-04-03 | **Dado** el paso 1, **cuando** el correo no pertenece a una cuenta, **entonces** veo "No encontramos una cuenta con este correo". |
+| ~~CA-04-03~~ | *Reemplazado por CA-REC-01-02 (spec 003): con un correo sin cuenta el flujo avanza igual al paso 2, para no revelar qué correos están registrados.* |
 | CA-04-04 | **Dado** el paso 1 con un correo con cuenta, **cuando** presiono "Enviar Código", **entonces** paso al paso 2, que muestra mi correo, y el indicador de pasos avanza. |
 | CA-04-05 | **Dado** el paso 2 (código), **cuando** presiono "Verificar Código" sin escribir nada, **entonces** veo "Código no puede estar vacío". |
 | CA-04-06 | **Dado** el paso 2, **cuando** el código está incompleto o no coincide, **entonces** veo "Código incorrecto, inténtalo de nuevo" y las casillas se marcan en rojo. |
@@ -121,7 +120,7 @@ celular compartido.
 | RF-AUTH-04 | Validar el formato del correo y la política de contraseña: 8 caracteres o más, al menos una mayúscula y al menos un carácter no alfanumérico. | HU-01, HU-02, HU-04 |
 | RF-AUTH-05 | Iniciar y cerrar sesión. | HU-02, HU-05 |
 | RF-AUTH-06 | Recordar la preferencia "Recuérdame" en el dispositivo y decidir el destino inicial según la sesión. | HU-03 |
-| RF-AUTH-07 | Flujo de recuperación de 3 pasos **simulado** con datos fijos e intercambiable por uno real. | HU-04 |
+| RF-AUTH-07 | Flujo de recuperación de 3 pasos intercambiable entre la versión real ([spec 003](../003-recuperacion-real/spec.md)) y la simulada con datos fijos (modo demo). | HU-04 |
 | RF-AUTH-08 | Traducir cada falla técnica a un error de negocio con un mensaje entendible. | HU-01, HU-02, HU-06 |
 
 ## 5. Requisitos no funcionales
@@ -137,7 +136,7 @@ celular compartido.
 
 ## 6. Fuera de alcance (v1)
 
-- Envío real del código de recuperación y cambio real de la contraseña (se simulan; ver HU-04).
+- Cambiar la contraseña con la sesión iniciada (contraseña actual y nueva).
 - Inicio de sesión con Google, Facebook o teléfono.
 - Exigir el correo verificado para entrar.
 - Editar el perfil o eliminar la cuenta desde la app.

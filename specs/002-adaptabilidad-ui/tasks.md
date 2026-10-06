@@ -46,6 +46,7 @@
 - [x] T028b Perfil por pantalla (bajar si no cabe), separaciones flexibles (`FlexibleGap`, `fillFormViewport`) y `FormProfileFitTest` (CA-UI-07-03).
 - [x] T029b Desborde pasajero entre pasos de la recuperación (perfil compacto por error) y checklist siempre encima (CA-UI-07-03, CA-UI-03-04).
 - [x] T029 Comparación visual con Figma (capturas a 412×917) y documentación.
+- [x] T030 Asentamiento inicial del perfil sin espera y oculto, y estado recordado por `maxHeight` (CA-UI-07-08).
 
 ## Matriz de trazabilidad
 
@@ -90,6 +91,7 @@ Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un
 | CA-UI-07-05 | M (captura del paso 2 frente al nodo 585:4467) |
 | CA-UI-07-06 | M (captura del diálogo frente al nodo 585:4441; desenfoque en Android 12+) |
 | CA-UI-07-07 | M (captura del paso 3 con el botón deshabilitado gris) |
+| CA-UI-07-08 | I `FormProfileFitTest.ca_ui_07_08_*` (2), M (Login → Registro → atrás → Registro en el V2436) |
 | RNF-UI-01..04 | Revisión de código: sin offsets fijos ni `scrollTo`/`animateScrollTo`, medidas en `FormMetrics`, foco con `onFocusChanged` |
 
 ### Hallazgos durante la verificación
