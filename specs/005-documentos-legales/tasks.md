@@ -24,7 +24,9 @@
 - [x] T011 Unitarias: `RegisterUseCaseTest` y `FakeUserRepository`.
 - [x] T012 Instrumentadas: `RegisterScreenTest`, `LegalDocumentScreenTest` y `AppNavigationTest`; llamadas a `RegisterScreen` actualizadas en `AdaptiveLayoutTest` y `FormFocusTest`.
 - [x] T013 `README.md` y `AGENTS.md`.
-- [ ] T014 Verificación completa en dispositivo (`AppNavigationTest`, `AdaptiveLayoutTest` y `FormFocusTest`) y checklist manual.
+- [x] T014 Verificación en dispositivo (V2436, 2026-10-07): `RegisterScreenTest` 10/10, `LegalDocumentScreenTest` 5/5, `AppNavigationTest` 7/7, `AdaptiveLayoutTest` 24/24 y `FormFocusTest` 6/6.
+  - `AppNavigationTest` marca la casilla con su acción semántica: un toque en el centro de la fila cae sobre el enlace de los Términos y abre el documento, que es lo correcto.
+- [ ] T016 Checklist manual (puntos 1 a 6), en especial TalkBack (CA-LEG-01-07).
 - [ ] T015 Publicar las reglas (`firebase deploy --only firestore:rules`) **junto con** la versión de la app que envía la constancia: una app anterior ya no podría crear perfiles.
 
 ## Matriz de trazabilidad
