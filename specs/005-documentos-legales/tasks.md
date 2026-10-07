@@ -34,7 +34,8 @@
 - [x] T017 Defecto encontrado en el punto 1: la pantalla usaba `background`, que en este design system es el verde de la marca, así que el título, la flecha y los encabezados (en `primary`) no se veían.
   - Ahora usa `surface`, texto Poppins (`bodyLarge`/`labelLarge`) y párrafos en `onSurface` al 80 %.
   - Pruebas nuevas en `LegalDocumentScreenTest`: el fondo es GreenLight en modo claro y SurfaceDark en modo oscuro.
-- [ ] T015 Publicar las reglas (`firebase deploy --only firestore:rules`) **junto con** la versión de la app que envía la constancia: una app anterior ya no podría crear perfiles.
+- [x] T015 Reglas publicadas en `smartfood-f62a1` el 2026-10-07 (`firebase deploy --only firestore:rules`, ruleset `b8f46637`). La versión activa es idéntica a `firestore.rules`.
+  - Desde ahora, una app anterior a la spec 005 ya no puede crear perfiles: hay que instalar la versión nueva.
 
 ## Matriz de trazabilidad
 

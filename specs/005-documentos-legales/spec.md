@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Feature | `005-documentos-legales` |
-| Estado | Implementada (v1, texto en vista previa) |
+| Estado | Implementada y desplegada (v1, texto en vista previa) |
 | Fecha | 2026-10-06 |
 | Depende de | 001-autenticacion (HU-01), 002-adaptabilidad-ui |
 | Afecta | Registro (casilla de Términos, CA-01-05) y perfil del usuario |

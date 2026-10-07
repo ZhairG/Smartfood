@@ -26,7 +26,7 @@
 - [x] T013 Verificación local: `npm test`, `testDebugUnitTest` y `assembleDebug`.
 - [x] T014 Despliegue de `sendWelcomeEmail` en `smartfood-f62a1` (2026-10-07, `firebase deploy --only functions`):
   - El primer intento falló porque los permisos del agente de servicio de Eventarc aún no se propagaban. Se reintentó a los 3 minutos.
-  - Las reglas no se publicaron: `welcomeEmails` ya queda cerrada por la regla por defecto, y publicarlas ahora exigiría la constancia de la spec 005 a las versiones anteriores de la app.
+  - Las reglas no se publicaron en ese momento, porque `welcomeEmails` ya quedaba cerrada por la regla por defecto. Se publicaron el 2026-10-07 junto con la spec 005 (ver su T015).
 - [x] T015 Checklist en producción (punto 5): registro con un correo real; el log dice `SENT`, el correo llega y el enlace verifica la cuenta.
 
 ## Matriz de trazabilidad
