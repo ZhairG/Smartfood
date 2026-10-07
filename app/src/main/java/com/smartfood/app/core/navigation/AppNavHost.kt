@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smartfood.app.feature.auth.ui.authGraph
 import com.smartfood.app.feature.home.mainGraph
+import com.smartfood.app.feature.legal.ui.legalDestinations
 import com.smartfood.app.feature.splash.SplashDestination
 import com.smartfood.app.feature.splash.SplashScreen
 import com.smartfood.app.feature.splash.SplashViewModel
@@ -20,7 +21,8 @@ import com.smartfood.app.feature.splash.SplashViewModel
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Raíz del árbol de navegación type-safe (plan.md §7).
- * Splash decide el destino inicial (HU-03); cada feature declara su propio grafo anidado.
+ * Splash decide el destino inicial (HU-03); cada feature declara su propio grafo anidado. Los documentos legales
+ * (spec 005) se declaran en la raíz.
  *
  * @param modifier Modificador opcional para el [NavHost].
  * @param navController Controlador de navegación.
@@ -58,6 +60,8 @@ fun AppNavHost(
 
         authGraph(navController)
         mainGraph(navController)
+        // En la raíz para que cualquier grafo pueda abrir los documentos legales (spec 005).
+        legalDestinations(navController)
     }
 }
 

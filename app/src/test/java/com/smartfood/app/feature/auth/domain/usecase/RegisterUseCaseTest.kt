@@ -4,6 +4,7 @@ import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthField
 import com.smartfood.app.feature.auth.domain.model.User
 import com.smartfood.app.feature.auth.domain.model.authFailure
+import com.smartfood.app.feature.legal.domain.model.LegalVersion
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
 import com.smartfood.app.testutil.FakeUserRepository
@@ -91,22 +92,20 @@ class RegisterUseCaseTest {
     }
 
     @Test
-    fun `CA-01-07 crea la cuenta, guarda el perfil, envia verificacion y cierra la sesion`() = runTest {
+    fun `CA-01-07 CA-MAIL-01-03 crea la cuenta, guarda el perfil y cierra la sesion sin pedir verificacion al cliente`() = runTest {
         val result = registrarValido()
 
         assertTrue(result.isSuccess)
         assertEquals(User(DEFAULT_UID, "Pepito Perez", "pepito@correo.com"), userRepository.profiles[DEFAULT_UID])
-        assertEquals(1, authRepository.sendVerificationCalls)
+        assertEquals(1, authRepository.logoutCalls)
         assertNull(authRepository.currentUserId())
     }
 
     @Test
-    fun `CA-01-07 si falla el envio de verificacion el registro igual es exitoso`() = runTest {
-        authRepository.sendVerificationResult = authFailure(AuthError.Network)
+    fun `CA-LEG-02-01 el perfil guarda la version vigente de los documentos legales`() = runTest {
+        registrarValido()
 
-        val result = registrarValido()
-
-        assertTrue(result.isSuccess)
+        assertEquals(LegalVersion.CURRENT, userRepository.acceptedTermsVersions[DEFAULT_UID])
     }
 
     @Test
@@ -117,7 +116,6 @@ class RegisterUseCaseTest {
 
         assertEquals(AuthError.Network, result.authError)
         assertEquals(1, authRepository.deleteAccountCalls)
-        assertEquals(0, authRepository.sendVerificationCalls)
         assertNull(authRepository.currentUserId())
     }
 }

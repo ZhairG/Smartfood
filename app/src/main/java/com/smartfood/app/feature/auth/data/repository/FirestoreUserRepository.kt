@@ -15,7 +15,7 @@ import javax.inject.Inject
  * Nombre: FirestoreUserRepository.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Implementación de [UserRepository] sobre Cloud Firestore (RF-AUTH-02).
+ * Descripción: Implementación de [UserRepository] sobre Cloud Firestore (RF-AUTH-02, RF-LEG-03).
  * Cada perfil vive en `users/{uid}` y se protege con `firestore.rules` (RNF-02).
  * Se escribe y se lee con mapas para no depender de reflexión con R8.
  *
@@ -25,11 +25,14 @@ class FirestoreUserRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : UserRepository {
 
-    override suspend fun createProfile(user: User): Result<Unit> = safeRunCatching {
+    override suspend fun createProfile(user: User, acceptedTermsVersion: String): Result<Unit> = safeRunCatching {
+        // Las reglas exigen la versión y que la fecha de aceptación sea la del servidor (CA-LEG-02-02).
         val document = mapOf(
             FIELD_FULL_NAME to user.fullName,
             FIELD_EMAIL to user.email,
-            FIELD_CREATED_AT to FieldValue.serverTimestamp()
+            FIELD_CREATED_AT to FieldValue.serverTimestamp(),
+            FIELD_TERMS_VERSION to acceptedTermsVersion,
+            FIELD_TERMS_ACCEPTED_AT to FieldValue.serverTimestamp()
         )
         firestore.collection(USERS_COLLECTION).document(user.uid).set(document).await()
         Unit
@@ -50,5 +53,7 @@ class FirestoreUserRepository @Inject constructor(
         const val FIELD_FULL_NAME = "fullName"
         const val FIELD_EMAIL = "email"
         const val FIELD_CREATED_AT = "createdAt"
+        const val FIELD_TERMS_VERSION = "termsVersion"
+        const val FIELD_TERMS_ACCEPTED_AT = "termsAcceptedAt"
     }
 }

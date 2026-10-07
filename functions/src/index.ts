@@ -2,9 +2,9 @@
  * Nombre: index.ts
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Funciones callable de la recuperación de contraseña real (spec 003, plan §3). Cada una arma el
- * `RecoveryService` con sus adaptadores y traduce `RecoveryError` a `HttpsError` con `details.reason`, que la app
- * clasifica en `FirebaseErrorMapper`.
+ * Descripción: Funciones de SmartFood. Las 3 callable de la recuperación de contraseña real (spec 003, plan §3) arman
+ * el `RecoveryService` con sus adaptadores y traducen `RecoveryError` a `HttpsError` con `details.reason`, que la app
+ * clasifica en `FirebaseErrorMapper`. `sendWelcomeEmail` envía la bienvenida al crearse un perfil (spec 004).
  */
 
 import { initializeApp } from "firebase-admin/app";
@@ -13,10 +13,12 @@ import { getFirestore } from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
 import { defineSecret } from "firebase-functions/params";
 import { setGlobalOptions } from "firebase-functions/v2";
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { FunctionsErrorCode, HttpsError, onCall } from "firebase-functions/v2/https";
-import { AdminUserDirectory, FirestoreResetStore, GmailMailer, LoggingMailer } from "./adapters.js";
-import { Mailer } from "./ports.js";
+import { AdminUserDirectory, FirestoreResetStore, FirestoreWelcomeLog, GmailMailer, LoggingMailer } from "./adapters.js";
+import { Mailer, WelcomeMailer } from "./ports.js";
 import { RecoveryError, RecoveryErrorReason, RecoveryService } from "./recoveryService.js";
+import { WelcomeService } from "./registrationService.js";
 
 initializeApp();
 
@@ -61,21 +63,45 @@ export const resetPasswordWithCode = onCall((request) =>
   }),
 );
 
+/**
+ * Bienvenida con enlace de verificación al crearse `users/{uid}` (spec 004, ADR-MAIL-01). Sin reintentos: un fallo
+ * se registra y libera la reserva, para no mandar correos repetidos (CA-MAIL-01-04, ADR-MAIL-04).
+ */
+export const sendWelcomeEmail = onDocumentCreated(
+  { document: "users/{uid}", secrets: [smtpUser, smtpPass], retry: false },
+  async (event) => {
+    const uid = event.params.uid;
+    try {
+      const outcome = await welcomeService().onProfileCreated(uid, event.data?.get("fullName"));
+      logger.info(`Bienvenida de ${uid}: ${outcome}`);
+    } catch (error) {
+      logger.error(`No se pudo enviar la bienvenida de ${uid}`, error);
+    }
+  },
+);
+
 function recoveryService(): RecoveryService {
   return new RecoveryService(new FirestoreResetStore(getFirestore()), new AdminUserDirectory(getAuth()), lazyMailer);
 }
 
+function welcomeService(): WelcomeService {
+  return new WelcomeService(new AdminUserDirectory(getAuth()), new FirestoreWelcomeLog(getFirestore()), lazyMailer);
+}
+
 /**
- * Crea el cliente de correo solo al enviar. Solo `requestPasswordResetCode` declara los secretos, así que las
- * otras funciones nunca los leen.
+ * Crea el cliente de correo solo al enviar. Solo `requestPasswordResetCode` y `sendWelcomeEmail` declaran los
+ * secretos, así que las otras funciones nunca los leen.
  */
-const lazyMailer: Mailer = {
-  sendRecoveryCode: (email, code) => {
-    const mailer =
-      process.env.FUNCTIONS_EMULATOR === "true" ? new LoggingMailer() : new GmailMailer(smtpUser.value(), smtpPass.value());
-    return mailer.sendRecoveryCode(email, code);
-  },
+const lazyMailer: Mailer & WelcomeMailer = {
+  sendRecoveryCode: (email, code) => mailer().sendRecoveryCode(email, code),
+  sendWelcome: (email, name, link) => mailer().sendWelcome(email, name, link),
 };
+
+function mailer(): Mailer & WelcomeMailer {
+  return process.env.FUNCTIONS_EMULATOR === "true"
+    ? new LoggingMailer()
+    : new GmailMailer(smtpUser.value(), smtpPass.value());
+}
 
 /**
  * Ejecuta un paso y traduce sus fallas. `TOO_MANY_REQUESTS` incluye `retryAfterSeconds` (RF-REC-07). Las fallas

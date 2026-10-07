@@ -10,14 +10,16 @@ Aplicación Android para reducir el desperdicio de comida en los hogares. Une **
 
 ## Estado
 
-| Módulo | Spec | Estado |
-|---|---|---|
-| 001 Autenticación | [`specs/001-autenticacion`](specs/001-autenticacion/spec.md) | ✅ Implementado (v1) |
-| 002 Adaptabilidad de la UI | [`specs/002-adaptabilidad-ui`](specs/002-adaptabilidad-ui/spec.md) | ✅ Implementado |
+| Tareas                              | Spec | Estado |
+|-------------------------------------|---|---|
+| 001 Autenticación                   | [`specs/001-autenticacion`](specs/001-autenticacion/spec.md) | ✅ Implementado (v1) |
+| 002 Adaptabilidad de la UI          | [`specs/002-adaptabilidad-ui`](specs/002-adaptabilidad-ui/spec.md) | ✅ Implementado |
 | 003 Recuperación de contraseña real | [`specs/003-recuperacion-real`](specs/003-recuperacion-real/spec.md) | ✅ Implementado y desplegado |
-| 004 Inventario | — | Pendiente |
-| 005 Catálogo de recetas | — | Pendiente |
-| 006 Agente recomendador | — | Pendiente |
+| 004 Correo de bienvenida            | [`specs/004-correo-registro`](specs/004-correo-registro/spec.md) | ✅ Implementado y desplegado |
+| 005 Documentos legales              | [`specs/005-documentos-legales`](specs/005-documentos-legales/spec.md) | ✅ Implementado (texto en vista previa) |
+| 006 Inventario                      | — | Pendiente |
+| 007 Catálogo de recetas             | — | Pendiente |
+| 008 Agente recomendador             | — | Pendiente |
 
 ## Metodología: Spec Driven Development
 
@@ -48,6 +50,7 @@ com.smartfood.app/
 └── feature/
     ├── splash/          Decide el destino inicial según la sesión
     ├── home/            Saludo y cierre de sesión (punto de entrada de las próximas features)
+    ├── legal/           Términos y Política de privacidad (plantilla en vista previa, spec 005)
     └── auth/
         ├── domain/      model/ (User, AuthError), repository/ (interfaces), usecase/
         ├── data/        repository/ (Firebase y Cloud Functions), mapper/, local/ (DataStore), demo/, di/
@@ -78,8 +81,19 @@ tipografía Poppins, incluida en el APK con licencia OFL (`docs/licenses/OFL-Pop
    - Publicar las reglas: `firebase deploy --only firestore:rules`.
 4. Ejecutar la configuración `app`.
 
-La recuperación de contraseña necesita además las Cloud Functions desplegadas (ver la sección siguiente). Sin ellas,
-usa el modo demo o los emuladores.
+La recuperación de contraseña y el correo de bienvenida necesitan además las Cloud Functions desplegadas (ver la
+sección siguiente). Sin ellas, usa el modo demo o los emuladores.
+
+## Documentos legales
+
+Los Términos y condiciones y la Política de privacidad ([spec 005](specs/005-documentos-legales/spec.md)) se abren desde
+el registro. Hoy son una **plantilla en vista previa**. Para publicar el texto definitivo:
+
+1. Reemplazar los textos `[Pendiente de redacción…]` de `app/src/main/res/values/strings_legal.xml` (y agregar o quitar
+   secciones en `feature/legal/ui/LegalContent.kt` si cambia la estructura).
+2. Cambiar `LegalVersion.CURRENT` y poner `IS_PREVIEW = false` en `feature/legal/domain/model/LegalDocument.kt`.
+
+Cada perfil guarda la versión aceptada (`termsVersion`) y la fecha del servidor (`termsAcceptedAt`).
 
 ## Ícono de la app
 
@@ -93,11 +107,17 @@ python tools/generate_launcher_icon.py
 
 El script verifica que el logo quede dentro de la zona segura de 66 dp. No edites los `mipmap-*` a mano.
 
-## Recuperación de contraseña (Cloud Functions)
+## Cloud Functions: recuperación de contraseña y correo de bienvenida
 
-La recuperación es **real** ([spec 003](specs/003-recuperacion-real/spec.md)): tres funciones en `functions/`
-(región `southamerica-east1`) envían un código de 4 dígitos por Gmail y cambian la contraseña con el Admin SDK.
-Las credenciales de Gmail viven en Secret Manager, nunca en el repositorio ni en el APK.
+Las funciones de `functions/` (región `southamerica-east1`) envían correos por Gmail. Las credenciales de Gmail viven
+en Secret Manager, nunca en el repositorio ni en el APK.
+
+- **Recuperación real** ([spec 003](specs/003-recuperacion-real/spec.md)): tres funciones callable envían un código de
+  4 dígitos y cambian la contraseña con el Admin SDK.
+- **Bienvenida** ([spec 004](specs/004-correo-registro/spec.md)): `sendWelcomeEmail` se dispara al crearse
+  `users/{uid}` y envía un único correo de bienvenida con el enlace de verificación (reemplaza el correo genérico de
+  Firebase). Se envía como máximo uno por cuenta (`welcomeEmails/{uid}`). Conviene configurar en español la página de
+  acción (consola → Authentication → Plantillas → idioma).
 
 ### Despliegue (una vez por proyecto, requiere el plan Blaze)
 
@@ -111,7 +131,7 @@ Las credenciales de Gmail viven en Secret Manager, nunca en el repositorio ni en
 3. Desplegar las funciones y las reglas, y configurar la limpieza de imágenes antiguas (evita pequeños cobros):
    ```bash
    cd functions && npm ci && cd ..
-   firebase deploy --only functions,firestore:rules
+   firebase deploy --only functions,firestore:rules   # la primera vez habilita Eventarc (disparador de Firestore)
    firebase functions:artifacts:setpolicy --location southamerica-east1 --force
    ```
 4. Recomendado: una alerta de presupuesto de 1 USD en Google Cloud Billing. La prueba gratuita de Blaze vence el
@@ -127,6 +147,8 @@ firebase emulators:start --only auth,firestore,functions
 
 - El código de recuperación **no se envía**: aparece en la consola de los emuladores como
   `[EMULADOR] Código de recuperación para …`.
+- El correo de bienvenida tampoco se envía: el enlace de verificación aparece como `[EMULADOR] Correo de bienvenida
+  para …`. Al abrirlo, la cuenta queda verificada en el emulador de Auth.
 - Crea `functions/.secret.local` (ignorado por git) con `SMTP_USER=x` y `SMTP_PASS=x` para que el emulador no
   consulte Secret Manager.
 - En un teléfono físico: `adb reverse tcp:9099 tcp:9099`, lo mismo para los puertos 8080 y 5001, y

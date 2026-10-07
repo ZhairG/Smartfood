@@ -35,7 +35,7 @@
 
     <!-- Register Success Screen -->
     <string name="register_success_title">¡Cuenta creada con éxito!</string>
-    <string name="register_success_body">Ya puedes acceder a todas nuestras funciones. Te enviamos un correo de confirmación.</string>
+    <string name="register_success_body">Ya puedes acceder a todas nuestras funciones. Te enviamos un correo de bienvenida para confirmar tu cuenta.</string>
     <string name="register_success_login_button">Continuar</string>
 
     <!-- Password Checklist Requirements -->

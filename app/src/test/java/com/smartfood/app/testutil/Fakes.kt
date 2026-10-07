@@ -27,11 +27,9 @@ class FakeAuthRepository : AuthRepository {
     /** Latencia simulada del inicio de sesión, para probar el estado de carga. */
     var loginDelayMs: Long = 0
     var createAccountResult: Result<String> = Result.success(DEFAULT_UID)
-    var sendVerificationResult: Result<Unit> = Result.success(Unit)
 
     var loginCalls = 0
     var createAccountCalls = 0
-    var sendVerificationCalls = 0
     var deleteAccountCalls = 0
     var logoutCalls = 0
 
@@ -55,11 +53,6 @@ class FakeAuthRepository : AuthRepository {
         return createAccountResult.onSuccess { signedInUserId = it }
     }
 
-    override suspend fun sendEmailVerification(): Result<Unit> {
-        sendVerificationCalls++
-        return sendVerificationResult
-    }
-
     override suspend fun deleteCurrentAccount(): Result<Unit> {
         deleteAccountCalls++
         return Result.success(Unit)
@@ -78,12 +71,15 @@ class FakeAuthRepository : AuthRepository {
 /** Fake de [UserRepository] que guarda los perfiles en memoria. */
 class FakeUserRepository : UserRepository {
     val profiles = mutableMapOf<String, User>()
+    /** Versión de los documentos legales aceptada por cada perfil creado. */
+    val acceptedTermsVersions = mutableMapOf<String, String>()
     var createProfileResult: Result<Unit>? = null
     var getProfileError: AuthError? = null
 
-    override suspend fun createProfile(user: User): Result<Unit> {
+    override suspend fun createProfile(user: User, acceptedTermsVersion: String): Result<Unit> {
         createProfileResult?.let { return it }
         profiles[user.uid] = user
+        acceptedTermsVersions[user.uid] = acceptedTermsVersion
         return Result.success(Unit)
     }
 

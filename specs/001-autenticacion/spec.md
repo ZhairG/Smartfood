@@ -7,7 +7,7 @@
 | Fecha | 2026-10-04 |
 | Entrega | Martes 6 de octubre de 2026 |
 | Depende de | Ninguna (es el módulo 1) |
-| Habilita | 002-inventario, 003-recetas, 004-agente-recomendador |
+| Habilita | Inventario, recetas y agente recomendador (specs futuras) |
 
 ## 1. Contexto y motivación
 
@@ -37,7 +37,7 @@ inventario y mis recetas de forma privada.
 | CA-01-04 | **Dado** una contraseña que no cumple los requisitos, **cuando** presiono "Crear Cuenta", **entonces** veo "La contraseña no cumple los requisitos de seguridad" y no se crea la cuenta. |
 | CA-01-05 | **Dado** que no acepto los Términos y condiciones, **entonces** el botón "Crear Cuenta" está deshabilitado. |
 | CA-01-06 | **Dado** un correo que ya tiene cuenta, **cuando** presiono "Crear Cuenta", **entonces** veo "Ya existe una cuenta registrada con este correo electrónico". |
-| CA-01-07 | **Dado** que todos los datos son válidos, **cuando** presiono "Crear Cuenta", **entonces** se crea la cuenta, se guarda mi perfil (nombre y correo), se envía un correo de verificación, la sesión queda cerrada y veo la pantalla "¡Cuenta creada con éxito!". |
+| CA-01-07 | **Dado** que todos los datos son válidos, **cuando** presiono "Crear Cuenta", **entonces** se crea la cuenta, se guarda mi perfil (nombre y correo), se envía un correo de verificación, la sesión queda cerrada y veo la pantalla "¡Cuenta creada con éxito!". *(Desde la [spec 004](../004-correo-registro/spec.md), el servidor envía un único correo de bienvenida con el enlace de verificación.)* |
 | CA-01-08 | **Dado** que estoy en "¡Cuenta creada con éxito!", **cuando** presiono "Continuar", **entonces** llego a "Bienvenido" (inicio de sesión) y no puedo volver atrás al formulario de registro. |
 | CA-01-09 | **Dado** que se crea la cuenta pero falla el guardado del perfil, **entonces** la cuenta se elimina (no quedan cuentas sin perfil) y veo el error correspondiente. |
 
@@ -116,7 +116,7 @@ celular compartido.
 |---|---|---|
 | RF-AUTH-01 | Crear cuentas con correo y contraseña. | HU-01 |
 | RF-AUTH-02 | Guardar el perfil del usuario (nombre completo, correo y fecha de creación) asociado a su cuenta. | HU-01, HU-05 |
-| RF-AUTH-03 | Enviar un correo de verificación al registrarse. La verificación **no** es obligatoria para entrar en la v1. | HU-01 |
+| RF-AUTH-03 | Enviar un correo de verificación al registrarse. La verificación **no** es obligatoria para entrar en la v1. Desde la [spec 004](../004-correo-registro/spec.md) lo envía el servidor dentro del correo de bienvenida (RF-MAIL-03). | HU-01 |
 | RF-AUTH-04 | Validar el formato del correo y la política de contraseña: 8 caracteres o más, al menos una mayúscula y al menos un carácter no alfanumérico. | HU-01, HU-02, HU-04 |
 | RF-AUTH-05 | Iniciar y cerrar sesión. | HU-02, HU-05 |
 | RF-AUTH-06 | Recordar la preferencia "Recuérdame" en el dispositivo y decidir el destino inicial según la sesión. | HU-03 |
@@ -145,5 +145,6 @@ celular compartido.
 ## 7. Supuestos
 
 - El proyecto de Firebase tiene habilitados **Authentication (correo/contraseña)** y **Cloud Firestore**.
-- Los textos legales de Términos y Política de privacidad se redactarán en otra feature; por ahora los enlaces
-  son decorativos.
+- Los textos legales de Términos y Política de privacidad se redactarán en otra feature. Desde la
+  [spec 005](../005-documentos-legales/spec.md), los enlaces abren cada documento (por ahora una plantilla en vista
+  previa) y el perfil guarda la versión aceptada.

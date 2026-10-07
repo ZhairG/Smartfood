@@ -2,9 +2,9 @@
  * Nombre: ports.ts
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Contratos que necesita el servicio de recuperación (spec 003, plan §2). La lógica de
- * `recoveryService.ts` solo conoce estas interfaces; `adapters.ts` las implementa con Firebase y nodemailer,
- * y las pruebas las implementan en memoria.
+ * Descripción: Contratos de los servicios de recuperación (spec 003, plan §2) y de bienvenida (spec 004). La lógica de
+ * `recoveryService.ts` y `registrationService.ts` solo conoce estas interfaces; `adapters.ts` las implementa con
+ * Firebase y nodemailer, y las pruebas las implementan en memoria.
  */
 
 /** Registro de `passwordResets/{sha256(correo)}` (plan §4). Las fechas son epoch en milisegundos. */
@@ -50,3 +50,30 @@ export interface Mailer {
 
 /** Hora actual en epoch ms; inyectable para probar vencimientos. */
 export type Clock = () => number;
+
+/** Datos de una cuenta que necesita la bienvenida (spec 004). */
+export interface RegisteredAccount {
+  email: string;
+  emailVerified: boolean;
+}
+
+/** Consulta de cuentas y enlaces de verificación (Admin SDK de Firebase Auth, spec 004). */
+export interface RegisteredAccounts {
+  /** Cuenta con ese `uid`, o `null` si no existe o no tiene correo. */
+  find(uid: string): Promise<RegisteredAccount | null>;
+  /** Enlace que verifica el correo al abrirlo (CA-MAIL-01-02). */
+  verificationLink(email: string): Promise<string>;
+}
+
+/** Registro de bienvenidas enviadas, para enviar como máximo una por cuenta (CA-MAIL-02-01). */
+export interface WelcomeLog {
+  /** Reserva el envío de forma atómica: `false` si la cuenta ya tenía una bienvenida. */
+  claim(uid: string): Promise<boolean>;
+  /** Libera la reserva cuando el envío falla. */
+  release(uid: string): Promise<void>;
+}
+
+/** Envío del correo de bienvenida. `name` puede venir vacío: el saludo es genérico. */
+export interface WelcomeMailer {
+  sendWelcome(email: string, name: string, verificationLink: string): Promise<void>;
+}

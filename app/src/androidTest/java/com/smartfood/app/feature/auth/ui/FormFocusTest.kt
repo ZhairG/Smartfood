@@ -37,7 +37,7 @@ class FormFocusTest {
 
     private fun mostrarRegistro() {
         composeTestRule.setContent {
-            SmartfoodTheme { RegisterScreen(state = RegisterUiState(), onEvent = {}, onNavigateToLogin = {}) }
+            SmartfoodTheme { RegisterScreen(state = RegisterUiState(), onEvent = {}, onNavigateToLogin = {}, onOpenTerms = {}, onOpenPrivacy = {}) }
         }
     }
 
