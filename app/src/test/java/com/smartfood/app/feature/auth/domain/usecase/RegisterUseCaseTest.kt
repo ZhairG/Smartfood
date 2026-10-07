@@ -91,22 +91,13 @@ class RegisterUseCaseTest {
     }
 
     @Test
-    fun `CA-01-07 crea la cuenta, guarda el perfil, envia verificacion y cierra la sesion`() = runTest {
+    fun `CA-01-07 CA-MAIL-01-03 crea la cuenta, guarda el perfil y cierra la sesion sin pedir verificacion al cliente`() = runTest {
         val result = registrarValido()
 
         assertTrue(result.isSuccess)
         assertEquals(User(DEFAULT_UID, "Pepito Perez", "pepito@correo.com"), userRepository.profiles[DEFAULT_UID])
-        assertEquals(1, authRepository.sendVerificationCalls)
+        assertEquals(1, authRepository.logoutCalls)
         assertNull(authRepository.currentUserId())
-    }
-
-    @Test
-    fun `CA-01-07 si falla el envio de verificacion el registro igual es exitoso`() = runTest {
-        authRepository.sendVerificationResult = authFailure(AuthError.Network)
-
-        val result = registrarValido()
-
-        assertTrue(result.isSuccess)
     }
 
     @Test
@@ -117,7 +108,6 @@ class RegisterUseCaseTest {
 
         assertEquals(AuthError.Network, result.authError)
         assertEquals(1, authRepository.deleteAccountCalls)
-        assertEquals(0, authRepository.sendVerificationCalls)
         assertNull(authRepository.currentUserId())
     }
 }

@@ -4,7 +4,7 @@ package com.smartfood.app.feature.auth.domain.repository
  * Nombre: AuthRepository.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Contrato de las operaciones de cuenta y sesión (RF-AUTH-01, RF-AUTH-03, RF-AUTH-05).
+ * Descripción: Contrato de las operaciones de cuenta y sesión (RF-AUTH-01, RF-AUTH-05).
  * Toda falla se entrega como `Result.failure` con un
  * [com.smartfood.app.feature.auth.domain.model.AuthException].
  */
@@ -22,9 +22,6 @@ interface AuthRepository {
      * @return El `uid` de la cuenta creada.
      */
     suspend fun createAccount(email: String, password: String): Result<String>
-
-    /** Envía el correo de verificación a la cuenta con sesión activa. */
-    suspend fun sendEmailVerification(): Result<Unit>
 
     /** Elimina la cuenta con sesión activa. Se usa como rollback del registro. */
     suspend fun deleteCurrentAccount(): Result<Unit>

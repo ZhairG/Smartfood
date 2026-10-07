@@ -13,8 +13,8 @@ import javax.inject.Inject
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Caso de uso del registro (HU-01). Valida los datos y orquesta la creación de la cuenta,
- * el guardado del perfil (con rollback si falla, CA-01-09), el envío del correo de verificación y
- * el cierre de sesión final (CA-01-07).
+ * el guardado del perfil (con rollback si falla, CA-01-09) y el cierre de sesión final (CA-01-07).
+ * El correo de bienvenida con la verificación lo envía el servidor al crearse el perfil (spec 004, RF-MAIL-03).
  *
  * @param authRepository Repositorio de cuenta y sesión.
  * @param userRepository Repositorio del perfil del usuario.
@@ -63,8 +63,6 @@ class RegisterUseCase @Inject constructor(
                 return Result.failure(error)
             }
 
-        // La verificación es informativa en la v1 (RF-AUTH-03): si falla el envío, el registro sigue siendo válido.
-        authRepository.sendEmailVerification()
         authRepository.logout()
         return Result.success(Unit)
     }

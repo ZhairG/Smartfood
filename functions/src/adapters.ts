@@ -2,15 +2,26 @@
  * Nombre: adapters.ts
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Implementaciones de los puertos de `ports.ts` con Firebase y nodemailer (spec 003, plan §2).
+ * Descripción: Implementaciones de los puertos de `ports.ts` con Firebase y nodemailer (spec 003, plan §2; spec 004).
  * Es el único archivo del servidor que conoce Firestore, el Admin SDK de Auth y el SMTP de Gmail.
  */
 
 import * as logger from "firebase-functions/logger";
 import type { Auth } from "firebase-admin/auth";
-import type { Firestore } from "firebase-admin/firestore";
+import { FieldValue, type Firestore } from "firebase-admin/firestore";
 import nodemailer from "nodemailer";
-import { Mailer, ResetRecord, ResetStore, StoreUpdate, UserDirectory } from "./ports.js";
+import { EmailContent, recoveryEmail, welcomeEmail } from "./emailTemplates.js";
+import {
+  Mailer,
+  RegisteredAccount,
+  RegisteredAccounts,
+  ResetRecord,
+  ResetStore,
+  StoreUpdate,
+  UserDirectory,
+  WelcomeLog,
+  WelcomeMailer,
+} from "./ports.js";
 
 /** Colección privada de la recuperación; las reglas niegan todo acceso de los clientes (RNF-REC-02). */
 const COLLECTION = "passwordResets";
@@ -35,17 +46,34 @@ export class FirestoreResetStore implements ResetStore {
   }
 }
 
+/** Código de Firebase Auth cuando no hay una cuenta con ese correo o `uid`. */
+const USER_NOT_FOUND = "auth/user-not-found";
+
 /** Cuentas de Firebase Auth a través del Admin SDK. */
-export class AdminUserDirectory implements UserDirectory {
+export class AdminUserDirectory implements UserDirectory, RegisteredAccounts {
   constructor(private readonly auth: Auth) {}
 
   async findUidByEmail(email: string): Promise<string | null> {
     try {
       return (await this.auth.getUserByEmail(email)).uid;
     } catch (error) {
-      if ((error as { code?: string }).code === "auth/user-not-found") return null;
+      if ((error as { code?: string }).code === USER_NOT_FOUND) return null;
       throw error;
     }
+  }
+
+  async find(uid: string): Promise<RegisteredAccount | null> {
+    try {
+      const user = await this.auth.getUser(uid);
+      return user.email ? { email: user.email, emailVerified: user.emailVerified } : null;
+    } catch (error) {
+      if ((error as { code?: string }).code === USER_NOT_FOUND) return null;
+      throw error;
+    }
+  }
+
+  verificationLink(email: string): Promise<string> {
+    return this.auth.generateEmailVerificationLink(email);
   }
 
   async updatePassword(uid: string, newPassword: string): Promise<void> {
@@ -54,6 +82,31 @@ export class AdminUserDirectory implements UserDirectory {
 
   async revokeSessions(uid: string): Promise<void> {
     await this.auth.revokeRefreshTokens(uid);
+  }
+}
+
+/** Colección privada de las bienvenidas enviadas (spec 004, RNF-MAIL-04). */
+const WELCOME_COLLECTION = "welcomeEmails";
+
+/** Código de gRPC que devuelve `create()` cuando el documento ya existe. */
+const ALREADY_EXISTS = 6;
+
+/** Registro de bienvenidas en Firestore. `create()` falla si el documento existe, así la reserva es atómica. */
+export class FirestoreWelcomeLog implements WelcomeLog {
+  constructor(private readonly db: Firestore) {}
+
+  async claim(uid: string): Promise<boolean> {
+    try {
+      await this.db.collection(WELCOME_COLLECTION).doc(uid).create({ sentAt: FieldValue.serverTimestamp() });
+      return true;
+    } catch (error) {
+      if ((error as { code?: number }).code === ALREADY_EXISTS) return false;
+      throw error;
+    }
+  }
+
+  async release(uid: string): Promise<void> {
+    await this.db.collection(WELCOME_COLLECTION).doc(uid).delete();
   }
 }
 
@@ -67,46 +120,35 @@ export function gmailCredentials(user: string, appPassword: string): { user: str
 }
 
 /** Envío por Gmail SMTP con una contraseña de aplicación (ADR-REC-04). */
-export class GmailMailer implements Mailer {
+export class GmailMailer implements Mailer, WelcomeMailer {
   private readonly auth: { user: string; pass: string };
 
   constructor(user: string, appPassword: string) {
     this.auth = gmailCredentials(user, appPassword);
   }
 
-  async sendRecoveryCode(email: string, code: string): Promise<void> {
+  sendRecoveryCode(email: string, code: string): Promise<void> {
+    return this.send(email, recoveryEmail(code));
+  }
+
+  sendWelcome(email: string, name: string, verificationLink: string): Promise<void> {
+    return this.send(email, welcomeEmail(name, verificationLink));
+  }
+
+  private async send(to: string, content: EmailContent): Promise<void> {
     const transport = nodemailer.createTransport({ service: "gmail", auth: this.auth });
-    await transport.sendMail({
-      from: `"SmartFood" <${this.auth.user}>`,
-      to: email,
-      subject: `Tu código de SmartFood es ${code}`,
-      text:
-        `Tu código para restablecer la contraseña de SmartFood es ${code}.\n\n` +
-        "Vence en 10 minutos. Si no lo pediste, ignora este correo: tu contraseña no cambiará.",
-      html: recoveryEmailHtml(code),
-    });
+    await transport.sendMail({ from: `"SmartFood" <${this.auth.user}>`, to, ...content });
   }
 }
 
-/** En la Emulator Suite el código se lee en el log en lugar de enviarse (RNF-REC-04). */
-export class LoggingMailer implements Mailer {
+/** En la Emulator Suite el código y el enlace se leen en el log en lugar de enviarse (RNF-REC-04, RNF-MAIL-02). */
+export class LoggingMailer implements Mailer, WelcomeMailer {
   async sendRecoveryCode(email: string, code: string): Promise<void> {
     logger.info(`[EMULADOR] Código de recuperación para ${email}: ${code}`);
   }
+
+  async sendWelcome(email: string, name: string, verificationLink: string): Promise<void> {
+    logger.info(`[EMULADOR] Correo de bienvenida para ${email} (${name || "sin nombre"}): ${verificationLink}`);
+  }
 }
 
-function recoveryEmailHtml(code: string): string {
-  return `<!doctype html>
-<html lang="es">
-  <body style="margin:0;padding:24px;background:#f4f7f2;font-family:Arial,Helvetica,sans-serif;color:#1f2a1c">
-    <div style="max-width:420px;margin:0 auto;background:#ffffff;border-radius:16px;padding:32px;text-align:center">
-      <h1 style="margin:0 0 8px;font-size:22px;color:#2e7d32">SmartFood</h1>
-      <p style="margin:0 0 24px;font-size:15px">Usa este código para restablecer tu contraseña:</p>
-      <p style="margin:0 0 24px;font-size:36px;font-weight:bold;letter-spacing:12px">${code}</p>
-      <p style="margin:0;font-size:13px;color:#5f6b5a">
-        Vence en 10 minutos. Si no lo pediste, ignora este correo: tu contraseña no cambiará.
-      </p>
-    </div>
-  </body>
-</html>`;
-}

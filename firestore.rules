@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Reglas de seguridad de SmartFood (spec 001, RNF-02; spec 003, RNF-REC-02).
+// Reglas de seguridad de SmartFood (spec 001, RNF-02; spec 003, RNF-REC-02; spec 004, RNF-MAIL-04).
 // Cada usuario solo puede leer y escribir su propio perfil. Todo lo demás está denegado.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -10,6 +10,11 @@ service cloud.firestore {
 
     // Recuperación de contraseña: solo la usan las Cloud Functions con el Admin SDK, que no pasa por estas reglas.
     match /passwordResets/{id} {
+      allow read, write: if false;
+    }
+
+    // Bienvenidas enviadas: solo las usa la función sendWelcomeEmail (spec 004).
+    match /welcomeEmails/{id} {
       allow read, write: if false;
     }
   }

@@ -12,7 +12,7 @@ App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, pa
 
 Antes de escribir código, leer **`specs/constitution.md`** (principios no negociables) y la spec de la feature.
 
-- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui` y `003-recuperacion-real`. A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`).
+- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real` y `004-correo-registro`. A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`).
 - Cada feature vive en `specs/NNN-nombre/` con `spec.md` (QUÉ: historias, criterios Dado/Cuando/Entonces), `plan.md` (CÓMO: contratos, decisiones) y `tasks.md` (tareas + matriz CA → test).
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
 - Códigos de trazabilidad: `HU-NN`, `CA-NN-MM`, `RF-XXX-NN`, `RNF-NN`. Los nombres de los tests citan el CA que cubren.
@@ -52,7 +52,11 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
   - La colección `passwordResets` es solo del servidor; las reglas niegan todo acceso a los clientes.
   - **Modo demo:** con `-PrecoveryDemo=true` (solo debug), `AuthDataModule` enlaza `data/demo/DemoPasswordRecoveryRepository` (correos `demo@smartfood.com` y `prueba@smartfood.com`; código `1234`).
   - Con `-PuseFirebaseEmulator=true` (solo debug), `CoreDataModule` conecta Auth, Firestore y Functions a la Emulator Suite. En el emulador, el código se lee en el log.
-- **Orquestación del registro** en `RegisterUseCase`: crear cuenta → perfil Firestore (si falla, rollback con `deleteCurrentAccount`) → verificación por correo → `logout`.
+- **Orquestación del registro** en `RegisterUseCase`: crear cuenta → perfil Firestore (si falla, rollback con `deleteCurrentAccount`) → `logout`. La app **no** pide el correo de verificación de Firebase.
+- **Correo de bienvenida (spec 004):** la función `sendWelcomeEmail` (`onDocumentCreated("users/{uid}")`, sin reintentos) envía un único correo con el nombre y el enlace de verificación (`generateEmailVerificationLink`).
+  - La lógica vive en `functions/src/registrationService.ts` (`WelcomeService`, probado con fakes) y las plantillas en `emailTemplates.ts` (puras, con `escapeHtml`).
+  - El destinatario sale siempre de Auth, nunca del perfil. `welcomeEmails/{uid}` (solo servidor) garantiza un correo por cuenta; si el envío falla, se libera.
+  - En el emulador, el enlace se lee en el log (`[EMULADOR] Correo de bienvenida…`).
 - **UI (MVVM + UDF):** un ViewModel por pantalla. Cada pantalla tiene un `XContract.kt` con `XUiState` (los campos en rojo se **derivan** de `error`), `XEvent` y `XEffect`. Los efectos de un solo uso (navegación) salen por `Channel` → `Flow` y se recolectan con `ObserveEffects`. Patrón Route/Screen: los `*NavGraph.kt` obtienen el ViewModel con `hiltViewModel()` y llaman a la `XScreen` **stateless**, que es la que se prueba.
 - **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 600 ms se declaran una sola vez (`NavTransitions`). `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
 - **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore`, `FirebaseFunctions` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
@@ -90,4 +94,4 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 
 ## Configuración externa
 
-Firebase (`smartfood-f62a1`, plan Blaze): Authentication con correo/contraseña, Cloud Firestore (`southamerica-east1`) y Cloud Functions. Reglas en `firestore.rules`: cada usuario solo accede a `users/{su uid}` y `passwordResets` está cerrado a los clientes. Los secretos de Gmail se configuran con `firebase functions:secrets:set` (ver README).
+Firebase (`smartfood-f62a1`, plan Blaze): Authentication con correo/contraseña, Cloud Firestore (`southamerica-east1`) y Cloud Functions. Reglas en `firestore.rules`: cada usuario solo accede a `users/{su uid}` y `passwordResets` y `welcomeEmails` están cerrados a los clientes. Los secretos de Gmail se configuran con `firebase functions:secrets:set` (ver README).

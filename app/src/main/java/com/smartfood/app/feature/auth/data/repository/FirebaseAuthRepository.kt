@@ -13,7 +13,8 @@ import javax.inject.Inject
  * Nombre: FirebaseAuthRepository.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Implementación de [AuthRepository] sobre Firebase Authentication (RF-AUTH-01, 03 y 05).
+ * Descripción: Implementación de [AuthRepository] sobre Firebase Authentication (RF-AUTH-01 y 05). El correo de verificación lo
+ * envía el servidor (spec 004).
  * Cada fallo se clasifica con [com.smartfood.app.feature.auth.data.mapper.FirebaseErrorMapper].
  *
  * @param firebaseAuth Instancia de [FirebaseAuth] provista por Hilt.
@@ -32,11 +33,6 @@ class FirebaseAuthRepository @Inject constructor(
     override suspend fun createAccount(email: String, password: String): Result<String> = safeRunCatching {
         val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
         result.user?.uid ?: throw AuthException(AuthError.Unknown("Firebase no devolvió el usuario creado"))
-    }.mapFirebaseError()
-
-    override suspend fun sendEmailVerification(): Result<Unit> = safeRunCatching {
-        firebaseAuth.currentUser?.sendEmailVerification()?.await()
-        Unit
     }.mapFirebaseError()
 
     override suspend fun deleteCurrentAccount(): Result<Unit> = safeRunCatching {

@@ -27,11 +27,9 @@ class FakeAuthRepository : AuthRepository {
     /** Latencia simulada del inicio de sesión, para probar el estado de carga. */
     var loginDelayMs: Long = 0
     var createAccountResult: Result<String> = Result.success(DEFAULT_UID)
-    var sendVerificationResult: Result<Unit> = Result.success(Unit)
 
     var loginCalls = 0
     var createAccountCalls = 0
-    var sendVerificationCalls = 0
     var deleteAccountCalls = 0
     var logoutCalls = 0
 
@@ -53,11 +51,6 @@ class FakeAuthRepository : AuthRepository {
         lastEmail = email
         lastPassword = password
         return createAccountResult.onSuccess { signedInUserId = it }
-    }
-
-    override suspend fun sendEmailVerification(): Result<Unit> {
-        sendVerificationCalls++
-        return sendVerificationResult
     }
 
     override suspend fun deleteCurrentAccount(): Result<Unit> {
