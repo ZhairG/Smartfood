@@ -1,12 +1,15 @@
 package com.smartfood.app.core.navigation
 
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
 import com.smartfood.app.HiltTestActivity
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -179,5 +182,55 @@ class AppNavigationTest {
 
         // Verificación: Regresamos a LoginScreen
         composeTestRule.onNodeWithText("Bienvenido").assertIsDisplayed()
+    }
+
+    /** Llena el nombre y acepta los términos para comprobar después que el formulario se conserva. */
+    private fun llenarRegistroParcial() {
+        composeTestRule.onNodeWithText("Ej. Pepito Perez").performTextInput("Pepito Perez")
+        composeTestRule.onNodeWithText("Acepto los", substring = true).performClick()
+    }
+
+    /** Abre un documento legal con la acción de la casilla (la misma que usa el lector de pantalla). */
+    private fun abrirDocumento(accion: String, titulo: String) {
+        val acciones = composeTestRule.onNodeWithText("Acepto los", substring = true)
+            .fetchSemanticsNode().config[SemanticsActions.CustomActions]
+        composeTestRule.runOnIdle { acciones.first { it.label == accion }.action() }
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+            composeTestRule.onAllNodesWithText("Vista previa: el contenido definitivo está en redacción")
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+        composeTestRule.onNodeWithText(titulo).assertIsDisplayed()
+    }
+
+    private fun esperarRegistroConDatos() {
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+            composeTestRule.onAllNodesWithText("Crea tu cuenta").fetchSemanticsNodes().isNotEmpty()
+        }
+        composeTestRule.onNodeWithText("Pepito Perez").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Acepto los", substring = true).assertIsOn()
+    }
+
+    @Test
+    fun caLeg0103_terminosYFlechaVolver_conservanElFormulario() {
+        launchAppNavHost()
+        advanceToRegister()
+        llenarRegistroParcial()
+
+        abrirDocumento("Abrir Términos y condiciones", "Términos y condiciones")
+        composeTestRule.onNodeWithContentDescription("Volver").performClick()
+
+        esperarRegistroConDatos()
+    }
+
+    @Test
+    fun caLeg0103_politicaYAtrasDelSistema_conservanElFormulario() {
+        launchAppNavHost()
+        advanceToRegister()
+        llenarRegistroParcial()
+
+        abrirDocumento("Abrir Política de privacidad", "Política de privacidad")
+        composeTestRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+
+        esperarRegistroConDatos()
     }
 }

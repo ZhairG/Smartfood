@@ -1,5 +1,6 @@
 package com.smartfood.app.core.designsystem.components
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -35,16 +36,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -258,23 +267,61 @@ fun SmartFoodCheckbox(
 
 /**
  * Casilla de verificación de aceptación de Términos y Condiciones con enlaces naranja estilo Figma.
+ * Tocar la casilla o el texto alterna la aceptación (CA-01-05); tocar un enlace solo abre su documento
+ * (spec 005, CA-LEG-01-01, CA-LEG-01-02). El toque se resuelve por carácter: así un enlace partido en dos líneas no
+ * tapa el resto del texto. Como la fila fusiona su semántica, los enlaces se ofrecen como acciones del lector de
+ * pantalla (CA-LEG-01-07).
  *
  * @param checked Estado de selección de la casilla.
  * @param onCheckedChange Callback notificado al alternar el estado.
+ * @param onTermsClick Callback del enlace "Términos y condiciones".
+ * @param onPrivacyClick Callback del enlace "Política de privacidad".
  * @param modifier Modificador opcional.
  */
 @Composable
 fun SmartFoodTermsCheckbox(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    onTermsClick: () -> Unit,
+    onPrivacyClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val currentChecked by rememberUpdatedState(checked)
+    val currentOnCheckedChange by rememberUpdatedState(onCheckedChange)
+    val currentOnTermsClick by rememberUpdatedState(onTermsClick)
+    val currentOnPrivacyClick by rememberUpdatedState(onPrivacyClick)
+    val openTermsLabel = stringResource(id = R.string.legal_open_terms_action)
+    val openPrivacyLabel = stringResource(id = R.string.legal_open_privacy_action)
+
+    val textColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val linkStyle = SpanStyle(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.SemiBold)
+    val accept = stringResource(id = R.string.register_terms_accept).trimEnd()
+    val terms = stringResource(id = R.string.register_terms_link)
+    val and = stringResource(id = R.string.register_terms_and).trim()
+    val privacy = stringResource(id = R.string.register_privacy_link)
+    val text = remember(accept, terms, and, privacy, textColor, linkStyle) {
+        buildAnnotatedString {
+            withStyle(SpanStyle(color = textColor)) { append("$accept ") }
+            withAnnotation(LEGAL_LINK_ANNOTATION, TERMS_LINK) { withStyle(linkStyle) { append(terms) } }
+            withStyle(SpanStyle(color = textColor)) { append(" $and ") }
+            withAnnotation(LEGAL_LINK_ANNOTATION, PRIVACY_LINK) { withStyle(linkStyle) { append(privacy) } }
+        }
+    }
+    var textLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
+
     Row(
-        modifier = modifier.toggleable(
-            value = checked,
-            role = Role.Checkbox,
-            onValueChange = onCheckedChange
-        ),
+        modifier = modifier
+            .toggleable(
+                value = checked,
+                role = Role.Checkbox,
+                onValueChange = onCheckedChange
+            )
+            .semantics {
+                customActions = listOf(
+                    CustomAccessibilityAction(openTermsLabel) { currentOnTermsClick(); true },
+                    CustomAccessibilityAction(openPrivacyLabel) { currentOnPrivacyClick(); true }
+                )
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -290,34 +337,33 @@ fun SmartFoodTermsCheckbox(
         )
 
         Text(
-            text = buildAnnotatedString {
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                    append(stringResource(id = R.string.register_terms_accept).trimEnd() + " ")
-                }
-                withStyle(
-                    SpanStyle(
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                ) {
-                    append(stringResource(id = R.string.register_terms_link))
-                }
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                    append(" " + stringResource(id = R.string.register_terms_and).trim() + " ")
-                }
-                withStyle(
-                    SpanStyle(
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                ) {
-                    append(stringResource(id = R.string.register_privacy_link))
-                }
-            },
+            text = text,
             fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            onTextLayout = { textLayout = it },
+            modifier = Modifier.pointerInput(text) {
+                detectTapGestures { position ->
+                    when (textLayout?.legalLinkAt(text, position)) {
+                        TERMS_LINK -> currentOnTermsClick()
+                        PRIVACY_LINK -> currentOnPrivacyClick()
+                        else -> currentOnCheckedChange(!currentChecked)
+                    }
+                }
+            }
         )
     }
+}
+
+private const val LEGAL_LINK_ANNOTATION = "legal_link"
+private const val TERMS_LINK = "terms"
+private const val PRIVACY_LINK = "privacy"
+
+/** Enlace legal del carácter que está exactamente bajo [position], o `null` si no hay uno. */
+private fun TextLayoutResult.legalLinkAt(text: AnnotatedString, position: Offset): String? {
+    val offset = getOffsetForPosition(position)
+    val index = listOf(offset, offset - 1).firstOrNull { it in text.indices && getBoundingBox(it).contains(position) }
+        ?: return null
+    return text.getStringAnnotations(LEGAL_LINK_ANNOTATION, index, index + 1).firstOrNull()?.item
 }
 
 @Preview(showBackground = true)
@@ -346,7 +392,9 @@ private fun SmartFoodTextFieldPreview() {
             )
             SmartFoodTermsCheckbox(
                 checked = true,
-                onCheckedChange = {}
+                onCheckedChange = {},
+                onTermsClick = {},
+                onPrivacyClick = {}
             )
         }
     }

@@ -145,5 +145,6 @@ celular compartido.
 ## 7. Supuestos
 
 - El proyecto de Firebase tiene habilitados **Authentication (correo/contraseña)** y **Cloud Firestore**.
-- Los textos legales de Términos y Política de privacidad se redactarán en otra feature; por ahora los enlaces
-  son decorativos.
+- Los textos legales de Términos y Política de privacidad se redactarán en otra feature. Desde la
+  [spec 005](../005-documentos-legales/spec.md), los enlaces abren cada documento (por ahora una plantilla en vista
+  previa) y el perfil guarda la versión aceptada.

@@ -69,7 +69,9 @@ fun NavGraphBuilder.authGraph(navController: NavHostController) {
             RegisterScreen(
                 state = state,
                 onEvent = viewModel::onEvent,
-                onNavigateToLogin = { navController.popBackStack() }
+                onNavigateToLogin = { navController.popBackStack() },
+                onOpenTerms = { navController.navigate(Route.TermsOfService) },
+                onOpenPrivacy = { navController.navigate(Route.PrivacyPolicy) }
             )
         }
 

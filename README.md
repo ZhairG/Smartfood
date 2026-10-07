@@ -16,7 +16,7 @@ Aplicación Android para reducir el desperdicio de comida en los hogares. Une **
 | 002 Adaptabilidad de la UI          | [`specs/002-adaptabilidad-ui`](specs/002-adaptabilidad-ui/spec.md) | ✅ Implementado |
 | 003 Recuperación de contraseña real | [`specs/003-recuperacion-real`](specs/003-recuperacion-real/spec.md) | ✅ Implementado y desplegado |
 | 004 Correo de bienvenida            | [`specs/004-correo-registro`](specs/004-correo-registro/spec.md) | ✅ Implementado (falta desplegar) |
-| 005 Documentos legales              | — | Pendiente |
+| 005 Documentos legales              | [`specs/005-documentos-legales`](specs/005-documentos-legales/spec.md) | ✅ Implementado (texto en vista previa) |
 | 006 Inventario                      | — | Pendiente |
 | 007 Catálogo de recetas             | — | Pendiente |
 | 008 Agente recomendador             | — | Pendiente |
@@ -50,6 +50,7 @@ com.smartfood.app/
 └── feature/
     ├── splash/          Decide el destino inicial según la sesión
     ├── home/            Saludo y cierre de sesión (punto de entrada de las próximas features)
+    ├── legal/           Términos y Política de privacidad (plantilla en vista previa, spec 005)
     └── auth/
         ├── domain/      model/ (User, AuthError), repository/ (interfaces), usecase/
         ├── data/        repository/ (Firebase y Cloud Functions), mapper/, local/ (DataStore), demo/, di/
@@ -82,6 +83,17 @@ tipografía Poppins, incluida en el APK con licencia OFL (`docs/licenses/OFL-Pop
 
 La recuperación de contraseña y el correo de bienvenida necesitan además las Cloud Functions desplegadas (ver la
 sección siguiente). Sin ellas, usa el modo demo o los emuladores.
+
+## Documentos legales
+
+Los Términos y condiciones y la Política de privacidad ([spec 005](specs/005-documentos-legales/spec.md)) se abren desde
+el registro. Hoy son una **plantilla en vista previa**. Para publicar el texto definitivo:
+
+1. Reemplazar los textos `[Pendiente de redacción…]` de `app/src/main/res/values/strings_legal.xml` (y agregar o quitar
+   secciones en `feature/legal/ui/LegalContent.kt` si cambia la estructura).
+2. Cambiar `LegalVersion.CURRENT` y poner `IS_PREVIEW = false` en `feature/legal/domain/model/LegalDocument.kt`.
+
+Cada perfil guarda la versión aceptada (`termsVersion`) y la fecha del servidor (`termsAcceptedAt`).
 
 ## Ícono de la app
 

@@ -71,12 +71,15 @@ class FakeAuthRepository : AuthRepository {
 /** Fake de [UserRepository] que guarda los perfiles en memoria. */
 class FakeUserRepository : UserRepository {
     val profiles = mutableMapOf<String, User>()
+    /** Versión de los documentos legales aceptada por cada perfil creado. */
+    val acceptedTermsVersions = mutableMapOf<String, String>()
     var createProfileResult: Result<Unit>? = null
     var getProfileError: AuthError? = null
 
-    override suspend fun createProfile(user: User): Result<Unit> {
+    override suspend fun createProfile(user: User, acceptedTermsVersion: String): Result<Unit> {
         createProfileResult?.let { return it }
         profiles[user.uid] = user
+        acceptedTermsVersions[user.uid] = acceptedTermsVersion
         return Result.success(Unit)
     }
 

@@ -46,6 +46,8 @@ import com.smartfood.app.core.designsystem.theme.titleStyle
  * @param state Objeto de estado inmutable [RegisterUiState] proveniente del ViewModel.
  * @param onEvent Callback centralizado para despachar eventos [RegisterEvent] hacia el ViewModel.
  * @param onNavigateToLogin Callback para navegar de regreso a la pantalla de Inicio de Sesión.
+ * @param onOpenTerms Callback que abre los Términos y condiciones (spec 005, CA-LEG-01-01).
+ * @param onOpenPrivacy Callback que abre la Política de privacidad (spec 005, CA-LEG-01-02).
  * @param modifier Modificador opcional para la apariencia exterior.
  */
 @Composable
@@ -53,6 +55,8 @@ fun RegisterScreen(
     state: RegisterUiState,
     onEvent: (RegisterEvent) -> Unit,
     onNavigateToLogin: () -> Unit,
+    onOpenTerms: () -> Unit,
+    onOpenPrivacy: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AuthScreenScaffold(
@@ -70,7 +74,9 @@ fun RegisterScreen(
 
         SmartFoodTermsCheckbox(
             checked = state.acceptedTerms,
-            onCheckedChange = remember(onEvent) { { checked -> onEvent(RegisterEvent.AcceptedTermsChanged(checked)) } }
+            onCheckedChange = remember(onEvent) { { checked -> onEvent(RegisterEvent.AcceptedTermsChanged(checked)) } },
+            onTermsClick = onOpenTerms,
+            onPrivacyClick = onOpenPrivacy
         )
         // Con alto de sobra, el botón y el enlace bajan como en Figma (nodo 585:4447, CA-UI-07-03).
         FlexibleGap(minHeight = LocalFormMetrics.current.sectionSpacing)
@@ -208,7 +214,9 @@ private fun RegisterScreenPreview() {
         RegisterScreen(
             state = RegisterUiState(),
             onEvent = {},
-            onNavigateToLogin = {}
+            onNavigateToLogin = {},
+            onOpenTerms = {},
+            onOpenPrivacy = {}
         )
     }
 }

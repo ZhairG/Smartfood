@@ -94,13 +94,13 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
 
     @Test
     fun ca_ui_01_01_registro_cabeSinScroll() {
-        mostrar { RegisterScreen(RegisterUiState(acceptedTerms = true), {}, {}) }
+        mostrar { RegisterScreen(RegisterUiState(acceptedTerms = true), {}, {}, {}, {}) }
         assertCabeSinScroll("Crear Cuenta")
     }
 
     @Test
     fun ca_ui_01_01_registroConMensajeDeError_cabeSinScroll() {
-        mostrar { RegisterScreen(RegisterUiState(acceptedTerms = true, error = AuthError.EmailAlreadyInUse), {}, {}) }
+        mostrar { RegisterScreen(RegisterUiState(acceptedTerms = true, error = AuthError.EmailAlreadyInUse), {}, {}, {}, {}) }
         assertCabeSinScroll("Crear Cuenta")
     }
 

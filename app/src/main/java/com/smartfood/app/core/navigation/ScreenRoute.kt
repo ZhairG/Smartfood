@@ -20,5 +20,7 @@ enum class ScreenRoute(val routeName: String) {
     REGISTER_SUCCESS("register_success"),
     PASSWORD_RECOVERY("password_recovery"),
     PASSWORD_RECOVERY_SUCCESS("password_recovery_success"),
+    TERMS_OF_SERVICE("terms_of_service"),
+    PRIVACY_POLICY("privacy_policy"),
     HOME("home")
 }

@@ -64,6 +64,18 @@ sealed interface Route {
         override val screenRoute: ScreenRoute = ScreenRoute.PASSWORD_RECOVERY_SUCCESS
     }
 
+    /** Términos y condiciones (spec 005). */
+    @Serializable
+    data object TermsOfService : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.TERMS_OF_SERVICE
+    }
+
+    /** Política de privacidad (spec 005). */
+    @Serializable
+    data object PrivacyPolicy : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.PRIVACY_POLICY
+    }
+
     /** Pantalla principal (Home) de la aplicación. */
     @Serializable
     data object Home : Route {

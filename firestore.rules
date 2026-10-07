@@ -1,11 +1,20 @@
 rules_version = '2';
 
-// Reglas de seguridad de SmartFood (spec 001, RNF-02; spec 003, RNF-REC-02; spec 004, RNF-MAIL-04).
+// Reglas de seguridad de SmartFood (spec 001, RNF-02; spec 003, RNF-REC-02; spec 004, RNF-MAIL-04;
+// spec 005, CA-LEG-02-02).
 // Cada usuario solo puede leer y escribir su propio perfil. Todo lo demás está denegado.
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
     match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, update, delete: if isOwner(uid);
+      // Al crear el perfil se exige la constancia de aceptación de los documentos legales, con la hora del servidor.
+      allow create: if isOwner(uid)
+        && request.resource.data.termsVersion is string
+        && request.resource.data.termsAcceptedAt == request.time;
     }
 
     // Recuperación de contraseña: solo la usan las Cloud Functions con el Admin SDK, que no pasa por estas reglas.
