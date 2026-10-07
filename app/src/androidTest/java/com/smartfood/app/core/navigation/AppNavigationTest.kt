@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
 import com.smartfood.app.HiltTestActivity
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
@@ -184,10 +185,13 @@ class AppNavigationTest {
         composeTestRule.onNodeWithText("Bienvenido").assertIsDisplayed()
     }
 
-    /** Llena el nombre y acepta los términos para comprobar después que el formulario se conserva. */
+    /**
+     * Llena el nombre y acepta los términos para comprobar después que el formulario se conserva. La casilla se
+     * marca con su acción semántica: un toque en el centro de la fila caería sobre el enlace de los Términos.
+     */
     private fun llenarRegistroParcial() {
         composeTestRule.onNodeWithText("Ej. Pepito Perez").performTextInput("Pepito Perez")
-        composeTestRule.onNodeWithText("Acepto los", substring = true).performClick()
+        composeTestRule.onNodeWithText("Acepto los", substring = true).performSemanticsAction(SemanticsActions.OnClick)
     }
 
     /** Abre un documento legal con la acción de la casilla (la misma que usa el lector de pantalla). */
