@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Feature | `004-correo-registro` |
-| Estado | Implementada (v1) |
+| Estado | Implementada y desplegada (v1) |
 | Fecha | 2026-10-06 |
 | Depende de | 001-autenticacion (HU-01), 003-recuperacion-real (servidor y correo) |
 | Afecta | Registro (CA-01-07, RF-AUTH-03) |

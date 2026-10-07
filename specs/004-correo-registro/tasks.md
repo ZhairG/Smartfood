@@ -24,7 +24,10 @@
 ## Fase 3: Cierre
 - [x] T012 `README.md` y `AGENTS.md`.
 - [x] T013 Verificación local: `npm test`, `testDebugUnitTest` y `assembleDebug`.
-- [ ] T014 Despliegue (`firebase deploy --only functions,firestore:rules`) y checklist con el emulador y con un correo real.
+- [x] T014 Despliegue de `sendWelcomeEmail` en `smartfood-f62a1` (2026-10-07, `firebase deploy --only functions`):
+  - El primer intento falló porque los permisos del agente de servicio de Eventarc aún no se propagaban. Se reintentó a los 3 minutos.
+  - Las reglas no se publicaron: `welcomeEmails` ya queda cerrada por la regla por defecto, y publicarlas ahora exigiría la constancia de la spec 005 a las versiones anteriores de la app.
+- [x] T015 Checklist en producción (punto 5): registro con un correo real; el log dice `SENT`, el correo llega y el enlace verifica la cuenta.
 
 ## Matriz de trazabilidad
 
@@ -33,9 +36,9 @@ app (`app/src/test`), **M** = verificación manual (checklist).
 
 | Criterio | Pruebas |
 |---|---|
-| CA-MAIL-01-01 | S (3), M |
-| CA-MAIL-01-02 | M |
-| CA-MAIL-01-03 | U `RegisterUseCaseTest`, M |
+| CA-MAIL-01-01 | S (3), M (producción, 2026-10-07) |
+| CA-MAIL-01-02 | M (producción, 2026-10-07) |
+| CA-MAIL-01-03 | U `RegisterUseCaseTest`, M (producción, 2026-10-07) |
 | CA-MAIL-01-04 | S (2), M |
 | CA-MAIL-02-01 | S |
 | CA-MAIL-02-02 | S |
