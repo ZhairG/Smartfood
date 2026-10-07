@@ -46,6 +46,9 @@ res/values/strings_legal.xml        textos de la plantilla (RNF-LEG-01)
 - Primer elemento: píldora de vista previa en `secondaryContainer`/`onSecondaryContainer` con "Vista previa: el
   contenido definitivo está en redacción" y la versión (CA-LEG-01-05). Solo se muestra si `LegalVersion.IS_PREVIEW`.
 - `LazyColumn` con el texto introductorio y las secciones. Cada título lleva `semantics { heading() }` (CA-LEG-01-06).
+- Fondo `surface` (el panel claro). En este design system `background` es el verde del encabezado de marca, y el
+  título y los encabezados en `primary` no se verían sobre él. Texto en Poppins (`bodyLarge`/`labelLarge`): los
+  estilos `bodyMedium`, `bodySmall` y `titleMedium` del tema no la usan.
 - Colores del `MaterialTheme` (claro y oscuro salen del tema; no se usa `isSystemInDarkTheme`). `SystemBarEffect`
   ajusta los íconos de la barra de estado según `LocalIsDarkTheme`.
 - Ancho máximo del texto de 600 dp y márgenes de `MaterialTheme.spacing`.

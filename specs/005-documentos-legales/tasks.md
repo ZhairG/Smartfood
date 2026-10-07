@@ -26,7 +26,14 @@
 - [x] T013 `README.md` y `AGENTS.md`.
 - [x] T014 Verificación en dispositivo (V2436, 2026-10-07): `RegisterScreenTest` 10/10, `LegalDocumentScreenTest` 5/5, `AppNavigationTest` 7/7, `AdaptiveLayoutTest` 24/24 y `FormFocusTest` 6/6.
   - `AppNavigationTest` marca la casilla con su acción semántica: un toque en el centro de la fila cae sobre el enlace de los Términos y abre el documento, que es lo correcto.
-- [ ] T016 Checklist manual (puntos 1 a 6), en especial TalkBack (CA-LEG-01-07).
+- [x] T016 Checklist manual (2026-10-07, V2436 con Firebase real), todos los puntos verificados:
+  - Puntos 1 a 3: capturas a 384 dp y a 360 dp (`wm density 320`).
+  - Punto 4 (TalkBack): lo verificó el equipo.
+  - Punto 5: perfil real en producción.
+  - Punto 6: emuladores.
+- [x] T017 Defecto encontrado en el punto 1: la pantalla usaba `background`, que en este design system es el verde de la marca, así que el título, la flecha y los encabezados (en `primary`) no se veían.
+  - Ahora usa `surface`, texto Poppins (`bodyLarge`/`labelLarge`) y párrafos en `onSurface` al 80 %.
+  - Pruebas nuevas en `LegalDocumentScreenTest`: el fondo es GreenLight en modo claro y SurfaceDark en modo oscuro.
 - [ ] T015 Publicar las reglas (`firebase deploy --only firestore:rules`) **junto con** la versión de la app que envía la constancia: una app anterior ya no podría crear perfiles.
 
 ## Matriz de trazabilidad
@@ -36,14 +43,14 @@ Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada 
 
 | Criterio | Pruebas |
 |---|---|
-| CA-LEG-01-01 | I `RegisterScreenTest.caLeg0101_*`, M |
-| CA-LEG-01-02 | I `RegisterScreenTest.caLeg0102_*`, M |
+| CA-LEG-01-01 | I `RegisterScreenTest.caLeg0101_*`, M ✅ |
+| CA-LEG-01-02 | I `RegisterScreenTest.caLeg0102_*`, M ✅ |
 | CA-LEG-01-03 | I `AppNavigationTest.caLeg0103_*` (2), I `LegalDocumentScreenTest.caLeg0103_*` |
 | CA-LEG-01-04 | I `RegisterScreenTest.caLeg0104_*` |
 | CA-LEG-01-05 | I `LegalDocumentScreenTest.caLeg0105_*` (2) |
-| CA-LEG-01-06 | I `LegalDocumentScreenTest.caLeg0106_*` (2), M |
-| CA-LEG-01-07 | I `RegisterScreenTest.caLeg0107_*`, M (TalkBack) |
-| CA-LEG-02-01 | U `RegisterUseCaseTest`, M |
+| CA-LEG-01-06 | I `LegalDocumentScreenTest.caLeg0106_*` (4), M (360 dp) |
+| CA-LEG-01-07 | I `RegisterScreenTest.caLeg0107_*`, M (TalkBack) ✅ |
+| CA-LEG-02-01 | U `RegisterUseCaseTest`, M (producción: `termsVersion` y `termsAcceptedAt` = `createdAt`) ✅ |
 | CA-LEG-02-02 | M (verificado el 2026-10-06 con los emuladores por REST: sin versión, con fecha del cliente y en el perfil de otro usuario → 403; con constancia → 200) |
 
 ### Checklist de verificación manual
@@ -55,7 +62,8 @@ Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada 
    aviso de vista previa, y la casilla no cambia (CA-LEG-01-01, 02 y 05).
 2. Escribir el nombre, marcar la casilla, abrir un documento y volver con la flecha y con el "atrás" del sistema: el
    formulario sigue igual (CA-LEG-01-03).
-3. Activar el modo oscuro y revisar el documento a 360 dp de ancho (CA-LEG-01-06).
+3. Revisar el documento a 360 dp de ancho (CA-LEG-01-06). El modo oscuro no se puede activar desde la app (siempre
+   `ThemeMode.LIGHT`, spec 002); lo cubre `LegalDocumentScreenTest`.
 4. Con TalkBack, en la casilla: el menú de acciones ofrece abrir los dos documentos (CA-LEG-01-07).
 5. Registrar una cuenta y revisar en la UI del emulador que `users/{uid}` tiene `termsVersion` y `termsAcceptedAt`
    (CA-LEG-02-01).

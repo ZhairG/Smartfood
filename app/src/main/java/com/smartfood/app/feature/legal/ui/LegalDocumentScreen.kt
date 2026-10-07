@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
@@ -66,7 +67,8 @@ fun LegalDocumentScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
+        // En este design system `background` es el verde del encabezado de marca; el panel claro es `surface`.
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -85,7 +87,7 @@ fun LegalDocumentScreen(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                     navigationIconContentColor = MaterialTheme.colorScheme.primary
                 )
@@ -138,13 +140,12 @@ private fun PreviewNotice(modifier: Modifier = Modifier) {
         Column {
             Text(
                 text = stringResource(id = R.string.legal_preview_notice),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Text(
                 text = stringResource(id = R.string.legal_version, LegalVersion.CURRENT),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp, lineHeight = 19.5.sp),
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
@@ -157,15 +158,15 @@ private fun LegalSectionBlock(section: LegalSection, modifier: Modifier = Modifi
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
         Text(
             text = stringResource(id = section.title),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.labelLarge.copy(fontSize = 17.sp, lineHeight = 25.5.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.semantics { heading() }
         )
         Text(
             text = stringResource(id = section.body),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
+            // onSurfaceVariant es gris claro, pensado para subtítulos; en párrafos largos el contraste es bajo.
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
     }
 }
