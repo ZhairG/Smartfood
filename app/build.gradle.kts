@@ -49,6 +49,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        // java.time (LocalDate, Clock) en el dominio con minSdk 24 (spec 006, plan §9).
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         compose = true
@@ -90,6 +92,9 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.functions)
+
+    // java.time con minSdk 24
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     // Preferencias locales ("Recuérdame")
     implementation(libs.androidx.datastore.preferences)
