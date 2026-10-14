@@ -100,3 +100,5 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 ## Configuración externa
 
 Firebase (`smartfood-f62a1`, plan Blaze): Authentication con correo/contraseña, Cloud Firestore (`southamerica-east1`) y Cloud Functions. Reglas en `firestore.rules`: cada usuario solo accede a `users/{su uid}` (al crearlo debe incluir la constancia de la spec 005), y `passwordResets` y `welcomeEmails` están cerrados a los clientes. Los secretos de Gmail se configuran con `firebase functions:secrets:set` (ver README).
+
+La API key de Android tiene restricción por paquete + SHA-1. Cada computador necesita el `google-services.json` vigente (no se versiona) y su SHA-1 de debug registrada en Google Cloud Console. Si en Logcat aparece `API key expired` o `Requests from this Android client application com.smartfood.app are blocked`, la causa es esa configuración, no el código (ver "Primero: configurar tu equipo" en el README).
