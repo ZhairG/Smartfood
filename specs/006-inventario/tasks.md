@@ -7,15 +7,15 @@
 
 ## Fase 0: Preparación
 - [x] T001 La spec, el plan y las tareas en `master` (PR #17), la 006 en la lista de specs de `AGENTS.md` y las tareas divididas en Issues del milestone "Spec 006: Inventario". Cada Issue se trabaja en su propia rama `feature/006-<issue>-<tema>`.
-- [ ] T002 El equipo confirma si se agregan cantidad, unidad o precio (spec §7). Si se agregan, se actualizan primero la spec y el plan. → #18
+- [x] T002 El equipo confirma si se agregan cantidad, unidad o precio (spec §7). Si se agregan, se actualizan primero la spec y el plan. **Decisión (2026-10-14):** cantidad y unidad opcionales (CA-INV-01-08, 02-08, 02-09); el precio queda para la spec de presupuesto. → #18
 
 ## Fase 1: Dominio (Kotlin puro y pruebas JVM)
 - [ ] T003 `coreLibraryDesugaring` en `app/build.gradle.kts` y `libs.versions.toml` (plan §9), necesario para `java.time` con `minSdk` 24. → #19
-- [ ] T004 Modelos: `InventoryItem`, `ItemPhoto`, `FoodCategory`, `ExpiryStatus`, `InventorySection`, `ItemDraft`, `LocalPhoto`, `InventoryError` + `InventoryException` + `toInventoryError()`, `InventoryField`, `SpeechEvent` y `SpeechError` (plan §2). → #20
+- [ ] T004 Modelos: `InventoryItem`, `ItemPhoto`, `FoodCategory`, `ExpiryStatus`, `Quantity`, `QuantityUnit`, `InventorySection`, `ItemDraft`, `ValidItem`, `LocalPhoto`, `InventoryError` + `InventoryException` + `toInventoryError()`, `InventoryField`, `SpeechEvent` y `SpeechError` (plan §2). → #20
 - [ ] T005 Interfaces: `InventoryRepository`, `PhotoRepository`, `SpeechToText`, `ExpiryReminderScheduler` e `InventoryPreferences`. → #20
 - [ ] T006 [P] Fakes en `testutil/`: `FakeInventoryRepository`, `FakePhotoRepository`, `FakeSpeechToText`, `FakeExpiryReminderScheduler`, `FakeInventoryPreferences` y `FixedClock`. → #21
 - [ ] T007 `ClassifyExpiryUseCase` y `ObserveInventoryUseCase`, con pruebas (CA-INV-01-01, 01-04, 01-06; RF-INV-02). → #22
-- [ ] T008 `ValidateItemUseCase`, con pruebas (CA-INV-02-02, 02-03, 02-04, 03-03; RF-INV-03). → #23
+- [ ] T008 `ValidateItemUseCase`, con pruebas (CA-INV-02-02, 02-03, 02-04, 02-08, 02-09, 03-03; RF-INV-03). → #23
 - [ ] T009 `AddItemUseCase`, `UpdateItemUseCase` y `DeleteItemUseCase`, con pruebas de orden, rollback de la foto y programación de avisos (CA-INV-02-06, 03-02, 04-02, 05-04 a 05-06, 08-01). → #24
 - [ ] T010 [P] `SearchInventoryUseCase`, con pruebas (CA-INV-06-02 a 06-05, 07-04; RF-INV-05). → #25
 - [ ] T011 [P] `ParseSpokenIngredientsUseCase`, con pruebas (CA-INV-07-03; RF-INV-06). → #26
@@ -26,12 +26,12 @@
 - [ ] T014 Dependencias: `firebase-storage`, CameraX, Coil 3, WorkManager y `hilt-work` (plan §9). → #19
 - [ ] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador. → #29
 - [ ] T016 `InventoryErrorMapper`, con pruebas (plan §10). → #30
-- [ ] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`) (RF-INV-01). → #30
+- [ ] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). → #30
 - [ ] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). → #31
 - [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5). → #32
 - [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente. → #33
 - [ ] T021 `InventoryDataModule`, que enlaza las interfaces. → #29
-- [ ] T022 Reglas: subcolección `inventory` en `firestore.rules` y `storage.rules` nuevo (RNF-INV-01, plan §3). → #34
+- [ ] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). → #34
 
 ## Fase 3: Design system
 - [ ] T023 `SmartFoodTextField` con `leadingContent` y `label: String?`, sin cambios en los usos actuales. Las pruebas de autenticación siguen verdes. → #35
@@ -47,7 +47,7 @@
 
 ## Fase 5: Pantallas
 - [ ] T031 Lista: `InventoryContract`, `InventoryViewModel` e `InventoryScreen` con `InventoryItemRow` y `ExpirySectionHeader`, y sus pruebas (HU-INV-01). → #39
-- [ ] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel` y `ProductEditorScreen` con `PhotoSlot`, `CategorySheet` y `DatePicker` sin días pasados, y sus pruebas (HU-INV-02, 03, 04). → #40
+- [ ] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel` y `ProductEditorScreen` con `PhotoSlot`, `CategorySheet`, `DatePicker` sin días pasados y la fila de cantidad con su hoja de unidad, y sus pruebas (HU-INV-02, 03, 04; CA-INV-02-08, 02-09). La fila de la lista muestra la cantidad (CA-INV-01-08, en T031). → #40
 - [ ] T033 Cámara: `ProductCameraScreen` (CameraX, recuadro de encuadre, resultado por `savedStateHandle`), con el permiso y la explicación (HU-INV-05). → #41
 - [ ] T034 Búsqueda: `InventorySearchContract`, `InventorySearchViewModel` e `InventorySearchScreen` con `CategoryChips` y "x", y sus pruebas (HU-INV-06). → #42
 - [ ] T035 Voz: `VoiceSearchCard` y `VoiceSearchOverlay` ("Habla ahora", "…", error con "Reintentar"), el permiso de micrófono y la cancelación, con pruebas del ViewModel y de la pantalla (HU-INV-07). → #43
@@ -79,6 +79,7 @@ verificación manual (checklist).
 | CA-INV-01-05 | U `InventoryViewModelTest`, I `InventoryScreenTest` |
 | CA-INV-01-06 | U `ClassifyExpiryUseCaseTest` |
 | CA-INV-01-07 | U `InventoryViewModelTest` (el flujo del fake emite), M 1 |
+| CA-INV-01-08 | I `InventoryScreenTest`, M 1 |
 | CA-INV-02-01 | I `ProductEditorScreenTest` |
 | CA-INV-02-02 | U `ValidateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest` |
 | CA-INV-02-03 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
@@ -86,6 +87,8 @@ verificación manual (checklist).
 | CA-INV-02-05 | I `ProductEditorScreenTest` |
 | CA-INV-02-06 | U `AddItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest` |
 | CA-INV-02-07 | U `ProductEditorViewModelTest`, M 7 |
+| CA-INV-02-08 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
+| CA-INV-02-09 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-03-01 | U `ProductEditorViewModelTest` |
 | CA-INV-03-02 | U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest` |
 | CA-INV-03-03 | U `ValidateItemUseCaseTest` |
@@ -137,8 +140,9 @@ verificación manual (checklist).
 **Con los emuladores** (`firebase emulators:start --only auth,firestore,storage` y la app con
 `-PuseFirebaseEmulator=true`), en un dispositivo real o un emulador con cámara y micrófono:
 
-1. Añadir "Leche Entera" (Lácteos, vence en 2 días) y "Pasta" (Cereales, vence en 60 días): aparecen en "Próximo a
-   vencer" y en "Fresco" sin recargar. El calendario no deja elegir ayer (CA-INV-01-07, 02-04).
+1. Añadir "Leche Entera" (Lácteos, vence en 2 días, 1,5 L) y "Pasta" (Cereales, vence en 60 días, sin cantidad):
+   aparecen en "Próximo a vencer" y en "Fresco" sin recargar; la leche muestra "1,5 L" y la pasta no muestra cantidad.
+   El calendario no deja elegir ayer (CA-INV-01-07, 01-08, 02-04).
 2. Añadir "Carne" con foto: el visor muestra el recuadro, la miniatura aparece en la lista y en la UI del emulador
    (Storage) el archivo pesa menos de 400 KB. Reemplazar la foto: el archivo anterior desaparece (CA-INV-05-01,
    05-02, 05-05; RNF-INV-02).
@@ -154,7 +158,8 @@ verificación manual (checklist).
    o la App Inspection de WorkManager): llega "«…» vence pronto" y al tocarla se abre "Mi Inventario". En Android
    13+, el permiso se pidió después del primer guardado y no se vuelve a pedir (CA-INV-08-01, 08-02, 08-04, 08-05).
 9. Reglas: con la REST del emulador, leer `users/{otroUid}/inventory` → `PERMISSION_DENIED`; subir a Storage un
-   JPEG de 3 MB → denegado; crear un producto con categoría "X" → denegado (RNF-INV-01, RNF-INV-02).
+   JPEG de 3 MB → denegado; crear un producto con categoría "X", con `quantity` sin `unit` o con `quantity: 0` → denegado (RNF-INV-01,
+   RNF-INV-02).
 
 **En producción** (después del despliegue):
 

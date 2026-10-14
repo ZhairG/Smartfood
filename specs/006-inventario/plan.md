@@ -8,9 +8,10 @@
 feature/inventory/
 ├── domain/                                   Kotlin puro (java.time permitido)
 │   ├── model/
-│   │   ├── InventoryItem.kt                  InventoryItem, ItemPhoto, FoodCategory, ExpiryStatus
+│   │   ├── InventoryItem.kt                  InventoryItem, ItemPhoto, FoodCategory, ExpiryStatus, Quantity,
+│   │   │                                     QuantityUnit, InventorySection, ItemDraft, ValidItem, LocalPhoto
 │   │   ├── InventoryError.kt                 InventoryError (sealed), InventoryException, toInventoryError()
-│   │   ├── InventoryField.kt                 NAME, EXPIRY, CATEGORY
+│   │   ├── InventoryField.kt                 NAME, EXPIRY, CATEGORY, QUANTITY
 │   │   └── Speech.kt                         SpeechEvent, SpeechError
 │   ├── repository/
 │   │   ├── InventoryRepository.kt
@@ -68,6 +69,10 @@ res/values/strings_inventory.xml              todos los textos de la feature
 ```kotlin
 enum class FoodCategory { FRUITS, DAIRY, PROTEINS, VEGETABLES, GRAINS, OTHER }   // código estable en la nube
 enum class ExpiryStatus { EXPIRED, EXPIRING_SOON, FRESH }
+enum class QuantityUnit { UNITS, GRAMS, KILOGRAMS, POUNDS, MILLILITERS, LITERS }   // código estable en la nube
+
+/** Cantidad con su unidad: al ser un solo valor opcional, "van juntas" queda en el tipo (T002). */
+data class Quantity(val amount: Double, val unit: QuantityUnit)
 
 data class ItemPhoto(val path: String, val url: String)
 data class InventoryItem(
@@ -75,13 +80,23 @@ data class InventoryItem(
     val name: String,
     val category: FoodCategory,
     val expiresOn: LocalDate,
+    val quantity: Quantity? = null,
     val photo: ItemPhoto? = null,
-    // La cantidad y el precio se agregarán aquí como campos opcionales (spec §7).
+    // El precio se agregará aquí como campo opcional en la spec de presupuesto (spec §7).
 )
 data class InventorySection(val status: ExpiryStatus, val items: List<InventoryItem>)
 
-/** Borrador del formulario: lo que valida ValidateItemUseCase. */
-data class ItemDraft(val name: String, val expiresOn: LocalDate?, val category: FoodCategory?)
+/** Borrador del formulario: lo que valida ValidateItemUseCase. La cantidad llega como texto, tal como se escribió. */
+data class ItemDraft(
+    val name: String,
+    val expiresOn: LocalDate?,
+    val category: FoodCategory?,
+    val quantityText: String = "",
+    val unit: QuantityUnit? = null,
+)
+
+/** Resultado de ValidateItemUseCase: nombre recortado, campos obligatorios presentes y cantidad interpretada. */
+data class ValidItem(val name: String, val expiresOn: LocalDate, val category: FoodCategory, val quantity: Quantity?)
 
 @JvmInline value class LocalPhoto(val filePath: String)
 
@@ -92,7 +107,7 @@ sealed interface InventoryError {
     data object PhotoUploadFailed : InventoryError
     data object NotAuthenticated : InventoryError
     data class Validation(val field: InventoryField, val reason: Reason) : InventoryError {
-        enum class Reason { EMPTY, TOO_LONG, PAST_DATE }
+        enum class Reason { EMPTY, TOO_LONG, PAST_DATE, INVALID }   // INVALID: cantidad fuera de rango o no numérica
     }
     data class Unknown(val cause: String?) : InventoryError
 }
@@ -117,7 +132,7 @@ enum class SpeechError { NO_MATCH, NOT_AVAILABLE, PERMISSION_DENIED, NETWORK }
 |---|---|
 | `ClassifyExpiryUseCase(clock)` | `invoke(expiresOn): ExpiryStatus`. Días = `ChronoUnit.DAYS.between(hoy, expiresOn)`; < 0 vencido, 0..3 próximo, > 3 fresco (CA-INV-01-06). |
 | `ObserveInventoryUseCase` | `Flow<List<InventorySection>>` en orden EXPIRED, EXPIRING_SOON, FRESH, sin secciones vacías, ordenado por fecha y nombre. |
-| `ValidateItemUseCase(clock)` | `invoke(draft, originalExpiresOn: LocalDate?): Result<ValidItem>`. El nombre recortado debe tener entre 1 y 50 caracteres; la fecha y la categoría son obligatorias; la fecha no puede ser anterior a hoy, salvo si es igual a `originalExpiresOn` (CA-INV-03-03). Además expone `isComplete(draft)` para habilitar el botón (CA-INV-02-02). |
+| `ValidateItemUseCase(clock)` | `invoke(draft, originalExpiresOn: LocalDate?): Result<ValidItem>`. El nombre recortado debe tener entre 1 y 50 caracteres; la fecha y la categoría son obligatorias; la fecha no puede ser anterior a hoy, salvo si es igual a `originalExpiresOn` (CA-INV-03-03). Cantidad: el texto recortado vacío da `quantity = null` (la unidad se descarta); si no, se cambia la coma por punto y debe ser un número > 0, ≤ 9999 y con 2 decimales como máximo, o falla con `Validation(QUANTITY, INVALID)` (CA-INV-02-09). Sin unidad se usa `UNITS` (CA-INV-02-08). Además expone `isComplete(draft)`, que solo mira nombre, fecha y categoría, para habilitar el botón (CA-INV-02-02). |
 | `AddItemUseCase` | Valida → `newItemId()` → sube la foto si hay → `saveItem`. Si `saveItem` falla, borra la foto subida (CA-INV-05-06). La primera vez que guarda, programa los avisos. |
 | `UpdateItemUseCase` | Valida → sube la foto nueva si cambió → `saveItem` → borra la foto anterior si se reemplazó o se quitó. Si `saveItem` falla, borra la foto nueva. Que falle el borrado de la foto anterior no falla la operación (queda en el log). |
 | `DeleteItemUseCase` | `deleteItem` → borra la foto si había (CA-INV-04-02). |
@@ -131,7 +146,7 @@ enum class SpeechError { NO_MATCH, NOT_AVAILABLE, PERMISSION_DENIED, NETWORK }
 |---|---|---|---|
 | `InventoryScreen` | `isLoading`, `sections`, `error` | `AddClicked`, `SearchClicked`, `EditClicked(id)`, `RetryClicked` | `NavigateToEditor(id?)`, `NavigateToSearch` |
 | `InventorySearchScreen` | `query`, `selectedCategory`, `results`, `isVoiceAvailable`, `voice: VoiceUiState {Hidden, Listening, Processing, Failed(error)}` | `QueryChanged`, `ClearQuery`, `CategorySelected(c?)`, `VoiceClicked`, `VoicePermissionResult(granted)`, `VoiceRetry`, `VoiceDismissed`, `ResultClicked(id)` | `RequestMicPermission`, `NavigateToEditor(id)`, `ShowPermissionRationale` |
-| `ProductEditorScreen` | `mode {Add, Edit}`, `name`, `expiresOn`, `category`, `photo: PhotoUiState {None, Local(path), Remote(url)}`, `isSaveEnabled`, `isSaving`, `error`, `dialog: EditorDialog?` | `NameChanged`, `ExpiryPicked`, `CategoryPicked`, `CameraClicked`, `PhotoCaptured(path)`, `RemovePhotoClicked`, `RemovePhotoConfirmed`, `SaveClicked`, `DeleteClicked`, `DeleteConfirmed`, `DialogDismissed` | `RequestCameraPermission`, `NavigateToCamera`, `RequestNotificationPermission`, `NavigateBack` |
+| `ProductEditorScreen` | `mode {Add, Edit}`, `name`, `expiresOn`, `category`, `quantityText`, `unit`, `photo: PhotoUiState {None, Local(path), Remote(url)}`, `isSaveEnabled`, `isSaving`, `error`, `dialog: EditorDialog?` | `NameChanged`, `ExpiryPicked`, `CategoryPicked`, `QuantityChanged`, `UnitPicked`, `CameraClicked`, `PhotoCaptured(path)`, `RemovePhotoClicked`, `RemovePhotoConfirmed`, `SaveClicked`, `DeleteClicked`, `DeleteConfirmed`, `DialogDismissed` | `RequestCameraPermission`, `NavigateToCamera`, `RequestNotificationPermission`, `NavigateBack` |
 
 - Los campos en rojo se **derivan** de `error` (`InventoryError.Validation.field`), como en autenticación.
 - `isSaveEnabled` viene de `ValidateItemUseCase.isComplete`; el ViewModel no repite reglas.
@@ -151,14 +166,17 @@ users/{uid}/inventory/{itemId}
   ├── nameNormalized  : string     minúsculas sin tildes (para futuras consultas en el servidor)
   ├── category        : string     FRUITS | DAIRY | PROTEINS | VEGETABLES | GRAINS | OTHER
   ├── expiresOn       : string     "yyyy-MM-dd" (día sin hora; ADR-INV-02)
+  ├── quantity        : number?    > 0 y ≤ 9999; presente solo junto con unit (T002)
+  ├── unit            : string?    UNITS | GRAMS | KILOGRAMS | POUNDS | MILLILITERS | LITERS
   ├── photoPath       : string?    ruta en Storage
   ├── photoUrl        : string?    URL de descarga
   ├── createdAt       : timestamp  serverTimestamp (solo al crear)
   └── updatedAt       : timestamp  serverTimestamp
 ```
 
-Se escribe y se lee con `Map` (sin reflexión, por R8), igual que `FirestoreUserRepository`. Agregar `quantity`,
-`unit` o `price` más adelante es agregar claves opcionales: los documentos viejos siguen siendo válidos.
+Se escribe y se lee con `Map` (sin reflexión, por R8), igual que `FirestoreUserRepository`. Sin cantidad, las claves
+`quantity` y `unit` no se escriben. Agregar `price` más adelante es agregar otra clave opcional: los documentos viejos
+siguen siendo válidos.
 
 Reglas (`firestore.rules`):
 
@@ -168,7 +186,14 @@ match /users/{uid}/inventory/{itemId} {
     return d.name is string && d.name.size() > 0 && d.name.size() <= 50
       && d.category in ['FRUITS','DAIRY','PROTEINS','VEGETABLES','GRAINS','OTHER']
       && d.expiresOn is string && d.expiresOn.matches('^\\d{4}-\\d{2}-\\d{2}$')
+      && validQuantity(d)
       && d.updatedAt == request.time;
+  }
+  // Cantidad y unidad van juntas: las dos ausentes o las dos válidas (T002).
+  function validQuantity(d) {
+    return (!('quantity' in d) && !('unit' in d))
+      || (d.quantity is number && d.quantity > 0 && d.quantity <= 9999
+          && d.unit in ['UNITS','GRAMS','KILOGRAMS','POUNDS','MILLILITERS','LITERS']);
   }
   allow read, delete: if isOwner(uid);
   allow create: if isOwner(uid) && validItem(request.resource.data) && request.resource.data.createdAt == request.time;
@@ -295,6 +320,10 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 | `SmartFoodResultDialog` (nuevo, `Dialogs.kt`) | Ícono de check, título y cuerpo opcional ("Producto Guardado" / "Te avisaremos…"). Se anuncia como `liveRegion`. |
 | `SmartFoodPrimaryButton` | Variante de color "acento" (naranja `secondary`) para "Añadir al Inventario" habilitado. El deshabilitado conserva el gris actual. |
 
+- **Cantidad (T002, desviación de la spec §8):** en el editor, debajo de la categoría, una fila con un
+  `SmartFoodTextField` numérico (`KeyboardType.Decimal`) y un `SmartFoodSelectorField` de unidad que abre una hoja
+  como la de categoría. En `InventoryItemRow`, el texto "1,5 kg" junto a la etiqueta de categoría, formateado con la
+  configuración regional del teléfono (sin ceros decimales sobrantes).
 - El editor provee `LocalFormMetrics` con `formMetricsForWindow(maxHeight)`. No hacen falta `smaller()` ni medidas
   fijas nuevas (RNF-INV-06).
 - Los colores de estado se toman de los tokens existentes (rojo `error`, amarillo y verde de la paleta). Si falta el
@@ -343,7 +372,7 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 - **Unitarias (JVM)**, con fakes nuevos en `testutil/`: `FakeInventoryRepository`, `FakePhotoRepository`,
   `FakeSpeechToText`, `FakeExpiryReminderScheduler` y `FixedClock`.
   - `ClassifyExpiryUseCaseTest` (bordes de -1, 0, 3 y 4 días), `ObserveInventoryUseCaseTest`,
-    `ValidateItemUseCaseTest`, `AddItemUseCaseTest` y `UpdateItemUseCaseTest` (rollback de la foto),
+    `ValidateItemUseCaseTest` (incluye la cantidad: vacía, "1,5", sin unidad, 0, 10000, "1,234" y "abc"), `AddItemUseCaseTest` y `UpdateItemUseCaseTest` (rollback de la foto),
     `DeleteItemUseCaseTest`.
   - `SearchInventoryUseCaseTest` (tildes, comas, plural, "Carne Pollo") y `ParseSpokenIngredientsUseCaseTest`.
   - `InventoryErrorMapperTest`.
