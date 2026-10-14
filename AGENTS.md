@@ -78,6 +78,54 @@ Hay dos servidores. Usar el **remoto** salvo que el entorno no permita iniciar s
 
 Después de configurarlo, reiniciar la sesión del agente y pedirle que lea un frame del archivo para confirmar la conexión.
 
+## Flujo de trabajo en GitHub (ramas y pull requests)
+
+Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `master` por pull request. GitHub no permite proteger `master` en este plan, así que estas reglas no las impone la plataforma: se cumplen por acuerdo del equipo.
+
+### 1. Ramas
+
+- Siempre se parte de `master` actualizado: `git switch master && git pull`, luego `git switch -c <rama>`.
+- Nombres: `feature/NNN-nombre` para una spec (`feature/006-inventario`), `fix/<tema>`, `docs/<tema>` y `refactor/<tema>`.
+- Una rama por feature o tema. **Nunca** se trabaja ni se hace push directo a `master`.
+
+### 2. Commits
+
+- Convencionales y en español: `feat`, `fix`, `test`, `docs`, `refactor` o `chore`, con ámbito y la spec o el CA que cubren. Ejemplos: `feat(inventario): agregar producto con fecha de vencimiento (spec 006, CA-INV-01-01)` y `fix(ui): … (spec 002, CA-UI-07-08)`.
+- Commits pequeños y con un solo propósito. Antes de confirmar, revisar `git status` y `git diff --cached`. Nunca se suben `app/google-services.json`, keystores ni otros secretos (RNF-01).
+
+### 3. Antes de abrir el PR (todo obligatorio)
+
+1. `./gradlew :app:testDebugUnitTest` en verde (y `npm --prefix functions test` si cambió `functions/`).
+2. `./gradlew :app:assembleDebug` compila y `./gradlew :app:lintDebug` no agrega errores nuevos.
+3. `spec.md` y `tasks.md` de la feature reflejan el cambio, y la matriz CA → test está al día.
+4. La app se probó en emulador o dispositivo.
+
+### 4. El pull request
+
+- Base `master`. El título sigue el formato de los commits.
+- La descripción incluye:
+  - **Resumen:** qué cambia y por qué.
+  - **Trazabilidad:** spec, HU y CA cubiertos.
+  - **Pruebas:** comandos ejecutados y su resultado, y dispositivo o emulador usado.
+  - **Capturas:** antes y después, si cambia la UI.
+- Si el PR queda incompleto, se abre como *draft*.
+
+### 5. Revisión y fusión
+
+- **Solo Zhair aprueba y fusiona** los PR hacia `master`, siempre con **Merge commit**, que conserva cada commit con su CA. No se usa squash ni rebase.
+- Si la revisión pide cambios, se hacen commits nuevos en la misma rama y se hace push. No se reescribe el historial publicado.
+
+### 6. Después de fusionar
+
+`git switch master && git pull`, y borrar la rama local con `git branch -d <rama>`. Si la rama ya se fusionó, el trabajo siguiente va en una rama nueva.
+
+### Reglas para la IA
+
+- Crea ramas, commits, push y PR **solo cuando el integrante lo pide**. Antes muestra qué archivos va a incluir.
+- Nunca fusiona PR, nunca hace push a `master` y nunca usa `--force`, `--no-verify`, `reset --hard` ni comandos que descarten cambios ajenos.
+- Solo incluye en el commit los cambios de la tarea. Lo que el integrante tenga sin confirmar (otros archivos, `.idea/`) se queda fuera, salvo que pida lo contrario.
+- Si alguno de los puntos del paso 3 falla, lo informa con la salida y no abre el PR hasta resolverlo, o lo abre como *draft* si el integrante así lo pide.
+
 ## Comandos
 
 En Windows usar `gradlew.bat` (o `./gradlew` desde Git Bash).
