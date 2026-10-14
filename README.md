@@ -69,7 +69,7 @@ solo guardan preferencias de Android Studio.
 | 003 Recuperación de contraseña real | [`specs/003-recuperacion-real`](specs/003-recuperacion-real/spec.md) | ✅ Implementado y desplegado |
 | 004 Correo de bienvenida            | [`specs/004-correo-registro`](specs/004-correo-registro/spec.md) | ✅ Implementado y desplegado |
 | 005 Documentos legales              | [`specs/005-documentos-legales`](specs/005-documentos-legales/spec.md) | ✅ Implementado (texto en vista previa) |
-| 006 Inventario                      | — | Pendiente |
+| 006 Inventario                      | [`specs/006-inventario`](specs/006-inventario/spec.md) | 📋 Especificada, en Issues (milestone "Spec 006: Inventario") |
 | 007 Catálogo de recetas             | — | Pendiente |
 | 008 Agente recomendador             | — | Pendiente |
 
