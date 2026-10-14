@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) or others when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code), Gemini or any other AI agent when working with code in this repository. Las reglas de este archivo aplican igual a cualquier modelo o entorno.
 
 ## Proyecto
 
@@ -17,6 +17,66 @@ Antes de escribir código, leer **`specs/constitution.md`** (principios no negoc
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
 - Códigos de trazabilidad: `HU-NN`, `CA-NN-MM`, `RF-XXX-NN`, `RNF-NN`. Los nombres de los tests citan el CA que cubren.
 - Al revisar comentarios `TODO`, implementarlos aplicando MVVM según la constitución.
+
+## Modo plan con preguntas (obligatorio en toda modificación)
+
+Ninguna modificación de archivos (código, specs, recursos, configuración o documentación) se hace sin pasar antes por el modo plan.
+
+1. **Entrar en modo plan.** Usar el modo plan del entorno (Claude Code: `Shift+Tab` hasta "plan mode"; Gemini CLI: `--approval-mode plan` o `/plan` si la versión lo ofrece; Cursor/Copilot: modo *Ask*/*Plan*). Si el entorno no tiene modo plan, la IA se comporta como si lo tuviera: **solo lee y pregunta, no edita** hasta recibir aprobación explícita.
+2. **Investigar sin modificar:** leer la constitución, la spec afectada y el código relacionado.
+3. **Hacer siempre preguntas al usuario antes del plan final.** Como mínimo una pregunta por cada categoría que aplique, con opciones concretas y la opción recomendada marcada:
+   - **Auditoría:** qué spec, HU y CA cubre el cambio; si el código y la spec discrepan, cuál manda; qué pruebas se agregan o cambian.
+   - **Toma de decisiones:** alternativas de implementación con sus ventajas y desventajas (librería, capa donde vive la lógica, alcance del cambio).
+   - **Diseño:** frame o nodo de Figma de referencia, estados (vacío, carga, error), modo claro/oscuro, perfiles `Compact`/`Medium`/`Regular`, accesibilidad.
+   - **Riesgos:** datos de Firebase, reglas de Firestore, secretos (RNF-01), R8/ProGuard, compatibilidad con `minSdk` 24.
+4. **Presentar el plan:** archivos a crear o modificar, pasos, pruebas que citan su CA y cómo se verifica.
+5. **Esperar la aprobación explícita** del usuario. Un "sí" a las preguntas no es aprobación del plan. Si durante la implementación aparece una decisión nueva, se detiene y se pregunta otra vez.
+
+## Implementar diseños de Figma (MCP)
+
+El diseño de referencia es el archivo **[SmartFood en Figma](https://www.figma.com/design/z1AoQvluQcmx98gjP4vHF6/SmartFood)** (`fileKey`: `z1AoQvluQcmx98gjP4vHF6`, frames "_Claro"). Toda pantalla o componente nuevo se implementa leyendo ese archivo a través del **MCP de Figma**, no desde capturas ni de memoria.
+
+- Al implementar, pedir al usuario el enlace del frame (`...?node-id=123-456`; en las llamadas el nodo se escribe `123:456`) y obtener el contexto de diseño y una captura del nodo con el MCP.
+- El código que entrega Figma es **referencia**, no código final: se adapta a los tokens de `core/designsystem/theme`, a los componentes `SmartFood*`, a `LocalFormMetrics` y al resto de reglas de este archivo. No se copian colores ni medidas fijas.
+- Si el diseño pide un color o una medida que no existe, se pregunta en el modo plan (categoría *Diseño*) antes de crear nada.
+
+### Si el MCP de Figma no está configurado
+
+Antes de implementar, la IA comprueba si tiene herramientas de Figma disponibles. **Si no las tiene, no implementa el diseño**: identifica el entorno y el modelo en que está corriendo y muestra **solo** los pasos de ese entorno, tal como aparecen abajo. Si no puede identificarlo, pregunta cuál es.
+
+Hay dos servidores. Usar el **remoto** salvo que el entorno no permita iniciar sesión con OAuth:
+
+| Servidor | URL | Requisito |
+|---|---|---|
+| Remoto (recomendado) | `https://mcp.figma.com/mcp` | Cuenta de Figma con acceso al archivo. Las cuentas gratuitas tienen un límite bajo de llamadas al mes. |
+| Escritorio | `http://127.0.0.1:3845/mcp` | App de escritorio de Figma abierta, Dev Mode, *Enable desktop MCP server*. Requiere un asiento Dev o Full de un plan pago. |
+
+**Gemini CLI**
+1. Ejecutar `gemini mcp add --transport http figma https://mcp.figma.com/mcp` (o agregar en `~/.gemini/settings.json`: `"mcpServers": { "figma": { "httpUrl": "https://mcp.figma.com/mcp" } }`).
+2. Abrir `gemini` y ejecutar `/mcp auth figma`; autorizar en el navegador con la cuenta de Figma.
+3. Comprobar con `/mcp` que `figma` aparece conectado con sus herramientas.
+
+**Gemini en Android Studio**
+1. *Settings → Tools → AI → MCP Servers* → activar *Enable MCP Servers*.
+2. En el `mcp.json` que abre, agregar `"mcpServers": { "figma": { "httpUrl": "https://mcp.figma.com/mcp" } }`. Si la versión no permite iniciar sesión, usar el servidor de escritorio: `"httpUrl": "http://127.0.0.1:3845/mcp"` con la app de Figma abierta.
+3. Aplicar y comprobar en el chat del agente (modo *Agent*) que aparecen las herramientas de Figma.
+
+**Claude Code**
+1. Ejecutar `claude mcp add --transport http figma https://mcp.figma.com/mcp`.
+2. En la sesión, ejecutar `/mcp`, elegir `figma` → *Authenticate* y autorizar en el navegador.
+
+**VS Code (GitHub Copilot, modo Agent)**
+1. Crear `.vscode/mcp.json` con `{ "servers": { "figma": { "type": "http", "url": "https://mcp.figma.com/mcp" } } }`.
+2. Pulsar *Start* sobre el servidor en ese archivo y autorizar en el navegador.
+3. En el chat, modo *Agent* → icono de herramientas → comprobar que figuran las de Figma.
+
+**Cursor**
+1. *Settings → MCP → Add new MCP server*, o en `~/.cursor/mcp.json`: `{ "mcpServers": { "figma": { "url": "https://mcp.figma.com/mcp" } } }`.
+2. Pulsar *Connect* / *Login* junto a `figma` y autorizar en el navegador.
+
+**Otro entorno:** buscar en su configuración la sección "MCP servers", agregar un servidor HTTP con la URL remota y autenticarse. Si el entorno no admite MCP, decirlo y pedir al usuario que exporte el frame (captura + medidas de Dev Mode) mientras tanto.
+
+Después de configurarlo, reiniciar la sesión del agente y pedirle que lea un frame del archivo para confirmar la conexión.
 
 ## Comandos
 
