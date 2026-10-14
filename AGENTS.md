@@ -92,7 +92,7 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 ### 1. Ramas
 
 - Siempre se parte de `master` actualizado: `git switch master && git pull`, luego `git switch -c <rama>`.
-- **Una rama por Issue:** `feature/NNN-<issue>-<tema>` para las tareas de una spec (`feature/006-25-busqueda`), y `fix/<tema>`, `docs/<tema>` o `refactor/<tema>` para lo demás.
+- **Una rama por Issue:** `feature/NNN-<issue>-<tema>` para las tareas de una spec (`feature/006-42-busqueda`), y `fix/<tema>`, `docs/<tema>` o `refactor/<tema>` para lo demás.
 - **Nunca** se trabaja ni se hace push directo a `master`.
 
 ### 2. Commits

@@ -3,66 +3,67 @@
 > Derivadas de [`plan.md`](./plan.md). `[P]` = se puede hacer en paralelo con la tarea anterior (toca otros archivos).
 > Cada tarea cita los requisitos o criterios que cubre. Se marca `[x]` cuando cumple la Definition of Done de la
 > [constitución](../constitution.md#7-definition-of-done).
+> `→ #N` es el Issue de GitHub donde se planea y se cierra la tarea (milestone "Spec 006: Inventario").
 
 ## Fase 0: Preparación
 - [x] T001 La spec, el plan y las tareas en `master` (PR #17), la 006 en la lista de specs de `AGENTS.md` y las tareas divididas en Issues del milestone "Spec 006: Inventario". Cada Issue se trabaja en su propia rama `feature/006-<issue>-<tema>`.
-- [ ] T002 El equipo confirma si se agregan cantidad, unidad o precio (spec §7). Si se agregan, se actualizan primero la spec y el plan.
+- [ ] T002 El equipo confirma si se agregan cantidad, unidad o precio (spec §7). Si se agregan, se actualizan primero la spec y el plan. → #18
 
 ## Fase 1: Dominio (Kotlin puro y pruebas JVM)
-- [ ] T003 `coreLibraryDesugaring` en `app/build.gradle.kts` y `libs.versions.toml` (plan §9), necesario para `java.time` con `minSdk` 24.
-- [ ] T004 Modelos: `InventoryItem`, `ItemPhoto`, `FoodCategory`, `ExpiryStatus`, `InventorySection`, `ItemDraft`, `LocalPhoto`, `InventoryError` + `InventoryException` + `toInventoryError()`, `InventoryField`, `SpeechEvent` y `SpeechError` (plan §2).
-- [ ] T005 Interfaces: `InventoryRepository`, `PhotoRepository`, `SpeechToText`, `ExpiryReminderScheduler` e `InventoryPreferences`.
-- [ ] T006 [P] Fakes en `testutil/`: `FakeInventoryRepository`, `FakePhotoRepository`, `FakeSpeechToText`, `FakeExpiryReminderScheduler`, `FakeInventoryPreferences` y `FixedClock`.
-- [ ] T007 `ClassifyExpiryUseCase` y `ObserveInventoryUseCase`, con pruebas (CA-INV-01-01, 01-04, 01-06; RF-INV-02).
-- [ ] T008 `ValidateItemUseCase`, con pruebas (CA-INV-02-02, 02-03, 02-04, 03-03; RF-INV-03).
-- [ ] T009 `AddItemUseCase`, `UpdateItemUseCase` y `DeleteItemUseCase`, con pruebas de orden, rollback de la foto y programación de avisos (CA-INV-02-06, 03-02, 04-02, 05-04 a 05-06, 08-01).
-- [ ] T010 [P] `SearchInventoryUseCase`, con pruebas (CA-INV-06-02 a 06-05, 07-04; RF-INV-05).
-- [ ] T011 [P] `ParseSpokenIngredientsUseCase`, con pruebas (CA-INV-07-03; RF-INV-06).
-- [ ] T012 [P] `GetExpiringItemsUseCase`, con pruebas (CA-INV-08-01 a 08-03).
-- [ ] T013 `LogoutUseCase` cancela los avisos (`ExpiryReminderScheduler.cancel()`); se actualiza su prueba (CA-INV-08-06).
+- [ ] T003 `coreLibraryDesugaring` en `app/build.gradle.kts` y `libs.versions.toml` (plan §9), necesario para `java.time` con `minSdk` 24. → #19
+- [ ] T004 Modelos: `InventoryItem`, `ItemPhoto`, `FoodCategory`, `ExpiryStatus`, `InventorySection`, `ItemDraft`, `LocalPhoto`, `InventoryError` + `InventoryException` + `toInventoryError()`, `InventoryField`, `SpeechEvent` y `SpeechError` (plan §2). → #20
+- [ ] T005 Interfaces: `InventoryRepository`, `PhotoRepository`, `SpeechToText`, `ExpiryReminderScheduler` e `InventoryPreferences`. → #20
+- [ ] T006 [P] Fakes en `testutil/`: `FakeInventoryRepository`, `FakePhotoRepository`, `FakeSpeechToText`, `FakeExpiryReminderScheduler`, `FakeInventoryPreferences` y `FixedClock`. → #21
+- [ ] T007 `ClassifyExpiryUseCase` y `ObserveInventoryUseCase`, con pruebas (CA-INV-01-01, 01-04, 01-06; RF-INV-02). → #22
+- [ ] T008 `ValidateItemUseCase`, con pruebas (CA-INV-02-02, 02-03, 02-04, 03-03; RF-INV-03). → #23
+- [ ] T009 `AddItemUseCase`, `UpdateItemUseCase` y `DeleteItemUseCase`, con pruebas de orden, rollback de la foto y programación de avisos (CA-INV-02-06, 03-02, 04-02, 05-04 a 05-06, 08-01). → #24
+- [ ] T010 [P] `SearchInventoryUseCase`, con pruebas (CA-INV-06-02 a 06-05, 07-04; RF-INV-05). → #25
+- [ ] T011 [P] `ParseSpokenIngredientsUseCase`, con pruebas (CA-INV-07-03; RF-INV-06). → #26
+- [ ] T012 [P] `GetExpiringItemsUseCase`, con pruebas (CA-INV-08-01 a 08-03). → #27
+- [ ] T013 `LogoutUseCase` cancela los avisos (`ExpiryReminderScheduler.cancel()`); se actualiza su prueba (CA-INV-08-06). → #28
 
 ## Fase 2: Datos e infraestructura
-- [ ] T014 Dependencias: `firebase-storage`, CameraX, Coil 3, WorkManager y `hilt-work` (plan §9).
-- [ ] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador.
-- [ ] T016 `InventoryErrorMapper`, con pruebas (plan §10).
-- [ ] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`) (RF-INV-01).
-- [ ] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02).
-- [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5).
-- [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente.
-- [ ] T021 `InventoryDataModule`, que enlaza las interfaces.
-- [ ] T022 Reglas: subcolección `inventory` en `firestore.rules` y `storage.rules` nuevo (RNF-INV-01, plan §3).
+- [ ] T014 Dependencias: `firebase-storage`, CameraX, Coil 3, WorkManager y `hilt-work` (plan §9). → #19
+- [ ] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador. → #29
+- [ ] T016 `InventoryErrorMapper`, con pruebas (plan §10). → #30
+- [ ] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`) (RF-INV-01). → #30
+- [ ] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). → #31
+- [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5). → #32
+- [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente. → #33
+- [ ] T021 `InventoryDataModule`, que enlaza las interfaces. → #29
+- [ ] T022 Reglas: subcolección `inventory` en `firestore.rules` y `storage.rules` nuevo (RNF-INV-01, plan §3). → #34
 
 ## Fase 3: Design system
-- [ ] T023 `SmartFoodTextField` con `leadingContent` y `label: String?`, sin cambios en los usos actuales. Las pruebas de autenticación siguen verdes.
-- [ ] T024 [P] `SmartFoodSelectorField` (comparte la caja con el campo de texto) (CA-INV-02-04, 02-05).
-- [ ] T025 [P] `SmartFoodConfirmDialog` y `SmartFoodResultDialog` (CA-INV-02-06, 03-02, 04-01, 05-04).
-- [ ] T026 [P] `SmartFoodBottomBar` y la variante de acento de `SmartFoodPrimaryButton` (CA-INV-02-02, 09-02).
-- [ ] T027 [P] Íconos vectoriales exportados del Figma y `strings_inventory.xml` (RNF-INV-08). Rol de color `ExpiringSoon` si hace falta (plan §8).
+- [ ] T023 `SmartFoodTextField` con `leadingContent` y `label: String?`, sin cambios en los usos actuales. Las pruebas de autenticación siguen verdes. → #35
+- [ ] T024 [P] `SmartFoodSelectorField` (comparte la caja con el campo de texto) (CA-INV-02-04, 02-05). → #35
+- [ ] T025 [P] `SmartFoodConfirmDialog` y `SmartFoodResultDialog` (CA-INV-02-06, 03-02, 04-01, 05-04). → #36
+- [ ] T026 [P] `SmartFoodBottomBar` y la variante de acento de `SmartFoodPrimaryButton` (CA-INV-02-02, 09-02). → #36
+- [ ] T027 [P] Íconos vectoriales exportados del Figma y `strings_inventory.xml` (RNF-INV-08). Rol de color `ExpiringSoon` si hace falta (plan §8). → #37
 
 ## Fase 4: Navegación
-- [ ] T028 Renombrar `feature/home` → `feature/profile` (`ProfileScreen`, `ProfileViewModel`, `Route.Profile`). Se ajustan sus pruebas (CA-INV-09-03).
-- [ ] T029 Rutas `Inventory`, `InventorySearch`, `ProductEditor(itemId?)` y `ProductCamera`. `MainGraph` arranca en `Inventory`. `MainScaffold` con la barra inferior solo en las pestañas (CA-INV-09-01, 09-02, 09-04, 09-05).
-- [ ] T030 `MainNavigationTest` y `AppNavigationTest` actualizados (el inicio de sesión llega a "Mi Inventario" y el cierre de sesión pasa por Perfil).
+- [ ] T028 Renombrar `feature/home` → `feature/profile` (`ProfileScreen`, `ProfileViewModel`, `Route.Profile`). Se ajustan sus pruebas (CA-INV-09-03). → #38
+- [ ] T029 Rutas `Inventory`, `InventorySearch`, `ProductEditor(itemId?)` y `ProductCamera`. `MainGraph` arranca en `Inventory`. `MainScaffold` con la barra inferior solo en las pestañas (CA-INV-09-01, 09-02, 09-04, 09-05). → #38
+- [ ] T030 `MainNavigationTest` y `AppNavigationTest` actualizados (el inicio de sesión llega a "Mi Inventario" y el cierre de sesión pasa por Perfil). → #38
 
 ## Fase 5: Pantallas
-- [ ] T031 Lista: `InventoryContract`, `InventoryViewModel` e `InventoryScreen` con `InventoryItemRow` y `ExpirySectionHeader`, y sus pruebas (HU-INV-01).
-- [ ] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel` y `ProductEditorScreen` con `PhotoSlot`, `CategorySheet` y `DatePicker` sin días pasados, y sus pruebas (HU-INV-02, 03, 04).
-- [ ] T033 Cámara: `ProductCameraScreen` (CameraX, recuadro de encuadre, resultado por `savedStateHandle`), con el permiso y la explicación (HU-INV-05).
-- [ ] T034 Búsqueda: `InventorySearchContract`, `InventorySearchViewModel` e `InventorySearchScreen` con `CategoryChips` y "x", y sus pruebas (HU-INV-06).
-- [ ] T035 Voz: `VoiceSearchCard` y `VoiceSearchOverlay` ("Habla ahora", "…", error con "Reintentar"), el permiso de micrófono y la cancelación, con pruebas del ViewModel y de la pantalla (HU-INV-07).
-- [ ] T036 `AdaptiveLayoutTest` cubre el editor en 360×720, con el teclado abierto y cerrado (RNF-INV-06).
+- [ ] T031 Lista: `InventoryContract`, `InventoryViewModel` e `InventoryScreen` con `InventoryItemRow` y `ExpirySectionHeader`, y sus pruebas (HU-INV-01). → #39
+- [ ] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel` y `ProductEditorScreen` con `PhotoSlot`, `CategorySheet` y `DatePicker` sin días pasados, y sus pruebas (HU-INV-02, 03, 04). → #40
+- [ ] T033 Cámara: `ProductCameraScreen` (CameraX, recuadro de encuadre, resultado por `savedStateHandle`), con el permiso y la explicación (HU-INV-05). → #41
+- [ ] T034 Búsqueda: `InventorySearchContract`, `InventorySearchViewModel` e `InventorySearchScreen` con `CategoryChips` y "x", y sus pruebas (HU-INV-06). → #42
+- [ ] T035 Voz: `VoiceSearchCard` y `VoiceSearchOverlay` ("Habla ahora", "…", error con "Reintentar"), el permiso de micrófono y la cancelación, con pruebas del ViewModel y de la pantalla (HU-INV-07). → #43
+- [ ] T036 `AdaptiveLayoutTest` cubre el editor en 360×720, con el teclado abierto y cerrado (RNF-INV-06). → #40
 
 ## Fase 6: Avisos
-- [ ] T037 `ExpiryNotifier` (canal, plurales y `PendingIntent`) y `ExpiryReminderWorker` (`@HiltWorker`) (CA-INV-08-01 a 08-04).
-- [ ] T038 `WorkManagerExpiryReminderScheduler` (próxima 9:00, `UPDATE`). `SmartfoodApp` como `Configuration.Provider`, sin el inicializador por defecto. `SplashViewModel` reprograma los avisos con sesión activa.
-- [ ] T039 Permiso `POST_NOTIFICATIONS` después del primer guardado, pedido una sola vez (CA-INV-08-05).
+- [ ] T037 `ExpiryNotifier` (canal, plurales y `PendingIntent`) y `ExpiryReminderWorker` (`@HiltWorker`) (CA-INV-08-01 a 08-04). → #44
+- [ ] T038 `WorkManagerExpiryReminderScheduler` (próxima 9:00, `UPDATE`). `SmartfoodApp` como `Configuration.Provider`, sin el inicializador por defecto. `SplashViewModel` reprograma los avisos con sesión activa. → #44
+- [ ] T039 Permiso `POST_NOTIFICATIONS` después del primer guardado, pedido una sola vez (CA-INV-08-05). → #44
 
 ## Fase 7: Cierre
-- [ ] T040 `proguard-rules.pro` revisado y `assembleRelease` compilado (Coil, WorkManager).
-- [ ] T041 Plantilla de la Política de privacidad (spec 005): fotos, micrófono y avisos (spec §9).
-- [ ] T042 `README.md` y `AGENTS.md` (arquitectura de `feature/inventory`, emulador de Storage y comandos).
-- [ ] T043 Verificación local: `testDebugUnitTest`, `assembleDebug`, pruebas instrumentadas con `firebase emulators:start --only auth,firestore,storage` y el checklist manual (puntos 1 a 9).
-- [ ] T044 Despliegue: activar Cloud Storage en `smartfood-f62a1` (`southamerica-east1`) y `firebase deploy --only firestore:rules,storage`. Checklist en producción (punto 10).
+- [ ] T040 `proguard-rules.pro` revisado y `assembleRelease` compilado (Coil, WorkManager). → #45
+- [ ] T041 Plantilla de la Política de privacidad (spec 005): fotos, micrófono y avisos (spec §9). → #45
+- [ ] T042 `README.md` y `AGENTS.md` (arquitectura de `feature/inventory`, emulador de Storage y comandos). → #45
+- [ ] T043 Verificación local: `testDebugUnitTest`, `assembleDebug`, pruebas instrumentadas con `firebase emulators:start --only auth,firestore,storage` y el checklist manual (puntos 1 a 9). → #45
+- [ ] T044 Despliegue: activar Cloud Storage en `smartfood-f62a1` (`southamerica-east1`) y `firebase deploy --only firestore:rules,storage`. Checklist en producción (punto 10). → #45
 
 ## Matriz de trazabilidad
 
