@@ -28,8 +28,8 @@
 ## Fase 2: Datos e infraestructura
 - [x] T014 Dependencias: `firebase-storage`, CameraX, Coil 3, WorkManager y `hilt-work` (plan §9). → #19
 - [ ] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador. → #29
-- [ ] T016 `InventoryErrorMapper`, con pruebas (plan §10). → #30
-- [ ] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). → #30
+- [x] T016 `InventoryErrorMapper`, con pruebas (plan §10). Prueba: U `InventoryErrorMapperTest`. → #30
+- [x] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). Guardar y borrar con transacción (RNF-INV-05). Prueba: U `InventoryDocumentTest`; de punta a punta con las reglas en T022. → #30
 - [ ] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). → #31
 - [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5). → #32
 - [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente. → #33

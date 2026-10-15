@@ -178,6 +178,13 @@ Se escribe y se lee con `Map` (sin reflexión, por R8), igual que `FirestoreUser
 `quantity` y `unit` no se escriben. Agregar `price` más adelante es agregar otra clave opcional: los documentos viejos
 siguen siendo válidos.
 
+Guardar y borrar usan **transacciones** (`runTransaction`). Sin conexión, una transacción falla con `UNAVAILABLE` →
+`Network` (RNF-INV-05), mientras que `set().await()` se quedaría esperando a que vuelva la red. Además, al leer el
+documento dentro de la transacción se sabe si ya existe: `createdAt` se escribe con la hora del servidor solo al
+crear y se conserva al editar, como piden las reglas. Cada guardado es un `set` completo, así que una cantidad o una
+foto que se quitaron desaparecen del documento. La lectura es tolerante: una categoría desconocida pasa a `OTHER`,
+una cantidad o unidad inválida se descarta y un documento sin nombre o sin fecha válida se omite de la lista.
+
 Reglas (`firestore.rules`):
 
 ```
@@ -344,13 +351,14 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 
 ## 10. Errores
 
-- `InventoryErrorMapper.mapFirebaseError()`:
-  - `FirebaseFirestoreException` → `UNAVAILABLE` → `Network`, `PERMISSION_DENIED` → `PermissionDenied`,
-    `NOT_FOUND` → `NotFound`;
-  - `StorageException` → `ERROR_RETRY_LIMIT_EXCEEDED` → `Network`, `ERROR_NOT_AUTHORIZED` → `PermissionDenied` y
-    el resto → `PhotoUploadFailed`;
+- `InventoryErrorMapper.map()`:
+  - `FirebaseFirestoreException` → `UNAVAILABLE` y `DEADLINE_EXCEEDED` → `Network`, `PERMISSION_DENIED` →
+    `PermissionDenied`, `NOT_FOUND` → `NotFound`, `UNAUTHENTICATED` → `NotAuthenticated`;
+  - `StorageException` → `ERROR_RETRY_LIMIT_EXCEEDED` → `Network`, `ERROR_NOT_AUTHORIZED` → `PermissionDenied`,
+    `ERROR_OBJECT_NOT_FOUND` → `NotFound` y el resto → `PhotoUploadFailed`;
   - `FirebaseNetworkException` → `Network`.
-- Todo en `data` usa `safeRunCatching { … }.mapFirebaseError()`.
+- Todo en `data` usa `safeRunCatching { … }.mapInventoryError()`. El nombre es distinto del `mapFirebaseError()` de
+  autenticación para no confundir los imports.
 - `InventoryErrorText.kt` traduce `InventoryError` y `SpeechError` a `strings_inventory.xml`. Para agregar un error:
   `InventoryError` → mapper → `InventoryErrorText` → strings.
 
