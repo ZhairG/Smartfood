@@ -42,6 +42,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
@@ -50,6 +51,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -107,6 +109,8 @@ private val FieldPaddingEndWithTrailing = 6.dp
  * @param enabled Si es `false`, deshabilita la interacción con el campo.
  * @param isError Si es `true`, dibuja el borde con color de error (rojo).
  * @param onFocusChanged Callback notificado en el mismo frame en que el campo gana o pierde el foco.
+ * @param contentType Qué dato es para el autocompletado del teléfono (usuario, contraseña…); `null` no participa
+ * (spec 001, HU-07).
  */
 @Composable
 fun SmartFoodTextField(
@@ -124,6 +128,7 @@ fun SmartFoodTextField(
     enabled: Boolean = true,
     isError: Boolean = false,
     onFocusChanged: ((Boolean) -> Unit)? = null,
+    contentType: ContentType? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -139,7 +144,9 @@ fun SmartFoodTextField(
         modifier = modifier
             .fillMaxWidth()
             .onFocusChanged { currentOnFocusChanged?.invoke(it.isFocused) }
-            .then(if (spokenName != null) Modifier.semantics { contentDescription = spokenName } else Modifier),
+            .then(if (spokenName != null) Modifier.semantics { contentDescription = spokenName } else Modifier)
+            // El gestor de contraseñas del teléfono reconoce el campo por su tipo (CA-07-01, CA-07-03).
+            .then(if (contentType != null) Modifier.semantics { this.contentType = contentType } else Modifier),
         textStyle = MaterialTheme.typography.bodyLarge.copy(
             fontSize = FieldTextSize,
             color = MaterialTheme.colorScheme.onSurface
@@ -248,6 +255,9 @@ private fun FieldPlaceholder(text: String) {
 /**
  * Variante específica de [SmartFoodTextField] configurada exclusivamente para contraseñas.
  * Gestiona de forma encapsulada la visibilidad del texto mediante el botón de visibilidad.
+ *
+ * @param contentType Tipo para el autocompletado: [ContentType.Password] al iniciar sesión y
+ * [ContentType.NewPassword] al crear o cambiar la contraseña (spec 001, HU-07).
  */
 @Composable
 fun SmartFoodPasswordField(
@@ -261,6 +271,7 @@ fun SmartFoodPasswordField(
     enabled: Boolean = true,
     isError: Boolean = false,
     onFocusChanged: ((Boolean) -> Unit)? = null,
+    contentType: ContentType = ContentType.Password,
 ) {
     var visible by rememberSaveable { mutableStateOf(false) }
 
@@ -279,6 +290,7 @@ fun SmartFoodPasswordField(
         enabled = enabled,
         isError = isError,
         onFocusChanged = onFocusChanged,
+        contentType = contentType,
         trailingContent = {
             IconButton(onClick = { visible = !visible }, modifier = Modifier.size(40.dp)) {
                 Icon(

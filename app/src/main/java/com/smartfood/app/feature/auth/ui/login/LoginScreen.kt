@@ -24,11 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
-import com.smartfood.app.feature.auth.ui.inlineError
-import com.smartfood.app.feature.auth.ui.messageRes
-import com.smartfood.app.feature.auth.ui.components.AuthErrorMessage
-import com.smartfood.app.feature.auth.ui.components.AuthScreenScaffold
-import com.smartfood.app.feature.auth.ui.components.FlexibleGap
 import com.smartfood.app.core.designsystem.components.SmartFoodCheckbox
 import com.smartfood.app.core.designsystem.components.SmartFoodPasswordField
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
@@ -38,6 +33,12 @@ import com.smartfood.app.core.designsystem.components.SmartFoodTextLink
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.titleStyle
+import com.smartfood.app.feature.auth.ui.components.AuthErrorMessage
+import com.smartfood.app.feature.auth.ui.components.AuthScreenScaffold
+import com.smartfood.app.feature.auth.ui.components.EmailAccountContentType
+import com.smartfood.app.feature.auth.ui.components.FlexibleGap
+import com.smartfood.app.feature.auth.ui.inlineError
+import com.smartfood.app.feature.auth.ui.messageRes
 
 /**
  * Nombre: LoginScreen.kt
@@ -125,6 +126,7 @@ private fun LoginFormFields(
     Column(modifier = modifier) {
         SmartFoodTextField(
             label = stringResource(id = R.string.login_email_label),
+            contentType = EmailAccountContentType,
             value = state.email,
             onValueChange = remember(onEvent) { { email -> onEvent(LoginEvent.EmailChanged(email)) } },
             placeholder = stringResource(id = R.string.login_email_placeholder),

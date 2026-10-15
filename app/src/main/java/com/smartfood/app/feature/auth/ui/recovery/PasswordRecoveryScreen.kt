@@ -41,10 +41,11 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.titleStyle
 import com.smartfood.app.feature.auth.ui.components.AuthErrorMessage
 import com.smartfood.app.feature.auth.ui.components.AuthScreenScaffold
+import com.smartfood.app.feature.auth.ui.components.EmailAccountContentType
 import com.smartfood.app.feature.auth.ui.components.FlexibleGap
 import com.smartfood.app.feature.auth.ui.components.LocalFormViewport
-import com.smartfood.app.feature.auth.ui.components.fillFormViewport
 import com.smartfood.app.feature.auth.ui.components.PasswordFieldWithChecklist
+import com.smartfood.app.feature.auth.ui.components.fillFormViewport
 import com.smartfood.app.feature.auth.ui.recoveryMessageRes
 
 /**
@@ -183,6 +184,7 @@ private fun ForgotPasswordStep(
     ) {
         SmartFoodTextField(
             label = stringResource(id = R.string.login_email_label),
+            contentType = EmailAccountContentType,
             value = state.email,
             onValueChange = remember(onEvent) { { email -> onEvent(PasswordRecoveryEvent.EmailChanged(email)) } },
             placeholder = stringResource(id = R.string.login_email_placeholder),

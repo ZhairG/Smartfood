@@ -1,5 +1,9 @@
 package com.smartfood.app.feature.auth.ui.recovery
 
+import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -12,10 +16,11 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthField
 import com.smartfood.app.feature.auth.domain.usecase.ValidatePasswordUseCase
+import com.smartfood.app.feature.auth.ui.components.EmailAccountContentType
+import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Nombre: PasswordRecoveryScreenTest.kt
@@ -166,5 +171,23 @@ class PasswordRecoveryScreenTest {
         )
 
         composeTestRule.onNode(hasText("Reestablecer Contraseña") and hasClickAction()).assertIsEnabled()
+    }
+
+    /** El nodo editable declara [type] para el autocompletado del teléfono (spec 001, HU-07). */
+    private fun conTipo(type: ContentType) = SemanticsMatcher.expectValue(SemanticsProperties.ContentType, type)
+
+    @Test
+    fun ca0703_paso1OfreceElCorreoComoUsuario() {
+        mostrar()
+
+        composeTestRule.onNodeWithText("Correo electrónico").assert(conTipo(EmailAccountContentType))
+    }
+
+    @Test
+    fun ca0703_paso3PideContrasenasNuevas() {
+        mostrar(PasswordRecoveryUiState(step = RecoveryStep.NEW_PASSWORD))
+
+        composeTestRule.onNodeWithText("Nueva Contraseña").assert(conTipo(ContentType.NewPassword))
+        composeTestRule.onNodeWithText("Confirmar Contraseña").assert(conTipo(ContentType.NewPassword))
     }
 }
