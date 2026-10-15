@@ -5,11 +5,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.smartfood.app.BuildConfig
-import com.smartfood.app.feature.inventory.data.photo.PhotoCompressor
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
 import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
 import com.smartfood.app.feature.inventory.domain.model.toInventoryError
+import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
@@ -33,8 +33,8 @@ import javax.inject.Inject
  * Descripción: Prueba de punta a punta de [FirebaseStoragePhotoRepository] contra los emuladores de Auth y Storage,
  * con las reglas reales de `storage.rules` (spec 006, T018, RNF-INV-01, RNF-INV-02, CA-INV-05-06). Solo se ejecuta
  * en un build con `-PuseFirebaseEmulator=true`. Con un teléfono físico: `adb reverse` de 9099 y 9199 y
- * `-PfirebaseEmulatorHost=127.0.0.1`. Es un solo `@Test` porque `useEmulator()` solo se puede llamar una vez por
- * proceso.
+ * `-PfirebaseEmulatorHost=127.0.0.1`. Desde el #69, `FirebaseStorage` y [PhotoRepository] salen del grafo real de
+ * Hilt (`CoreDataModule` e `InventoryDataModule`), así que la prueba también comprueba ese enlace.
  */
 @HiltAndroidTest
 class FirebaseStoragePhotoRepositoryEmulatorTest {
@@ -45,17 +45,17 @@ class FirebaseStoragePhotoRepositoryEmulatorTest {
     @Inject
     lateinit var auth: FirebaseAuth
 
-    private lateinit var storage: FirebaseStorage
-    private lateinit var repository: FirebaseStoragePhotoRepository
+    @Inject
+    lateinit var storage: FirebaseStorage
+
+    @Inject
+    lateinit var repository: PhotoRepository
     private val cacheDir = InstrumentationRegistry.getInstrumentation().targetContext.cacheDir
 
     @Before
     fun prepararEntornoTest() {
         assumeTrue("Solo con -PuseFirebaseEmulator=true", BuildConfig.USE_FIREBASE_EMULATOR)
         hiltRule.inject()
-        // provideFirebaseStorage llega con el #29; mientras tanto, la prueba conecta Storage al emulador.
-        storage = FirebaseStorage.getInstance().apply { useEmulator(BuildConfig.FIREBASE_EMULATOR_HOST, STORAGE_PORT) }
-        repository = FirebaseStoragePhotoRepository(storage, auth, PhotoCompressor())
         runBlocking {
             auth.createUserWithEmailAndPassword("foto-${UUID.randomUUID()}@prueba.com", "Clave123*").await()
         }
@@ -107,9 +107,5 @@ class FirebaseStoragePhotoRepositoryEmulatorTest {
         )
         assertTrue(otra.exists())
         otra.delete()
-    }
-
-    private companion object {
-        const val STORAGE_PORT = 9199
     }
 }
