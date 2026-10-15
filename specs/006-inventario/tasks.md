@@ -30,7 +30,7 @@
 - [ ] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador. → #29
 - [x] T016 `InventoryErrorMapper`, con pruebas (plan §10). Prueba: U `InventoryErrorMapperTest`. → #30
 - [x] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). Guardar y borrar con transacción (RNF-INV-05). Prueba: U `InventoryDocumentTest`; de punta a punta con las reglas en T022. → #30
-- [ ] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). → #31
+- [x] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). Pruebas: U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (con `-PuseFirebaseEmulator=true`). → #31
 - [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5). → #32
 - [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente. → #33
 - [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. → #29
@@ -108,7 +108,7 @@ verificación manual (checklist).
 | CA-INV-05-03 | U `ProductEditorViewModelTest`, M 4 |
 | CA-INV-05-04 | U `UpdateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-05-05 | U `UpdateItemUseCaseTest`, M 2 |
-| CA-INV-05-06 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest` |
+| CA-INV-05-06 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (conserva el archivo si falla) |
 | CA-INV-06-01 | I `InventorySearchScreenTest` |
 | CA-INV-06-02 | U `SearchInventoryUseCaseTest` |
 | CA-INV-06-03 | U `SearchInventoryUseCaseTest`, I `InventorySearchScreenTest` |
@@ -138,7 +138,7 @@ verificación manual (checklist).
 | CA-INV-09-04 | I `MainNavigationTest` |
 | CA-INV-09-05 | I `MainNavigationTest` |
 | RNF-INV-01 | R `firestore.test.js`, R `storage.test.js`, I `FirestoreInventoryRepositoryEmulatorTest`, M 9 |
-| RNF-INV-02 | M 9 (foto > 2 MB denegada), M 2 (tamaño subido) |
+| RNF-INV-02 | U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest`, R `storage.test.js`, M 9 (foto > 2 MB denegada), M 2 (tamaño subido) |
 | RNF-INV-04 | I `InventoryScreenTest`, I `InventorySearchScreenTest` (descripciones y estado de los chips) |
 | RNF-INV-06 | I `AdaptiveLayoutTest` |
 
