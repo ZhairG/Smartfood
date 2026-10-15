@@ -170,7 +170,8 @@ fun SmartFoodTextField(
 /**
  * Etiqueta opcional y caja con borde que comparten [SmartFoodTextField] y [SmartFoodSelectorField] (spec 006,
  * plan §8). El ícono inicial va en una caja de `fieldIconSize` que fija su tamaño y lo pinta en `onSurfaceVariant`,
- * separado del texto por `fieldIconSpacing` (Figma "Añadir Producto" `476:3664`).
+ * separado del texto por `fieldIconSpacing` (Figma "Añadir Producto" `476:3664`). El contenido final también
+ * recibe ese gris por omisión.
  */
 @Composable
 private fun FieldFrame(
@@ -227,7 +228,13 @@ private fun FieldFrame(
                 }
             }
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart, content = content)
-            trailingContent?.invoke()
+            if (trailingContent != null) {
+                // El chevron va en gris, como en Figma (476:4200).
+                CompositionLocalProvider(
+                    LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
+                    content = trailingContent
+                )
+            }
         }
     }
 }
