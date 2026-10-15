@@ -1,8 +1,9 @@
 rules_version = '2';
 
 // Reglas de seguridad de SmartFood (spec 001, RNF-02; spec 003, RNF-REC-02; spec 004, RNF-MAIL-04;
-// spec 005, CA-LEG-02-02).
-// Cada usuario solo puede leer y escribir su propio perfil. Todo lo demás está denegado.
+// spec 005, CA-LEG-02-02; spec 006, RNF-INV-01).
+// Cada usuario solo puede leer y escribir su propio perfil y su inventario. Todo lo demás está denegado.
+// Pruebas: rules-test/ (firebase emulators:exec --only firestore,storage "npm --prefix rules-test test").
 service cloud.firestore {
   match /databases/{database}/documents {
     function isOwner(uid) {
@@ -15,6 +16,38 @@ service cloud.firestore {
       allow create: if isOwner(uid)
         && request.resource.data.termsVersion is string
         && request.resource.data.termsAcceptedAt == request.time;
+    }
+
+    // Inventario (spec 006, plan §3). La regla de users/{uid} no cubre las subcolecciones.
+    match /users/{uid}/inventory/{itemId} {
+      function validItem(d) {
+        return d.keys().hasOnly(['name', 'nameNormalized', 'category', 'expiresOn', 'quantity', 'unit',
+                                 'photoPath', 'photoUrl', 'createdAt', 'updatedAt'])
+          && d.name is string && d.name.size() > 0 && d.name.size() <= 50
+          && d.nameNormalized is string
+          && d.category in ['FRUITS', 'DAIRY', 'PROTEINS', 'VEGETABLES', 'GRAINS', 'OTHER']
+          && d.expiresOn is string && d.expiresOn.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && validQuantity(d)
+          && validPhoto(d)
+          && d.updatedAt == request.time;
+      }
+      // Cantidad y unidad van juntas: las dos ausentes o las dos válidas (T002, CA-INV-02-08, 02-09).
+      function validQuantity(d) {
+        return (!('quantity' in d) && !('unit' in d))
+          || (d.quantity is number && d.quantity > 0 && d.quantity <= 9999
+              && d.unit in ['UNITS', 'GRAMS', 'KILOGRAMS', 'POUNDS', 'MILLILITERS', 'LITERS']);
+      }
+      // La ruta y la URL de la foto también van juntas.
+      function validPhoto(d) {
+        return (!('photoPath' in d) && !('photoUrl' in d))
+          || (d.photoPath is string && d.photoUrl is string);
+      }
+
+      allow read, delete: if isOwner(uid);
+      allow create: if isOwner(uid) && validItem(request.resource.data)
+        && request.resource.data.createdAt == request.time;
+      allow update: if isOwner(uid) && validItem(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt;
     }
 
     // Recuperación de contraseña: solo la usan las Cloud Functions con el Admin SDK, que no pasa por estas reglas.
