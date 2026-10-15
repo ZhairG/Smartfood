@@ -104,8 +104,9 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 
 1. `./gradlew :app:testDebugUnitTest` en verde (y `npm --prefix functions test` si cambió `functions/`).
 2. `./gradlew :app:assembleDebug` compila y `./gradlew :app:lintDebug` no agrega errores nuevos.
-3. `spec.md` y `tasks.md` de la feature reflejan el cambio, y la matriz CA → test está al día.
-4. La app se probó en emulador o dispositivo.
+3. Si el cambio toca `ui/`, `core/designsystem` o `core/navigation`: `./gradlew :app:connectedDebugAndroidTest` en verde en emulador o dispositivo. Las pruebas unitarias no dibujan Compose, así que un componente que se cae al mostrarse pasa el punto 1 sin fallar (Issue #60).
+4. `spec.md` y `tasks.md` de la feature reflejan el cambio, y la matriz CA → test está al día.
+5. La app se probó en emulador o dispositivo.
 
 ### 4. El pull request
 
@@ -147,7 +148,7 @@ Cada agente mantiene al día el checklist del Issue en el que trabaja, sin que n
 | Plan del modo plan publicado | el agente publicó el plan como comentario en el Issue. |
 | Plan aprobado por Zhair | Zhair aprueba en el Issue o lo dice explícitamente en la sesión. Nunca se da por supuesto. |
 | Cada tarea `Tnnn` | la tarea quedó hecha y confirmada en la rama del Issue. |
-| Pruebas unitarias en verde… | `testDebugUnitTest`, `assembleDebug` y `lintDebug` pasaron (puntos 1 y 2 del paso 3). |
+| Pruebas unitarias en verde… | `testDebugUnitTest`, `assembleDebug` y `lintDebug` pasaron, y `connectedDebugAndroidTest` si el cambio toca la UI (puntos 1 a 3 del paso 3). |
 | `spec.md` y `tasks.md` al día | la tarea está `[x]` en `tasks.md` y la matriz CA → test está actualizada. |
 | Probado en emulador o dispositivo | **el integrante confirma** que probó el flujo. El agente puede instalar el APK (`./gradlew :app:installDebug`) y revisar que la app abre sin errores en Logcat, pero eso solo no basta. |
 | PR hacia `master` con `Closes #n` | el PR quedó creado. Si es *draft*, también se marca, y en el PR se indica qué falta. |

@@ -67,7 +67,7 @@ Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un
 | CA-UI-02-05 | M (capturas en el dispositivo: el encabezado se colapsa con el teclado) |
 | CA-UI-02-06 | M |
 | CA-UI-02-07 | M |
-| CA-UI-02-08 | I `FormFocusTest.ca_ui_02_01_*` (la etiqueta forma parte del nodo editable) |
+| CA-UI-02-08 | I `FormFocusTest.ca_ui_02_01_*` (la etiqueta forma parte del nodo editable), I `SmartFoodFieldsTest.ca_ui_02_08_*` |
 | CA-UI-03-01 | U `AbovePopupPositionProviderTest`, I `FormFocusTest.ca_ui_03_01_*` |
 | CA-UI-03-02 | I `FormFocusTest.ca_ui_03_02_*` |
 | CA-UI-03-03 | Diseño: `PopupProperties(focusable = false)`; I `FormFocusTest.ca_ui_03_05_*` (el foco sigue en los campos) |

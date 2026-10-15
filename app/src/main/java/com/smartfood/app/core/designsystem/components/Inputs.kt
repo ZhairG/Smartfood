@@ -187,43 +187,6 @@ fun SmartFoodTextField(
 }
 
 /**
- * Sobrecarga de conveniencia de [SmartFoodTextField] con el parámetro [label] como primer argumento
- * para conservar compatibilidad con llamadas que usan posición.
- */
-@Composable
-fun SmartFoodTextField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    placeholder: String? = null,
-    leadingContent: (@Composable () -> Unit)? = null,
-    trailingContent: (@Composable () -> Unit)? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    enabled: Boolean = true,
-    isError: Boolean = false,
-    onFocusChanged: ((Boolean) -> Unit)? = null,
-) {
-    SmartFoodTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        label = label,
-        placeholder = placeholder,
-        leadingContent = leadingContent,
-        trailingContent = trailingContent,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        visualTransformation = visualTransformation,
-        enabled = enabled,
-        isError = isError,
-        onFocusChanged = onFocusChanged,
-    )
-}
-
-/**
  * Variante específica de [SmartFoodTextField] configurada exclusivamente para contraseñas.
  * Gestiona de forma encapsulada la visibilidad del texto mediante el botón de visibilidad.
  */
