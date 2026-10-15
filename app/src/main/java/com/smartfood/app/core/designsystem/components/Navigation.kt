@@ -101,7 +101,8 @@ private fun BottomBarTab(tab: SmartFoodTab) {
         Text(
             text = tab.label,
             color = color,
-            style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            // labelLarge es el estilo de etiqueta con Poppins; el Figma usa Poppins SemiBold de 12 sp.
+            style = MaterialTheme.typography.labelLarge.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         )
     }
 }
