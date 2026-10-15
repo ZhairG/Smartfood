@@ -102,7 +102,7 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 
 ### 3. Antes de abrir el PR (todo obligatorio)
 
-1. `./gradlew :app:testDebugUnitTest` en verde (y `npm --prefix functions test` si cambió `functions/`).
+1. `./gradlew :app:testDebugUnitTest` en verde (y `npm --prefix functions test` si cambió `functions/`, y las pruebas de `rules-test/` con los emuladores si cambiaron `firestore.rules` o `storage.rules`).
 2. `./gradlew :app:assembleDebug` compila y `./gradlew :app:lintDebug` no agrega errores nuevos.
 3. Si el cambio toca `ui/`, `core/designsystem` o `core/navigation`: `./gradlew :app:connectedDebugAndroidTest` en verde en emulador o dispositivo. Las pruebas unitarias no dibujan Compose, así que un componente que se cae al mostrarse pasa el punto 1 sin fallar (Issue #60).
 4. `spec.md` y `tasks.md` de la feature reflejan el cambio, y la matriz CA → test está al día.
@@ -170,6 +170,7 @@ En Windows usar `gradlew.bat` (o `./gradlew` desde Git Bash).
 ./gradlew :app:lintDebug                     # Android Lint (no hay ktlint/detekt configurados)
 firebase deploy --only firestore:rules       # Publicar firestore.rules
 npm --prefix functions test                  # Compilar y probar las Cloud Functions (node:test)
+firebase emulators:exec --only firestore,storage "npm --prefix rules-test test"   # Probar firestore.rules y storage.rules (antes: npm --prefix rules-test ci)
 firebase emulators:start --only auth,firestore,functions   # Emulator Suite; la app con -PuseFirebaseEmulator=true
 firebase deploy --only functions             # Desplegar las funciones (requiere los secretos SMTP_USER y SMTP_PASS)
 ```
@@ -237,6 +238,6 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 
 ## Configuración externa
 
-Firebase (`smartfood-f62a1`, plan Blaze): Authentication con correo/contraseña, Cloud Firestore (`southamerica-east1`) y Cloud Functions. Reglas en `firestore.rules`: cada usuario solo accede a `users/{su uid}` (al crearlo debe incluir la constancia de la spec 005), y `passwordResets` y `welcomeEmails` están cerrados a los clientes. Los secretos de Gmail se configuran con `firebase functions:secrets:set` (ver README).
+Firebase (`smartfood-f62a1`, plan Blaze): Authentication con correo/contraseña, Cloud Firestore (`southamerica-east1`) y Cloud Functions. Reglas en `firestore.rules`: cada usuario solo accede a `users/{su uid}` (al crearlo debe incluir la constancia de la spec 005), y `passwordResets` y `welcomeEmails` están cerrados a los clientes. El inventario vive en `users/{uid}/inventory` (solo el dueño, con los datos validados) y sus fotos en Storage (`storage.rules`: JPEG de menos de 2 MB, sin sobrescribir); el bucket de Storage se crea en `southamerica-east1` antes de desplegar `storage.rules`. Las pruebas de ambas reglas están en `rules-test/`. Los secretos de Gmail se configuran con `firebase functions:secrets:set` (ver README).
 
 La API key de Android tiene restricción por paquete + SHA-1. Cada computador necesita el `google-services.json` vigente (no se versiona) y su SHA-1 de debug registrada en Google Cloud Console. Si en Logcat aparece `API key expired` o `Requests from this Android client application com.smartfood.app are blocked`, la causa es esa configuración, no el código (ver "Primero: configurar tu equipo" en el README).

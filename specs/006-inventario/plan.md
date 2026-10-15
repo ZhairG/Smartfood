@@ -211,6 +211,11 @@ match /users/{uid}/inventory/{itemId} {
 
 La regla actual de `users/{uid}` no cubre las subcolecciones, así que esta regla es necesaria.
 
+La versión vigente (`firestore.rules`, T022) endurece este esquema: `keys().hasOnly([...])` con los 10 campos del
+documento (no se cuelan claves extra), `nameNormalized` debe ser texto y `validPhoto` exige que `photoPath` y
+`photoUrl` vayan juntas. Las pruebas automáticas viven en `rules-test/` (`@firebase/rules-unit-testing`) y se corren
+con `firebase emulators:exec --only firestore,storage "npm --prefix rules-test test"`.
+
 ### Cloud Storage
 
 ```
@@ -229,6 +234,8 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 ```
 
 - Un nombre de archivo único (`uuid`) evita que la caché de imágenes muestre la foto vieja al reemplazarla.
+- En Storage, sobrescribir un archivo cuenta como `create`, así que la regla vigente exige además `resource == null`:
+  una foto subida no se puede reemplazar, solo borrar (lo comprobó `rules-test`).
 - El bucket se crea en `southamerica-east1`, como Firestore. El plan Blaze ya está activo.
 
 ## 4. Foto: captura, compresión y subida

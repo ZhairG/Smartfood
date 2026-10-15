@@ -347,4 +347,6 @@ contraseña. Solo existe en debug; release usa siempre la versión real.
 ./gradlew :app:connectedDebugAndroidTest  # Pruebas instrumentadas (requiere emulador)
 ./gradlew :app:lintDebug                  # Android Lint
 npm --prefix functions test               # Pruebas de las Cloud Functions
+npm --prefix rules-test ci                # Una vez: dependencias de las pruebas de reglas
+firebase emulators:exec --only firestore,storage "npm --prefix rules-test test"   # Pruebas de firestore.rules y storage.rules
 ```
