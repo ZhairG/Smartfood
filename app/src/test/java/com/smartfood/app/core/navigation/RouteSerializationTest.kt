@@ -35,7 +35,7 @@ class RouteSerializationTest {
             Route.RegisterSuccess,
             Route.PasswordRecovery,
             Route.PasswordRecoverySuccess,
-            Route.Home,
+            Route.Profile,
         )
 
         routes.forEach { route ->

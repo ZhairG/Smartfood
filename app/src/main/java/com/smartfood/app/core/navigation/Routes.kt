@@ -76,9 +76,9 @@ sealed interface Route {
         override val screenRoute: ScreenRoute = ScreenRoute.PRIVACY_POLICY
     }
 
-    /** Pantalla principal (Home) de la aplicación. */
+    /** Pestaña Perfil: saludo y cierre de sesión (antes Home; spec 006, CA-INV-09-03). */
     @Serializable
-    data object Home : Route {
-        override val screenRoute: ScreenRoute = ScreenRoute.HOME
+    data object Profile : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.PROFILE
     }
 }
