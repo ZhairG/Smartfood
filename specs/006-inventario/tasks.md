@@ -29,13 +29,13 @@
 
 ## Fase 2: Datos e infraestructura
 - [x] T014 Dependencias: `firebase-storage`, CameraX, Coil 3, WorkManager y `hilt-work` (plan §9). → #19
-- [ ] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador (hecho en el #34). → #69
+- [x] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador (hecho en el #34). Prueba: I `InventoryDataModuleTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (inyecta desde Hilt). → #69
 - [x] T016 `InventoryErrorMapper`, con pruebas (plan §10). Prueba: U `InventoryErrorMapperTest`. → #30
 - [x] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). Guardar y borrar con transacción (RNF-INV-05). Prueba: U `InventoryDocumentTest`; de punta a punta con las reglas en T022. → #30
 - [x] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). Pruebas: U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (con `-PuseFirebaseEmulator=true`). → #31
 - [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5), y su `@Binds` en `InventoryDataModule`. → #32
 - [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente, y su `@Binds` en `InventoryDataModule`. → #33
-- [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. Cada implementación se enlaza en su Issue: Firestore y fotos → #69, voz → #32, preferencias → #33. Se marca cuando las tres estén enlazadas.
+- [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. Cada implementación se enlaza en su Issue: Firestore y fotos → #69 (hecho; I `InventoryDataModuleTest`), voz → #32, preferencias → #33. Se marca cuando las tres estén enlazadas.
 - [x] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). Pruebas: R `rules-test/` (Firestore y Storage), I `FirestoreInventoryRepositoryEmulatorTest` (de punta a punta con `-PuseFirebaseEmulator=true`). → #34
 
 ## Fase 3: Design system
