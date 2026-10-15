@@ -1,6 +1,7 @@
 package com.smartfood.app.feature.auth.ui
 
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,10 +40,15 @@ fun NavGraphBuilder.authGraph(navController: NavHostController) {
         composable<Route.Login> {
             val viewModel: LoginViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
+            val autofill = LocalAutofillManager.current
 
             ObserveEffects(viewModel.effects) { effect ->
                 when (effect) {
-                    LoginEffect.NavigateToHome -> navController.navigateToMainGraph()
+                    LoginEffect.NavigateToHome -> {
+                        // El teléfono ofrece guardar la cuenta con la que se entró (spec 001, CA-07-02).
+                        autofill?.commit()
+                        navController.navigateToMainGraph()
+                    }
                 }
             }
 
@@ -57,11 +63,15 @@ fun NavGraphBuilder.authGraph(navController: NavHostController) {
         composable<Route.Register> {
             val viewModel: RegisterViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
+            val autofill = LocalAutofillManager.current
 
             ObserveEffects(viewModel.effects) { effect ->
                 when (effect) {
-                    RegisterEffect.NavigateToSuccess -> navController.navigate(Route.RegisterSuccess) {
-                        popUpTo<Route.Register> { inclusive = true }
+                    RegisterEffect.NavigateToSuccess -> {
+                        autofill?.commit() // CA-07-02: guardar la cuenta recién creada.
+                        navController.navigate(Route.RegisterSuccess) {
+                            popUpTo<Route.Register> { inclusive = true }
+                        }
                     }
                 }
             }
@@ -87,11 +97,15 @@ fun NavGraphBuilder.authGraph(navController: NavHostController) {
         composable<Route.PasswordRecovery> {
             val viewModel: PasswordRecoveryViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
+            val autofill = LocalAutofillManager.current
 
             ObserveEffects(viewModel.effects) { effect ->
                 when (effect) {
-                    PasswordRecoveryEffect.NavigateToSuccess -> navController.navigate(Route.PasswordRecoverySuccess) {
-                        popUpTo<Route.PasswordRecovery> { inclusive = true }
+                    PasswordRecoveryEffect.NavigateToSuccess -> {
+                        autofill?.commit() // CA-07-02: actualizar la contraseña guardada.
+                        navController.navigate(Route.PasswordRecoverySuccess) {
+                            popUpTo<Route.PasswordRecovery> { inclusive = true }
+                        }
                     }
                 }
             }

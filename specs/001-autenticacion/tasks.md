@@ -52,8 +52,8 @@
 
 ## Fase 7: Autocompletado (HU-07, #67)
 - [x] T033 Spec: HU-07 (CA-07-01 a 07-04), RF-AUTH-09, "Fuera de alcance", ADR-07 y §8.1 del plan.
-- [ ] T034 `contentType` en `SmartFoodTextField`, `SmartFoodPasswordField` y `PasswordFieldWithChecklist`, y los tipos de cada campo en Login, Registro y Recuperación (CA-07-01, 07-03, 07-04).
-- [ ] T035 `AuthNavGraph` llama a `AutofillManager.commit()` al terminar bien el login, el registro o el cambio de contraseña (CA-07-02).
+- [x] T034 `contentType` en `SmartFoodTextField`, `SmartFoodPasswordField` y `PasswordFieldWithChecklist`, y los tipos de cada campo en Login, Registro y Recuperación (CA-07-01, 07-03, 07-04). El tipo del correo es la constante `EmailAccountContentType` (`AuthContentTypes.kt`): cada `+` crea un objeto nuevo y las pruebas comparan por instancia.
+- [x] T035 `AuthNavGraph` llama a `AutofillManager.commit()` al terminar bien el login, el registro o el cambio de contraseña (CA-07-02).
 - [ ] T036 Pruebas instrumentadas de los tipos y verificación manual en el teléfono (checklist 7).
 
 ## Matriz de trazabilidad

@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -21,12 +22,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
-import com.smartfood.app.feature.auth.ui.inlineError
-import com.smartfood.app.feature.auth.ui.messageRes
-import com.smartfood.app.feature.auth.ui.components.AuthErrorMessage
-import com.smartfood.app.feature.auth.ui.components.AuthScreenScaffold
-import com.smartfood.app.feature.auth.ui.components.FlexibleGap
-import com.smartfood.app.feature.auth.ui.components.PasswordFieldWithChecklist
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.components.SmartFoodPromptLink
 import com.smartfood.app.core.designsystem.components.SmartFoodTermsCheckbox
@@ -34,6 +29,13 @@ import com.smartfood.app.core.designsystem.components.SmartFoodTextField
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.titleStyle
+import com.smartfood.app.feature.auth.ui.components.AuthErrorMessage
+import com.smartfood.app.feature.auth.ui.components.AuthScreenScaffold
+import com.smartfood.app.feature.auth.ui.components.EmailAccountContentType
+import com.smartfood.app.feature.auth.ui.components.FlexibleGap
+import com.smartfood.app.feature.auth.ui.components.PasswordFieldWithChecklist
+import com.smartfood.app.feature.auth.ui.inlineError
+import com.smartfood.app.feature.auth.ui.messageRes
 
 /**
  * Nombre: RegisterScreen.kt
@@ -125,6 +127,7 @@ private fun RegisterFormFields(
     Column(modifier = modifier) {
         SmartFoodTextField(
             label = stringResource(id = R.string.register_name_label),
+            contentType = ContentType.PersonFullName,
             value = state.fullName,
             onValueChange = remember(onEvent) { { name -> onEvent(RegisterEvent.FullNameChanged(name)) } },
             placeholder = stringResource(id = R.string.register_name_placeholder),
@@ -141,6 +144,7 @@ private fun RegisterFormFields(
 
         SmartFoodTextField(
             label = stringResource(id = R.string.login_email_label),
+            contentType = EmailAccountContentType,
             value = state.email,
             onValueChange = remember(onEvent) { { email -> onEvent(RegisterEvent.EmailChanged(email)) } },
             placeholder = stringResource(id = R.string.login_email_placeholder),

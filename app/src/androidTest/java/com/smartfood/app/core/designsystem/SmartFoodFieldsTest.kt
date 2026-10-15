@@ -174,4 +174,11 @@ class SmartFoodFieldsTest {
         composeTestRule.onNodeWithContentDescription("Compact", useUnmergedTree = true)
             .assertWidthIsEqualTo(FormMetrics.Compact.fieldIconSize)
     }
+
+    @Test
+    fun ca_07_04_sinTipoElCampoNoParticipaDelAutocompletado() {
+        mostrar { SmartFoodTextField(label = "Correo", value = "", onValueChange = {}) }
+
+        composeTestRule.onNodeWithText("Correo").assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ContentType))
+    }
 }

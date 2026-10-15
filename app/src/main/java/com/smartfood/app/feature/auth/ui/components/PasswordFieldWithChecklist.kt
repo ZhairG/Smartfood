@@ -1,13 +1,14 @@
 package com.smartfood.app.feature.auth.ui.components
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.core.designsystem.components.AnchoredPopup
@@ -31,6 +32,7 @@ import com.smartfood.app.feature.auth.domain.usecase.PasswordValidationResult
  * @param isError Resalta el campo con borde de error.
  * @param imeAction Acción de la tecla del teclado.
  * @param keyboardActions Acciones del teclado.
+ * @param contentType Tipo para el autocompletado del teléfono; por defecto, contraseña nueva (spec 001, CA-07-03).
  */
 @Composable
 fun PasswordFieldWithChecklist(
@@ -43,7 +45,8 @@ fun PasswordFieldWithChecklist(
     enabled: Boolean = true,
     isError: Boolean = false,
     imeAction: ImeAction = ImeAction.Done,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    contentType: ContentType = ContentType.NewPassword
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
@@ -70,7 +73,9 @@ fun PasswordFieldWithChecklist(
             isError = isError,
             imeAction = imeAction,
             keyboardActions = keyboardActions,
-            onFocusChanged = { isFocused = it }
+            onFocusChanged = { isFocused = it },
+            // Se pasa al campo: el modifier de este componente va al popup (HU-07).
+            contentType = contentType
         )
     }
 }

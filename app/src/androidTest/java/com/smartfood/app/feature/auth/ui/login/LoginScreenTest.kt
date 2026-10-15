@@ -1,5 +1,9 @@
 package com.smartfood.app.feature.auth.ui.login
 
+import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -8,6 +12,7 @@ import androidx.compose.ui.test.performTextInput
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthField
+import com.smartfood.app.feature.auth.ui.components.EmailAccountContentType
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -89,5 +94,16 @@ class LoginScreenTest {
         composeTestRule.onNodeWithText("Reconectar").performClick()
 
         assertEquals(LoginEvent.RetryConnectionClicked, lastEvent)
+    }
+
+    /** El nodo editable declara [type] para el autocompletado del teléfono (spec 001, HU-07). */
+    private fun conTipo(type: ContentType) = SemanticsMatcher.expectValue(SemanticsProperties.ContentType, type)
+
+    @Test
+    fun ca0701_correoYContrasenaSeOfrecenAlAutocompletado() {
+        mostrar()
+
+        composeTestRule.onNodeWithText("Correo electrónico").assert(conTipo(EmailAccountContentType))
+        composeTestRule.onNodeWithText("Contraseña").assert(conTipo(ContentType.Password))
     }
 }

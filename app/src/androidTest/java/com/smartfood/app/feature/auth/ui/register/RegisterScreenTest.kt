@@ -1,13 +1,15 @@
 package com.smartfood.app.feature.auth.ui.register
 
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.click
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
@@ -20,6 +22,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextLayoutResult
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.auth.domain.model.AuthError
+import com.smartfood.app.feature.auth.ui.components.EmailAccountContentType
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -182,5 +185,17 @@ class RegisterScreenTest {
 
         assertEquals(1, terminos)
         assertEquals(1, privacidad)
+    }
+
+    /** El nodo editable declara [type] para el autocompletado del teléfono (spec 001, HU-07). */
+    private fun conTipo(type: ContentType) = SemanticsMatcher.expectValue(SemanticsProperties.ContentType, type)
+
+    @Test
+    fun ca0703_registroOfreceUsuarioYPideContrasenaNueva() {
+        mostrar()
+
+        composeTestRule.onNodeWithText("Nombre completo").assert(conTipo(ContentType.PersonFullName))
+        composeTestRule.onNodeWithText("Correo electrónico").assert(conTipo(EmailAccountContentType))
+        campoContrasena().assert(conTipo(ContentType.NewPassword))
     }
 }
