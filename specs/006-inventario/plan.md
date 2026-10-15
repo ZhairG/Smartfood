@@ -331,8 +331,9 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 
 | Componente | Cambio |
 |---|---|
-| `SmartFoodTextField` | Nuevos `leadingContent: (@Composable () -> Unit)? = null` y `label: String?`. Sin etiqueta visible, la etiqueta accesible va en `semantics { contentDescription }`. Los usos actuales no cambian. |
-| `SmartFoodSelectorField` (nuevo, `Inputs.kt`) | La misma caja que `SmartFoodTextField` (`inputBorderAndBackground`, `LocalFormMetrics`), sin teclado. Se toca con `Role.Button` y admite `leadingContent`, `trailingContent` (chevron) e `isError`. La etiqueta y la fila con borde se extraen a un `private @Composable` compartido para no duplicar código. |
+| `SmartFoodTextField` | Nuevos `leadingContent: (@Composable () -> Unit)? = null`, `label: String?` y `accessibilityLabel: String?`. Sin etiqueta visible, el campo se anuncia con `accessibilityLabel` o, si falta, con el placeholder (`semantics { contentDescription }`). Los usos actuales no cambian. |
+| `SmartFoodSelectorField` (nuevo, `Inputs.kt`) | La misma caja que `SmartFoodTextField`: las dos usan el `private @Composable FieldFrame` (etiqueta, caja con `inputBorderAndBackground`, ícono y contenido final). Sin teclado. La etiqueta y la caja forman **un solo nodo** que se toca (`Role.Button`), así que tocar la etiqueta abre el selector y TalkBack anuncia "Categoría, Lácteos, botón". Admite `leadingContent`, `trailingContent` (chevron), `isError` y `accessibilityLabel`. |
+| `FormMetrics` | `fieldIconSize` (Regular 30, Medium 26, Compact 24 dp) y `fieldIconSpacing` (23, 18 y 14 dp): el ícono inicial va en una caja de ese tamaño, en gris `onSurfaceVariant` (el `#9AA39D` del Figma), separado del texto por esa distancia (#62). |
 | `SmartFoodBottomBar` (nuevo) | `NavigationBar` con los ítems Inventario y Perfil, ícono y texto. El seleccionado va en `primary`. |
 | `SmartFoodConfirmDialog` (nuevo, `Dialogs.kt`) | Ícono en círculo, pregunta, botón destructivo ("Eliminar", `error`) y "Cancelar" (`secondary`). Usa la forma de `SmartFoodOfflineDialog`. |
 | `SmartFoodResultDialog` (nuevo, `Dialogs.kt`) | Ícono de check, título y cuerpo opcional ("Producto Guardado" / "Te avisaremos…"). Se anuncia como `liveRegion`. |
