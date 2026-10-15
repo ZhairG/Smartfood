@@ -117,7 +117,10 @@ Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada 
 7. Con el autocompletado de Google activo en el teléfono (*Ajustes → Contraseñas y cuentas*): tocar el correo del
    login → aparecen las cuentas guardadas y al elegir una se llenan los dos campos (CA-07-01); entrar con una cuenta
    no guardada → el teléfono ofrece guardarla (CA-07-02); en el registro, tocar la contraseña → se ofrece una
-   contraseña segura (CA-07-03); la hoja de Google dice "Nombre de usuario" (etiqueta fija de Google) y muestra el
-   correo, que es el usuario con el que se guarda la cuenta. Las cuentas guardadas con el APK release no aparecen en
+   contraseña segura (CA-07-03). En esa hoja, Google pide escribir el "Nombre de usuario" (el correo): la arma con los
+   datos del inicio de la sesión de autocompletado, cuando el correo aún estaba vacío, y ni la app ni Compose pueden
+   llenarla. Se probó marcar el correo solo como `EmailAddress` y cancelar la sesión al salir del correo: ninguno lo
+   llena (el segundo incluso quita la sugerencia). Al terminar el registro, el ofrecimiento de guardar usa el correo
+   del formulario. Las cuentas guardadas con el APK release no aparecen en
    el debug. Si Google no ofrece guardar, revisar en el Gestor de contraseñas que "Ofrecer guardar contraseñas" esté
    activo y que SmartFood no esté en "Sitios y apps rechazados" (sin eso, su respuesta no trae `SaveInfo`).
