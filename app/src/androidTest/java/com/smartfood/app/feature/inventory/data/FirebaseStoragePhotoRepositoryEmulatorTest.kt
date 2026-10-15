@@ -75,7 +75,7 @@ class FirebaseStoragePhotoRepositoryEmulatorTest {
     }
 
     @Test
-    fun t018_subeReducidaBorraIdempotenteYFallaSinSesion() = runBlocking {
+    fun t018_subeReducidaBorraIdempotenteYFallaSinSesion(): Unit = runBlocking {
         val uid = auth.currentUser!!.uid
         val local = fotoGrande()
 
