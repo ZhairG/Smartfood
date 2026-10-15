@@ -1,5 +1,6 @@
 package com.smartfood.app.core.designsystem.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -78,33 +79,35 @@ private val InputShape = RoundedCornerShape(10.dp)
 /**
  * Componente atómico de Campo de Texto genérico con estilo de SmartFood basado en el mockup inicial.
  *
- * @param label Texto descriptivo superior. Forma parte del área táctil y de la semántica del campo.
+ * @param label Texto descriptivo superior opcional. Forma parte del área táctil y de la semántica del campo.
  * @param value Valor actual del texto ingresado.
  * @param onValueChange Callback notificado al modificar el texto.
  * @param modifier Modificador opcional.
  * @param placeholder Texto de sugerencia exhibido cuando [value] está vacío.
+ * @param leadingContent Composable opcional al inicio del contenedor de texto.
+ * @param trailingContent Composable opcional al final del contenedor de texto.
  * @param keyboardOptions Opciones de comportamiento del teclado.
  * @param keyboardActions Acciones disparadas desde las teclas del teclado.
  * @param visualTransformation Transforma la representación visual del texto.
  * @param enabled Si es `false`, deshabilita la interacción con el campo.
  * @param isError Si es `true`, dibuja el borde con color de error (rojo).
  * @param onFocusChanged Callback notificado en el mismo frame en que el campo gana o pierde el foco.
- * @param trailingContent Composable opcional al final del contenedor de texto.
  */
 @Composable
 fun SmartFoodTextField(
-    label: String,
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    label: String? = null,
     placeholder: String? = null,
+    leadingContent: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     enabled: Boolean = true,
     isError: Boolean = false,
     onFocusChanged: ((Boolean) -> Unit)? = null,
-    trailingContent: (@Composable () -> Unit)? = null,
 ) {
     val metrics = LocalFormMetrics.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -140,12 +143,14 @@ fun SmartFoodTextField(
             // La etiqueta vive dentro del campo: tocarla lo enfoca y su texto forma parte de la
             // semántica del campo, así que los lectores de pantalla la anuncian (CA-UI-02-01 y CA-UI-02-08).
             Column(verticalArrangement = Arrangement.spacedBy(metrics.labelSpacing)) {
-                Text(
-                    text = label,
-                    fontSize = metrics.labelFontSize,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                if (label != null) {
+                    Text(
+                        text = label,
+                        fontSize = metrics.labelFontSize,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -156,9 +161,14 @@ fun SmartFoodTextField(
                             borderColor = borderColor,
                             backgroundColor = MaterialTheme.colorScheme.surfaceVariant
                         )
-                        .padding(start = 15.dp, end = if (trailingContent != null) 6.dp else 15.dp),
+                        .padding(
+                            start = if (leadingContent != null) 12.dp else 15.dp,
+                            end = if (trailingContent != null) 6.dp else 15.dp
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    leadingContent?.invoke()
                     Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                         if (value.isEmpty() && placeholder != null) {
                             Text(
@@ -173,6 +183,43 @@ fun SmartFoodTextField(
                 }
             }
         },
+    )
+}
+
+/**
+ * Sobrecarga de conveniencia de [SmartFoodTextField] con el parámetro [label] como primer argumento
+ * para conservar compatibilidad con llamadas que usan posición.
+ */
+@Composable
+fun SmartFoodTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String? = null,
+    leadingContent: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    enabled: Boolean = true,
+    isError: Boolean = false,
+    onFocusChanged: ((Boolean) -> Unit)? = null,
+) {
+    SmartFoodTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        label = label,
+        placeholder = placeholder,
+        leadingContent = leadingContent,
+        trailingContent = trailingContent,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        visualTransformation = visualTransformation,
+        enabled = enabled,
+        isError = isError,
+        onFocusChanged = onFocusChanged,
     )
 }
 
@@ -225,6 +272,96 @@ fun SmartFoodPasswordField(
             }
         },
     )
+}
+
+/**
+ * Componente atómico de Selección no editable con estilo de SmartFood.
+ * Comparte la caja, bordes, colores y tipografía de [SmartFoodTextField], pero reacciona
+ * al toque ejecutando [onClick] (útil para calendarios, selectores de categoría u hojas inferiores).
+ *
+ * @param value Valor actual seleccionado que se muestra en el campo.
+ * @param onClick Callback notificado al tocar el selector.
+ * @param modifier Modificador opcional.
+ * @param label Texto descriptivo superior opcional.
+ * @param placeholder Texto de sugerencia exhibido cuando [value] está vacío.
+ * @param leadingContent Composable opcional al inicio del contenedor (ícono descriptivo).
+ * @param trailingContent Composable opcional al final del contenedor (flecha de desplegable, calendario, etc.).
+ * @param enabled Si es `false`, deshabilita la interacción con el selector.
+ * @param isError Si es `true`, dibuja el borde con color de error (rojo).
+ */
+@Composable
+fun SmartFoodSelectorField(
+    value: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    label: String? = null,
+    placeholder: String? = null,
+    leadingContent: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true,
+    isError: Boolean = false,
+) {
+    val metrics = LocalFormMetrics.current
+
+    val borderColor = when {
+        isError -> MaterialTheme.colorScheme.error
+        else -> MaterialTheme.colorScheme.outline
+    }
+    val borderWidth = if (isError) 2.dp else 1.dp
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(metrics.labelSpacing)
+    ) {
+        if (label != null) {
+            Text(
+                text = label,
+                fontSize = metrics.labelFontSize,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(metrics.inputHeight)
+                .inputBorderAndBackground(
+                    shape = InputShape,
+                    borderWidth = borderWidth,
+                    borderColor = borderColor,
+                    backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+                .clickable(
+                    enabled = enabled,
+                    onClick = onClick,
+                    role = Role.Button
+                )
+                .padding(
+                    start = if (leadingContent != null) 12.dp else 15.dp,
+                    end = if (trailingContent != null) 12.dp else 15.dp
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            leadingContent?.invoke()
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                if (value.isEmpty() && placeholder != null) {
+                    Text(
+                        text = placeholder,
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else if (value.isNotEmpty()) {
+                    Text(
+                        text = value,
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+            trailingContent?.invoke()
+        }
+    }
 }
 
 /**
@@ -384,6 +521,12 @@ private fun SmartFoodTextFieldPreview() {
                 label = "Contraseña",
                 value = "12345678",
                 onValueChange = {}
+            )
+            SmartFoodSelectorField(
+                label = "Seleccionar categoría",
+                value = "Lácteos",
+                placeholder = "Elegir...",
+                onClick = {}
             )
             SmartFoodCheckbox(
                 label = "Recuérdame",
