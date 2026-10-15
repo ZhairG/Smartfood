@@ -1,4 +1,4 @@
-package com.smartfood.app.feature.home
+package com.smartfood.app.feature.profile
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -17,30 +17,30 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Nombre: HomeViewModel.kt
+ * Nombre: ProfileViewModel.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: ViewModel de la pantalla de inicio (HU-05). Lee el perfil del usuario para saludarlo
- * y gestiona el cierre de sesión. Es el punto de entrada de las próximas features (inventario y recetas).
+ * Descripción: ViewModel de la pestaña Perfil (spec 001 HU-05; spec 006 CA-INV-09-03). Lee el perfil del usuario
+ * para saludarlo y gestiona el cierre de sesión.
  *
  * @param getCurrentUser Caso de uso que obtiene el perfil del usuario actual.
  * @param logout Caso de uso de cierre de sesión.
  */
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class ProfileViewModel @Inject constructor(
     private val getCurrentUser: GetCurrentUserUseCase,
     private val logout: LogoutUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
+    private val _uiState = MutableStateFlow(ProfileUiState())
 
     /** Estado observable de la pantalla. */
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
-    private val _effects = Channel<HomeEffect>(Channel.BUFFERED)
+    private val _effects = Channel<ProfileEffect>(Channel.BUFFERED)
 
     /** Efectos de un solo uso, como la navegación. */
-    val effects: Flow<HomeEffect> = _effects.receiveAsFlow()
+    val effects: Flow<ProfileEffect> = _effects.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -51,34 +51,34 @@ class HomeViewModel @Inject constructor(
     }
 
     /** Procesa un evento de la UI. */
-    fun onEvent(event: HomeEvent) {
+    fun onEvent(event: ProfileEvent) {
         when (event) {
-            HomeEvent.LogoutClicked -> {
+            ProfileEvent.LogoutClicked -> {
                 logout()
-                viewModelScope.launch { _effects.send(HomeEffect.NavigateToLogin) }
+                viewModelScope.launch { _effects.send(ProfileEffect.NavigateToLogin) }
             }
         }
     }
 }
 
 /**
- * Estado inmutable de [HomeScreen].
+ * Estado inmutable de [ProfileScreen].
  *
  * @property isLoading Se está leyendo el perfil.
  * @property firstName Primer nombre del usuario, o `null` si no se pudo leer.
  */
 @Immutable
-data class HomeUiState(
+data class ProfileUiState(
     val isLoading: Boolean = true,
     val firstName: String? = null
 )
 
-/** Acciones del usuario en [HomeScreen]. */
-sealed interface HomeEvent {
-    data object LogoutClicked : HomeEvent
+/** Acciones del usuario en [ProfileScreen]. */
+sealed interface ProfileEvent {
+    data object LogoutClicked : ProfileEvent
 }
 
-/** Efectos de un solo uso emitidos por [HomeViewModel]. */
-sealed interface HomeEffect {
-    data object NavigateToLogin : HomeEffect
+/** Efectos de un solo uso emitidos por [ProfileViewModel]. */
+sealed interface ProfileEffect {
+    data object NavigateToLogin : ProfileEffect
 }

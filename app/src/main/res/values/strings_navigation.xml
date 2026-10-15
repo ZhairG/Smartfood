@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Textos de la navegación principal (spec 006, HU-INV-09, Issue #38).
+    Archivo propio para no tocar el strings.xml compartido. Las pantallas de inventario agregarán los suyos en
+    strings_inventory.xml (T027, #37).
+-->
+<resources>
+    <string name="tab_inventory">Inventario</string>
+    <string name="tab_profile">Perfil</string>
+    <string name="inventory_title">Mi Inventario</string>
+    <!-- Pantallas provisionales: las reemplazan los Issues de cada pantalla (#39, #40, #41 y #42). -->
+    <string name="placeholder_coming_soon">Próximamente</string>
+    <string name="placeholder_search_title">Buscar</string>
+    <string name="placeholder_editor_title">Producto</string>
+    <string name="placeholder_camera_title">Cámara</string>
+</resources>

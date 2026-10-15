@@ -320,10 +320,16 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 
 - `MainGraph` arranca en `Inventory`. `navigateToMainGraph()` no cambia, así que CA-INV-09-01 se cumple sin tocar
   la Splash ni el inicio de sesión.
-- `MainScaffold` (en `core/navigation`) envuelve el `NavHost` y muestra `SmartFoodBottomBar` solo si el destino
-  actual es `Inventory` o `Profile` (CA-INV-09-02, 04). Las pestañas navegan con
+- `MainTabScaffold` (en `core/navigation`) dibuja `SmartFoodBottomBar` y lo usan **solo** las pantallas de pestaña
+  (`Inventory` y `Profile`). Las internas y las de autenticación no lo usan, así que no muestran la barra
+  (CA-INV-09-02, 04) y no cambian sus márgenes de teclado ni de barras del sistema (spec 002). Un `Scaffold` global
+  alrededor del `NavHost` los habría cambiado (decisión del #38). Las pestañas navegan con `navigateToTab`:
   `popUpTo(Inventory) { saveState = true }`, `launchSingleTop = true` y `restoreState = true`.
-- Las rutas internas usan `NavTransitions` (empuje de 600 ms). Las pestañas cambian sin transición de empuje.
+- Las rutas internas usan `NavTransitions` (empuje de 600 ms). Entre pestañas no hay empuje
+  (`NavTransitions.tabEnter`, `tabExit`, `tabPopEnter` y `tabPopExit`).
+- `mainGraph()` vive en `core/navigation/MainNavGraph.kt` y reúne `inventoryDestinations` (`feature/inventory/ui`) y
+  `profileDestination` (`feature/profile`). Mientras no existan, los destinos del inventario son pantallas
+  provisionales que reemplazan sus Issues (#39 a #42).
 - `ScreenRoute` gana las entradas correspondientes y pierde `HOME`. `AppNavigationTest` se actualiza: después del
   inicio de sesión se espera "Mi Inventario" y el cierre de sesión pasa por la pestaña Perfil.
 
@@ -334,10 +340,10 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 | `SmartFoodTextField` | Nuevos `leadingContent: (@Composable () -> Unit)? = null`, `label: String?` y `accessibilityLabel: String?`. Sin etiqueta visible, el campo se anuncia con `accessibilityLabel` o, si falta, con el placeholder (`semantics { contentDescription }`). Los usos actuales no cambian. |
 | `SmartFoodSelectorField` (nuevo, `Inputs.kt`) | La misma caja que `SmartFoodTextField`: las dos usan el `private @Composable FieldFrame` (etiqueta, caja con `inputBorderAndBackground`, ícono y contenido final). Sin teclado. La etiqueta y la caja forman **un solo nodo** que se toca (`Role.Button`), así que tocar la etiqueta abre el selector y TalkBack anuncia "Categoría, Lácteos, botón". Admite `leadingContent`, `trailingContent` (chevron), `isError` y `accessibilityLabel`. |
 | `FormMetrics` | `fieldIconSize` (Regular 30, Medium 26, Compact 24 dp) y `fieldIconSpacing` (23, 18 y 14 dp): el ícono inicial va en una caja de ese tamaño, en gris `onSurfaceVariant` (el `#9AA39D` del Figma), separado del texto por esa distancia (#62). |
-| `SmartFoodBottomBar` (nuevo) | `NavigationBar` con los ítems Inventario y Perfil, ícono y texto. El seleccionado va en `primary`. |
+| `SmartFoodBottomBar` (nuevo, `Navigation.kt`) | Barra de 2 pestañas del Figma (`476:5570`): fondo `surfaceVariant` (blanco), línea superior `outline`, pestañas con ícono y texto (Poppins SemiBold de 12 sp) y rol `Tab`. La seleccionada va en `GreenCheck` (el `#16A34A` del Figma) y las demás en `onSurfaceVariant`. Recibe las pestañas por parámetro (`SmartFoodTab`). Los íconos son de Material hasta T027. |
 | `SmartFoodConfirmDialog` (nuevo, `Dialogs.kt`) | Ícono en círculo, pregunta, botón destructivo ("Eliminar", `error`) y "Cancelar" (`secondary`). Usa la forma de `SmartFoodOfflineDialog`. |
 | `SmartFoodResultDialog` (nuevo, `Dialogs.kt`) | Ícono de check, título y cuerpo opcional ("Producto Guardado" / "Te avisaremos…"). Se anuncia como `liveRegion`. |
-| `SmartFoodPrimaryButton` | Variante de color "acento" (naranja `secondary`) para "Añadir al Inventario" habilitado. El deshabilitado conserva el gris actual. |
+| `SmartFoodPrimaryButton` | Ya es naranja (`secondary`) habilitado y gris deshabilitado, como "Añadir al Inventario" (`476:5726`), así que no hace falta una variante de acento. Suma `leadingIcon` opcional para el "+". |
 
 - **Cantidad (T002, desviación de la spec §8):** en el editor, debajo de la categoría, una fila con un
   `SmartFoodTextField` numérico (`KeyboardType.Decimal`) y un `SmartFoodSelectorField` de unidad que abre una hoja

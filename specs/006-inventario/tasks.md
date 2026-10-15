@@ -44,13 +44,13 @@
 - [x] T023 `SmartFoodTextField` con `leadingContent` y `label: String?`, sin cambios en los usos actuales. Las pruebas de autenticación siguen verdes. Prueba: I `SmartFoodFieldsTest` (la sobrecarga recursiva que cerraba la app se corrigió en #60; nombre accesible, `FieldFrame` y medidas del ícono en #62). → #35
 - [x] T024 [P] `SmartFoodSelectorField` (comparte la caja con el campo de texto) (CA-INV-02-04, 02-05). Prueba: I `SmartFoodFieldsTest.t024_*` (etiqueta y valor en un solo nodo desde #62). → #35
 - [ ] T025 [P] `SmartFoodConfirmDialog` y `SmartFoodResultDialog` (CA-INV-02-06, 03-02, 04-01, 05-04). → #36
-- [ ] T026 [P] `SmartFoodBottomBar` y la variante de acento de `SmartFoodPrimaryButton` (CA-INV-02-02, 09-02). Pasó del #36 al #38 para no bloquear la navegación. → #38
+- [x] T026 [P] `SmartFoodBottomBar` y la variante de acento de `SmartFoodPrimaryButton` (CA-INV-02-02, 09-02). Pasó del #36 al #38 para no bloquear la navegación. El botón ya era naranja: solo se agregó `leadingIcon`. Prueba: I `SmartFoodNavigationTest`. → #38
 - [ ] T027 [P] Íconos vectoriales exportados del Figma y `strings_inventory.xml` (RNF-INV-08). Rol de color `ExpiringSoon` si hace falta (plan §8). → #37
 
 ## Fase 4: Navegación
-- [ ] T028 Renombrar `feature/home` → `feature/profile` (`ProfileScreen`, `ProfileViewModel`, `Route.Profile`). Se ajustan sus pruebas (CA-INV-09-03). → #38
-- [ ] T029 Rutas `Inventory`, `InventorySearch`, `ProductEditor(itemId?)` y `ProductCamera`. `MainGraph` arranca en `Inventory`. `MainScaffold` con la barra inferior solo en las pestañas (CA-INV-09-01, 09-02, 09-04, 09-05). → #38
-- [ ] T030 `MainNavigationTest` y `AppNavigationTest` actualizados (el inicio de sesión llega a "Mi Inventario" y el cierre de sesión pasa por Perfil). → #38
+- [x] T028 Renombrar `feature/home` → `feature/profile` (`ProfileScreen`, `ProfileViewModel`, `Route.Profile`). Se ajustan sus pruebas (CA-INV-09-03). Prueba: U `ProfileViewModelTest`. → #38
+- [x] T029 Rutas `Inventory`, `InventorySearch`, `ProductEditor(itemId?)` y `ProductCamera`. `MainGraph` arranca en `Inventory`. `MainTabScaffold` con la barra inferior solo en las pestañas (CA-INV-09-01, 09-02, 09-04, 09-05). Destinos del inventario provisionales hasta #39 a #42. → #38
+- [x] T030 `MainNavigationTest` y `AppNavigationTest` actualizados (el inicio de sesión llega a "Mi Inventario" y el cierre de sesión pasa por Perfil). `AppNavigationTest` no necesitó cambios (solo cubre la autenticación); `MainNavigationTest` no toca "Cerrar sesión" para no cerrar la sesión real del dispositivo (CA-05-03 lo cubre `ProfileViewModelTest`). → #38
 
 ## Fase 5: Pantallas
 > Requiere el MCP de Figma comprobado (ver la nota del inicio).
@@ -90,7 +90,7 @@ verificación manual (checklist).
 | CA-INV-01-07 | U `ObserveInventoryUseCaseTest`, U `InventoryViewModelTest` (el flujo del fake emite), M 1 |
 | CA-INV-01-08 | I `InventoryScreenTest`, M 1 |
 | CA-INV-02-01 | I `ProductEditorScreenTest` |
-| CA-INV-02-02 | U `ValidateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest` |
+| CA-INV-02-02 | U `ValidateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `SmartFoodNavigationTest` (botón) |
 | CA-INV-02-03 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-02-04 | U `ValidateItemUseCaseTest`, M 1 |
 | CA-INV-02-05 | I `ProductEditorScreenTest` |
@@ -134,9 +134,9 @@ verificación manual (checklist).
 | CA-INV-08-04 | M 8 |
 | CA-INV-08-05 | U `ProductEditorViewModelTest`, M 8 |
 | CA-INV-08-06 | U `LogoutUseCaseTest` |
-| CA-INV-09-01 | I `AppNavigationTest` |
-| CA-INV-09-02 | I `MainNavigationTest` |
-| CA-INV-09-03 | I `ProfileScreenTest` (antes `HomeScreenTest`) |
+| CA-INV-09-01 | I `MainNavigationTest` |
+| CA-INV-09-02 | I `MainNavigationTest`, I `SmartFoodNavigationTest` |
+| CA-INV-09-03 | I `MainNavigationTest`, U `ProfileViewModelTest` |
 | CA-INV-09-04 | I `MainNavigationTest` |
 | CA-INV-09-05 | I `MainNavigationTest` |
 | RNF-INV-01 | R `firestore.test.js`, R `storage.test.js`, I `FirestoreInventoryRepositoryEmulatorTest`, M 9 |

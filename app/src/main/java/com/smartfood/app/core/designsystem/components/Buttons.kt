@@ -8,19 +8,23 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,6 +53,8 @@ import com.smartfood.app.core.designsystem.util.figmaShadow
  * @param enabled Estado de habilitación del botón.
  * @param isLoading Indica si el botón se encuentra en un estado de procesamiento asíncrono.
  * @param loadingText Texto base a mostrar durante la animación de carga.
+ * @param leadingIcon Ícono opcional a la izquierda del texto, como el "+" de "Añadir al Inventario" (Figma
+ * `476:5726`, spec 006 T026). El color naranja habilitado y gris deshabilitado ya es el del Figma de inventario.
  */
 @Composable
 fun SmartFoodPrimaryButton(
@@ -57,7 +63,8 @@ fun SmartFoodPrimaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isLoading: Boolean = false,
-    loadingText: String = text
+    loadingText: String = text,
+    leadingIcon: ImageVector? = null
 ) {
     val buttonShape = RoundedCornerShape(10.dp)
     
@@ -104,6 +111,11 @@ fun SmartFoodPrimaryButton(
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier.fillMaxSize()
         ) {
+            if (leadingIcon != null && !isLoading) {
+                // Decorativo: el texto ya dice qué hace el botón.
+                Icon(imageVector = leadingIcon, contentDescription = null)
+                Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+            }
             Text(
                 text = displayText,
                 style = MaterialTheme.typography.titleLarge.copy(

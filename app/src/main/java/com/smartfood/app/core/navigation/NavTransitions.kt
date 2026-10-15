@@ -8,6 +8,8 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 
 /**
  * Nombre: NavTransitions.kt
@@ -42,4 +44,32 @@ object NavTransitions {
     val popExit: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
         slideOutOfContainer(towards = SlideDirection.Right, animationSpec = pushSpec)
     }
+
+    // Las pestañas (Inventario y Perfil) cambian sin empuje (spec 006, plan §7); hacia o desde una pantalla interna
+    // se usa el empuje de siempre.
+    private val AnimatedContentTransitionScope<NavBackStackEntry>.betweenTabs: Boolean
+        get() = initialState.destination.isTab() && targetState.destination.isTab()
+
+    /** Entrada de una pestaña. */
+    val tabEnter: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        if (betweenTabs) EnterTransition.None else enter()
+    }
+
+    /** Salida de una pestaña. */
+    val tabExit: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        if (betweenTabs) ExitTransition.None else exit()
+    }
+
+    /** Entrada de una pestaña al volver. */
+    val tabPopEnter: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        if (betweenTabs) EnterTransition.None else popEnter()
+    }
+
+    /** Salida de una pestaña al volver. */
+    val tabPopExit: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        if (betweenTabs) ExitTransition.None else popExit()
+    }
 }
+
+/** Si el destino es una de las pestañas de la barra inferior. */
+private fun NavDestination.isTab(): Boolean = hasRoute<Route.Inventory>() || hasRoute<Route.Profile>()

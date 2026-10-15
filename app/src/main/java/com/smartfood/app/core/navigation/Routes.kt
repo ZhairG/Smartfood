@@ -76,9 +76,37 @@ sealed interface Route {
         override val screenRoute: ScreenRoute = ScreenRoute.PRIVACY_POLICY
     }
 
-    /** Pantalla principal (Home) de la aplicación. */
+    /** Pestaña "Mi Inventario": inicio de la sesión (spec 006, CA-INV-09-01). */
     @Serializable
-    data object Home : Route {
-        override val screenRoute: ScreenRoute = ScreenRoute.HOME
+    data object Inventory : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.INVENTORY
+    }
+
+    /** Búsqueda en el inventario (spec 006, HU-INV-06). */
+    @Serializable
+    data object InventorySearch : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.INVENTORY_SEARCH
+    }
+
+    /**
+     * Editor de producto (spec 006, HU-INV-02 y 03).
+     *
+     * @property itemId Producto a editar, o `null` para añadir uno nuevo.
+     */
+    @Serializable
+    data class ProductEditor(val itemId: String? = null) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.PRODUCT_EDITOR
+    }
+
+    /** Cámara para la foto del producto (spec 006, HU-INV-05). */
+    @Serializable
+    data object ProductCamera : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.PRODUCT_CAMERA
+    }
+
+    /** Pestaña Perfil: saludo y cierre de sesión (antes Home; spec 006, CA-INV-09-03). */
+    @Serializable
+    data object Profile : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.PROFILE
     }
 }

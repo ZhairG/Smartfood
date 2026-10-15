@@ -1,4 +1,4 @@
-package com.smartfood.app.feature.home
+package com.smartfood.app.feature.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,20 +29,20 @@ import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
 
 /**
- * Nombre: HomeScreen.kt
+ * Nombre: ProfileScreen.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pantalla de inicio provisional (HU-05). Saluda al usuario por su nombre y permite cerrar sesión.
- * Aquí se integrarán el inventario y las recetas recomendadas en las próximas features.
+ * Descripción: Pestaña Perfil (spec 006, CA-INV-09-03; antes la pantalla de inicio de la spec 001, HU-05). Saluda al
+ * usuario por su nombre y permite cerrar sesión.
  *
- * @param state Estado inmutable [HomeUiState].
- * @param onEvent Callback para despachar eventos [HomeEvent].
+ * @param state Estado inmutable [ProfileUiState].
+ * @param onEvent Callback para despachar eventos [ProfileEvent].
  * @param modifier Modificador opcional.
  */
 @Composable
-fun HomeScreen(
-    state: HomeUiState,
-    onEvent: (HomeEvent) -> Unit,
+fun ProfileScreen(
+    state: ProfileUiState,
+    onEvent: (ProfileEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     SystemBarEffect(isLightBackground = !LocalIsDarkTheme.current)
@@ -82,7 +82,7 @@ fun HomeScreen(
 
             SmartFoodPrimaryButton(
                 text = stringResource(id = R.string.action_logout),
-                onClick = remember(onEvent) { { onEvent(HomeEvent.LogoutClicked) } }
+                onClick = remember(onEvent) { { onEvent(ProfileEvent.LogoutClicked) } }
             )
         }
     }
@@ -90,8 +90,8 @@ fun HomeScreen(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun HomeScreenPreview() {
+private fun ProfileScreenPreview() {
     SmartfoodTheme {
-        HomeScreen(state = HomeUiState(isLoading = false, firstName = "Pepito"), onEvent = {})
+        ProfileScreen(state = ProfileUiState(isLoading = false, firstName = "Pepito"), onEvent = {})
     }
 }

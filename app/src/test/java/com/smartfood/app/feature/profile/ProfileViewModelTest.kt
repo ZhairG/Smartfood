@@ -1,4 +1,4 @@
-package com.smartfood.app.feature.home
+package com.smartfood.app.feature.profile
 
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.User
@@ -19,12 +19,12 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Nombre: HomeViewModelTest.kt
+ * Nombre: ProfileViewModelTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [HomeViewModel] (HU-05).
+ * Descripción: Pruebas unitarias de [ProfileViewModel] (HU-05).
  */
-class HomeViewModelTest {
+class ProfileViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -37,7 +37,7 @@ class HomeViewModelTest {
         authRepository.signedInUserId = DEFAULT_UID
     }
 
-    private fun crearViewModel() = HomeViewModel(
+    private fun crearViewModel() = ProfileViewModel(
         getCurrentUser = GetCurrentUserUseCase(authRepository, userRepository),
         logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler())
     )
@@ -66,9 +66,9 @@ class HomeViewModelTest {
     fun `CA-05-03 cerrar sesion termina la sesion y emite NavigateToLogin`() = runTest {
         val viewModel = crearViewModel()
 
-        viewModel.onEvent(HomeEvent.LogoutClicked)
+        viewModel.onEvent(ProfileEvent.LogoutClicked)
 
         assertNull(authRepository.currentUserId())
-        assertEquals(HomeEffect.NavigateToLogin, viewModel.effects.first())
+        assertEquals(ProfileEffect.NavigateToLogin, viewModel.effects.first())
     }
 }
