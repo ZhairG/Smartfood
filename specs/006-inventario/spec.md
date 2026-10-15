@@ -4,7 +4,7 @@
 |---|---|
 | Feature | `006-inventario` |
 | Estado | Especificada (pendiente de implementación) |
-| Fecha | 2026-10-12 |
+| Fecha | 2026-10-12 (cantidad y unidad: 2026-10-14) |
 | Depende de | 001-autenticacion (sesión y perfil), 002-adaptabilidad-ui, 005-documentos-legales |
 | Afecta | Navegación principal (Home pasa a ser la pestaña Perfil, HU-05) y Política de privacidad |
 | Diseño | Figma `z1AoQvluQcmx98gjP4vHF6`, frames principales de inventario y búsqueda (ver §8) |
@@ -34,8 +34,10 @@ El inventario es también la entrada del futuro agente de recomendación de rece
 
 | Término | Significado |
 |---|---|
-| Producto | Un alimento del inventario: nombre, fecha de vencimiento, categoría y, opcionalmente, una foto. |
+| Producto | Un alimento del inventario: nombre, fecha de vencimiento, categoría y, opcionalmente, una cantidad con su unidad y una foto. |
 | Categoría | Una de: Frutas, Lácteos, Proteínas, Verduras, Cereales, Otro. |
+| Cantidad | Número opcional mayor que 0 y hasta 9999, con 2 decimales como máximo (por ejemplo, 1,5). Se escribe con coma o punto decimal. |
+| Unidad | Una de: unidades, g, kg, lb, ml, L. Va siempre con una cantidad: las dos están o ninguna. |
 | Días restantes | Días entre hoy y la fecha de vencimiento, según el calendario del teléfono. |
 | Vencido | Días restantes < 0 (la fecha ya pasó). |
 | Próximo a vencer | Días restantes entre 0 y 3, ambos incluidos (vence hoy o en los próximos 3 días). |
@@ -56,6 +58,7 @@ El inventario es también la entrada del futuro agente de recomendación de rece
 | CA-INV-01-05 | **Dado** que no tengo productos, **entonces** veo un mensaje que me invita a añadir el primero con el botón "+". |
 | CA-INV-01-06 | **Dado** que hoy es 10/09/2026, **entonces** un producto que vence el 09/09/2026 está en "Vencido", uno que vence el 10/09/2026 o el 13/09/2026 está en "Próximo a vencer" y uno que vence el 14/09/2026 está en "Fresco". |
 | CA-INV-01-07 | **Dado** que añadí, edité o eliminé un producto, **cuando** vuelvo a la lista, **entonces** veo el cambio sin recargar manualmente. |
+| CA-INV-01-08 | **Dado** un producto con cantidad, **entonces** su fila muestra la cantidad y la unidad junto a la etiqueta de la categoría (por ejemplo, "1,5 kg"); **dado** uno sin cantidad, **entonces** no se muestra nada en su lugar. |
 
 ### HU-INV-02: Añadir un producto
 **Como** usuario **quiero** registrar un producto con su vencimiento y categoría **para** llevar el control de lo que
@@ -70,15 +73,17 @@ tengo.
 | CA-INV-02-05 | **Dado** "Seleccionar categoría", **cuando** la toco, **entonces** aparece la hoja "Seleccione una categoría" con las seis categorías; "Guardar" aplica la elegida y "Cancelar" deja la anterior. |
 | CA-INV-02-06 | **Dado** un formulario válido, **cuando** toco "Añadir al Inventario", **entonces** veo "Producto Guardado: Te avisaremos antes de que caduque para que no se desperdicie." y regreso a "Mi Inventario" con el producto en su sección. |
 | CA-INV-02-07 | **Dado** que el guardado falla (por ejemplo, sin conexión), **entonces** veo un mensaje de error, el formulario conserva lo que escribí y puedo reintentar. |
+| CA-INV-02-08 | **Dado** el formulario, **entonces** el campo "Cantidad" es opcional y no cambia el estado del botón "Añadir al Inventario" (CA-INV-02-02). **Cuando** escribo una cantidad, **entonces** la unidad empieza en "unidades" y puedo cambiarla por g, kg, lb, ml o L; si dejo la cantidad vacía, el producto se guarda sin cantidad ni unidad. |
+| CA-INV-02-09 | **Dado** el campo "Cantidad", **cuando** escribo un valor que no es un número, que es 0 o menor, mayor que 9999 o con más de 2 decimales, **entonces** el campo se marca en rojo con su mensaje y no se guarda. |
 
 ### HU-INV-03: Editar un producto
 **Como** usuario **quiero** corregir los datos de un producto **para** que el inventario refleje lo que realmente tengo.
 
 | Código | Criterio |
 |---|---|
-| CA-INV-03-01 | **Dado** un producto de la lista, **cuando** toco su lápiz, **entonces** se abre "Editar Producto" con su foto, nombre, fecha y categoría cargados. |
+| CA-INV-03-01 | **Dado** un producto de la lista, **cuando** toco su lápiz, **entonces** se abre "Editar Producto" con su foto, nombre, fecha, categoría y cantidad (si tiene) cargados. |
 | CA-INV-03-02 | **Dado** "Editar Producto", **cuando** toco "Guardar" en la barra superior con datos válidos, **entonces** veo "Guardado: «Carne» se actualizó" y regreso a la lista con el cambio. |
-| CA-INV-03-03 | **Dado** "Editar Producto", **entonces** se aplican las mismas validaciones del alta (CA-INV-02-02 y 02-03), salvo que se puede conservar una fecha ya vencida; solo una fecha **nueva** no puede ser anterior a hoy. |
+| CA-INV-03-03 | **Dado** "Editar Producto", **entonces** se aplican las mismas validaciones del alta (CA-INV-02-02, 02-03 y 02-09), salvo que se puede conservar una fecha ya vencida; solo una fecha **nueva** no puede ser anterior a hoy. |
 | CA-INV-03-04 | **Dado** que cambié datos, **cuando** vuelvo atrás sin tocar "Guardar", **entonces** el producto queda como estaba. |
 
 ### HU-INV-04: Eliminar un producto
@@ -158,7 +163,7 @@ tengo.
 
 | Código | Requisito | Historias |
 |---|---|---|
-| RF-INV-01 | Guardar los productos de cada usuario en la nube (nombre, vencimiento, categoría y foto opcional) y mostrarlos actualizados. | HU-INV-01 a 04 |
+| RF-INV-01 | Guardar los productos de cada usuario en la nube (nombre, vencimiento, categoría, y cantidad con unidad y foto opcionales) y mostrarlos actualizados. | HU-INV-01 a 04 |
 | RF-INV-02 | Clasificar cada producto en Vencido, Próximo a vencer (0 a 3 días) o Fresco según la fecha del teléfono. | HU-INV-01, HU-INV-08 |
 | RF-INV-03 | Validar los datos del producto en un solo lugar del dominio, igual para el alta y la edición. | HU-INV-02, HU-INV-03 |
 | RF-INV-04 | Tomar fotos con la cámara dentro de la app, guardarlas en la nube y borrarlas cuando se eliminan, se reemplazan o se borra el producto. | HU-INV-04, HU-INV-05 |
@@ -171,7 +176,7 @@ tengo.
 
 | Código | Requisito |
 |---|---|
-| RNF-INV-01 | Privacidad (amplía RNF-02): cada usuario solo puede leer y escribir sus productos y sus fotos. Los datos se validan también en el servidor (tipos, longitudes, categoría y tamaño de la foto). |
+| RNF-INV-01 | Privacidad (amplía RNF-02): cada usuario solo puede leer y escribir sus productos y sus fotos. Los datos se validan también en el servidor (tipos, longitudes, categoría, cantidad y unidad, y tamaño de la foto). |
 | RNF-INV-02 | Las fotos se reducen antes de subir (lado mayor de 1080 px como máximo y unos 300 KB). El servidor rechaza archivos de más de 2 MB o que no sean imágenes. |
 | RNF-INV-03 | Sin secretos (RNF-01): el reconocimiento de voz usa el servicio del sistema del teléfono en español de Colombia, sin claves propias. Ese servicio puede procesar el audio en línea; la Política de privacidad lo informa. |
 | RNF-INV-04 | Accesibilidad (amplía RNF-04): el estado no se comunica solo con color (encabezado de sección y descripción "Vencido", "Próximo a vencer" o "Fresco" en cada fila); los filtros anuncian si están seleccionados; el aviso de voz y los mensajes de resultado se anuncian solos; los botones de solo ícono (lupa, lápiz, cámara, papelera, micrófono, "x") tienen descripción. |
@@ -182,8 +187,9 @@ tengo.
 
 ## 7. Fuera de alcance
 
-- **Cantidad, unidad y precio** del producto. El equipo está decidiendo si se agregan; el modelo debe poder crecer sin
-  romper los datos existentes. El precio pertenece a la futura spec de presupuesto.
+- **Precio** del producto. Pertenece a la futura spec de presupuesto; el modelo debe poder crecer sin romper los datos
+  existentes. (El equipo decidió el 2026-10-14 incluir cantidad y unidad opcionales en esta spec, T002.)
+- Convertir entre unidades o descontar cantidades al cocinar.
 - Elegir fotos de la galería.
 - Escáner de código de barras y reconocimiento del alimento por la foto.
 - Añadir productos por voz (la voz solo busca).
@@ -210,6 +216,9 @@ Desviaciones aprobadas por el equipo:
   deshabilitado.
 - **Campos con borde** del design system en lugar de la línea inferior del Figma, por consistencia con
   autenticación y la adaptabilidad de la spec 002. Se conserva el ícono a la izquierda de cada campo.
+- **Fila opcional "Cantidad"** debajo de "Seleccionar categoría" (campo numérico más selector de unidad), y la
+  cantidad en la fila de la lista junto a la etiqueta de categoría. El Figma no tiene estos elementos; se ajustan
+  cuando exista un frame (T002).
 
 ## 9. Supuestos
 
