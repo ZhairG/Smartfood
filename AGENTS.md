@@ -134,6 +134,27 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 - Solo incluye en el commit los cambios de la tarea. Lo que el integrante tenga sin confirmar (otros archivos, `.idea/`) se queda fuera, salvo que pida lo contrario.
 - Si alguno de los puntos del paso 3 falla, lo informa con la salida y no abre el PR hasta resolverlo, o lo abre como *draft* si el integrante así lo pide.
 
+### Checklist del Issue
+
+Cada agente mantiene al día el checklist del Issue en el que trabaja, sin que nadie se lo pida. En cuanto se cumple un paso, cambia `- [ ]` por `- [x]` **solo en la línea de ese paso** y no toca el resto del texto.
+
+- **Cómo:** `gh issue view <n> --json body --jq .body > <archivo temporal>`, editar solo la casilla y `gh issue edit <n> --body-file <archivo temporal>`. Siempre con `--body-file`, para evitar problemas de comillas en PowerShell y Git Bash.
+- **Cuándo se marca cada casilla:**
+
+| Casilla | Se marca cuando… |
+|---|---|
+| Asignado por Zhair | el Issue tiene a la persona asignada (`gh issue view`). |
+| Plan del modo plan publicado | el agente publicó el plan como comentario en el Issue. |
+| Plan aprobado por Zhair | Zhair aprueba en el Issue o lo dice explícitamente en la sesión. Nunca se da por supuesto. |
+| Cada tarea `Tnnn` | la tarea quedó hecha y confirmada en la rama del Issue. |
+| Pruebas unitarias en verde… | `testDebugUnitTest`, `assembleDebug` y `lintDebug` pasaron (puntos 1 y 2 del paso 3). |
+| `spec.md` y `tasks.md` al día | la tarea está `[x]` en `tasks.md` y la matriz CA → test está actualizada. |
+| Probado en emulador o dispositivo | **el integrante confirma** que probó el flujo. El agente puede instalar el APK (`./gradlew :app:installDebug`) y revisar que la app abre sin errores en Logcat, pero eso solo no basta. |
+| PR hacia `master` con `Closes #n` | el PR quedó creado. Si es *draft*, también se marca, y en el PR se indica qué falta. |
+
+- **Nunca** se marca una casilla cuyo paso no se cumplió. Si un paso falla, la casilla queda vacía y el agente lo informa con la salida.
+- Al terminar, el agente dice qué casillas marcó, cuáles quedan pendientes y por qué.
+
 ## Comandos
 
 En Windows usar `gradlew.bat` (o `./gradlew` desde Git Bash).
