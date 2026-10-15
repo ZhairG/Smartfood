@@ -54,7 +54,7 @@
 - [x] T033 Spec: HU-07 (CA-07-01 a 07-04), RF-AUTH-09, "Fuera de alcance", ADR-07 y §8.1 del plan.
 - [x] T034 `contentType` en `SmartFoodTextField`, `SmartFoodPasswordField` y `PasswordFieldWithChecklist`, y los tipos de cada campo en Login, Registro y Recuperación (CA-07-01, 07-03, 07-04). El tipo del correo es la constante `EmailAccountContentType` (`AuthContentTypes.kt`): cada `+` crea un objeto nuevo y las pruebas comparan por instancia.
 - [x] T035 `AuthNavGraph` llama a `AutofillManager.commit()` al terminar bien el login, el registro o el cambio de contraseña (CA-07-02).
-- [ ] T036 Pruebas instrumentadas de los tipos y verificación manual en el teléfono (checklist 7).
+- [x] T036 Pruebas instrumentadas de los tipos y verificación manual en el teléfono (checklist 7).
 
 ## Matriz de trazabilidad
 
@@ -117,4 +117,7 @@ Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada 
 7. Con el autocompletado de Google activo en el teléfono (*Ajustes → Contraseñas y cuentas*): tocar el correo del
    login → aparecen las cuentas guardadas y al elegir una se llenan los dos campos (CA-07-01); entrar con una cuenta
    no guardada → el teléfono ofrece guardarla (CA-07-02); en el registro, tocar la contraseña → se ofrece una
-   contraseña segura (CA-07-03). Las cuentas guardadas con el APK release no aparecen en el debug.
+   contraseña segura (CA-07-03); la hoja de Google dice "Nombre de usuario" (etiqueta fija de Google) y muestra el
+   correo, que es el usuario con el que se guarda la cuenta. Las cuentas guardadas con el APK release no aparecen en
+   el debug. Si Google no ofrece guardar, revisar en el Gestor de contraseñas que "Ofrecer guardar contraseñas" esté
+   activo y que SmartFood no esté en "Sitios y apps rechazados" (sin eso, su respuesta no trae `SaveInfo`).
