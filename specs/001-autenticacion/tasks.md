@@ -50,6 +50,12 @@
 - [x] T031 Actualizar `README.md` y `AGENTS.md` (guía para agentes de IA; reemplaza a `CLAUDE.md`).
 - [x] T032 Verificación final: 85 pruebas unitarias en verde, `assembleDebug` y `lintDebug` sin errores, `git grep` de secretos limpio.
 
+## Fase 7: Autocompletado (HU-07, #67)
+- [x] T033 Spec: HU-07 (CA-07-01 a 07-04), RF-AUTH-09, "Fuera de alcance", ADR-07 y §8.1 del plan.
+- [ ] T034 `contentType` en `SmartFoodTextField`, `SmartFoodPasswordField` y `PasswordFieldWithChecklist`, y los tipos de cada campo en Login, Registro y Recuperación (CA-07-01, 07-03, 07-04).
+- [ ] T035 `AuthNavGraph` llama a `AutofillManager.commit()` al terminar bien el login, el registro o el cambio de contraseña (CA-07-02).
+- [ ] T036 Pruebas instrumentadas de los tipos y verificación manual en el teléfono (checklist 7).
+
 ## Matriz de trazabilidad
 
 Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada (`app/src/androidTest`),
@@ -95,6 +101,10 @@ Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada 
 | CA-06-01 | U `FirebaseErrorMapperTest`, U `LoginViewModelTest`, U `RegisterViewModelTest`, I `LoginScreenTest.ca0601_*` |
 | CA-06-02 | U `LoginViewModelTest`, U `RegisterViewModelTest` |
 | RF-AUTH-04 | U `ValidateEmailUseCaseTest`, U `ValidatePasswordUseCaseTest` |
+| CA-07-01 | I `LoginScreenTest.ca0701_*`, M 7 |
+| CA-07-02 | M 7 |
+| CA-07-03 | I `RegisterScreenTest.ca0703_*`, I `PasswordRecoveryScreenTest.ca0703_*`, M 7 |
+| CA-07-04 | I `SmartFoodFieldsTest.ca_07_04_*` |
 
 ### Checklist de verificación manual (emulador con Firebase real)
 
@@ -104,3 +114,7 @@ Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada 
 4. Recuperación en modo demo (`-PrecoveryDemo=true`) con `demo@smartfood.com` + `1234` → nueva contraseña → éxito → login (CA-04-11). La recuperación real se verifica con el checklist de la [spec 003](../003-recuperacion-real/tasks.md#checklist-de-verificación-manual). Volver desde el paso 2 y reentrar → empieza en el paso 1 (CA-04-12).
 5. "Cerrar Sesión" en Home → Login y "atrás" no vuelve a Home (CA-05-03).
 6. Modo avión → intentar login → diálogo "Sin conexión" → desactivar modo avión → "Reconectar" (CA-06-01, CA-06-02).
+7. Con el autocompletado de Google activo en el teléfono (*Ajustes → Contraseñas y cuentas*): tocar el correo del
+   login → aparecen las cuentas guardadas y al elegir una se llenan los dos campos (CA-07-01); entrar con una cuenta
+   no guardada → el teléfono ofrece guardarla (CA-07-02); en el registro, tocar la contraseña → se ofrece una
+   contraseña segura (CA-07-03). Las cuentas guardadas con el APK release no aparecen en el debug.

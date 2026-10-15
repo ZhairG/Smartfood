@@ -110,6 +110,18 @@ celular compartido.
 | CA-06-01 | **Dado** que no hay internet, **cuando** intento iniciar sesión o registrarme, **entonces** veo el diálogo "Sin conexión a Internet" con el botón "Reconectar". |
 | CA-06-02 | **Dado** el diálogo de desconexión, **cuando** presiono "Reconectar", **entonces** se reintenta la misma acción con los datos que ya escribí. |
 
+### HU-07: Autocompletado con cuentas guardadas
+**Como** usuario **quiero** que el teléfono me ofrezca las cuentas que tengo guardadas **para** entrar sin escribir el
+correo y la contraseña, y guardar la cuenta nueva sin copiarla a mano. Lo hace el gestor de contraseñas del teléfono
+(por ejemplo, el de Google); "Recuérdame" (HU-03) sigue siendo solo mantener la sesión abierta.
+
+| Código | Criterio |
+|---|---|
+| CA-07-01 | **Dado** que tengo cuentas guardadas en el gestor de contraseñas del teléfono, **cuando** toco el correo o la contraseña del inicio de sesión, **entonces** el teléfono me ofrece esas cuentas, y al elegir una se llenan los dos campos. |
+| CA-07-02 | **Dado** que inicio sesión, creo mi cuenta o cambio la contraseña con éxito, **entonces** el teléfono me ofrece guardar o actualizar la cuenta (si su gestor lo permite). |
+| CA-07-03 | **Dado** el registro o el paso 3 de la recuperación, **cuando** toco una contraseña, **entonces** el teléfono puede sugerirme una contraseña segura; el correo del registro se ofrece como usuario. |
+| CA-07-04 | **Dado** que el teléfono no tiene un servicio de autocompletado activo, **entonces** los formularios funcionan igual que antes. La app no guarda contraseñas por su cuenta (RNF-01). |
+
 ## 4. Requisitos funcionales
 
 | Código | Requisito | Historias |
@@ -122,6 +134,7 @@ celular compartido.
 | RF-AUTH-06 | Recordar la preferencia "Recuérdame" en el dispositivo y decidir el destino inicial según la sesión. | HU-03 |
 | RF-AUTH-07 | Flujo de recuperación de 3 pasos intercambiable entre la versión real ([spec 003](../003-recuperacion-real/spec.md)) y la simulada con datos fijos (modo demo). | HU-04 |
 | RF-AUTH-08 | Traducir cada falla técnica a un error de negocio con un mensaje entendible. | HU-01, HU-02, HU-06 |
+| RF-AUTH-09 | Identificar los campos de correo y contraseña ante el autocompletado del teléfono y avisarle cuando un inicio de sesión, un registro o un cambio de contraseña terminan bien. | HU-07 |
 
 ## 5. Requisitos no funcionales
 
@@ -141,6 +154,8 @@ celular compartido.
 - Exigir el correo verificado para entrar.
 - Editar el perfil o eliminar la cuenta desde la app.
 - Pantalla independiente de "sin conexión" (se usa un diálogo).
+- Llaves de acceso (passkeys) y un selector de cuentas propio dentro de la app: el autocompletado lo da el gestor
+  de contraseñas del teléfono (HU-07).
 
 ## 7. Supuestos
 

@@ -269,6 +269,21 @@ Las transiciones de empuje de 600 ms con `FastOutSlowInEasing` se declaran **una
 | ADR-04 | El registro se orquesta en `RegisterUseCase` | Orquestarlo en el repositorio | El rollback (CA-01-09) se puede probar con fakes, sin Firebase. |
 | ADR-05 | Perfil en Firestore `users/{uid}` | `displayName` de Firebase Auth | `users/{uid}` será la raíz del inventario y del presupuesto (features 002 y 004). |
 | ADR-06 | "Recuérdame" en DataStore | `SharedPreferences` | API asíncrona basada en coroutines y recomendada por Android. |
+| ADR-07 | Autocompletado de Android con `ContentType` y `AutofillManager.commit()` (HU-07, #67) | (a) Credential Manager; (b) lista de cuentas propia | No agrega dependencias ni guarda contraseñas en la app (RNF-01): el gestor del teléfono (Google u otro) sugiere, guarda y propone contraseñas seguras. (a) suma una dependencia y una UI propia sin ganar nada para correo y contraseña; (b) obligaría a guardar credenciales. |
+
+### 8.1 Autocompletado (HU-07)
+
+- `SmartFoodTextField` recibe `contentType: ContentType?` y lo aplica con `semantics { contentType = … }`;
+  `SmartFoodPasswordField` usa `ContentType.Password` por defecto y `PasswordFieldWithChecklist`,
+  `ContentType.NewPassword` (su `modifier` va al popup, por eso el tipo es un parámetro).
+- Login: correo `Username + EmailAddress` y contraseña `Password`. Registro: nombre `PersonFullName`, correo
+  `Username + EmailAddress` y contraseñas `NewPassword`. Recuperación: correo del paso 1 `Username + EmailAddress`
+  y contraseñas del paso 3 `NewPassword`.
+- `AuthNavGraph` llama a `LocalAutofillManager.current?.commit()` justo antes de navegar en
+  `LoginEffect.NavigateToHome`, `RegisterEffect.NavigateToSuccess` y `PasswordRecoveryEffect.NavigateToSuccess`:
+  así el teléfono ofrece guardar la cuenta (CA-07-02). Las pantallas siguen sin estado.
+- Las contraseñas guardadas dependen de la firma del APK: las del release no aparecen en un debug firmado en otro
+  equipo.
 
 ## 9. Estrategia de pruebas
 
