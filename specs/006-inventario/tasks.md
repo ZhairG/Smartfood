@@ -4,6 +4,8 @@
 > Cada tarea cita los requisitos o criterios que cubre. Se marca `[x]` cuando cumple la Definition of Done de la
 > [constitución](../constitution.md#7-definition-of-done).
 > `→ #N` es el Issue de GitHub donde se planea y se cierra la tarea (milestone "Spec 006: Inventario").
+> **Cada Issue enlaza en `InventoryDataModule` la implementación que crea**, para que ninguna persona bloquee las
+> pantallas (reorganización del 15/10/2026: el #29 se cerró y sus tareas pasaron al #69, #32 y #33).
 > **Antes de las fases 3 y 5 (y de T027):** comprobar que el MCP de Figma responde leyendo un frame de la spec §8
 > (por ejemplo, "Inventario" `476:3095`, con `get_metadata` o `get_screenshot`). Si falla, no se implementa el diseño:
 > se siguen los pasos de `AGENTS.md` → "Si el MCP de Figma no está configurado".
@@ -27,13 +29,13 @@
 
 ## Fase 2: Datos e infraestructura
 - [x] T014 Dependencias: `firebase-storage`, CameraX, Coil 3, WorkManager y `hilt-work` (plan §9). → #19
-- [ ] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador. → #29
+- [ ] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador (hecho en el #34). → #69
 - [x] T016 `InventoryErrorMapper`, con pruebas (plan §10). Prueba: U `InventoryErrorMapperTest`. → #30
 - [x] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). Guardar y borrar con transacción (RNF-INV-05). Prueba: U `InventoryDocumentTest`; de punta a punta con las reglas en T022. → #30
 - [x] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). Pruebas: U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (con `-PuseFirebaseEmulator=true`). → #31
-- [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5). → #32
-- [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente. → #33
-- [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. → #29
+- [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5), y su `@Binds` en `InventoryDataModule`. → #32
+- [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente, y su `@Binds` en `InventoryDataModule`. → #33
+- [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. Cada implementación se enlaza en su Issue: Firestore y fotos → #69, voz → #32, preferencias → #33. Se marca cuando las tres estén enlazadas.
 - [x] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). Pruebas: R `rules-test/` (Firestore y Storage), I `FirestoreInventoryRepositoryEmulatorTest` (de punta a punta con `-PuseFirebaseEmulator=true`). → #34
 
 ## Fase 3: Design system
@@ -42,7 +44,7 @@
 - [x] T023 `SmartFoodTextField` con `leadingContent` y `label: String?`, sin cambios en los usos actuales. Las pruebas de autenticación siguen verdes. Prueba: I `SmartFoodFieldsTest` (la sobrecarga recursiva que cerraba la app se corrigió en #60; nombre accesible, `FieldFrame` y medidas del ícono en #62). → #35
 - [x] T024 [P] `SmartFoodSelectorField` (comparte la caja con el campo de texto) (CA-INV-02-04, 02-05). Prueba: I `SmartFoodFieldsTest.t024_*` (etiqueta y valor en un solo nodo desde #62). → #35
 - [ ] T025 [P] `SmartFoodConfirmDialog` y `SmartFoodResultDialog` (CA-INV-02-06, 03-02, 04-01, 05-04). → #36
-- [ ] T026 [P] `SmartFoodBottomBar` y la variante de acento de `SmartFoodPrimaryButton` (CA-INV-02-02, 09-02). → #36
+- [ ] T026 [P] `SmartFoodBottomBar` y la variante de acento de `SmartFoodPrimaryButton` (CA-INV-02-02, 09-02). Pasó del #36 al #38 para no bloquear la navegación. → #38
 - [ ] T027 [P] Íconos vectoriales exportados del Figma y `strings_inventory.xml` (RNF-INV-08). Rol de color `ExpiringSoon` si hace falta (plan §8). → #37
 
 ## Fase 4: Navegación
