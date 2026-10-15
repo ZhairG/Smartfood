@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.sp
  * @property otpSpacing Separación entre casillas del código.
  * @property successIconSize Diámetro del ícono de las pantallas de éxito.
  * @property stepIndicatorPadding Margen vertical del indicador de pasos.
+ * @property fieldIconSize Lado de la caja del ícono a la izquierda de un campo (Figma: 30 px; spec 006, #62).
+ * @property fieldIconSpacing Separación entre ese ícono y el texto del campo (Figma: 23 px).
  */
 @Immutable
 data class FormMetrics(
@@ -68,7 +70,9 @@ data class FormMetrics(
     val otpBoxHeight: Dp,
     val otpSpacing: Dp,
     val successIconSize: Dp,
-    val stepIndicatorPadding: Dp
+    val stepIndicatorPadding: Dp,
+    val fieldIconSize: Dp,
+    val fieldIconSpacing: Dp
 ) {
     companion object {
         /** Medidas exactas de Figma; el Registro necesita ~965 dp de alto útil (CA-UI-01-03). */
@@ -94,7 +98,9 @@ data class FormMetrics(
             otpBoxHeight = 70.dp,
             otpSpacing = 18.dp,
             successIconSize = 176.dp,
-            stepIndicatorPadding = 12.dp
+            stepIndicatorPadding = 12.dp,
+            fieldIconSize = 30.dp,
+            fieldIconSpacing = 23.dp
         )
 
         /** Teléfonos altos: alto útil de 760 a 1000 dp (CA-UI-01-04). */
@@ -120,7 +126,9 @@ data class FormMetrics(
             otpBoxHeight = 64.dp,
             otpSpacing = 16.dp,
             successIconSize = 150.dp,
-            stepIndicatorPadding = 10.dp
+            stepIndicatorPadding = 10.dp,
+            fieldIconSize = 26.dp,
+            fieldIconSpacing = 18.dp
         )
 
         /** Alto útil menor de 760 dp: logo y nombre en una fila (CA-UI-01-05). */
@@ -146,7 +154,9 @@ data class FormMetrics(
             otpBoxHeight = 58.dp,
             otpSpacing = 14.dp,
             successIconSize = 120.dp,
-            stepIndicatorPadding = 6.dp
+            stepIndicatorPadding = 6.dp,
+            fieldIconSize = 24.dp,
+            fieldIconSpacing = 14.dp
         )
 
         /** Alto útil a partir del cual se intenta [Medium] como perfil inicial. */

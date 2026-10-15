@@ -60,7 +60,7 @@ Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un
 | CA-UI-01-04 | U `FormMetricsTest`, I `AdaptiveLayoutTest` (384×857) |
 | CA-UI-01-05 | U `FormMetricsTest`, I `AdaptiveLayoutTest` (360×720) |
 | CA-UI-01-06 | Diseño: el `verticalScroll` del panel sigue activo como respaldo |
-| CA-UI-02-01 | I `FormFocusTest.ca_ui_02_01_*` |
+| CA-UI-02-01 | I `FormFocusTest.ca_ui_02_01_*`, I `SmartFoodFieldsTest.ca_ui_02_01_*` (selector) |
 | CA-UI-02-02 | I `FormFocusTest.ca_ui_02_02_*` |
 | CA-UI-02-03 | M (acciones "Listo" en Login, Registro y pasos 1, 2 y 3) |
 | CA-UI-02-04 | M (capturas en el dispositivo: el campo enfocado queda visible con el teclado abierto) |

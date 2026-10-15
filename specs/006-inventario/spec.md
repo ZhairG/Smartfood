@@ -219,7 +219,9 @@ Desviaciones aprobadas por el equipo:
 - **Botón "Añadir al Inventario" habilitado en naranja** (sección "Natalia"); los frames principales solo lo muestran
   deshabilitado.
 - **Campos con borde** del design system en lugar de la línea inferior del Figma, por consistencia con
-  autenticación y la adaptabilidad de la spec 002. Se conserva el ícono a la izquierda de cada campo.
+  autenticación y la adaptabilidad de la spec 002. Se conserva el ícono a la izquierda de cada campo, gris y con
+  el tamaño y la separación del Figma. El texto de los campos usa el mismo tamaño que en autenticación, no el más
+  pequeño del Figma de inventario (#62).
 - **Fila opcional "Cantidad"** debajo de "Seleccionar categoría" (campo numérico más selector de unidad), y la
   cantidad en la fila de la lista junto a la etiqueta de categoría. El Figma no tiene estos elementos; se ajustan
   cuando exista un frame (T002).
