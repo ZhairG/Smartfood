@@ -36,6 +36,8 @@ import javax.inject.Inject
  * reales (spec 006, RF-INV-01, RNF-INV-01, T017 y T022). Solo se ejecuta en un build con
  * `-PuseFirebaseEmulator=true`; en las corridas normales se omite. Con un teléfono físico:
  * `adb reverse tcp:9099 tcp:9099`, `adb reverse tcp:8080 tcp:8080` y `-PfirebaseEmulatorHost=127.0.0.1`.
+ * Es un solo `@Test`: Hilt arma el grafo en cada prueba y `CoreDataModule` no puede llamar `useEmulator()` dos veces
+ * sobre la misma instancia de Firebase en un mismo proceso.
  */
 @HiltAndroidTest
 class FirestoreInventoryRepositoryEmulatorTest {
@@ -63,7 +65,7 @@ class FirestoreInventoryRepositoryEmulatorTest {
 
     @After
     fun cerrarSesion() {
-        if (BuildConfig.USE_FIREBASE_EMULATOR) auth.signOut()
+        if (::auth.isInitialized) auth.signOut()
     }
 
     private suspend fun createdAt(id: String): Timestamp? =
@@ -71,7 +73,7 @@ class FirestoreInventoryRepositoryEmulatorTest {
             .collection("inventory").document(id).get().await().getTimestamp("createdAt")
 
     @Test
-    fun rfInv01_creaLeeEditaYBorraCumpliendoLasReglas() = runBlocking {
+    fun rfInv01_creaLeeEditaBorraYSinSesionFallaCumpliendoLasReglas() = runBlocking {
         val item = InventoryItem(
             id = repository.newItemId(),
             name = "Leche Entera",
@@ -97,21 +99,12 @@ class FirestoreInventoryRepositoryEmulatorTest {
         // Borrar.
         assertTrue(repository.deleteItem(item.id).isSuccess)
         assertEquals(InventoryError.NotFound, repository.getItem(item.id).exceptionOrNull()?.toInventoryError())
-    }
 
-    @Test
-    fun sinSesionGuardarFallaConNotAuthenticated() = runBlocking {
+        // Sin sesión, guardar falla con NotAuthenticated en lugar de lanzar.
         auth.signOut()
-        val item = InventoryItem(
-            id = repository.newItemId(),
-            name = "Arroz",
-            category = FoodCategory.GRAINS,
-            expiresOn = LocalDate.now().plusDays(30),
-        )
-
         assertEquals(
             InventoryError.NotAuthenticated,
-            repository.saveItem(item).exceptionOrNull()?.toInventoryError()
+            repository.saveItem(item.copy(id = repository.newItemId())).exceptionOrNull()?.toInventoryError()
         )
     }
 }
