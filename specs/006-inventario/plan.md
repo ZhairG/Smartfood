@@ -252,7 +252,11 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
    - comprime en JPEG con calidad 80 (RNF-INV-02);
    - sube con `putBytes` y `contentType = image/jpeg`;
    - devuelve `ItemPhoto(path, downloadUrl)`.
-5. El archivo temporal se borra después de subirlo o al descartar el formulario.
+5. El archivo temporal se borra después de subirlo o al descartar el formulario. El repositorio lo borra **solo si la
+   subida sale bien**: si falla, el formulario lo conserva para reintentar (CA-INV-05-06). Una foto ilegible da
+   `PhotoUploadFailed`. `delete(path)` es idempotente: una foto que ya no existe cuenta como borrada. Los cálculos
+   (muestreo, tamaño final y orientación EXIF) viven en `data/photo/PhotoScaling.kt`, sin Android, y se prueban en la
+   JVM; `PhotoCompressor` los aplica con `BitmapFactory`, `ExifInterface` y una sola `Matrix`.
 6. Las miniaturas y la zona de foto cargan `photoUrl` con Coil 3 (`AsyncImage`), con el color del estado como
    marcador (CA-INV-01-03).
 
@@ -349,7 +353,7 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 
 | Cambio | Detalle |
 |---|---|
-| `libs.versions.toml` | `firebase-storage` (BOM), `androidx.camera:camera-core`, `camera-camera2`, `camera-lifecycle` y `camera-view` (misma versión), `io.coil-kt.coil3:coil-compose` y `coil-network-okhttp`, `androidx.work:work-runtime-ktx`, `androidx.hilt:hilt-work` (+ `androidx.hilt:hilt-compiler` en KSP), `com.android.tools:desugar_jdk_libs`. Se usa la última versión estable de cada una al implementar, salvo dos excepciones: Coil queda en 3.4.0 (desde la 3.5 exige `kotlin-stdlib` 2.4 y el proyecto compila con Kotlin 2.2) y `androidx.hilt` en 1.2.0, alineado con `hilt-navigation-compose`. |
+| `libs.versions.toml` | `firebase-storage` (BOM), `androidx.camera:camera-core`, `camera-camera2`, `camera-lifecycle` y `camera-view` (misma versión), `io.coil-kt.coil3:coil-compose` y `coil-network-okhttp`, `androidx.work:work-runtime-ktx`, `androidx.hilt:hilt-work` (+ `androidx.hilt:hilt-compiler` en KSP), `com.android.tools:desugar_jdk_libs`, `androidx.exifinterface:exifinterface` (1.4.2, la que ya traían CameraX y Coil; se declara porque la usa la compresión de fotos, T018). Se usa la última versión estable de cada una al implementar, salvo dos excepciones: Coil queda en 3.4.0 (desde la 3.5 exige `kotlin-stdlib` 2.4 y el proyecto compila con Kotlin 2.2) y `androidx.hilt` en 1.2.0, alineado con `hilt-navigation-compose`. |
 | `app/build.gradle.kts` | `compileOptions.isCoreLibraryDesugaringEnabled = true` y `coreLibraryDesugaring(libs.desugar.jdk.libs)`. |
 | `AndroidManifest.xml` | Permisos `CAMERA`, `RECORD_AUDIO` y `POST_NOTIFICATIONS`; `<uses-feature android:name="android.hardware.camera" android:required="false"/>`; `<queries>` del servicio de voz; quitar el inicializador por defecto de WorkManager. |
 | `CoreDataModule` | `provideFirebaseStorage()`, no nulo, con `useEmulator(host, 9199)` en modo emulador. |
