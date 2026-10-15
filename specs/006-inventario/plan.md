@@ -138,7 +138,7 @@ enum class SpeechError { NO_MATCH, NOT_AVAILABLE, PERMISSION_DENIED, NETWORK }
 | `DeleteItemUseCase` | `invoke(item)`: `deleteItem` → borra la foto si había (CA-INV-04-02). Si falla el borrado de la foto, el producto queda eliminado. |
 | `SearchInventoryUseCase` | `invoke(items, query, category?): List<InventoryItem>`. Normaliza (minúsculas y sin tildes con `java.text.Normalizer`), divide por comas, descarta los términos vacíos y aplica OR por "contiene". Cada término coincide también sin la `s` o `es` final (CA-INV-07-04). Orden por fecha. |
 | `ParseSpokenIngredientsUseCase` | `invoke(alternatives): List<String>`. Toma la primera alternativa no vacía, la divide por comas y por las palabras " y " y " e ", recorta, quita los artículos iniciales ("el", "la", "los", "las", "un", "una", "unos", "unas") y los duplicados. "carne pollo y leche" → `[carne pollo, leche]`, porque sin pausa ni conector no se puede separar con seguridad. El reconocedor suele insertar las comas en las pausas. |
-| `GetExpiringItemsUseCase` | Los productos en estado `EXPIRING_SOON`, ordenados por fecha (CA-INV-08-01, 02). |
+| `GetExpiringItemsUseCase` | `invoke(items): List<InventoryItem>`. Los productos en estado `EXPIRING_SOON`, ordenados por fecha y nombre (CA-INV-08-01, 02). El worker se lo aplica a la primera emisión del repositorio. |
 
 ### UI (contratos de pantalla)
 
