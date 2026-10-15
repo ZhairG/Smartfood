@@ -39,8 +39,8 @@
 ## Fase 3: Design system
 > Requiere el MCP de Figma comprobado (ver la nota del inicio).
 
-- [x] T023 `SmartFoodTextField` con `leadingContent` y `label: String?`, sin cambios en los usos actuales. Las pruebas de autenticación siguen verdes. → #35
-- [x] T024 [P] `SmartFoodSelectorField` (comparte la caja con el campo de texto) (CA-INV-02-04, 02-05). → #35
+- [x] T023 `SmartFoodTextField` con `leadingContent` y `label: String?`, sin cambios en los usos actuales. Las pruebas de autenticación siguen verdes. Prueba: I `SmartFoodFieldsTest` (la sobrecarga recursiva que cerraba la app se corrigió en #60). → #35
+- [x] T024 [P] `SmartFoodSelectorField` (comparte la caja con el campo de texto) (CA-INV-02-04, 02-05). Prueba: I `SmartFoodFieldsTest.t024_*`. → #35
 - [ ] T025 [P] `SmartFoodConfirmDialog` y `SmartFoodResultDialog` (CA-INV-02-06, 03-02, 04-01, 05-04). → #36
 - [ ] T026 [P] `SmartFoodBottomBar` y la variante de acento de `SmartFoodPrimaryButton` (CA-INV-02-02, 09-02). → #36
 - [ ] T027 [P] Íconos vectoriales exportados del Figma y `strings_inventory.xml` (RNF-INV-08). Rol de color `ExpiringSoon` si hace falta (plan §8). → #37
