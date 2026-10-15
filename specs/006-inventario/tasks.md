@@ -34,7 +34,7 @@
 - [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5). → #32
 - [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente. → #33
 - [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. → #29
-- [ ] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). → #34
+- [x] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). Pruebas: R `rules-test/` (Firestore y Storage), I `FirestoreInventoryRepositoryEmulatorTest` (de punta a punta con `-PuseFirebaseEmulator=true`). → #34
 
 ## Fase 3: Design system
 > Requiere el MCP de Figma comprobado (ver la nota del inicio).
@@ -74,7 +74,7 @@
 
 ## Matriz de trazabilidad
 
-Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada (`app/src/androidTest`), **M** =
+Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada (`app/src/androidTest`), **R** = prueba de reglas (`rules-test/`, con los emuladores), **M** =
 verificación manual (checklist).
 
 | Criterio | Pruebas |
@@ -137,7 +137,7 @@ verificación manual (checklist).
 | CA-INV-09-03 | I `ProfileScreenTest` (antes `HomeScreenTest`) |
 | CA-INV-09-04 | I `MainNavigationTest` |
 | CA-INV-09-05 | I `MainNavigationTest` |
-| RNF-INV-01 | M 9 |
+| RNF-INV-01 | R `firestore.test.js`, R `storage.test.js`, I `FirestoreInventoryRepositoryEmulatorTest`, M 9 |
 | RNF-INV-02 | M 9 (foto > 2 MB denegada), M 2 (tamaño subido) |
 | RNF-INV-04 | I `InventoryScreenTest`, I `InventorySearchScreenTest` (descripciones y estado de los chips) |
 | RNF-INV-06 | I `AdaptiveLayoutTest` |

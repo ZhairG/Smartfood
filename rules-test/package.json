@@ -1,0 +1,16 @@
+{
+  "name": "smartfood-rules-test",
+  "description": "Pruebas de firestore.rules y storage.rules con los emuladores (spec 006, RNF-INV-01).",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=1"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "5.0.2",
+    "firebase": "12.19.0"
+  }
+}

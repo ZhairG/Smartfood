@@ -1,0 +1,18 @@
+rules_version = '2';
+
+// Reglas de Cloud Storage de SmartFood (spec 006, RNF-INV-01, RNF-INV-02, plan §3).
+// Cada usuario solo puede leer, subir y borrar las fotos de sus productos. Todo lo demás está denegado.
+// Las fotos no se reemplazan: cada una tiene un nombre único. En Storage, sobrescribir un archivo cuenta como
+// create, así que create exige además que el archivo no exista (resource == null).
+// Pruebas: rules-test/ (firebase emulators:exec --only firestore,storage "npm --prefix rules-test test").
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{uid}/inventory/{itemId}/{file} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && resource == null
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType == 'image/jpeg';
+    }
+  }
+}
