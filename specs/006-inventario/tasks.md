@@ -20,7 +20,7 @@
 - [x] T010 [P] `SearchInventoryUseCase`, con pruebas (CA-INV-06-02 a 06-05, 07-04; RF-INV-05). → #25
 - [x] T011 [P] `ParseSpokenIngredientsUseCase`, con pruebas (CA-INV-07-03; RF-INV-06). → #26
 - [x] T012 [P] `GetExpiringItemsUseCase`, con pruebas (CA-INV-08-01 a 08-03). → #27
-- [ ] T013 `LogoutUseCase` cancela los avisos (`ExpiryReminderScheduler.cancel()`); se actualiza su prueba (CA-INV-08-06). → #28
+- [x] T013 `LogoutUseCase` cancela los avisos (`ExpiryReminderScheduler.cancel()`); se actualiza su prueba (CA-INV-08-06). Mientras no existan los avisos reales, `InventoryDataModule` enlaza `NoOpExpiryReminderScheduler` para que Hilt compile. → #28
 
 ## Fase 2: Datos e infraestructura
 - [x] T014 Dependencias: `firebase-storage`, CameraX, Coil 3, WorkManager y `hilt-work` (plan §9). → #19
@@ -30,7 +30,7 @@
 - [ ] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). → #31
 - [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5). → #32
 - [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente. → #33
-- [ ] T021 `InventoryDataModule`, que enlaza las interfaces. → #29
+- [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. → #29
 - [ ] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). → #34
 
 ## Fase 3: Design system
@@ -55,7 +55,7 @@
 
 ## Fase 6: Avisos
 - [ ] T037 `ExpiryNotifier` (canal, plurales y `PendingIntent`) y `ExpiryReminderWorker` (`@HiltWorker`) (CA-INV-08-01 a 08-04). → #44
-- [ ] T038 `WorkManagerExpiryReminderScheduler` (próxima 9:00, `UPDATE`). `SmartfoodApp` como `Configuration.Provider`, sin el inicializador por defecto. `SplashViewModel` reprograma los avisos con sesión activa. → #44
+- [ ] T038 `WorkManagerExpiryReminderScheduler` (próxima 9:00, `UPDATE`). `SmartfoodApp` como `Configuration.Provider`, sin el inicializador por defecto. `SplashViewModel` reprograma los avisos con sesión activa. Reemplaza el enlace a `NoOpExpiryReminderScheduler` en `InventoryDataModule` y borra esa clase. → #44
 - [ ] T039 Permiso `POST_NOTIFICATIONS` después del primer guardado, pedido una sola vez (CA-INV-08-05). → #44
 
 ## Fase 7: Cierre

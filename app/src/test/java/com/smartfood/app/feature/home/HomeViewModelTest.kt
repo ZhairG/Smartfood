@@ -6,6 +6,7 @@ import com.smartfood.app.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.smartfood.app.feature.auth.domain.usecase.LogoutUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
+import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeUserRepository
 import com.smartfood.app.testutil.MainDispatcherRule
 import kotlinx.coroutines.flow.first
@@ -38,7 +39,7 @@ class HomeViewModelTest {
 
     private fun crearViewModel() = HomeViewModel(
         getCurrentUser = GetCurrentUserUseCase(authRepository, userRepository),
-        logout = LogoutUseCase(authRepository)
+        logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler())
     )
 
     @Test

@@ -4,6 +4,7 @@ import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.User
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
+import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeSessionPreferences
 import com.smartfood.app.testutil.FakeUserRepository
 import com.smartfood.app.testutil.authError
@@ -73,8 +74,20 @@ class SessionUseCasesTest {
     fun `CA-05-03 cerrar sesion delega en el repositorio`() {
         authRepository.signedInUserId = DEFAULT_UID
 
-        LogoutUseCase(authRepository)()
+        LogoutUseCase(authRepository, FakeExpiryReminderScheduler())()
 
         assertNull(authRepository.currentUserId())
+    }
+
+    @Test
+    fun `CA-INV-08-06 cerrar sesion cancela los avisos`() {
+        val scheduler = FakeExpiryReminderScheduler()
+        authRepository.signedInUserId = DEFAULT_UID
+
+        LogoutUseCase(authRepository, scheduler)()
+
+        assertEquals(1, scheduler.cancelCalls)
+        assertEquals(0, scheduler.scheduleCalls)
+        assertEquals(1, authRepository.logoutCalls)
     }
 }
