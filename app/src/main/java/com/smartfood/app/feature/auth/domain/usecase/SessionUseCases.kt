@@ -6,6 +6,7 @@ import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.feature.auth.domain.repository.AuthRepository
 import com.smartfood.app.feature.auth.domain.repository.SessionPreferences
 import com.smartfood.app.feature.auth.domain.repository.UserRepository
+import com.smartfood.app.feature.inventory.domain.repository.ExpiryReminderScheduler
 import javax.inject.Inject
 
 /**
@@ -56,12 +57,17 @@ class GetCurrentUserUseCase @Inject constructor(
 }
 
 /**
- * Cierra la sesión activa.
+ * Cierra la sesión activa y cancela los avisos de vencimiento de esa cuenta (spec 006, CA-INV-08-06).
  *
  * @param authRepository Repositorio de cuenta y sesión.
+ * @param reminderScheduler Aviso diario de productos por vencer.
  */
 class LogoutUseCase @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val reminderScheduler: ExpiryReminderScheduler
 ) {
-    operator fun invoke() = authRepository.logout()
+    operator fun invoke() {
+        reminderScheduler.cancel()
+        authRepository.logout()
+    }
 }
