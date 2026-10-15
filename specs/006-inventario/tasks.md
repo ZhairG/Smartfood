@@ -4,6 +4,9 @@
 > Cada tarea cita los requisitos o criterios que cubre. Se marca `[x]` cuando cumple la Definition of Done de la
 > [constitución](../constitution.md#7-definition-of-done).
 > `→ #N` es el Issue de GitHub donde se planea y se cierra la tarea (milestone "Spec 006: Inventario").
+> **Antes de las fases 3 y 5 (y de T027):** comprobar que el MCP de Figma responde leyendo un frame de la spec §8
+> (por ejemplo, "Inventario" `476:3095`, con `get_metadata` o `get_screenshot`). Si falla, no se implementa el diseño:
+> se siguen los pasos de `AGENTS.md` → "Si el MCP de Figma no está configurado".
 
 ## Fase 0: Preparación
 - [x] T001 La spec, el plan y las tareas en `master` (PR #17), la 006 en la lista de specs de `AGENTS.md` y las tareas divididas en Issues del milestone "Spec 006: Inventario". Cada Issue se trabaja en su propia rama `feature/006-<issue>-<tema>`.
@@ -34,6 +37,8 @@
 - [ ] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). → #34
 
 ## Fase 3: Design system
+> Requiere el MCP de Figma comprobado (ver la nota del inicio).
+
 - [x] T023 `SmartFoodTextField` con `leadingContent` y `label: String?`, sin cambios en los usos actuales. Las pruebas de autenticación siguen verdes. → #35
 - [x] T024 [P] `SmartFoodSelectorField` (comparte la caja con el campo de texto) (CA-INV-02-04, 02-05). → #35
 - [ ] T025 [P] `SmartFoodConfirmDialog` y `SmartFoodResultDialog` (CA-INV-02-06, 03-02, 04-01, 05-04). → #36
@@ -46,6 +51,8 @@
 - [ ] T030 `MainNavigationTest` y `AppNavigationTest` actualizados (el inicio de sesión llega a "Mi Inventario" y el cierre de sesión pasa por Perfil). → #38
 
 ## Fase 5: Pantallas
+> Requiere el MCP de Figma comprobado (ver la nota del inicio).
+
 - [ ] T031 Lista: `InventoryContract`, `InventoryViewModel` e `InventoryScreen` con `InventoryItemRow` y `ExpirySectionHeader`, y sus pruebas (HU-INV-01). → #39
 - [ ] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel` y `ProductEditorScreen` con `PhotoSlot`, `CategorySheet`, `DatePicker` sin días pasados y la fila de cantidad con su hoja de unidad, y sus pruebas (HU-INV-02, 03, 04; CA-INV-02-08, 02-09). La fila de la lista muestra la cantidad (CA-INV-01-08, en T031). → #40
 - [ ] T033 Cámara: `ProductCameraScreen` (CameraX, recuadro de encuadre, resultado por `savedStateHandle`), con el permiso y la explicación (HU-INV-05). → #41

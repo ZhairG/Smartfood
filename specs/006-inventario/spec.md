@@ -209,6 +209,10 @@ Referencia: frames principales de la página "SmartFood" del Figma `z1AoQvluQcmx
 - **Búsqueda:** "Busqueda Inventario" `476:3190` y sus variantes de texto, filtro, micrófono y error.
 - **Voz:** "Grabadora" `476:4507`.
 
+Los frames se leen desde el archivo de Figma, no desde capturas. Antes de empezar cualquier tarea de diseño, se
+comprueba que el acceso al archivo funciona leyendo uno de estos frames. Si no funciona, no se implementa el diseño
+hasta configurarlo (ver `AGENTS.md`, "Implementar diseños de Figma").
+
 Desviaciones aprobadas por el equipo:
 - **Barra inferior de 2 pestañas** (Inventario y Perfil), tomada de la sección "Natalia" del Figma, porque Recetas y
   Guardadas todavía no existen.
