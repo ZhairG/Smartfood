@@ -10,7 +10,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smartfood.app.feature.auth.ui.authGraph
-import com.smartfood.app.feature.profile.mainGraph
 import com.smartfood.app.feature.legal.ui.legalDestinations
 import com.smartfood.app.feature.splash.SplashDestination
 import com.smartfood.app.feature.splash.SplashScreen
@@ -65,7 +64,7 @@ fun AppNavHost(
     }
 }
 
-/** Entra a la app (Home) y elimina de la pila todo lo anterior: "atrás" no regresa al login (CA-02-05). */
+/** Entra a la app ("Mi Inventario") y elimina de la pila todo lo anterior: "atrás" no regresa al login (CA-02-05). */
 fun NavHostController.navigateToMainGraph() {
     navigate(Route.MainGraph) {
         popUpTo(graph.id) { inclusive = true }

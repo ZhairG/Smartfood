@@ -35,6 +35,11 @@ class RouteSerializationTest {
             Route.RegisterSuccess,
             Route.PasswordRecovery,
             Route.PasswordRecoverySuccess,
+            Route.Inventory,
+            Route.InventorySearch,
+            Route.ProductEditor(),
+            Route.ProductEditor(itemId = "abc123"),
+            Route.ProductCamera,
             Route.Profile,
         )
 
