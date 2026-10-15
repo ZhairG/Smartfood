@@ -15,7 +15,7 @@
 - [x] T005 Interfaces: `InventoryRepository`, `PhotoRepository`, `SpeechToText`, `ExpiryReminderScheduler` e `InventoryPreferences`. → #20
 - [x] T006 [P] Fakes en `testutil/`: `FakeInventoryRepository`, `FakePhotoRepository`, `FakeSpeechToText`, `FakeExpiryReminderScheduler`, `FakeInventoryPreferences` y `FixedClock`. → #21
 - [x] T007 `ClassifyExpiryUseCase` y `ObserveInventoryUseCase`, con pruebas (CA-INV-01-01, 01-04, 01-06; RF-INV-02). → #22
-- [ ] T008 `ValidateItemUseCase`, con pruebas (CA-INV-02-02, 02-03, 02-04, 02-08, 02-09, 03-03; RF-INV-03). → #23
+- [x] T008 `ValidateItemUseCase`, con pruebas (CA-INV-02-02, 02-03, 02-04, 02-08, 02-09, 03-03; RF-INV-03). → #23
 - [ ] T009 `AddItemUseCase`, `UpdateItemUseCase` y `DeleteItemUseCase`, con pruebas de orden, rollback de la foto y programación de avisos (CA-INV-02-06, 03-02, 04-02, 05-04 a 05-06, 08-01). → #24
 - [ ] T010 [P] `SearchInventoryUseCase`, con pruebas (CA-INV-06-02 a 06-05, 07-04; RF-INV-05). → #25
 - [ ] T011 [P] `ParseSpokenIngredientsUseCase`, con pruebas (CA-INV-07-03; RF-INV-06). → #26
