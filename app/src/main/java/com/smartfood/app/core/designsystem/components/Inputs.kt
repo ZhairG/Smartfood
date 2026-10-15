@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,15 +20,20 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.LocalOffer
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +49,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -62,8 +69,8 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
-import com.smartfood.app.core.designsystem.theme.White
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.White
 import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
 
 /**
@@ -76,15 +83,23 @@ import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
 
 private val InputShape = RoundedCornerShape(10.dp)
 
+/** Tamaño del texto de los campos: el de autenticación, no el de 13 sp del Figma de inventario (spec 006 §8). */
+private val FieldTextSize = 15.sp
+private val FieldPaddingStart = 15.dp
+private val FieldPaddingEndWithTrailing = 6.dp
+
 /**
  * Componente atómico de Campo de Texto genérico con estilo de SmartFood basado en el mockup inicial.
  *
- * @param label Texto descriptivo superior opcional. Forma parte del área táctil y de la semántica del campo.
  * @param value Valor actual del texto ingresado.
  * @param onValueChange Callback notificado al modificar el texto.
  * @param modifier Modificador opcional.
+ * @param label Texto descriptivo superior opcional. Forma parte del área táctil y de la semántica del campo.
  * @param placeholder Texto de sugerencia exhibido cuando [value] está vacío.
- * @param leadingContent Composable opcional al inicio del contenedor de texto.
+ * @param accessibilityLabel Nombre que anuncian los lectores de pantalla cuando no hay [label] visible. Si falta, se
+ * usa [placeholder] (spec 002, CA-UI-02-08).
+ * @param leadingContent Ícono opcional al inicio. Se dibuja en una caja de `fieldIconSize` y en gris
+ * (`onSurfaceVariant`), como en Figma.
  * @param trailingContent Composable opcional al final del contenedor de texto.
  * @param keyboardOptions Opciones de comportamiento del teclado.
  * @param keyboardActions Acciones disparadas desde las teclas del teclado.
@@ -100,6 +115,7 @@ fun SmartFoodTextField(
     modifier: Modifier = Modifier,
     label: String? = null,
     placeholder: String? = null,
+    accessibilityLabel: String? = null,
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -109,17 +125,11 @@ fun SmartFoodTextField(
     isError: Boolean = false,
     onFocusChanged: ((Boolean) -> Unit)? = null,
 ) {
-    val metrics = LocalFormMetrics.current
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val currentOnFocusChanged by rememberUpdatedState(onFocusChanged)
-
-    val borderColor = when {
-        isError -> MaterialTheme.colorScheme.error
-        isFocused -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.outline
-    }
-    val borderWidth = if (isError) 2.dp else 1.dp
+    // Sin etiqueta visible, el campo se anuncia con el nombre accesible o con el placeholder (CA-UI-02-08).
+    val spokenName = if (label == null) accessibilityLabel ?: placeholder else null
 
     BasicTextField(
         value = value,
@@ -128,9 +138,10 @@ fun SmartFoodTextField(
         // El foco se notifica en el mismo frame (RNF-UI-04).
         modifier = modifier
             .fillMaxWidth()
-            .onFocusChanged { currentOnFocusChanged?.invoke(it.isFocused) },
+            .onFocusChanged { currentOnFocusChanged?.invoke(it.isFocused) }
+            .then(if (spokenName != null) Modifier.semantics { contentDescription = spokenName } else Modifier),
         textStyle = MaterialTheme.typography.bodyLarge.copy(
-            fontSize = 15.sp,
+            fontSize = FieldTextSize,
             color = MaterialTheme.colorScheme.onSurface
         ),
         singleLine = true,
@@ -142,48 +153,89 @@ fun SmartFoodTextField(
         decorationBox = { innerTextField ->
             // La etiqueta vive dentro del campo: tocarla lo enfoca y su texto forma parte de la
             // semántica del campo, así que los lectores de pantalla la anuncian (CA-UI-02-01 y CA-UI-02-08).
-            Column(verticalArrangement = Arrangement.spacedBy(metrics.labelSpacing)) {
-                if (label != null) {
-                    Text(
-                        text = label,
-                        fontSize = metrics.labelFontSize,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(metrics.inputHeight)
-                        .inputBorderAndBackground(
-                            shape = InputShape,
-                            borderWidth = borderWidth,
-                            borderColor = borderColor,
-                            backgroundColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                        .padding(
-                            start = if (leadingContent != null) 12.dp else 15.dp,
-                            end = if (trailingContent != null) 6.dp else 15.dp
-                        ),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    leadingContent?.invoke()
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-                        if (value.isEmpty() && placeholder != null) {
-                            Text(
-                                text = placeholder,
-                                fontSize = 15.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        innerTextField()
-                    }
-                    trailingContent?.invoke()
-                }
+            FieldFrame(
+                label = label,
+                isError = isError,
+                isFocused = isFocused,
+                leadingContent = leadingContent,
+                trailingContent = trailingContent,
+            ) {
+                if (value.isEmpty() && placeholder != null) FieldPlaceholder(placeholder)
+                innerTextField()
             }
         },
     )
+}
+
+/**
+ * Etiqueta opcional y caja con borde que comparten [SmartFoodTextField] y [SmartFoodSelectorField] (spec 006,
+ * plan §8). El ícono inicial va en una caja de `fieldIconSize` que fija su tamaño y lo pinta en `onSurfaceVariant`,
+ * separado del texto por `fieldIconSpacing` (Figma "Añadir Producto" `476:3664`).
+ */
+@Composable
+private fun FieldFrame(
+    label: String?,
+    isError: Boolean,
+    isFocused: Boolean,
+    leadingContent: (@Composable () -> Unit)?,
+    trailingContent: (@Composable () -> Unit)?,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    val metrics = LocalFormMetrics.current
+    val borderColor = when {
+        isError -> MaterialTheme.colorScheme.error
+        isFocused -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.outline
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(metrics.labelSpacing)) {
+        if (label != null) {
+            Text(
+                text = label,
+                fontSize = metrics.labelFontSize,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(metrics.inputHeight)
+                .inputBorderAndBackground(
+                    shape = InputShape,
+                    borderWidth = if (isError) 2.dp else 1.dp,
+                    borderColor = borderColor,
+                    backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+                .padding(
+                    start = FieldPaddingStart,
+                    end = if (trailingContent != null) FieldPaddingEndWithTrailing else FieldPaddingStart
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(metrics.fieldIconSpacing)
+        ) {
+            if (leadingContent != null) {
+                // propagateMinConstraints hace que un Icon de 24 dp ocupe toda la caja del perfil.
+                Box(
+                    modifier = Modifier.size(metrics.fieldIconSize),
+                    contentAlignment = Alignment.Center,
+                    propagateMinConstraints = true
+                ) {
+                    CompositionLocalProvider(
+                        LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
+                        content = leadingContent
+                    )
+                }
+            }
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart, content = content)
+            trailingContent?.invoke()
+        }
+    }
+}
+
+/** Texto de sugerencia de un campo vacío. */
+@Composable
+private fun FieldPlaceholder(text: String) {
+    Text(text = text, fontSize = FieldTextSize, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
 /**
@@ -239,15 +291,19 @@ fun SmartFoodPasswordField(
 
 /**
  * Componente atómico de Selección no editable con estilo de SmartFood.
- * Comparte la caja, bordes, colores y tipografía de [SmartFoodTextField], pero reacciona
+ * Comparte la caja, bordes, colores y tipografía de [SmartFoodTextField] ([FieldFrame]), pero reacciona
  * al toque ejecutando [onClick] (útil para calendarios, selectores de categoría u hojas inferiores).
+ * La etiqueta y la caja forman un solo nodo: tocar la etiqueta también abre el selector, y los lectores de pantalla
+ * anuncian "etiqueta, valor, botón" (spec 002, CA-UI-02-01 y CA-UI-02-08).
  *
  * @param value Valor actual seleccionado que se muestra en el campo.
  * @param onClick Callback notificado al tocar el selector.
  * @param modifier Modificador opcional.
  * @param label Texto descriptivo superior opcional.
  * @param placeholder Texto de sugerencia exhibido cuando [value] está vacío.
- * @param leadingContent Composable opcional al inicio del contenedor (ícono descriptivo).
+ * @param accessibilityLabel Nombre que anuncian los lectores de pantalla cuando no hay [label] visible. Si falta y hay
+ * un valor, se usa [placeholder]; sin valor, el placeholder ya se lee como texto.
+ * @param leadingContent Ícono opcional al inicio, en la caja de `fieldIconSize` y en gris.
  * @param trailingContent Composable opcional al final del contenedor (flecha de desplegable, calendario, etc.).
  * @param enabled Si es `false`, deshabilita la interacción con el selector.
  * @param isError Si es `true`, dibuja el borde con color de error (rojo).
@@ -259,70 +315,32 @@ fun SmartFoodSelectorField(
     modifier: Modifier = Modifier,
     label: String? = null,
     placeholder: String? = null,
+    accessibilityLabel: String? = null,
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
     enabled: Boolean = true,
     isError: Boolean = false,
 ) {
-    val metrics = LocalFormMetrics.current
+    val spokenName = if (label == null) accessibilityLabel ?: placeholder.takeIf { value.isNotEmpty() } else null
 
-    val borderColor = when {
-        isError -> MaterialTheme.colorScheme.error
-        else -> MaterialTheme.colorScheme.outline
-    }
-    val borderWidth = if (isError) 2.dp else 1.dp
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(metrics.labelSpacing)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled, onClick = onClick, role = Role.Button)
+            .then(if (spokenName != null) Modifier.semantics { contentDescription = spokenName } else Modifier)
     ) {
-        if (label != null) {
-            Text(
-                text = label,
-                fontSize = metrics.labelFontSize,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(metrics.inputHeight)
-                .inputBorderAndBackground(
-                    shape = InputShape,
-                    borderWidth = borderWidth,
-                    borderColor = borderColor,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-                .clickable(
-                    enabled = enabled,
-                    onClick = onClick,
-                    role = Role.Button
-                )
-                .padding(
-                    start = if (leadingContent != null) 12.dp else 15.dp,
-                    end = if (trailingContent != null) 12.dp else 15.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        FieldFrame(
+            label = label,
+            isError = isError,
+            isFocused = false,
+            leadingContent = leadingContent,
+            trailingContent = trailingContent,
         ) {
-            leadingContent?.invoke()
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-                if (value.isEmpty() && placeholder != null) {
-                    Text(
-                        text = placeholder,
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                } else if (value.isNotEmpty()) {
-                    Text(
-                        text = value,
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
+            if (value.isNotEmpty()) {
+                Text(text = value, fontSize = FieldTextSize, color = MaterialTheme.colorScheme.onSurface)
+            } else if (placeholder != null) {
+                FieldPlaceholder(placeholder)
             }
-            trailingContent?.invoke()
         }
     }
 }
@@ -485,11 +503,24 @@ private fun SmartFoodTextFieldPreview() {
                 value = "12345678",
                 onValueChange = {}
             )
+            SmartFoodTextField(
+                value = "",
+                placeholder = "Ej. Carne",
+                onValueChange = {},
+                leadingContent = { Icon(Icons.Outlined.ShoppingCart, contentDescription = null) }
+            )
             SmartFoodSelectorField(
-                label = "Seleccionar categoría",
+                value = "",
+                placeholder = "Seleccionar categoría",
+                onClick = {},
+                leadingContent = { Icon(Icons.Outlined.LocalOffer, contentDescription = null) },
+                trailingContent = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null) }
+            )
+            SmartFoodSelectorField(
+                label = "Categoría",
                 value = "Lácteos",
-                placeholder = "Elegir...",
-                onClick = {}
+                onClick = {},
+                trailingContent = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null) }
             )
             SmartFoodCheckbox(
                 label = "Recuérdame",
