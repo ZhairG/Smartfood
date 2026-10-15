@@ -14,7 +14,7 @@
 - [x] T004 Modelos: `InventoryItem`, `ItemPhoto`, `FoodCategory`, `ExpiryStatus`, `Quantity`, `QuantityUnit`, `InventorySection`, `ItemDraft`, `ValidItem`, `LocalPhoto`, `InventoryError` + `InventoryException` + `toInventoryError()`, `InventoryField`, `SpeechEvent` y `SpeechError` (plan §2). → #20
 - [x] T005 Interfaces: `InventoryRepository`, `PhotoRepository`, `SpeechToText`, `ExpiryReminderScheduler` e `InventoryPreferences`. → #20
 - [x] T006 [P] Fakes en `testutil/`: `FakeInventoryRepository`, `FakePhotoRepository`, `FakeSpeechToText`, `FakeExpiryReminderScheduler`, `FakeInventoryPreferences` y `FixedClock`. → #21
-- [ ] T007 `ClassifyExpiryUseCase` y `ObserveInventoryUseCase`, con pruebas (CA-INV-01-01, 01-04, 01-06; RF-INV-02). → #22
+- [x] T007 `ClassifyExpiryUseCase` y `ObserveInventoryUseCase`, con pruebas (CA-INV-01-01, 01-04, 01-06; RF-INV-02). → #22
 - [ ] T008 `ValidateItemUseCase`, con pruebas (CA-INV-02-02, 02-03, 02-04, 02-08, 02-09, 03-03; RF-INV-03). → #23
 - [ ] T009 `AddItemUseCase`, `UpdateItemUseCase` y `DeleteItemUseCase`, con pruebas de orden, rollback de la foto y programación de avisos (CA-INV-02-06, 03-02, 04-02, 05-04 a 05-06, 08-01). → #24
 - [ ] T010 [P] `SearchInventoryUseCase`, con pruebas (CA-INV-06-02 a 06-05, 07-04; RF-INV-05). → #25
@@ -78,7 +78,7 @@ verificación manual (checklist).
 | CA-INV-01-04 | U `ObserveInventoryUseCaseTest` |
 | CA-INV-01-05 | U `InventoryViewModelTest`, I `InventoryScreenTest` |
 | CA-INV-01-06 | U `ClassifyExpiryUseCaseTest` |
-| CA-INV-01-07 | U `InventoryViewModelTest` (el flujo del fake emite), M 1 |
+| CA-INV-01-07 | U `ObserveInventoryUseCaseTest`, U `InventoryViewModelTest` (el flujo del fake emite), M 1 |
 | CA-INV-01-08 | I `InventoryScreenTest`, M 1 |
 | CA-INV-02-01 | I `ProductEditorScreenTest` |
 | CA-INV-02-02 | U `ValidateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest` |
