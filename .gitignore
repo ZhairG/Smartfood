@@ -13,3 +13,22 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Artefactos locales
+Smartfood.zip
+*.zip
+TestResults/
+
+# Configuración de Firebase: cada integrante la descarga desde la consola (no se versiona)
+app/google-services.json
+
+# Cloud Functions (spec 003): dependencias, compilado y secretos locales del emulador
+functions/node_modules/
+functions/lib/
+functions/.secret.local
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Configuración local de Claude Code (permisos personales)
+.claude/settings.local.json

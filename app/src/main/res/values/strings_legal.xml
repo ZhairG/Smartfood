@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Textos de los documentos legales (spec 005, RNF-LEG-01).
+    PLANTILLA EN VISTA PREVIA: reemplazar cada "[Pendiente de redacción…]" con el texto definitivo y, al publicarlo,
+    cambiar LegalVersion.CURRENT e IS_PREVIEW (feature/legal/domain/model/LegalDocument.kt).
+-->
+<resources>
+    <!-- Pantalla -->
+    <string name="legal_back">Volver</string>
+    <string name="legal_preview_notice">Vista previa: el contenido definitivo está en redacción</string>
+    <string name="legal_version">Versión %1$s</string>
+    <string name="legal_open_terms_action">Abrir Términos y condiciones</string>
+    <string name="legal_open_privacy_action">Abrir Política de privacidad</string>
+
+    <!-- Términos y condiciones -->
+    <string name="legal_terms_title">Términos y condiciones</string>
+    <string name="legal_terms_intro">Estos términos regulan el uso de SmartFood. Al crear tu cuenta declaras que los leíste y los aceptas.</string>
+    <string name="legal_terms_s1_title">1. Aceptación de los términos</string>
+    <string name="legal_terms_s1_body">[Pendiente de redacción: quién puede usar la app y cómo se aceptan estos términos.]</string>
+    <string name="legal_terms_s2_title">2. Descripción del servicio</string>
+    <string name="legal_terms_s2_body">[Pendiente de redacción: inventario, fechas de vencimiento, presupuesto y recomendaciones de recetas.]</string>
+    <string name="legal_terms_s3_title">3. Tu cuenta</string>
+    <string name="legal_terms_s3_body">[Pendiente de redacción: veracidad de los datos, custodia de la contraseña y cierre de la cuenta.]</string>
+    <string name="legal_terms_s4_title">4. Uso permitido</string>
+    <string name="legal_terms_s4_body">[Pendiente de redacción: usos prohibidos y consecuencias de incumplirlos.]</string>
+    <string name="legal_terms_s5_title">5. Propiedad intelectual</string>
+    <string name="legal_terms_s5_body">[Pendiente de redacción: titularidad de la marca, el diseño y el catálogo de recetas.]</string>
+    <string name="legal_terms_s6_title">6. Limitación de responsabilidad</string>
+    <string name="legal_terms_s6_body">[Pendiente de redacción: alcance de las recomendaciones (no son asesoría nutricional ni médica) y disponibilidad del servicio.]</string>
+    <string name="legal_terms_s7_title">7. Cambios a estos términos</string>
+    <string name="legal_terms_s7_body">[Pendiente de redacción: cómo se avisan los cambios y desde cuándo aplican.]</string>
+    <string name="legal_terms_s8_title">8. Ley aplicable</string>
+    <string name="legal_terms_s8_body">[Pendiente de redacción: legislación colombiana y jurisdicción.]</string>
+    <string name="legal_terms_s9_title">9. Contacto</string>
+    <string name="legal_terms_s9_body">[Pendiente de redacción: canal de contacto del equipo de SmartFood.]</string>
+
+    <!-- Política de privacidad (estructura de la Ley 1581 de 2012 y el Decreto 1377 de 2013) -->
+    <string name="legal_privacy_title">Política de privacidad</string>
+    <string name="legal_privacy_intro">Esta política explica qué datos personales trata SmartFood, para qué los usa y cómo puedes ejercer tus derechos.</string>
+    <string name="legal_privacy_s1_title">1. Responsable del tratamiento</string>
+    <string name="legal_privacy_s1_body">[Pendiente de redacción: nombre, domicilio y datos de contacto del responsable.]</string>
+    <string name="legal_privacy_s2_title">2. Datos que recolectamos</string>
+    <string name="legal_privacy_s2_body">[Pendiente de redacción: nombre, correo electrónico y, en próximas versiones, inventario, presupuesto e historial de recetas.]</string>
+    <string name="legal_privacy_s3_title">3. Finalidad del tratamiento</string>
+    <string name="legal_privacy_s3_body">[Pendiente de redacción: para qué se usa cada dato.]</string>
+    <string name="legal_privacy_s4_title">4. Derechos del titular</string>
+    <string name="legal_privacy_s4_body">[Pendiente de redacción: conocer, actualizar, rectificar y suprimir tus datos, y revocar la autorización.]</string>
+    <string name="legal_privacy_s5_title">5. Cómo ejercer tus derechos</string>
+    <string name="legal_privacy_s5_body">[Pendiente de redacción: procedimiento, canal y plazos para consultas y reclamos.]</string>
+    <string name="legal_privacy_s6_title">6. Seguridad y almacenamiento</string>
+    <string name="legal_privacy_s6_body">[Pendiente de redacción: medidas de seguridad y lugar donde se guardan los datos.]</string>
+    <string name="legal_privacy_s7_title">7. Cambios a esta política</string>
+    <string name="legal_privacy_s7_body">[Pendiente de redacción: cómo se avisan los cambios y su fecha de vigencia.]</string>
+    <string name="legal_privacy_s8_title">8. Contacto</string>
+    <string name="legal_privacy_s8_body">[Pendiente de redacción: correo para asuntos de privacidad.]</string>
+</resources>

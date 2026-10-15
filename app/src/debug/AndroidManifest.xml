@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- La configuración de red solo existe en debug: habilita la Emulator Suite (spec 003). -->
+    <application android:networkSecurityConfig="@xml/network_security_config">
+        <activity
+            android:name="com.smartfood.app.HiltTestActivity"
+            android:exported="false" />
+    </application>
+</manifest>

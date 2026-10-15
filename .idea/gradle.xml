@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
+        <option name="myGradleHome" value="C:\Gradle" />
       </GradleProjectSettings>
     </option>
   </component>
