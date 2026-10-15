@@ -16,7 +16,7 @@
 - [x] T006 [P] Fakes en `testutil/`: `FakeInventoryRepository`, `FakePhotoRepository`, `FakeSpeechToText`, `FakeExpiryReminderScheduler`, `FakeInventoryPreferences` y `FixedClock`. → #21
 - [x] T007 `ClassifyExpiryUseCase` y `ObserveInventoryUseCase`, con pruebas (CA-INV-01-01, 01-04, 01-06; RF-INV-02). → #22
 - [x] T008 `ValidateItemUseCase`, con pruebas (CA-INV-02-02, 02-03, 02-04, 02-08, 02-09, 03-03; RF-INV-03). → #23
-- [ ] T009 `AddItemUseCase`, `UpdateItemUseCase` y `DeleteItemUseCase`, con pruebas de orden, rollback de la foto y programación de avisos (CA-INV-02-06, 03-02, 04-02, 05-04 a 05-06, 08-01). → #24
+- [x] T009 `AddItemUseCase`, `UpdateItemUseCase` y `DeleteItemUseCase`, con pruebas de orden, rollback de la foto y programación de avisos (CA-INV-02-06, 03-02, 04-02, 05-04 a 05-06, 08-01). → #24
 - [ ] T010 [P] `SearchInventoryUseCase`, con pruebas (CA-INV-06-02 a 06-05, 07-04; RF-INV-05). → #25
 - [ ] T011 [P] `ParseSpokenIngredientsUseCase`, con pruebas (CA-INV-07-03; RF-INV-06). → #26
 - [ ] T012 [P] `GetExpiringItemsUseCase`, con pruebas (CA-INV-08-01 a 08-03). → #27
@@ -119,7 +119,7 @@ verificación manual (checklist).
 | CA-INV-07-07 | U `InventorySearchViewModelTest` (cancela la recolección del fake) |
 | CA-INV-07-08 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
 | CA-INV-07-09 | U `InventorySearchViewModelTest` |
-| CA-INV-08-01 | U `GetExpiringItemsUseCaseTest`, M 8 |
+| CA-INV-08-01 | U `GetExpiringItemsUseCaseTest`, U `AddItemUseCaseTest` (programa el aviso), M 8 |
 | CA-INV-08-02 | U `GetExpiringItemsUseCaseTest`, M 8 |
 | CA-INV-08-03 | U `GetExpiringItemsUseCaseTest` |
 | CA-INV-08-04 | M 8 |
