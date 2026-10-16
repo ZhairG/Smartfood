@@ -94,8 +94,9 @@ class MainNavigationTest {
         composeTestRule.runOnUiThread { navController.navigate(Route.InventorySearch) }
         composeTestRule.waitForIdle()
 
-        // La búsqueda ya es la pantalla real (T034, #42): su tarjeta "Usa tu voz" es la que se muestra.
-        composeTestRule.onNodeWithText("Usa tu voz").assertIsDisplayed()
+        // La búsqueda ya es la pantalla real (T034, #42). Se comprueba un elemento que siempre está (el filtro
+        // "Todos"); la tarjeta "Usa tu voz" depende del servicio de reconocimiento del dispositivo (CA-INV-07-08).
+        composeTestRule.onNodeWithText("Todos").assertIsDisplayed()
         composeTestRule.onNodeWithText("Perfil").assertDoesNotExist()
         composeTestRule.onNodeWithText("Inventario").assertDoesNotExist()
     }
