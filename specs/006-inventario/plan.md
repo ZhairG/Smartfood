@@ -242,8 +242,11 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 
 1. `ProductCameraScreen` usa `LifecycleCameraController` + `PreviewView` (`AndroidView`), con el recuadro de
    esquinas del Figma dibujado en Compose encima.
-2. La captura se guarda con `takePicture(OutputFileOptions)` en `cacheDir/photos/{uuid}.jpg`.
-3. La ruta vuelve al editor con `navController.previousBackStackEntry?.savedStateHandle["captured_photo"]`, y el
+2. La captura se guarda con `takePicture(OutputFileOptions)` en `filesDir/photos/{uuid}.jpg` (`takePhoto`, #41). No
+   va en `cacheDir` porque Android puede borrarla sola mientras espera a subirse (#71); el repositorio la borra al
+   subirla. El permiso se pide al abrir el visor y, si se niega, la misma pantalla explica para qué se usa y ofrece
+   abrir los ajustes (CA-INV-05-03).
+3. La ruta vuelve al editor con `navController.previousBackStackEntry?.savedStateHandle[CAPTURED_PHOTO_KEY]` (`"captured_photo"`), y el
    editor la recibe como `PhotoCaptured(path)`.
 4. `FirebaseStoragePhotoRepository.upload`:
    - decodifica con `inSampleSize`;
@@ -339,6 +342,7 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 |---|---|
 | `SmartFoodTextField` | Nuevos `leadingContent: (@Composable () -> Unit)? = null`, `label: String?` y `accessibilityLabel: String?`. Sin etiqueta visible, el campo se anuncia con `accessibilityLabel` o, si falta, con el placeholder (`semantics { contentDescription }`). Los usos actuales no cambian. |
 | `SmartFoodSelectorField` (nuevo, `Inputs.kt`) | La misma caja que `SmartFoodTextField`: las dos usan el `private @Composable FieldFrame` (etiqueta, caja con `inputBorderAndBackground`, ícono y contenido final). Sin teclado. La etiqueta y la caja forman **un solo nodo** que se toca (`Role.Button`), así que tocar la etiqueta abre el selector y TalkBack anuncia "Categoría, Lácteos, botón". Admite `leadingContent`, `trailingContent` (chevron), `isError` y `accessibilityLabel`. |
+| `SmartFoodTopBar` (nuevo, `TopBar.kt`) | Barra de las pantallas internas (Figma `476:5960`): fondo `primary`, flecha atrás con descripción "Volver", título centrado como encabezado y acción opcional a la derecha (el "Guardar" del editor). La usan la cámara, el editor y la búsqueda. |
 | `FormMetrics` | `fieldIconSize` (Regular 30, Medium 26, Compact 24 dp) y `fieldIconSpacing` (23, 18 y 14 dp): el ícono inicial va en una caja de ese tamaño, en gris `onSurfaceVariant` (el `#9AA39D` del Figma), separado del texto por esa distancia (#62). |
 | `SmartFoodBottomBar` (nuevo, `Navigation.kt`) | Barra de 2 pestañas del Figma (`476:5570`): fondo `surfaceVariant` (blanco), línea superior `outline`, pestañas con ícono y texto (Poppins SemiBold de 12 sp) y rol `Tab`. La seleccionada va en `GreenCheck` (el `#16A34A` del Figma) y las demás en `onSurfaceVariant`. Recibe las pestañas por parámetro (`SmartFoodTab`). Los íconos son de Material hasta T027. |
 | `SmartFoodConfirmDialog` (nuevo, `Dialogs.kt`) | Ícono en círculo, pregunta, botón destructivo ("Eliminar", `error`) y "Cancelar" (`secondary`). Usa la forma de `SmartFoodOfflineDialog`. |
