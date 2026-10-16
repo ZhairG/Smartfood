@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -51,6 +50,7 @@ import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
+import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -113,12 +113,15 @@ fun InventoryItemRow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val formattedDate = item.expiresOn.format(DateFormatter)
+                    val dateText = if (showExpiryLabel) {
+                        stringResource(id = R.string.inventory_expires_on, formattedDate)
+                    } else {
+                        formattedDate
+                    }
+                    // El precio, si lo tiene, va junto a la fecha (CA-INV-01-09).
+                    val priceText = item.price?.let { stringResource(id = R.string.inventory_price_format, formatPrice(it)) }
                     Text(
-                        text = if (showExpiryLabel) {
-                            stringResource(id = R.string.inventory_expires_on, formattedDate)
-                        } else {
-                            formattedDate
-                        },
+                        text = if (priceText == null) dateText else "$dateText · $priceText",
                         style = MaterialTheme.typography.bodyLarge.copy(fontSize = DateFontSize),
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -145,7 +148,7 @@ fun InventoryItemRow(
                         modifier = Modifier.size(EditButtonSize)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
+                            painter = painterResource(id = R.drawable.ic_figma_edit),
                             contentDescription = stringResource(id = R.string.cd_edit_button, item.name),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(EditIconSize)
@@ -154,7 +157,11 @@ fun InventoryItemRow(
                 }
             }
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+        // Figma 476:3110: la línea va 10 px debajo de la fila y la fila siguiente 8 px después.
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.outline,
+            modifier = Modifier.padding(top = RowToDividerGap, bottom = DividerToNextRowGap)
+        )
     }
 }
 
@@ -202,10 +209,11 @@ private fun ItemThumbnail(
 }
 
 /**
- * Etiqueta verde con la categoría del producto y, si tiene, su cantidad (CA-INV-01-02 y CA-INV-01-08).
+ * Etiqueta verde con la categoría del producto y, si tiene, su cantidad (CA-INV-01-02 y CA-INV-01-08). También la
+ * usan los resultados de la búsqueda (`SearchResultRow`).
  */
 @Composable
-private fun CategoryLabel(item: InventoryItem) {
+internal fun CategoryLabel(item: InventoryItem) {
     val category = stringResource(id = item.category.titleRes)
     val quantityText = item.quantity?.let { quantity ->
         stringResource(
@@ -247,6 +255,9 @@ private fun Quantity.formattedAmount(): String =
 
 private val QuantityLocale: Locale = Locale.forLanguageTag("es-CO")
 
+/** Precio en pesos con puntos de miles, como "12.500" (CA-INV-01-09). */
+internal fun formatPrice(price: Long): String = NumberFormat.getIntegerInstance(QuantityLocale).format(price)
+
 private val DateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
 // Medidas del Figma (`476:3116`): fila de 60 px, miniatura de 73 px (barra de 13 + imagen de 60) con radio 15,
@@ -259,6 +270,8 @@ private val ThumbnailRadius = 15.dp
 private val ThumbnailToTextGap = 14.dp
 private val EditButtonSize = 32.dp
 private val EditIconSize = 20.dp
+private val RowToDividerGap = 10.dp
+private val DividerToNextRowGap = 8.dp
 private val DateFontSize = 13.sp
 private val NameFontSize = 20.sp
 private val CategoryFontSize = 10.sp

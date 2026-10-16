@@ -122,13 +122,25 @@ describe('inventario: validación en el servidor (RNF-INV-01)', () => {
     await assertSucceeds(setDoc(item('u1', 'd'), valido({ quantity: 9999, unit: 'GRAMS' })));
   });
 
+  test('CA-INV-02-10 el precio es opcional y entero en pesos', async () => {
+    await assertSucceeds(setDoc(item('u1', 'a'), valido({ price: 12500 })));
+    await assertSucceeds(setDoc(item('u1', 'b'), valido({ price: 99999999 })));
+  });
+
+  test('CA-INV-02-11 el precio debe ser entero, mayor que 0 y como máximo 99.999.999', async () => {
+    await assertFails(setDoc(item('u1', 'a'), valido({ price: 0 })));
+    await assertFails(setDoc(item('u1', 'b'), valido({ price: 100000000 })));
+    await assertFails(setDoc(item('u1', 'c'), valido({ price: 12.5 })));
+    await assertFails(setDoc(item('u1', 'd'), valido({ price: '12500' })));
+  });
+
   test('la ruta y la URL de la foto van juntas', async () => {
     await assertSucceeds(setDoc(item('u1', 'a'), valido({ photoPath: 'users/u1/inventory/a/f.jpg', photoUrl: 'https://f' })));
     await assertFails(setDoc(item('u1', 'b'), valido({ photoPath: 'users/u1/inventory/b/f.jpg' })));
   });
 
   test('una clave que no es del modelo se rechaza', async () => {
-    await assertFails(setDoc(item('u1'), valido({ price: 3500 })));
+    await assertFails(setDoc(item('u1'), valido({ brand: 'Alpina' })));
   });
 });
 

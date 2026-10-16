@@ -30,8 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Mic
-import androidx.compose.material.icons.outlined.MicOff
+import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -43,11 +42,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
@@ -56,6 +56,7 @@ import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.SpeechError
 import com.smartfood.app.feature.inventory.ui.messageRes
 import com.smartfood.app.feature.inventory.ui.search.VoiceUiState
+import kotlin.math.sin
 
 /**
  * @param state Estado del aviso de voz; con [VoiceUiState.Hidden] no dibuja nada.
@@ -89,8 +90,9 @@ fun VoiceSearchOverlay(
                 .fillMaxWidth()
                 .padding(horizontal = MaterialTheme.spacing.large)
                 .pointerInput(Unit) { detectTapGestures { } },
-            shape = RoundedCornerShape(MaterialTheme.spacing.inputRadius),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            // Figma 476:4507: tarjeta blanca muy redondeada.
+            shape = RoundedCornerShape(MaterialTheme.spacing.panelRadius),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(
                 modifier = Modifier
@@ -104,8 +106,8 @@ fun VoiceSearchOverlay(
                         VoiceWaves(modifier = Modifier.size(WavesSize))
                         Text(
                             text = stringResource(id = R.string.search_voice_listening),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.primary,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -114,8 +116,8 @@ fun VoiceSearchOverlay(
                         VoiceWaves(modifier = Modifier.size(WavesSize))
                         Text(
                             text = stringResource(id = R.string.search_voice_processing),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.primary,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -128,16 +130,16 @@ fun VoiceSearchOverlay(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.MicOff,
+                                imageVector = Icons.Outlined.QuestionMark,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                tint = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.size(ErrorIconSize)
                             )
                         }
                         Text(
                             text = stringResource(id = state.error.messageRes()),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.error,
                             textAlign = TextAlign.Center
                         )
                         SmartFoodPrimaryButton(
@@ -154,7 +156,8 @@ fun VoiceSearchOverlay(
 }
 
 /**
- * Ondas de la escucha, dibujadas con Compose (plan §8): tres aros que crecen desde el micrófono en bucle.
+ * Ondas de la escucha, dibujadas con Compose (plan §8): barras verticales naranjas, más altas al centro, que suben y
+ * bajan en bucle, como el ecualizador del Figma (`476:4507`).
  */
 @Composable
 private fun VoiceWaves(modifier: Modifier = Modifier) {
@@ -168,29 +171,25 @@ private fun VoiceWaves(modifier: Modifier = Modifier) {
         ),
         label = "voice_waves_phase"
     )
-    val waveColor = MaterialTheme.colorScheme.primary
-    val micColor = MaterialTheme.colorScheme.primary
+    val barColor = MaterialTheme.colorScheme.secondary
 
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val center = Offset(size.width / 2f, size.height / 2f)
-            val maxRadius = size.minDimension / 2f
-            repeat(WaveCount) { index ->
-                val progress = (phase + index / WaveCount.toFloat()) % 1f
-                drawCircle(
-                    color = waveColor.copy(alpha = (1f - progress) * MaxWaveAlpha),
-                    radius = maxRadius * progress,
-                    center = center,
-                    style = Stroke(width = WaveStroke.toPx())
-                )
-            }
+    Canvas(modifier = modifier) {
+        val barWidth = WaveStroke.toPx()
+        val gap = (size.width - BarProfile.size * barWidth) / (BarProfile.size - 1)
+        val centerY = size.height / 2f
+        BarProfile.forEachIndexed { index, base ->
+            // Cada barra oscila desfasada de su vecina, sin bajar de la mitad de su alto.
+            val wave = 0.5f + 0.5f * sin((phase + index / BarProfile.size.toFloat()) * 2f * Math.PI.toFloat())
+            val height = size.height * base * (0.5f + 0.5f * wave)
+            val x = index * (barWidth + gap) + barWidth / 2f
+            drawLine(
+                color = barColor,
+                start = Offset(x, centerY - height / 2f),
+                end = Offset(x, centerY + height / 2f),
+                strokeWidth = barWidth,
+                cap = StrokeCap.Round
+            )
         }
-        Icon(
-            imageVector = Icons.Outlined.Mic,
-            contentDescription = null,
-            tint = micColor,
-            modifier = Modifier.size(MicIconSize)
-        )
     }
 }
 
@@ -200,10 +199,10 @@ private val ScrimColor = Color.Black.copy(alpha = 0.6f)
 // Medidas del componente "Grabadora" (`476:4507`): ondas de 132 px y círculo de error de 100 px. No son medidas de
 // formulario, así que no van en FormMetrics.
 private val WavesSize = 132.dp
-private val MicIconSize = 48.dp
 private val ErrorCircleSize = 100.dp
 private val ErrorIconSize = 52.dp
-private const val WaveCount = 3
 private const val WavePeriodMs = 1400
-private const val MaxWaveAlpha = 0.5f
-private val WaveStroke = 3.dp
+private val WaveStroke = 8.dp
+
+/** Alto relativo de cada barra del ecualizador, simétrico y más alto al centro, como el Figma. */
+private val BarProfile = listOf(0.25f, 0.45f, 0.6f, 0.8f, 1f, 0.8f, 0.6f, 0.45f, 0.25f)

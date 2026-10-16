@@ -63,6 +63,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -249,7 +250,14 @@ private fun FieldFrame(
 /** Texto de sugerencia de un campo vacío. */
 @Composable
 private fun FieldPlaceholder(text: String) {
-    Text(text = text, fontSize = FieldTextSize, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    // Una sola línea: con la fuente grande del sistema, un texto partido se corta dentro de la caja (T054).
+    Text(
+        text = text,
+        fontSize = FieldTextSize,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 /**
@@ -356,7 +364,13 @@ fun SmartFoodSelectorField(
             trailingContent = trailingContent,
         ) {
             if (value.isNotEmpty()) {
-                Text(text = value, fontSize = FieldTextSize, color = MaterialTheme.colorScheme.onSurface)
+                Text(
+                    text = value,
+                    fontSize = FieldTextSize,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             } else if (placeholder != null) {
                 FieldPlaceholder(placeholder)
             }

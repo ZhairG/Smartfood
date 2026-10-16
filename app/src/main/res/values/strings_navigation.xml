@@ -10,10 +10,6 @@
     <string name="inventory_title">Mi Inventario</string>
     <!-- Flecha atrás de SmartFoodTopBar (RNF-INV-04). -->
     <string name="cd_navigate_back">Volver</string>
-    <!-- Pantallas provisionales: las reemplazan los Issues de cada pantalla (#39, #40, #41 y #42). -->
-    <string name="placeholder_coming_soon">Próximamente</string>
-    <string name="placeholder_search_title">Buscar</string>
-    <string name="placeholder_editor_title">Producto</string>
     <!-- Cámara para la foto del producto (spec 006, HU-INV-05, #41). -->
     <string name="camera_title">Foto del producto</string>
     <string name="camera_take_photo">Tomar foto</string>
@@ -21,7 +17,4 @@
     <string name="camera_permission_title">Necesitamos tu cámara</string>
     <string name="camera_permission_body">Usamos la cámara solo para tomarle una foto al producto y reconocerlo en tu lista. Puedes activarla en los ajustes del teléfono o guardar el producto sin foto.</string>
     <string name="camera_open_settings">Abrir ajustes</string>
-    <!-- Botones provisionales para probar la cámara mientras llega el editor real (#40). -->
-    <string name="placeholder_add_product">Añadir producto</string>
-    <string name="placeholder_captured_photo">Foto tomada</string>
 </resources>

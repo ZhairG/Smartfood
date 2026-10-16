@@ -82,4 +82,52 @@
     <string name="error_inventory_not_found">El producto solicitado no fue encontrado.</string>
     <string name="error_inventory_photo_upload">No se pudo subir la foto del producto.</string>
     <string name="error_inventory_unknown">Ocurrió un error inesperado al cargar el inventario.</string>
+
+    <!-- Errores de validación del editor (CA-INV-02-03, 02-09, 03-03) -->
+    <string name="error_inventory_name_empty">Escribe el nombre del producto.</string>
+    <string name="error_inventory_name_too_long">El nombre puede tener hasta 50 caracteres.</string>
+    <string name="error_inventory_expiry_empty">Elige la fecha de vencimiento.</string>
+    <string name="error_inventory_past_date">La fecha no puede ser anterior a hoy.</string>
+    <string name="error_inventory_category_empty">Elige una categoría.</string>
+    <string name="error_inventory_price_invalid">Escribe un precio en pesos, sin decimales, mayor que 0 y hasta 99.999.999.</string>
+    <string name="error_inventory_quantity_invalid">Escribe una cantidad mayor que 0, hasta 9999 y con 2 decimales como máximo.</string>
+
+    <!-- Editor de producto (HU-INV-02 a HU-INV-05, Figma 476:3664 y 476:3689) -->
+    <string name="editor_title_add">Añadir Producto</string>
+    <string name="editor_title_edit">Editar Producto</string>
+    <string name="editor_save">Guardar</string>
+    <string name="editor_add_button">Añadir al Inventario</string>
+    <string name="editor_delete_button">Eliminar</string>
+    <string name="editor_name_placeholder">Ej. Carne</string>
+    <string name="editor_name_label">Nombre del producto</string>
+    <string name="editor_expiry_placeholder">Fecha de vencimiento</string>
+    <string name="editor_category_placeholder">Seleccionar categoría</string>
+    <string name="editor_quantity_placeholder">Cantidad</string>
+    <string name="editor_unit_label">Unidad</string>
+    <string name="editor_missing_fields">⚠ Los campos no pueden estar vacíos</string>
+    <string name="editor_price_placeholder">Precio (opcional)</string>
+    <string name="inventory_price_format">$ %1$s</string>
+    <string name="cd_editor_take_photo">Tomar foto</string>
+    <string name="cd_editor_remove_photo">Eliminar la foto</string>
+    <string name="cd_editor_photo">Foto del producto</string>
+
+    <!-- Hojas y calendario (CA-INV-02-04, 02-05, 02-08) -->
+    <string name="editor_category_sheet_title">Seleccione una categoría</string>
+    <string name="editor_unit_sheet_title">Seleccione una unidad</string>
+    <string name="editor_sheet_save">Guardar</string>
+    <string name="editor_sheet_cancel">Cancelar</string>
+    <string name="editor_date_ok">Aceptar</string>
+    <string name="editor_date_cancel">Cancelar</string>
+
+    <!-- Diálogos del editor (CA-INV-02-06, 03-02, 04-01, 04-02, 05-04) -->
+    <string name="editor_saved_title">Producto Guardado</string>
+    <string name="editor_saved_body">Te avisaremos antes de que caduque para que no se desperdicie.</string>
+    <string name="editor_updated_title">Guardado</string>
+    <string name="editor_updated_body">«%1$s» se actualizó</string>
+    <string name="editor_deleted_title">Producto eliminado</string>
+    <string name="editor_confirm_delete">¿Desea eliminar el producto?</string>
+    <string name="editor_confirm_remove_photo">¿Desea eliminar la imagen?</string>
+    <string name="editor_photo_removed">Imagen eliminada</string>
+    <string name="editor_confirm">Eliminar</string>
+    <string name="editor_cancel">Cancelar</string>
 </resources>

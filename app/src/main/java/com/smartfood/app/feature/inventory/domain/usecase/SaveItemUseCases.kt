@@ -106,4 +106,4 @@ class UpdateItemUseCase @Inject constructor(
 
 /** Arma el producto a partir de los datos validados. */
 private fun ValidItem.toItem(id: String, photo: ItemPhoto?) =
-    InventoryItem(id = id, name = name, category = category, expiresOn = expiresOn, quantity = quantity, photo = photo)
+    InventoryItem(id = id, name = name, category = category, expiresOn = expiresOn, quantity = quantity, photo = photo, price = price)

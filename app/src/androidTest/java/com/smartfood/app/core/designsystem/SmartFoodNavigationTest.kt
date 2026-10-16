@@ -3,8 +3,6 @@ package com.smartfood.app.core.designsystem
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -18,6 +16,7 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodBottomBar
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.components.SmartFoodTab
@@ -48,8 +47,8 @@ class SmartFoodNavigationTest {
         mostrar {
             SmartFoodBottomBar(
                 tabs = listOf(
-                    SmartFoodTab("Inventario", Icons.Outlined.Inventory2, selected = true, onClick = {}),
-                    SmartFoodTab("Perfil", Icons.Outlined.Person, selected = false, onClick = { perfil++ }),
+                    SmartFoodTab("Inventario", R.drawable.ic_figma_tab_inventory, selected = true, onClick = {}),
+                    SmartFoodTab("Perfil", R.drawable.ic_figma_tab_profile, selected = false, onClick = { perfil++ }),
                 )
             )
         }

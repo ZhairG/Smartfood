@@ -40,13 +40,15 @@ class InventoryScreenTest {
         expiresOn: LocalDate = today,
         quantity: Quantity? = null,
         photo: ItemPhoto? = null,
+        price: Long? = null,
     ) = InventoryItem(
         id = id,
         name = name,
         category = category,
         expiresOn = expiresOn,
         quantity = quantity,
-        photo = photo
+        photo = photo,
+        price = price
     )
 
     private fun show(
@@ -259,5 +261,22 @@ class InventoryScreenTest {
         composeTestRule.onNodeWithText("Reintentar").performClick()
 
         assertEquals(InventoryEvent.RetryClicked, lastEvent)
+    }
+
+    @Test
+    fun caInv0109_laFilaMuestraElPrecioJuntoALaFecha() {
+        show(
+            InventoryUiState(
+                isLoading = false,
+                sections = listOf(
+                    InventorySection(
+                        ExpiryStatus.FRESH,
+                        listOf(item(id = "1", name = "Carne", expiresOn = LocalDate.of(2026, 9, 20), price = 12_500L))
+                    )
+                )
+            )
+        )
+
+        composeTestRule.onNodeWithText("20/09/2026 · $ 12.500").assertIsDisplayed()
     }
 }

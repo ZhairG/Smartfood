@@ -91,7 +91,7 @@ data class InventoryItem(
     val photo: ItemPhoto? = null,
     val localPhotoPath: String? = null,   // foto que espera subirse (CA-INV-10-04, T046)
     val isPendingSync: Boolean = false,   // cambios o foto sin subir (CA-INV-10-02, T046)
-    // El precio se agregará aquí como campo opcional en la spec de presupuesto (spec §7).
+    val price: Long? = null,              // pesos colombianos enteros, opcional (CA-INV-02-10, T052)
 )
 
 /** Cómo terminó una escritura: confirmada por el servidor o guardada en el teléfono (§13, T046). */
@@ -106,10 +106,13 @@ data class ItemDraft(
     val category: FoodCategory?,
     val quantityText: String = "",
     val unit: QuantityUnit? = null,
+    val priceText: String = "",          // "12500" o "12.500"; vacío = sin precio (T052)
 )
 
 /** Resultado de ValidateItemUseCase: nombre recortado, campos obligatorios presentes y cantidad interpretada. */
-data class ValidItem(val name: String, val expiresOn: LocalDate, val category: FoodCategory, val quantity: Quantity?)
+data class ValidItem(
+    val name: String, val expiresOn: LocalDate, val category: FoodCategory, val quantity: Quantity?, val price: Long? = null,
+)
 
 @JvmInline value class LocalPhoto(val filePath: String)
 
@@ -189,6 +192,7 @@ users/{uid}/inventory/{itemId}
   ├── expiresOn       : string     "yyyy-MM-dd" (día sin hora; ADR-INV-02)
   ├── quantity        : number?    > 0 y ≤ 9999; presente solo junto con unit (T002)
   ├── unit            : string?    UNITS | GRAMS | KILOGRAMS | POUNDS | MILLILITERS | LITERS
+  ├── price           : int?       pesos colombianos, > 0 y ≤ 99999999 (T052)
   ├── photoPath       : string?    ruta en Storage
   ├── photoUrl        : string?    URL de descarga
   ├── createdAt       : timestamp  serverTimestamp (solo al crear)
@@ -196,8 +200,8 @@ users/{uid}/inventory/{itemId}
 ```
 
 Se escribe y se lee con `Map` (sin reflexión, por R8), igual que `FirestoreUserRepository`. Sin cantidad, las claves
-`quantity` y `unit` no se escriben. Agregar `price` más adelante es agregar otra clave opcional: los documentos viejos
-siguen siendo válidos.
+`quantity` y `unit` no se escriben; sin precio, `price` tampoco. El precio (T052, 16/10) fue la primera clave opcional
+que se agregó después: los documentos viejos siguen siendo válidos.
 
 **Escritura (desde el #71, T047).** Hasta el #71, guardar y borrar usaban transacciones (`runTransaction`) para
 fallar con `Network` sin conexión, como pedía la versión anterior de RNF-INV-05. Ahora se escribe en la cola de
@@ -243,8 +247,8 @@ match /users/{uid}/inventory/{itemId} {
 
 La regla actual de `users/{uid}` no cubre las subcolecciones, así que esta regla es necesaria.
 
-La versión vigente (`firestore.rules`, T022) endurece este esquema: `keys().hasOnly([...])` con los 10 campos del
-documento (no se cuelan claves extra), `nameNormalized` debe ser texto y `validPhoto` exige que `photoPath` y
+La versión vigente (`firestore.rules`, T022 y T052) endurece este esquema: `keys().hasOnly([...])` con los 11 campos del
+documento (con `price`, validado por `validPrice`: ausente, o `int` > 0 y ≤ 99999999) (no se cuelan claves extra), `nameNormalized` debe ser texto y `validPhoto` exige que `photoPath` y
 `photoUrl` vayan juntas. Las pruebas automáticas viven en `rules-test/` (`@firebase/rules-unit-testing`) y se corren
 con `firebase emulators:exec --only firestore,storage "npm --prefix rules-test test"`.
 
@@ -384,6 +388,14 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 | `SmartFoodResultDialog` (nuevo, `Dialogs.kt`) | Ícono de check, título y cuerpo opcional ("Producto Guardado" / "Te avisaremos…"). Se anuncia como `liveRegion`. |
 | `SmartFoodPrimaryButton` | Ya es naranja (`secondary`) habilitado y gris deshabilitado, como "Añadir al Inventario" (`476:5726`), así que no hace falta una variante de acento. Suma `leadingIcon` opcional para el "+" y `destructive` (Boolean) para el botón rojo de confirmación (`error`/`onError`, Figma `476:3815`, CA-INV-04-01), con los colores cerrados: nadie pasa colores sueltos (#80). |
 
+- **Editor adaptable (T054, RNF-INV-06):** barra superior; debajo, un `BoxWithConstraints` que calcula
+  `formMetricsFor(maxHeight)` con el alto **sin** el teclado (así los campos no cambian de tamaño al abrirlo); dentro,
+  una columna con `imePadding` que lleva los campos (`weight(1f)` y `verticalScroll`), el aviso de error y el botón
+  fijo abajo. Al tocar el botón gris, `showMissingFields` marca en rojo los campos que faltan y muestra
+  "⚠ Los campos no pueden estar vacíos" (CA-INV-02-02). Se prueba con `AdaptiveLayoutTest` y con capturas reales de
+  adb en 360×640, 360×804 y 412×917 dp y con la fuente al 130 %.
+- **Precio (T052):** fila "Precio" con teclado numérico debajo de la cantidad; en `InventoryItemRow`, "$ 12.500" junto
+  a la fecha con el formato es-CO.
 - **Cantidad (T002, desviación de la spec §8):** en el editor, debajo de la categoría, una fila con un
   `SmartFoodTextField` numérico (`KeyboardType.Decimal`) y un `SmartFoodSelectorField` de unidad que abre una hoja
   como la de categoría. En `InventoryItemRow`, el texto "1,5 kg" junto a la etiqueta de categoría, formateado con la

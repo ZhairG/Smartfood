@@ -4,19 +4,25 @@
  * Fecha: Octubre 2026
  * Descripción: Pantalla de búsqueda del inventario (spec 006, HU-INV-06 y HU-INV-07, CA-INV-06-01 a 06-08 y
  * CA-INV-07-01 a 07-09). Es stateless: recibe el estado y avisa por eventos, y adapta sus medidas a los tokens del
- * Design System (RNF-INV-06). Usa `SmartFoodTopBar` (Figma `476:5960`) y reutiliza `InventoryItemRow` y
- * `CategoryChips` de `ui/components/`. La tarjeta "Usa tu voz" solo se muestra si hay servicio (CA-INV-07-08) y el
+ * Design System (RNF-INV-06). Usa `SmartFoodTopBar` (Figma `476:5960`), `CategoryChips` y una fila propia
+ * (`SearchResultRow`), sin miniatura ni lápiz, como el Figma `476:3190`. La tarjeta "Usa tu voz" solo se muestra si hay servicio (CA-INV-07-08) y el
  * aviso de voz (`VoiceSearchOverlay`) se dibuja encima cuando escucha, procesa o falla.
  */
 package com.smartfood.app.feature.inventory.ui.search
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
@@ -29,14 +35,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.components.SmartFoodTextField
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.ui.components.CategoryChips
-import com.smartfood.app.feature.inventory.ui.components.InventoryItemRow
 import com.smartfood.app.feature.inventory.ui.components.PermissionRationale
 import com.smartfood.app.feature.inventory.ui.components.VoiceSearchCard
 import com.smartfood.app.feature.inventory.ui.components.VoiceSearchOverlay
@@ -67,10 +75,13 @@ fun InventorySearchScreen(
                 onBack = { onEvent(InventorySearchEvent.BackClicked) }
             )
 
+            // Figma 476:3190: la barra, la tarjeta de voz y los filtros van separados unos 24 dp.
             Column(
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = MaterialTheme.spacing.medium)
+                    .padding(top = MaterialTheme.spacing.medium)
             ) {
                 SearchField(
                     query = state.query,
@@ -103,11 +114,9 @@ fun InventorySearchScreen(
 
                         else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
                             items(items = state.results, key = { it.item.id }) { result ->
-                                InventoryItemRow(
-                                    item = result.item,
-                                    status = result.status,
-                                    onEditClicked = { id -> onEvent(InventorySearchEvent.ResultClicked(id)) },
-                                    showExpiryLabel = true
+                                SearchResultRow(
+                                    result = result,
+                                    onClick = { id -> onEvent(InventorySearchEvent.ResultClicked(id)) }
                                 )
                             }
                         }
@@ -147,29 +156,56 @@ private fun SearchField(
     onQueryChanged: (String) -> Unit,
     onClearQuery: () -> Unit,
 ) {
-    val clearButton: (@Composable () -> Unit)? = if (query.isEmpty()) {
-        null
-    } else {
-        {
-            IconButton(onClick = onClearQuery) {
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = stringResource(id = R.string.cd_clear_search)
-                )
-            }
-        }
-    }
+    val placeholder = stringResource(id = R.string.inventory_search_placeholder)
+    val textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
 
-    SmartFoodTextField(
+    // Figma 476:3190: píldora gris sin borde, con la lupa a la izquierda y la "x" al escribir (CA-INV-06-07).
+    BasicTextField(
         value = query,
         onValueChange = onQueryChanged,
-        placeholder = stringResource(id = R.string.inventory_search_placeholder),
-        leadingContent = {
-            Icon(imageVector = Icons.Default.Search, contentDescription = null)
-        },
-        trailingContent = clearButton,
+        singleLine = true,
+        textStyle = textStyle,
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = MaterialTheme.spacing.small)
+            .semantics { contentDescription = placeholder },
+        decorationBox = { innerTextField ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = SearchBarHeight)
+                    .background(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = CircleShape)
+                    .padding(horizontal = MaterialTheme.spacing.medium)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = MaterialTheme.spacing.small)
+                ) {
+                    if (query.isEmpty()) {
+                        Text(text = placeholder, style = textStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    innerTextField()
+                }
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = onClearQuery) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = stringResource(id = R.string.cd_clear_search),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
     )
 }
+
+// Medida del Figma (476:3190): barra de búsqueda de 48 px de alto. No es de formulario, así que no va en FormMetrics.
+private val SearchBarHeight = 48.dp
