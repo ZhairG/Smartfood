@@ -6,6 +6,8 @@
 -->
 <resources>
     <string name="tab_inventory">Inventario</string>
+    <string name="tab_recipes">Recetas</string>
+    <string name="tab_saved">Guardadas</string>
     <string name="tab_profile">Perfil</string>
     <string name="inventory_title">Mi Inventario</string>
     <!-- Flecha atrás de SmartFoodTopBar (RNF-INV-04). -->

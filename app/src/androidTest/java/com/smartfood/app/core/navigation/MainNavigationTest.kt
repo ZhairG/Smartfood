@@ -90,15 +90,16 @@ class MainNavigationTest {
     }
 
     @Test
-    fun caInv0904_unaPantallaInternaNoMuestraLaBarra() {
+    fun caInv0904_laBusquedaMuestraLaBarraConInventarioResaltado() {
         composeTestRule.runOnUiThread { navController.navigate(Route.InventorySearch) }
         composeTestRule.waitForIdle()
 
         // La búsqueda ya es la pantalla real (T034, #42). Se comprueba un elemento que siempre está (el filtro
         // "Todos"); la tarjeta "Usa tu voz" depende del servicio de reconocimiento del dispositivo (CA-INV-07-08).
         composeTestRule.onNodeWithText("Todos").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Perfil").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Inventario").assertDoesNotExist()
+        // Como el Figma, la búsqueda muestra la barra inferior con Inventario resaltado (T055).
+        composeTestRule.onNodeWithText("Inventario").assertIsSelected()
+        composeTestRule.onNodeWithText("Perfil").assertIsDisplayed()
     }
 
     @Test

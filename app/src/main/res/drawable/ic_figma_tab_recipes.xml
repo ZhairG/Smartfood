@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícono de la pestaña Recetas (libro) de la barra inferior del Figma (476:4176), convertido del SVG del MCP (spec 006, T055).
+     Se dibuja con trazo y se tiñe con el tema desde la barra. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    <path
+        android:pathData="M5.3344 26.0008V5.9992C5.3344 5.11507 5.68555 4.26716 6.31061 3.64199C6.93567 3.01682 7.78343 2.6656 8.6674 2.6656H25.3324C25.686 2.6656 26.0251 2.80609 26.2751 3.05616C26.5251 3.30622 26.6656 3.64539 26.6656 3.99904V22.6672M5.3344 26.0008C5.3344 26.8849 5.68555 27.7328 6.31061 28.358C6.93567 28.9832 7.78343 29.3344 8.6674 29.3344H25.3324C25.686 29.3344 26.0251 29.1939 26.2751 28.9438C26.5251 28.6938 26.6656 28.3546 26.6656 28.001V22.6672M5.3344 26.0008C5.3344 25.1167 5.68555 24.2688 6.31061 23.6436C6.93567 23.0184 7.78343 22.6672 8.6674 22.6672H26.6656"
+        android:strokeWidth="2"
+        android:strokeColor="#9AA39D"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+</vector>

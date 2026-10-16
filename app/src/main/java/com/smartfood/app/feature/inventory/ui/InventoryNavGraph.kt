@@ -50,18 +50,23 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
             InventoryScreen(state = state, onEvent = viewModel::onEvent)
         }
     }
+    // La búsqueda y el editor muestran la barra inferior con Inventario resaltado, como el Figma (CA-INV-09-04, T055).
     composable<Route.InventorySearch> {
-        InventorySearchRoute(
-            onNavigateToEditor = { id -> navController.navigate(Route.ProductEditor(id)) },
-            onBack = { navController.popBackStack() }
-        )
+        MainTabScaffold(currentTab = MainTab.INVENTORY, onTabSelected = navController::navigateToTab) {
+            InventorySearchRoute(
+                onNavigateToEditor = { id -> navController.navigate(Route.ProductEditor(id)) },
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
     composable<Route.ProductEditor> { entry ->
-        ProductEditorRoute(
-            savedStateHandle = entry.savedStateHandle,
-            onNavigateToCamera = { navController.navigate(Route.ProductCamera) },
-            onBack = { navController.popBackStack() }
-        )
+        MainTabScaffold(currentTab = MainTab.INVENTORY, onTabSelected = navController::navigateToTab) {
+            ProductEditorRoute(
+                savedStateHandle = entry.savedStateHandle,
+                onNavigateToCamera = { navController.navigate(Route.ProductCamera) },
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
     composable<Route.ProductCamera> {
         ProductCameraRoute(

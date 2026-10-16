@@ -48,6 +48,8 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
  * @property icon Ícono de la pestaña (decorativo: el texto ya la nombra).
  * @property selected Si es la pestaña actual.
  * @property onClick Acción al tocarla.
+ * @property enabled `false` para una pestaña que todavía no existe (Recetas y Guardadas, spec 006 T055): se ve gris y
+ *   no responde.
  */
 @Immutable
 data class SmartFoodTab(
@@ -55,6 +57,7 @@ data class SmartFoodTab(
     @DrawableRes val icon: Int,
     val selected: Boolean,
     val onClick: () -> Unit,
+    val enabled: Boolean = true,
 )
 
 /**
@@ -78,7 +81,8 @@ fun SmartFoodBottomBar(tabs: List<SmartFoodTab>, modifier: Modifier = Modifier) 
                 .fillMaxWidth()
                 .height(BottomBarHeight)
                 .selectableGroup(),
-            horizontalArrangement = Arrangement.spacedBy(TabSpacing, Alignment.CenterHorizontally),
+            // Con 4 pestañas (Figma 476:4176) el reparto es parejo: un espacio fijo de 40 px no cabe en 360 dp.
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
             tabs.forEach { tab -> BottomBarTab(tab) }
@@ -92,7 +96,7 @@ private fun BottomBarTab(tab: SmartFoodTab) {
     val color = if (tab.selected) GreenCheck else MaterialTheme.colorScheme.onSurfaceVariant
     Column(
         modifier = Modifier
-            .selectable(selected = tab.selected, onClick = tab.onClick, role = Role.Tab)
+            .selectable(selected = tab.selected, enabled = tab.enabled, onClick = tab.onClick, role = Role.Tab)
             .padding(horizontal = TabTouchPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -109,7 +113,6 @@ private fun BottomBarTab(tab: SmartFoodTab) {
 // Medidas de la barra del Figma (476:5570). No son de formulario, así que no van en FormMetrics.
 private val BottomBarHeight = 75.dp
 private val TabIconSize = 32.dp
-private val TabSpacing = 40.dp
 private val TabTouchPadding = 8.dp
 
 @Preview(showBackground = true)
