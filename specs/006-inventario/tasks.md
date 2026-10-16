@@ -31,7 +31,7 @@
 - [x] T014 Dependencias: `firebase-storage`, CameraX, Coil 3, WorkManager y `hilt-work` (plan §9). → #19
 - [x] T015 `CoreDataModule.provideFirebaseStorage()` con el emulador en el puerto 9199. `firebase.json` con `storage` y el emulador (hecho en el #34). Prueba: I `InventoryDataModuleTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (inyecta desde Hilt). → #69
 - [x] T016 `InventoryErrorMapper`, con pruebas (plan §10). Prueba: U `InventoryErrorMapperTest`. → #30
-- [x] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). Guardar y borrar con transacción (RNF-INV-05). Prueba: U `InventoryDocumentTest`; de punta a punta con las reglas en T022. → #30
+- [x] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). Guardar y borrar con transacción (versión anterior de RNF-INV-05; desde el #71 se reemplaza en T047 por la cola de Firestore). Prueba: U `InventoryDocumentTest`; de punta a punta con las reglas en T022. → #30
 - [x] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). Pruebas: U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (con `-PuseFirebaseEmulator=true`). → #31
 - [x] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5), y su `@Binds` en `InventoryDataModule`. Pruebas: U `AndroidSpeechToTextTest`, I `InventoryDataModuleTest`. → #32
 - [x] T020 [P] `InventoryPreferences` sobre el DataStore existente, y su `@Binds` en `InventoryDataModule`. Pruebas: U `DataStoreInventoryPreferencesTest`, I `InventoryDataModuleTest`. → #33
@@ -64,7 +64,7 @@
 
 ## Fase 6: Avisos
 - [ ] T037 `ExpiryNotifier` (canal, plurales y `PendingIntent`) y `ExpiryReminderWorker` (`@HiltWorker`) (CA-INV-08-01 a 08-04). → #44
-- [ ] T038 `WorkManagerExpiryReminderScheduler` (próxima 9:00, `UPDATE`). `SmartfoodApp` como `Configuration.Provider`, sin el inicializador por defecto. `SplashViewModel` reprograma los avisos con sesión activa. Reemplaza el enlace a `NoOpExpiryReminderScheduler` en `InventoryDataModule` y borra esa clase. → #44
+- [ ] T038 `WorkManagerExpiryReminderScheduler` (próxima 9:00, `UPDATE`). `SmartfoodApp` como `Configuration.Provider`, sin el inicializador por defecto (desde el #71 lo hace la T048; si ya está, no se repite). `SplashViewModel` reprograma los avisos con sesión activa. Reemplaza el enlace a `NoOpExpiryReminderScheduler` en `InventoryDataModule` y borra esa clase. → #44
 - [ ] T039 Permiso `POST_NOTIFICATIONS` después del primer guardado, pedido una sola vez (CA-INV-08-05). → #44
 
 ## Fase 7: Cierre
@@ -73,6 +73,18 @@
 - [ ] T042 `README.md` y `AGENTS.md` (arquitectura de `feature/inventory`, emulador de Storage y comandos). → #45
 - [ ] T043 Verificación local: `testDebugUnitTest`, `assembleDebug`, pruebas instrumentadas con `firebase emulators:start --only auth,firestore,storage` y el checklist manual (puntos 1 a 9). → #45
 - [ ] T044 Despliegue: activar Cloud Storage en `smartfood-f62a1` (`southamerica-east1`) y `firebase deploy --only firestore:rules,storage`. Checklist en producción (punto 10). → #45
+
+## Fase 8: Sin conexión (HU-INV-10)
+> Spec, plan §13 y ADR-INV-09 aprobados en el #71. Las tareas T046 a T051 se dividen en Issues después de fusionar
+> el #71. El orden es T046 → T047 y T048 (en paralelo) → T049, T050 y T051.
+
+- [x] T045 Spec, plan y tareas del uso sin conexión: §7, RNF-INV-05, CA-INV-02-07, 04-02, 05-02, 05-04 a 05-06, HU-INV-10, RF-INV-09 y ADR-INV-09. → #71
+- [ ] T046 Dominio: `WriteOutcome`, `SavedItem`, `isPendingSync` y `localPhotoPath` en `InventoryItem`; `InventoryRepository` con `createItem`, `updateItem`, `setPhoto` y `hasPendingWrites`; la interfaz `PhotoSync`; los casos de uso de agregar, editar, eliminar y observar sin subir fotos, `HasPendingChangesUseCase` y `LogoutUseCase` con `clearAll()`. Fakes: `FakeInventoryRepository` actualizado y `FakePhotoSync`. Pruebas U que citan CA-INV-10-xx (plan §2 y §13).
+- [ ] T047 [P] `FirestoreInventoryRepository` sin transacciones: `set`/`update`/`delete` con espera de 3 s → `WriteOutcome`, `MetadataChanges.INCLUDE` → `isPendingSync`, `setPhoto` y `hasPendingWrites` (plan §3). Las reglas no cambian. Pruebas: U `InventoryDocumentTest`, I `FirestoreInventoryRepositoryEmulatorTest` con `disableNetwork()` (CA-INV-10-02, 10-05).
+- [ ] T048 [P] `PendingPhotoStore`, `PhotoUploadWorker`, `PhotoDeleteWorker` y `WorkManagerPhotoSync` (`@HiltWorker`), con su `@Binds` en `InventoryDataModule`. `SmartfoodApp` como `Configuration.Provider` y sin el inicializador del manifiesto (sale de la T038). `work-testing` en `libs.versions.toml` y `app/build.gradle.kts`. Pruebas I de los workers (CA-INV-05-05, 05-06, 10-03, 10-04).
+- [ ] T049 Lista: ícono de pendiente y foto local en `InventoryItemRow`, con la descripción "Pendiente de sincronizar" (CA-INV-10-02, 10-04, 10-06). Va después del #39. Pruebas: I `InventoryScreenTest`.
+- [ ] T050 Editor: diálogo "Guardado en tu teléfono" con `WriteOutcome.PENDING` y la foto local en `PhotoSlot` (CA-INV-10-02, 10-04). Se integra en el editor (#40). Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`.
+- [ ] T051 Perfil: aviso al cerrar sesión con cambios pendientes, con `SmartFoodConfirmDialog` (CA-INV-10-07). Pruebas: U `ProfileViewModelTest`, I `ProfileScreenTest`.
 
 ## Matriz de trazabilidad
 
@@ -95,7 +107,7 @@ verificación manual (checklist).
 | CA-INV-02-04 | U `ValidateItemUseCaseTest`, M 1 |
 | CA-INV-02-05 | I `ProductEditorScreenTest` |
 | CA-INV-02-06 | U `AddItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
-| CA-INV-02-07 | U `ProductEditorViewModelTest`, M 7 |
+| CA-INV-02-07 | U `ProductEditorViewModelTest` (rechazo del servidor), U `AddItemUseCaseTest` |
 | CA-INV-02-08 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-02-09 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-03-01 | U `ProductEditorViewModelTest` |
@@ -103,14 +115,14 @@ verificación manual (checklist).
 | CA-INV-03-03 | U `ValidateItemUseCaseTest` |
 | CA-INV-03-04 | U `ProductEditorViewModelTest` |
 | CA-INV-04-01 | I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
-| CA-INV-04-02 | U `DeleteItemUseCaseTest`, M 3 |
+| CA-INV-04-02 | U `DeleteItemUseCaseTest` (encola el borrado de la foto), I `PhotoDeleteWorkerTest`, M 3 |
 | CA-INV-04-03 | I `ProductEditorScreenTest` |
 | CA-INV-05-01 | I `ProductCameraScreenTest`, M 2 |
 | CA-INV-05-02 | U `ProductEditorViewModelTest`, M 2 |
 | CA-INV-05-03 | U `ProductEditorViewModelTest`, I `ProductCameraScreenTest`, M 4 |
 | CA-INV-05-04 | U `UpdateItemUseCaseTest`, I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
-| CA-INV-05-05 | U `UpdateItemUseCaseTest`, M 2 |
-| CA-INV-05-06 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (conserva el archivo si falla) |
+| CA-INV-05-05 | U `UpdateItemUseCaseTest`, I `PhotoUploadWorkerTest` (borra la anterior después de subir), M 2 |
+| CA-INV-05-06 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (conserva el archivo si falla), I `PhotoUploadWorkerTest` (reintenta; archivo ilegible → sin foto) |
 | CA-INV-06-01 | I `InventorySearchScreenTest` |
 | CA-INV-06-02 | U `SearchInventoryUseCaseTest` |
 | CA-INV-06-03 | U `SearchInventoryUseCaseTest`, I `InventorySearchScreenTest` |
@@ -139,9 +151,17 @@ verificación manual (checklist).
 | CA-INV-09-03 | I `MainNavigationTest`, U `ProfileViewModelTest` |
 | CA-INV-09-04 | I `MainNavigationTest` |
 | CA-INV-09-05 | I `MainNavigationTest` |
+| CA-INV-10-01 | M 7 |
+| CA-INV-10-02 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `FirestoreInventoryRepositoryEmulatorTest` (sin red → `PENDING`), I `InventoryScreenTest`, M 7 |
+| CA-INV-10-03 | U `DeleteItemUseCaseTest`, I `PhotoDeleteWorkerTest`, M 7 |
+| CA-INV-10-04 | U `ObserveInventoryUseCaseTest`, I `PhotoUploadWorkerTest`, I `InventoryScreenTest`, I `ProductEditorScreenTest` |
+| CA-INV-10-05 | I `FirestoreInventoryRepositoryEmulatorTest` (al encender la red, `isPendingSync` pasa a falso), M 7 |
+| CA-INV-10-06 | I `InventoryScreenTest` |
+| CA-INV-10-07 | U `HasPendingChangesUseCaseTest`, U `LogoutUseCaseTest`, U `ProfileViewModelTest`, I `ProfileScreenTest` |
 | RNF-INV-01 | R `firestore.test.js`, R `storage.test.js`, I `FirestoreInventoryRepositoryEmulatorTest`, M 9 |
 | RNF-INV-02 | U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest`, R `storage.test.js`, M 9 (foto > 2 MB denegada), M 2 (tamaño subido) |
 | RNF-INV-04 | I `InventoryScreenTest`, I `InventorySearchScreenTest` (descripciones y estado de los chips) |
+| RNF-INV-05 | Las de CA-INV-10-01 a 10-05, M 7 |
 | RNF-INV-06 | I `AdaptiveLayoutTest` |
 
 ### Checklist de verificación manual
@@ -161,8 +181,16 @@ verificación manual (checklist).
 5. En la búsqueda, dictar "leche, tomate y pasta": la barra muestra "leche, tomate, pasta" y aparecen los
    productos existentes. Quedarse en silencio: "No se entendió. Reinténtalo" (CA-INV-07-03, 07-05).
 6. Negar el permiso de micrófono: aparece el mensaje y la búsqueda por texto funciona (CA-INV-07-06).
-7. Con el modo avión, guardar un producto: aparece el error de red y el formulario conserva los datos
-   (CA-INV-02-07).
+7. Con el modo avión:
+   - abrir "Mi Inventario": se ven los productos y las fotos ya vistas (CA-INV-10-01);
+   - añadir "Arroz" con foto y editar "Leche Entera": aparece "Guardado en tu teléfono…", y los dos quedan con el
+     ícono de pendiente; la fila de "Arroz" muestra la foto del teléfono (CA-INV-10-02, 10-04, 10-06);
+   - eliminar "Pasta": desaparece de la lista (CA-INV-10-03);
+   - tocar "Cerrar sesión" en Perfil: aparece el aviso de cambios sin subir, y "Cancelar" deja la sesión abierta
+     (CA-INV-10-07).
+
+   Quitar el modo avión: sin recargar, desaparecen los íconos, y en el emulador aparecen "Arroz" con su foto en
+   Storage y la edición de la leche, y "Pasta" ya no está (CA-INV-10-05).
 8. Con un producto que vence mañana, forzar el worker (`adb shell cmd jobscheduler run -f com.smartfood.app <id>`
    o la App Inspection de WorkManager): llega "«…» vence pronto" y al tocarla se abre "Mi Inventario". En Android
    13+, el permiso se pidió después del primer guardado y no se vuelve a pedir (CA-INV-08-01, 08-02, 08-04, 08-05).
