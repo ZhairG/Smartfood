@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
@@ -29,10 +27,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.spacing
 
@@ -51,7 +51,7 @@ fun VoiceSearchCard(
             .clickable(onClick = onClick),
         // Figma 476:3190: tarjeta blanca con borde verde y esquinas de 20 px.
         shape = RoundedCornerShape(CardRadius),
-        border = BorderStroke(CardBorder, MaterialTheme.colorScheme.primary),
+        border = BorderStroke(CardBorder, MaterialTheme.colorScheme.onSurfaceVariant),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(
@@ -63,14 +63,14 @@ fun VoiceSearchCard(
         ) {
             Text(
                 text = stringResource(id = R.string.search_voice_card_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold,
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = stringResource(id = R.string.search_voice_card_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp),
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center
             )
@@ -83,9 +83,11 @@ fun VoiceSearchCard(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
+                // Micrófono del Figma (476:3211): 36 px dentro del círculo de 60.
                 Icon(
-                    imageVector = Icons.Outlined.Mic,
-                    contentDescription = stringResource(id = R.string.cd_mic_button)
+                    painter = painterResource(id = R.drawable.ic_figma_mic),
+                    contentDescription = stringResource(id = R.string.cd_mic_button),
+                    modifier = Modifier.size(MicIconSize)
                 )
             }
         }
@@ -95,5 +97,6 @@ fun VoiceSearchCard(
 // Medidas del Figma (`476:3190`): el micrófono es un círculo de 60 px centrado en la tarjeta. No son medidas de
 // formulario, así que no van en FormMetrics.
 private val MicButtonSize = 60.dp
+private val MicIconSize = 36.dp
 private val CardRadius = 20.dp
 private val CardBorder = 1.dp

@@ -10,6 +10,10 @@
 package com.smartfood.app.feature.inventory.ui.editor
 
 import androidx.compose.foundation.clickable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,6 +69,9 @@ internal fun EditorLineTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     val name = accessibilityLabel ?: placeholder
+    // El mismo enfoque de los campos de autenticación: la línea se pone verde al enfocar (FieldFrame).
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
@@ -72,11 +79,12 @@ internal fun EditorLineTextField(
         keyboardOptions = keyboardOptions,
         textStyle = lineTextStyle(color = MaterialTheme.colorScheme.onSurface),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        interactionSource = interactionSource,
         modifier = modifier
             .fillMaxWidth()
             .semantics { contentDescription = name },
         decorationBox = { innerTextField ->
-            LineFrame(icon = icon, isError = isError) {
+            LineFrame(icon = icon, isError = isError, isFocused = isFocused) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     if (value.isEmpty()) {
                         LineText(text = placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -128,11 +136,12 @@ internal fun EditorLineSelector(
     }
 }
 
-/** Marco común: ícono, contenido, contenido final y la línea inferior. */
+/** Marco común: ícono, contenido, contenido final y la línea inferior (roja con error, verde al enfocar). */
 @Composable
 private fun LineFrame(
     icon: (@Composable () -> Unit)?,
     isError: Boolean,
+    isFocused: Boolean = false,
     trailing: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
@@ -161,8 +170,12 @@ private fun LineFrame(
             }
         }
         HorizontalDivider(
-            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
-            thickness = if (isError) ErrorLine else Line
+            color = when {
+                isError -> MaterialTheme.colorScheme.error
+                isFocused -> MaterialTheme.colorScheme.primary
+                else -> MaterialTheme.colorScheme.outline
+            },
+            thickness = if (isError || isFocused) ErrorLine else Line
         )
     }
 }

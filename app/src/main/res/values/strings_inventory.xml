@@ -97,6 +97,7 @@
     <string name="editor_title_edit">Editar Producto</string>
     <string name="editor_save">Guardar</string>
     <string name="editor_add_button">Añadir al Inventario</string>
+    <string name="editor_saving">Registrando</string>
     <string name="editor_delete_button">Eliminar</string>
     <string name="editor_name_placeholder">Ej. Carne</string>
     <string name="editor_name_label">Nombre del producto</string>

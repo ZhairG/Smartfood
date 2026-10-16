@@ -14,7 +14,6 @@ package com.smartfood.app.feature.inventory.ui.editor
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,6 +54,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -257,6 +257,8 @@ private fun EditorBottom(state: ProductEditorUiState, onEvent: (ProductEditorEve
                 onClick = { onEvent(ProductEditorEvent.SaveClicked) },
                 enabled = state.isSaveEnabled,
                 isLoading = state.isSaving,
+                // Figma 476:4229: mientras guarda, el botón anima "Registrando…".
+                loadingText = stringResource(id = R.string.editor_saving),
                 leadingIcon = Icons.Rounded.Add
             )
             if (!state.isSaveEnabled && !state.isSaving) {

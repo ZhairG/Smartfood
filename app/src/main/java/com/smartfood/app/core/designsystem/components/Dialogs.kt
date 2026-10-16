@@ -146,10 +146,12 @@ private fun SmartFoodOfflineDialogContent(
                     .fillMaxWidth()
                     .padding(start = 29.dp, end = 29.dp)
             ) {
+                // Figma 281:333: mientras reconecta, el botón sigue naranja y anima "Conectando…".
                 SmartFoodPrimaryButton(
-                    text = if (isReconnecting) stringResource(id = R.string.offline_dialog_connecting)
-                           else stringResource(id = R.string.offline_dialog_button),
-                    onClick = onReconnect
+                    text = stringResource(id = R.string.offline_dialog_button),
+                    onClick = onReconnect,
+                    isLoading = isReconnecting,
+                    loadingText = stringResource(id = R.string.offline_dialog_connecting)
                 )
             }
         }
