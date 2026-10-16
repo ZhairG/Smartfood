@@ -12,7 +12,7 @@
 
 ## Fase 0: Preparación
 - [x] T001 La spec, el plan y las tareas en `master` (PR #17), la 006 en la lista de specs de `AGENTS.md` y las tareas divididas en Issues del milestone "Spec 006: Inventario". Cada Issue se trabaja en su propia rama `feature/006-<issue>-<tema>`.
-- [x] T002 El equipo confirma si se agregan cantidad, unidad o precio (spec §7). Si se agregan, se actualizan primero la spec y el plan. **Decisión (2026-10-14):** cantidad y unidad opcionales (CA-INV-01-08, 02-08, 02-09); el precio queda para la spec de presupuesto. → #18
+- [x] T002 El equipo confirma si se agregan cantidad, unidad o precio (spec §7). Si se agregan, se actualizan primero la spec y el plan. **Decisión (2026-10-14):** cantidad y unidad opcionales (CA-INV-01-08, 02-08, 02-09); el precio queda para la spec de presupuesto. **Cambio (2026-10-16):** el precio opcional entra en esta spec (T052). → #18
 
 ## Fase 1: Dominio (Kotlin puro y pruebas JVM)
 - [x] T003 `coreLibraryDesugaring` en `app/build.gradle.kts` y `libs.versions.toml` (plan §9), necesario para `java.time` con `minSdk` 24. → #19
@@ -62,6 +62,10 @@
 - [x] T035 Voz: `VoiceSearchCard` y `VoiceSearchOverlay` ("Habla ahora", "…", error con "Reintentar"), el permiso de micrófono y la cancelación, con pruebas del ViewModel y de la pantalla (HU-INV-07). → #43
 - [x] T036 `AdaptiveLayoutTest` cubre el editor (alta y edición) en 360×720, 384×857 y 412×917 con el teclado cerrado; con el teclado abierto se comprueba a mano (RNF-INV-06). Prueba: I `AdaptiveLayoutTest.t036_*`. → #40
 
+- [ ] T052 Precio opcional en COP (CA-INV-01-09, 02-10, 02-11): `ItemDraft.priceText`, `ValidItem.price` e `InventoryItem.price`, validación en `ValidateItemUseCase` (`InventoryField.PRICE`), `price` en `InventoryDocument`, `validPrice` y `hasOnly` en `firestore.rules` (desplegado), fila "Precio" en el editor y "$ 12.500" en la lista. Pruebas: U `ValidateItemUseCaseTest`, U `InventoryDocumentTest`, U `ProductEditorViewModelTest`, R `firestore.test.js`, I `ProductEditorScreenTest`, I `InventoryScreenTest`. → #40
+- [ ] T053 Íconos del Figma (PNG teñidos con el tema) en el editor, la lista, la barra superior, la barra inferior y el Perfil (spec §8). Prueba: las instrumentadas de esas pantallas siguen en verde. → #40
+- [ ] T054 Editor adaptable: botón fijo abajo con el aviso "⚠ Los campos no pueden estar vacíos" (CA-INV-02-02), medidas sin el inset del teclado y pruebas reales con adb en 360×640, 360×804, 412×917 dp y fuente al 130 % (RNF-INV-06). Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `AdaptiveLayoutTest.t036_*`, M (capturas de adb). → #40
+
 ## Fase 6: Avisos
 - [ ] T037 `ExpiryNotifier` (canal, plurales y `PendingIntent`) y `ExpiryReminderWorker` (`@HiltWorker`) (CA-INV-08-01 a 08-04). → #44
 - [ ] T038 `WorkManagerExpiryReminderScheduler` (próxima 9:00, `UPDATE`). `SmartfoodApp` como `Configuration.Provider`, sin el inicializador por defecto (desde el #71 lo hace la T048; si ya está, no se repite). `SplashViewModel` reprograma los avisos con sesión activa. Reemplaza el enlace a `NoOpExpiryReminderScheduler` en `InventoryDataModule` y borra esa clase. → #44
@@ -101,8 +105,9 @@ verificación manual (checklist).
 | CA-INV-01-06 | U `ClassifyExpiryUseCaseTest` |
 | CA-INV-01-07 | U `ObserveInventoryUseCaseTest`, U `InventoryViewModelTest` (el flujo del fake emite), M 1 |
 | CA-INV-01-08 | I `InventoryScreenTest`, M 1 |
+| CA-INV-01-09 | I `InventoryScreenTest` |
 | CA-INV-02-01 | I `ProductEditorScreenTest` |
-| CA-INV-02-02 | U `ValidateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `SmartFoodNavigationTest` (botón) |
+| CA-INV-02-02 | U `ValidateItemUseCaseTest`, U `ProductEditorViewModelTest` (aviso de campos vacíos), I `ProductEditorScreenTest`, I `SmartFoodNavigationTest` (botón) |
 | CA-INV-02-03 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-02-04 | U `ValidateItemUseCaseTest`, M 1 |
 | CA-INV-02-05 | I `ProductEditorScreenTest` |
@@ -110,6 +115,8 @@ verificación manual (checklist).
 | CA-INV-02-07 | U `ProductEditorViewModelTest` (rechazo del servidor), U `AddItemUseCaseTest` |
 | CA-INV-02-08 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-02-09 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
+| CA-INV-02-10 | U `ValidateItemUseCaseTest`, U `InventoryDocumentTest`, U `ProductEditorViewModelTest`, R `firestore.test.js` |
+| CA-INV-02-11 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-03-01 | U `ProductEditorViewModelTest` |
 | CA-INV-03-02 | U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `SmartFoodDialogsTest` |
 | CA-INV-03-03 | U `ValidateItemUseCaseTest` |
