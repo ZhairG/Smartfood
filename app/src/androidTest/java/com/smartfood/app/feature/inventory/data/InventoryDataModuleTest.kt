@@ -1,8 +1,10 @@
 package com.smartfood.app.feature.inventory.data
 
+import com.smartfood.app.feature.inventory.data.local.DataStoreInventoryPreferences
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
 import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
+import com.smartfood.app.feature.inventory.domain.repository.InventoryPreferences
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
 import com.smartfood.app.feature.inventory.domain.repository.SpeechToText
@@ -40,6 +42,9 @@ class InventoryDataModuleTest {
     @Inject
     lateinit var speechToText: SpeechToText
 
+    @Inject
+    lateinit var inventoryPreferences: InventoryPreferences
+
     @Before
     fun inyectar() {
         hiltRule.inject()
@@ -59,5 +64,10 @@ class InventoryDataModuleTest {
     @Test
     fun t019_reconocimientoDeVozSeInyectaConLaImplementacionDeAndroid() {
         assertTrue(speechToText is AndroidSpeechToText)
+    }
+
+    @Test
+    fun t020_lasPreferenciasDeInventarioSeInyectanSobreElDataStore() {
+        assertTrue(inventoryPreferences is DataStoreInventoryPreferences)
     }
 }
