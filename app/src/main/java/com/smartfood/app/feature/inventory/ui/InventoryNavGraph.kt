@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -29,21 +30,25 @@ import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.navigation.MainTab
 import com.smartfood.app.core.navigation.MainTabScaffold
 import com.smartfood.app.core.navigation.NavTransitions
+import com.smartfood.app.core.navigation.ObserveEffects
 import com.smartfood.app.core.navigation.Route
 import com.smartfood.app.core.navigation.navigateToTab
 import com.smartfood.app.feature.inventory.ui.camera.CAPTURED_PHOTO_KEY
 import com.smartfood.app.feature.inventory.ui.camera.ProductCameraRoute
+import com.smartfood.app.feature.inventory.ui.search.InventorySearchEffect
+import com.smartfood.app.feature.inventory.ui.search.InventorySearchScreen
+import com.smartfood.app.feature.inventory.ui.search.InventorySearchViewModel
 import java.io.File
 
 /**
  * Nombre: InventoryNavGraph.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Destinos del inventario dentro de `MainGraph` (spec 006, plan §7). La cámara ya es la real (#41);
- * la lista, el editor y la búsqueda siguen siendo **pantallas provisionales** que cada Issue reemplaza sin tocar las
- * rutas (lista → #39, editor → #40, búsqueda → #42). Los botones provisionales permiten probar la cámara hasta que
- * llegue el editor real. "Mi Inventario" es una pestaña con barra inferior; las demás son pantallas internas, con
- * empuje y sin barra (CA-INV-09-04).
+ * Descripción: Destinos del inventario dentro de `MainGraph` (spec 006, plan §7). Ya son reales la cámara (#41) y la
+ * búsqueda (#42, CA-INV-06-01 a 06-08); la lista y el editor siguen siendo **pantallas provisionales** que cada Issue
+ * reemplaza sin tocar las rutas (lista → #39, editor → #40). Los botones provisionales permiten probar las pantallas
+ * reales hasta que lleguen la lista y el editor. "Mi Inventario" es una pestaña con barra inferior; las demás son
+ * pantallas internas, con empuje y sin barra (CA-INV-09-04).
  *
  * @param navController Controlador de navegación de la app.
  */
@@ -61,11 +66,28 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
                     text = stringResource(id = R.string.placeholder_add_product),
                     onClick = { navController.navigate(Route.ProductEditor()) }
                 )
+                // Provisional: la lupa de la lista real llega con el #39; este botón permite probar la búsqueda.
+                SmartFoodPrimaryButton(
+                    text = stringResource(id = R.string.placeholder_search_title),
+                    onClick = { navController.navigate(Route.InventorySearch) }
+                )
             }
         }
     }
     composable<Route.InventorySearch> {
-        PlaceholderScreen(title = stringResource(id = R.string.placeholder_search_title)) // #42
+        val viewModel: InventorySearchViewModel = hiltViewModel()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+        ObserveEffects(viewModel.effects) { effect ->
+            when (effect) {
+                is InventorySearchEffect.NavigateToEditor ->
+                    navController.navigate(Route.ProductEditor(effect.itemId))
+
+                InventorySearchEffect.NavigateBack -> navController.popBackStack()
+            }
+        }
+
+        InventorySearchScreen(state = state, onEvent = viewModel::onEvent)
     }
     composable<Route.ProductEditor> { entry ->
         // Provisional (#40): recibe la foto de la cámara por el savedStateHandle, como lo hará el editor real.

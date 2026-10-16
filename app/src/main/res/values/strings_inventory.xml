@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Textos de las pantallas de inventario (spec 006, RNF-INV-08, RNF-03). Archivo propio para no tocar strings.xml.
+    Lo comparten las pantallas de inventario: la búsqueda (T034, #42) agrega los suyos y el #37 (T027) los íconos.
+-->
+<resources>
+    <!-- Búsqueda de inventario (HU-INV-06, CA-INV-06-01) -->
+    <string name="inventory_search_placeholder">Buscar producto.</string>
+    <string name="cd_clear_search">Limpiar búsqueda</string>
+    <string name="search_no_results">No hay productos que coincidan</string>
+    <string name="inventory_expires_on">Vence: %1$s</string>
+
+    <!-- Filtros por categoría (CA-INV-06-01, CA-INV-06-03) -->
+    <string name="category_all">Todos</string>
+    <string name="category_fruits">Frutas</string>
+    <string name="category_dairy">Lácteos</string>
+    <string name="category_proteins">Proteínas</string>
+    <string name="category_vegetables">Verduras</string>
+    <string name="category_grains">Cereales</string>
+    <string name="category_other">Otro</string>
+
+    <!-- Estado de vencimiento de cada resultado (RNF-INV-04: el estado no se comunica solo con color) -->
+    <string name="inventory_section_expired">Vencido</string>
+    <string name="inventory_section_expiring_soon">Próximo a vencer</string>
+    <string name="inventory_section_fresh">Fresco</string>
+
+    <!-- Acciones y contenido de cada resultado (RNF-INV-04) -->
+    <string name="cd_edit_button">Editar %1$s</string>
+
+    <!-- Tarjeta "Usa tu voz" (CA-INV-06-01). La escucha y su aviso llegan con el #43 (T035). -->
+    <string name="search_voice_card_title">Usa tu voz</string>
+    <string name="search_voice_card_subtitle">Dicta muchos ingredientes al mismo tiempo</string>
+    <string name="cd_mic_button">Buscar por voz</string>
+</resources>
