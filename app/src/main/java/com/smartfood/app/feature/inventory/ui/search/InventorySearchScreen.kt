@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -69,7 +70,9 @@ fun InventorySearchScreen(
     onDismissPermissionRationale: () -> Unit = {},
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        // Con el aviso de voz abierto, la búsqueda se desenfoca detrás (Figma 476:4507; API 31+).
+        val blurRadius = if (state.voice == VoiceUiState.Hidden) 0.dp else VoiceBlur
+        Column(modifier = Modifier.fillMaxSize().blur(blurRadius)) {
             SmartFoodTopBar(
                 title = stringResource(id = R.string.inventory_title),
                 onBack = { onEvent(InventorySearchEvent.BackClicked) }
@@ -209,3 +212,6 @@ private fun SearchField(
 
 // Medida del Figma (476:3190): barra de búsqueda de 48 px de alto. No es de formulario, así que no va en FormMetrics.
 private val SearchBarHeight = 48.dp
+
+// Desenfoque del contenido con el aviso de voz abierto.
+private val VoiceBlur = 8.dp

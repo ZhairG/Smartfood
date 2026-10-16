@@ -37,6 +37,9 @@ sealed interface VoiceUiState {
     /** Se procesa el audio: el aviso muestra "…" (CA-INV-07-02). */
     data object Processing : VoiceUiState
 
+    /** Se entendió el dictado: el aviso muestra un momento lo que entendió ("Carne Leche Tomate", CA-INV-07-03). */
+    data class Recognized(val text: String) : VoiceUiState
+
     /** La escucha falló: el aviso muestra el error y, si no se entendió, "Reintentar" (CA-INV-07-05). */
     data class Failed(val error: SpeechError) : VoiceUiState
 }

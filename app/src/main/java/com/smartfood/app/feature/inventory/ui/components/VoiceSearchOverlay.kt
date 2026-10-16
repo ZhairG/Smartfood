@@ -112,6 +112,16 @@ fun VoiceSearchOverlay(
                         )
                     }
 
+                    is VoiceUiState.Recognized -> {
+                        VoiceWaves(modifier = Modifier.size(WavesSize))
+                        Text(
+                            text = state.text,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
                     VoiceUiState.Processing -> {
                         VoiceWaves(modifier = Modifier.size(WavesSize))
                         Text(
@@ -194,7 +204,8 @@ private fun VoiceWaves(modifier: Modifier = Modifier) {
 }
 
 /** Velo oscuro que separa el aviso del contenido de la búsqueda. */
-private val ScrimColor = Color.Black.copy(alpha = 0.6f)
+// Velo claro: el contenido de la búsqueda va desenfocado detrás, como el Figma (476:4507).
+private val ScrimColor = Color.White.copy(alpha = 0.35f)
 
 // Medidas del componente "Grabadora" (`476:4507`): ondas de 132 px y círculo de error de 100 px. No son medidas de
 // formulario, así que no van en FormMetrics.

@@ -125,9 +125,11 @@
     <string name="editor_updated_title">Guardado</string>
     <string name="editor_updated_body">«%1$s» se actualizó</string>
     <string name="editor_deleted_title">Producto eliminado</string>
+    <string name="editor_deleted_body">El producto ha sido eliminado exitosamente.</string>
     <string name="editor_confirm_delete">¿Desea eliminar el producto?</string>
     <string name="editor_confirm_remove_photo">¿Desea eliminar la imagen?</string>
-    <string name="editor_photo_removed">Imagen eliminada</string>
+    <string name="editor_photo_removed">Imagen Eliminada</string>
+    <string name="editor_photo_removed_body">La imagen ha sido eliminada exitosamente.</string>
     <string name="editor_confirm">Eliminar</string>
     <string name="editor_cancel">Cancelar</string>
 

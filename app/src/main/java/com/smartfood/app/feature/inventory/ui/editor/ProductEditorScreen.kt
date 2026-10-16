@@ -332,13 +332,18 @@ private fun EditorDialogs(state: ProductEditorUiState, onEvent: (ProductEditorEv
             title = stringResource(id = R.string.editor_updated_title),
             body = stringResource(id = R.string.editor_updated_body, dialog.name)
         )
+        // Resultados de borrado como el Figma (476:3960): círculo rosado con la papelera roja y cuerpo naranja.
         EditorDialog.ProductDeleted -> SmartFoodResultDialog(
-            icon = { DialogIcon(Icons.Outlined.Check, MaterialTheme.colorScheme.primary) },
-            title = stringResource(id = R.string.editor_deleted_title)
+            icon = { DialogIcon(Icons.Outlined.Delete, MaterialTheme.colorScheme.error) },
+            title = stringResource(id = R.string.editor_deleted_title),
+            body = stringResource(id = R.string.editor_deleted_body),
+            destructive = true
         )
         EditorDialog.PhotoRemoved -> SmartFoodResultDialog(
-            icon = { DialogIcon(Icons.Outlined.Check, MaterialTheme.colorScheme.primary) },
-            title = stringResource(id = R.string.editor_photo_removed)
+            icon = { DialogIcon(Icons.Outlined.Delete, MaterialTheme.colorScheme.error) },
+            title = stringResource(id = R.string.editor_photo_removed),
+            body = stringResource(id = R.string.editor_photo_removed_body),
+            destructive = true
         )
         null -> Unit
     }

@@ -20,6 +20,7 @@ import com.smartfood.app.feature.inventory.domain.usecase.SearchInventoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -127,11 +128,16 @@ class InventorySearchViewModel @Inject constructor(
      * Con el dictado, llena la barra con los ingredientes y cierra el aviso (CA-INV-07-03). Si no se separó ningún
      * ingrediente, se trata como que no se entendió nada (CA-INV-07-05).
      */
-    private fun applySpokenIngredients(alternatives: List<String>) {
+    private suspend fun applySpokenIngredients(alternatives: List<String>) {
         val ingredients = parseSpokenIngredientsUseCase(alternatives)
         if (ingredients.isEmpty()) {
             voice.value = VoiceUiState.Failed(SpeechError.NO_MATCH)
         } else {
+            // Como el Figma, el aviso muestra un momento lo que entendió antes de cerrarse (CA-INV-07-03, T055).
+            voice.value = VoiceUiState.Recognized(
+                ingredients.joinToString(" ") { word -> word.replaceFirstChar { it.titlecase() } }
+            )
+            delay(RecognizedVisibleMillis)
             query.value = ingredients.joinToString(IngredientSeparator)
             voice.value = VoiceUiState.Hidden
         }
@@ -161,3 +167,6 @@ class InventorySearchViewModel @Inject constructor(
         const val IngredientSeparator = ", "
     }
 }
+
+/** Tiempo que el aviso de voz muestra lo que entendió antes de cerrarse (CA-INV-07-03). */
+internal const val RecognizedVisibleMillis = 1_500L
