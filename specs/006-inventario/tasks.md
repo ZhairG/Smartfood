@@ -43,7 +43,7 @@
 
 - [x] T023 `SmartFoodTextField` con `leadingContent` y `label: String?`, sin cambios en los usos actuales. Las pruebas de autenticación siguen verdes. Prueba: I `SmartFoodFieldsTest` (la sobrecarga recursiva que cerraba la app se corrigió en #60; nombre accesible, `FieldFrame` y medidas del ícono en #62). → #35
 - [x] T024 [P] `SmartFoodSelectorField` (comparte la caja con el campo de texto) (CA-INV-02-04, 02-05). Prueba: I `SmartFoodFieldsTest.t024_*` (etiqueta y valor en un solo nodo desde #62). → #35
-- [ ] T025 [P] `SmartFoodConfirmDialog` y `SmartFoodResultDialog` (CA-INV-02-06, 03-02, 04-01, 05-04). → #36
+- [x] T025 [P] `SmartFoodConfirmDialog` y `SmartFoodResultDialog` (CA-INV-02-06, 03-02, 04-01, 05-04). Ícono, pregunta, título y cuerpo por parámetro; el resultado se anuncia como `liveRegion` (RNF-INV-04). Prueba: I `SmartFoodDialogsTest.t025_*`. → #36
 - [x] T026 [P] `SmartFoodBottomBar` y la variante de acento de `SmartFoodPrimaryButton` (CA-INV-02-02, 09-02). Pasó del #36 al #38 para no bloquear la navegación. El botón ya era naranja: solo se agregó `leadingIcon`. Prueba: I `SmartFoodNavigationTest`. → #38
 - [ ] T027 [P] Íconos vectoriales exportados del Figma y `strings_inventory.xml` (RNF-INV-08). Rol de color `ExpiringSoon` si hace falta (plan §8). → #37
 
@@ -94,21 +94,21 @@ verificación manual (checklist).
 | CA-INV-02-03 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-02-04 | U `ValidateItemUseCaseTest`, M 1 |
 | CA-INV-02-05 | I `ProductEditorScreenTest` |
-| CA-INV-02-06 | U `AddItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest` |
+| CA-INV-02-06 | U `AddItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
 | CA-INV-02-07 | U `ProductEditorViewModelTest`, M 7 |
 | CA-INV-02-08 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-02-09 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-03-01 | U `ProductEditorViewModelTest` |
-| CA-INV-03-02 | U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest` |
+| CA-INV-03-02 | U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `SmartFoodDialogsTest` |
 | CA-INV-03-03 | U `ValidateItemUseCaseTest` |
 | CA-INV-03-04 | U `ProductEditorViewModelTest` |
-| CA-INV-04-01 | I `ProductEditorScreenTest` |
+| CA-INV-04-01 | I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
 | CA-INV-04-02 | U `DeleteItemUseCaseTest`, M 3 |
 | CA-INV-04-03 | I `ProductEditorScreenTest` |
 | CA-INV-05-01 | I `ProductCameraScreenTest`, M 2 |
 | CA-INV-05-02 | U `ProductEditorViewModelTest`, M 2 |
 | CA-INV-05-03 | U `ProductEditorViewModelTest`, I `ProductCameraScreenTest`, M 4 |
-| CA-INV-05-04 | U `UpdateItemUseCaseTest`, I `ProductEditorScreenTest` |
+| CA-INV-05-04 | U `UpdateItemUseCaseTest`, I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
 | CA-INV-05-05 | U `UpdateItemUseCaseTest`, M 2 |
 | CA-INV-05-06 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (conserva el archivo si falla) |
 | CA-INV-06-01 | I `InventorySearchScreenTest` |
