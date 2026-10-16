@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -29,19 +30,23 @@ import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.navigation.MainTab
 import com.smartfood.app.core.navigation.MainTabScaffold
 import com.smartfood.app.core.navigation.NavTransitions
+import com.smartfood.app.core.navigation.ObserveEffects
 import com.smartfood.app.core.navigation.Route
 import com.smartfood.app.core.navigation.navigateToTab
 import com.smartfood.app.feature.inventory.ui.camera.CAPTURED_PHOTO_KEY
 import com.smartfood.app.feature.inventory.ui.camera.ProductCameraRoute
+import com.smartfood.app.feature.inventory.ui.list.InventoryEffect
+import com.smartfood.app.feature.inventory.ui.list.InventoryScreen
+import com.smartfood.app.feature.inventory.ui.list.InventoryViewModel
 import java.io.File
 
 /**
  * Nombre: InventoryNavGraph.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Destinos del inventario dentro de `MainGraph` (spec 006, plan §7). La cámara ya es la real (#41);
- * la lista, el editor y la búsqueda siguen siendo **pantallas provisionales** que cada Issue reemplaza sin tocar las
- * rutas (lista → #39, editor → #40, búsqueda → #42). Los botones provisionales permiten probar la cámara hasta que
+ * Descripción: Destinos del inventario dentro de `MainGraph` (spec 006, plan §7). La cámara (#41) y la lista (#39)
+ * ya son las reales; el editor y la búsqueda siguen siendo **pantallas provisionales** que cada Issue reemplaza sin
+ * tocar las rutas (editor → #40, búsqueda → #42). Los botones provisionales permiten probar la cámara hasta que
  * llegue el editor real. "Mi Inventario" es una pestaña con barra inferior; las demás son pantallas internas, con
  * empuje y sin barra (CA-INV-09-04).
  *
@@ -55,13 +60,16 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
         popExitTransition = NavTransitions.tabPopExit
     ) {
         MainTabScaffold(currentTab = MainTab.INVENTORY, onTabSelected = navController::navigateToTab) {
-            // Provisional: la lista llega con el #39.
-            PlaceholderScreen(title = stringResource(id = R.string.inventory_title)) {
-                SmartFoodPrimaryButton(
-                    text = stringResource(id = R.string.placeholder_add_product),
-                    onClick = { navController.navigate(Route.ProductEditor()) }
-                )
+            val viewModel: InventoryViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveEffects(viewModel.effects) { effect ->
+                when (effect) {
+                    is InventoryEffect.NavigateToEditor ->
+                        navController.navigate(Route.ProductEditor(itemId = effect.itemId))
+                    InventoryEffect.NavigateToSearch -> navController.navigate(Route.InventorySearch)
+                }
             }
+            InventoryScreen(state = state, onEvent = viewModel::onEvent)
         }
     }
     composable<Route.InventorySearch> {

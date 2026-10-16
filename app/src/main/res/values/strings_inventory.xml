@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Textos de las pantallas de inventario (spec 006, RNF-INV-08 y RNF-03). Archivo propio para no tocar strings.xml.
+    El título de la pantalla (`inventory_title`) y `cd_navigate_back` viven en strings_navigation.xml (spec 006, T030)
+    y aquí solo se referencian. Lo crea la lista (T031, #39); la búsqueda (#42), la voz (#43) y los íconos (#37)
+    agregan lo suyo.
+-->
+<resources>
+    <!-- Barra superior de la lista -->
+    <string name="cd_search_button">Buscar productos</string>
+    <string name="cd_add_button">Añadir producto</string>
+
+    <!-- Fila de producto: descripciones accesibles (RNF-INV-04) -->
+    <string name="cd_edit_button">Editar %1$s</string>
+    <string name="cd_item_photo">Foto de %1$s</string>
+
+    <!-- Encabezados de las secciones de vencimiento (CA-INV-01-01) -->
+    <string name="inventory_section_expired">Vencido</string>
+    <string name="inventory_section_expiring_soon">Próximo a vencer</string>
+    <string name="inventory_section_fresh">Fresco</string>
+
+    <!-- Estado vacío (CA-INV-01-05) -->
+    <string name="inventory_empty_title">Tu inventario está vacío</string>
+    <string name="inventory_empty_message">Añade tus alimentos para hacer seguimiento de sus fechas de vencimiento y evitar el desperdicio.</string>
+    <string name="inventory_empty_action">Añadir Producto</string>
+
+    <!-- Categoría y cantidad de la fila (CA-INV-01-02 y CA-INV-01-08) -->
+    <string name="inventory_quantity_format">%1$s %2$s</string>
+    <string name="inventory_category_with_quantity">%1$s · %2$s</string>
+
+    <!-- Reintento cuando la carga falla -->
+    <string name="inventory_retry">Reintentar</string>
+
+    <!-- Categorías de alimentos (CA-INV-01-02) -->
+    <string name="category_fruits">Frutas</string>
+    <string name="category_dairy">Lácteos</string>
+    <string name="category_proteins">Proteínas</string>
+    <string name="category_vegetables">Verduras</string>
+    <string name="category_grains">Cereales</string>
+    <string name="category_other">Otro</string>
+
+    <!-- Unidades de cantidad (CA-INV-01-08) -->
+    <string name="unit_units">unidades</string>
+    <string name="unit_grams">g</string>
+    <string name="unit_kilograms">kg</string>
+    <string name="unit_pounds">lb</string>
+    <string name="unit_milliliters">ml</string>
+    <string name="unit_liters">L</string>
+
+    <!-- Errores del inventario (plan §10) -->
+    <string name="error_inventory_network">Sin conexión a Internet. Verifica tu red e inténtalo de nuevo.</string>
+    <string name="error_inventory_permission">No tienes permiso para acceder a esta información.</string>
+    <string name="error_inventory_not_found">El producto solicitado no fue encontrado.</string>
+    <string name="error_inventory_photo_upload">No se pudo subir la foto del producto.</string>
+    <string name="error_inventory_unknown">Ocurrió un error inesperado al cargar el inventario.</string>
+</resources>
