@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -246,12 +247,15 @@ private fun CategoryLabel(item: InventoryItem, modifier: Modifier = Modifier) {
 @Composable
 private fun QuantityText(item: InventoryItem) {
     val quantity = item.quantity ?: return
+    val amount = quantity.formattedAmount()
+    // "unidades" concuerda con la cantidad ("1 unidad"); los símbolos (g, kg, lb, ml, L) no cambian.
+    val text = if (quantity.unit == QuantityUnit.UNITS) {
+        pluralStringResource(id = R.plurals.inventory_quantity_units, count = if (quantity.amount == 1.0) 1 else 2, amount)
+    } else {
+        stringResource(id = R.string.inventory_quantity_format, amount, stringResource(id = quantity.unit.titleRes))
+    }
     Text(
-        text = stringResource(
-            id = R.string.inventory_quantity_format,
-            quantity.formattedAmount(),
-            stringResource(id = quantity.unit.titleRes)
-        ),
+        text = text,
         style = MaterialTheme.typography.bodyLarge.copy(fontSize = DateFontSize, fontWeight = FontWeight.Medium),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         maxLines = 1,

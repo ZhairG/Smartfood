@@ -209,6 +209,27 @@ class InventoryScreenTest {
     }
 
     @Test
+    fun CA_INV_01_08_unaUnidadVaEnSingularYVariasEnPlural() {
+        show(
+            InventoryUiState(
+                isLoading = false,
+                sections = listOf(
+                    InventorySection(
+                        status = ExpiryStatus.EXPIRING_SOON,
+                        items = listOf(
+                            item(id = "1", name = "Pollo", quantity = Quantity(amount = 1.0, unit = QuantityUnit.UNITS)),
+                            item(id = "2", name = "Huevos", quantity = Quantity(amount = 12.0, unit = QuantityUnit.UNITS))
+                        )
+                    )
+                )
+            )
+        )
+
+        composeTestRule.onNodeWithText("1 unidad").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12 unidades").assertIsDisplayed()
+    }
+
+    @Test
     fun alTocarLaLupa_seEmiteSearchClicked() {
         var lastEvent: InventoryEvent? = null
         show(onEvent = { lastEvent = it })

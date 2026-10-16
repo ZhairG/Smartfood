@@ -60,7 +60,7 @@ El inventario es también la entrada del futuro agente de recomendación de rece
 | CA-INV-01-05 | **Dado** que no tengo productos, **entonces** veo un mensaje que me invita a añadir el primero con el botón "+". |
 | CA-INV-01-06 | **Dado** que hoy es 10/09/2026, **entonces** un producto que vence el 09/09/2026 está en "Vencido", uno que vence el 10/09/2026 o el 13/09/2026 está en "Próximo a vencer" y uno que vence el 14/09/2026 está en "Fresco". |
 | CA-INV-01-07 | **Dado** que añadí, edité o eliminé un producto, **cuando** vuelvo a la lista, **entonces** veo el cambio sin recargar manualmente. |
-| CA-INV-01-08 | **Dado** un producto con cantidad, **entonces** su fila muestra la cantidad y la unidad en gris después del nombre (por ejemplo, "Leche Entera 1,5 L"), y la etiqueta solo lleva la categoría (spec §8); **dado** uno sin cantidad, **entonces** no se muestra nada en su lugar. |
+| CA-INV-01-08 | **Dado** un producto con cantidad, **entonces** su fila muestra la cantidad y la unidad en gris después del nombre (por ejemplo, "Leche Entera 1,5 L"; "unidad" en singular si la cantidad es 1), y la etiqueta solo lleva la categoría (spec §8); **dado** uno sin cantidad, **entonces** no se muestra nada en su lugar. |
 | CA-INV-01-09 | **Dado** un producto con precio, **entonces** su fila muestra el precio en pesos (por ejemplo, "$ 12.500") junto a la fecha; **dado** uno sin precio, **entonces** no se muestra nada en su lugar. |
 
 ### HU-INV-02: Añadir un producto
