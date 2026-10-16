@@ -381,7 +381,7 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 | `SmartFoodBottomBar` (nuevo, `Navigation.kt`) | Barra de 2 pestañas del Figma (`476:5570`): fondo `surfaceVariant` (blanco), línea superior `outline`, pestañas con ícono y texto (Poppins SemiBold de 12 sp) y rol `Tab`. La seleccionada va en `GreenCheck` (el `#16A34A` del Figma) y las demás en `onSurfaceVariant`. Recibe las pestañas por parámetro (`SmartFoodTab`). Los íconos son de Material hasta T027. |
 | `SmartFoodConfirmDialog` (nuevo, `Dialogs.kt`) | Ícono en círculo, pregunta, botón destructivo ("Eliminar", `error`) y "Cancelar" (`secondary`). Usa la forma de `SmartFoodOfflineDialog`. |
 | `SmartFoodResultDialog` (nuevo, `Dialogs.kt`) | Ícono de check, título y cuerpo opcional ("Producto Guardado" / "Te avisaremos…"). Se anuncia como `liveRegion`. |
-| `SmartFoodPrimaryButton` | Ya es naranja (`secondary`) habilitado y gris deshabilitado, como "Añadir al Inventario" (`476:5726`), así que no hace falta una variante de acento. Suma `leadingIcon` opcional para el "+". |
+| `SmartFoodPrimaryButton` | Ya es naranja (`secondary`) habilitado y gris deshabilitado, como "Añadir al Inventario" (`476:5726`), así que no hace falta una variante de acento. Suma `leadingIcon` opcional para el "+" y `destructive` (Boolean) para el botón rojo de confirmación (`error`/`onError`, Figma `476:3815`, CA-INV-04-01), con los colores cerrados: nadie pasa colores sueltos (#80). |
 
 - **Cantidad (T002, desviación de la spec §8):** en el editor, debajo de la categoría, una fila con un
   `SmartFoodTextField` numérico (`KeyboardType.Decimal`) y un `SmartFoodSelectorField` de unidad que abre una hoja
