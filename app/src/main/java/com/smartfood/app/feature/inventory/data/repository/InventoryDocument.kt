@@ -6,6 +6,7 @@ import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
 import com.smartfood.app.feature.inventory.domain.usecase.SearchInventoryUseCase
+import com.smartfood.app.feature.inventory.domain.usecase.ValidateItemUseCase
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
@@ -24,6 +25,7 @@ internal object InventoryDocument {
     const val EXPIRES_ON = "expiresOn"
     const val QUANTITY = "quantity"
     const val UNIT = "unit"
+    const val PRICE = "price"
     const val PHOTO_PATH = "photoPath"
     const val PHOTO_URL = "photoUrl"
     const val CREATED_AT = "createdAt"
@@ -44,6 +46,8 @@ internal fun InventoryItem.toDocumentFields(): Map<String, Any> = buildMap {
         put(InventoryDocument.QUANTITY, it.amount)
         put(InventoryDocument.UNIT, it.unit.name)
     }
+    // Sin precio no se escribe la clave (T052): los documentos viejos siguen siendo válidos.
+    price?.let { put(InventoryDocument.PRICE, it) }
     photo?.let {
         put(InventoryDocument.PHOTO_PATH, it.path)
         put(InventoryDocument.PHOTO_URL, it.url)
@@ -70,6 +74,7 @@ internal fun inventoryItemFromDocument(id: String, data: Map<String, Any?>): Inv
     val category = enumOrNull<FoodCategory>(data[InventoryDocument.CATEGORY]) ?: FoodCategory.OTHER
     val amount = (data[InventoryDocument.QUANTITY] as? Number)?.toDouble()?.takeIf { it > 0 }
     val unit = enumOrNull<QuantityUnit>(data[InventoryDocument.UNIT])
+    val price = (data[InventoryDocument.PRICE] as? Number)?.toLong()?.takeIf { it in 1..ValidateItemUseCase.MAX_PRICE }
     val photoPath = data[InventoryDocument.PHOTO_PATH] as? String
     val photoUrl = data[InventoryDocument.PHOTO_URL] as? String
     return InventoryItem(
@@ -79,6 +84,7 @@ internal fun inventoryItemFromDocument(id: String, data: Map<String, Any?>): Inv
         expiresOn = expiresOn,
         quantity = if (amount != null && unit != null) Quantity(amount, unit) else null,
         photo = if (photoPath != null && photoUrl != null) ItemPhoto(photoPath, photoUrl) else null,
+        price = price,
     )
 }
 

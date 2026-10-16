@@ -109,4 +109,18 @@ class InventoryDocumentTest {
 
         assertNull(item?.photo)
     }
+
+    @Test
+    fun `CA-INV-02-10 el precio va y vuelve, y sin precio no se escribe`() {
+        val conPrecio = completo.copy(price = 12_500L)
+        assertEquals(12_500L, conPrecio.toDocumentFields()[InventoryDocument.PRICE])
+        assertEquals(conPrecio, inventoryItemFromDocument("abc", conPrecio.toDocumentFields()))
+        assertFalse(InventoryDocument.PRICE in completo.toDocumentFields())
+    }
+
+    @Test
+    fun `un precio fuera de rango se descarta al leer`() {
+        assertNull(inventoryItemFromDocument("x", minimo + mapOf(InventoryDocument.PRICE to 0L))?.price)
+        assertNull(inventoryItemFromDocument("x", minimo + mapOf(InventoryDocument.PRICE to "12500"))?.price)
+    }
 }

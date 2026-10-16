@@ -52,6 +52,8 @@ data class InventoryItem(
     val expiresOn: LocalDate,
     val quantity: Quantity? = null,
     val photo: ItemPhoto? = null,
+    /** Precio en pesos colombianos enteros, opcional (CA-INV-02-10, T052). */
+    val price: Long? = null,
     // El precio se agregará aquí como campo opcional en la spec de presupuesto (spec §7).
 )
 
@@ -70,6 +72,8 @@ data class ItemDraft(
     val category: FoodCategory?,
     val quantityText: String = "",
     val unit: QuantityUnit? = null,
+    /** Precio tal como se escribió ("12500" o "12.500"); vacío es "sin precio" (T052). */
+    val priceText: String = "",
 )
 
 /** Datos de un producto ya validados: nombre recortado, campos obligatorios presentes y cantidad interpretada. */
@@ -78,6 +82,7 @@ data class ValidItem(
     val expiresOn: LocalDate,
     val category: FoodCategory,
     val quantity: Quantity?,
+    val price: Long? = null,
 )
 
 /** Foto tomada con la cámara que todavía está en el teléfono, antes de subirla. */

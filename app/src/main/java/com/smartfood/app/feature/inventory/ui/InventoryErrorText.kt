@@ -38,6 +38,7 @@ private fun InventoryError.Validation.validationMessageRes(): Int = when (field)
         else R.string.error_inventory_expiry_empty
     InventoryField.CATEGORY -> R.string.error_inventory_category_empty
     InventoryField.QUANTITY -> R.string.error_inventory_quantity_invalid
+    InventoryField.PRICE -> R.string.error_inventory_price_invalid
 }
 
 /**

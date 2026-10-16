@@ -51,6 +51,7 @@ import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
+import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -113,12 +114,15 @@ fun InventoryItemRow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val formattedDate = item.expiresOn.format(DateFormatter)
+                    val dateText = if (showExpiryLabel) {
+                        stringResource(id = R.string.inventory_expires_on, formattedDate)
+                    } else {
+                        formattedDate
+                    }
+                    // El precio, si lo tiene, va junto a la fecha (CA-INV-01-09).
+                    val priceText = item.price?.let { stringResource(id = R.string.inventory_price_format, formatPrice(it)) }
                     Text(
-                        text = if (showExpiryLabel) {
-                            stringResource(id = R.string.inventory_expires_on, formattedDate)
-                        } else {
-                            formattedDate
-                        },
+                        text = if (priceText == null) dateText else "$dateText · $priceText",
                         style = MaterialTheme.typography.bodyLarge.copy(fontSize = DateFontSize),
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -251,6 +255,9 @@ private fun Quantity.formattedAmount(): String =
         .trimEnd(',', '.')
 
 private val QuantityLocale: Locale = Locale.forLanguageTag("es-CO")
+
+/** Precio en pesos con puntos de miles, como "12.500" (CA-INV-01-09). */
+internal fun formatPrice(price: Long): String = NumberFormat.getIntegerInstance(QuantityLocale).format(price)
 
 private val DateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 

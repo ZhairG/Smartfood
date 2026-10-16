@@ -7,6 +7,7 @@ import com.smartfood.app.feature.inventory.domain.model.InventoryField
 import com.smartfood.app.feature.inventory.domain.model.ItemDraft
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
+import com.smartfood.app.feature.inventory.domain.model.toInventoryError
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryError
 import org.junit.Assert.assertEquals
@@ -34,7 +35,8 @@ class ValidateItemUseCaseTest {
         category: FoodCategory? = FoodCategory.PROTEINS,
         quantityText: String = "",
         unit: QuantityUnit? = null,
-    ) = ItemDraft(name, expiresOn, category, quantityText, unit)
+        priceText: String = "",
+    ) = ItemDraft(name, expiresOn, category, quantityText, unit, priceText)
 
     // CA-INV-02-02: botón habilitado solo con los tres campos obligatorios.
 
@@ -160,5 +162,30 @@ class ValidateItemUseCaseTest {
                 validate(draft(quantityText = text)).inventoryError
             )
         }
+    }
+
+    @Test
+    fun `CA-INV-02-10 el precio es opcional y acepta puntos de miles`() {
+        assertNull(validate(draft()).getOrThrow().price)
+        assertEquals(12_500L, validate(draft(priceText = "12500")).getOrThrow().price)
+        assertEquals(12_500L, validate(draft(priceText = " 12.500 ")).getOrThrow().price)
+        assertEquals(99_999_999L, validate(draft(priceText = "99.999.999")).getOrThrow().price)
+    }
+
+    @Test
+    fun `CA-INV-02-11 un precio invalido falla con INVALID en el precio`() {
+        listOf("0", "abc", "12,5", "12.5", "100000000", "-3", "1.2345").forEach { texto ->
+            val error = validate(draft(priceText = texto)).exceptionOrNull()?.toInventoryError()
+            assertEquals(
+                "Precio \"$texto\"",
+                Validation(InventoryField.PRICE, Reason.INVALID),
+                error
+            )
+        }
+    }
+
+    @Test
+    fun `CA-INV-02-10 el precio no cambia si el formulario esta completo`() {
+        assertTrue(validate.isComplete(draft(priceText = "abc")))
     }
 }

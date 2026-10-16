@@ -43,7 +43,9 @@ class ValidateItemUseCase @Inject constructor(
             expiresOn.isBefore(LocalDate.now(clock)) && expiresOn != originalExpiresOn ->
                 invalid(InventoryField.EXPIRY, Reason.PAST_DATE)
             category == null -> invalid(InventoryField.CATEGORY, Reason.EMPTY)
-            else -> parseQuantity(draft).map { quantity -> ValidItem(name, expiresOn, category, quantity) }
+            else -> parseQuantity(draft).mapCatching { quantity ->
+                ValidItem(name, expiresOn, category, quantity, parsePrice(draft).getOrThrow())
+            }
         }
     }
 
@@ -65,6 +67,18 @@ class ValidateItemUseCase @Inject constructor(
         return Result.success(Quantity(amount.toDouble(), draft.unit ?: QuantityUnit.UNITS))
     }
 
+    /**
+     * Interpreta el precio opcional en pesos enteros (CA-INV-02-10, CA-INV-02-11). Acepta "12500" o "12.500" (puntos
+     * de miles); vacío es "sin precio".
+     */
+    private fun parsePrice(draft: ItemDraft): Result<Long?> {
+        val text = draft.priceText.trim()
+        if (text.isEmpty()) return Result.success(null)
+        val price = text.takeIf { PRICE_PATTERN.matches(it) }?.replace(".", "")?.toLongOrNull()
+        if (price == null || price <= 0 || price > MAX_PRICE) return invalid(InventoryField.PRICE, Reason.INVALID)
+        return Result.success(price)
+    }
+
     private fun <T> invalid(field: InventoryField, reason: Reason): Result<T> =
         inventoryFailure(InventoryError.Validation(field, reason))
 
@@ -77,5 +91,11 @@ class ValidateItemUseCase @Inject constructor(
 
         /** Solo dígitos con un separador decimal opcional: sin signo, exponente ni separador de miles. */
         private val QUANTITY_PATTERN = Regex("""\d+(\.\d+)?""")
+
+        /** Precio máximo en pesos (CA-INV-02-11). */
+        const val MAX_PRICE = 99_999_999L
+
+        /** Dígitos sin separadores ("12500") o con puntos de miles bien agrupados ("12.500"). */
+        private val PRICE_PATTERN = Regex("""\d{1,3}(\.\d{3})+|\d+""")
     }
 }

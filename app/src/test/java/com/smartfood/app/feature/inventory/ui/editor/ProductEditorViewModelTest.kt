@@ -280,4 +280,28 @@ class ProductEditorViewModelTest {
         viewModel.onEvent(ProductEditorEvent.CameraClicked)
         assertEquals(ProductEditorEffect.NavigateToCamera, viewModel.effects.first())
     }
+
+    @Test
+    fun `CA-INV-02-10 el precio escrito se guarda con el producto y se carga al editar`() {
+        val viewModel = createViewModel()
+        viewModel.fillValidForm()
+        viewModel.onEvent(ProductEditorEvent.PriceChanged("12.500"))
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        assertEquals(12_500L, repository.savedItems.single().price)
+        assertEquals("12500", createViewModel(itemId = repository.savedItems.single().id).uiState.value.priceText)
+    }
+
+    @Test
+    fun `CA-INV-02-11 un precio invalido marca el campo en rojo y no guarda`() {
+        val viewModel = createViewModel()
+        viewModel.fillValidForm()
+        viewModel.onEvent(ProductEditorEvent.PriceChanged("0"))
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        assertEquals(InventoryField.PRICE, viewModel.uiState.value.errorField)
+        assertTrue(repository.savedItems.isEmpty())
+    }
 }

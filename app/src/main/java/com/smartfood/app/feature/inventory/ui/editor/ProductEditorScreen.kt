@@ -34,6 +34,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.Scale
 import androidx.compose.material.icons.outlined.Sell
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -196,6 +197,15 @@ private fun EditorForm(state: ProductEditorUiState, onEvent: (ProductEditorEvent
                 modifier = Modifier.weight(UnitWeight)
             )
         }
+        // Precio opcional en pesos (T052, CA-INV-02-10): teclado numérico, sin decimales.
+        SmartFoodTextField(
+            value = state.priceText,
+            onValueChange = { onEvent(ProductEditorEvent.PriceChanged(it)) },
+            placeholder = stringResource(id = R.string.editor_price_placeholder),
+            leadingContent = { FieldIcon(Icons.Outlined.Payments) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = errorField == InventoryField.PRICE
+        )
 
         if (errorText != null) {
             Text(

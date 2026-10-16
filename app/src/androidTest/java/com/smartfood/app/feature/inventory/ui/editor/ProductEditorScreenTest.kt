@@ -150,4 +150,18 @@ class ProductEditorScreenTest {
 
         assertEquals(listOf<ProductEditorEvent>(ProductEditorEvent.RemovePhotoClicked), eventos)
     }
+
+    @Test
+    fun t052_caInv0211_unPrecioInvalidoMuestraSuMensaje() {
+        mostrar(
+            formularioCompleto.copy(
+                priceText = "0",
+                error = InventoryError.Validation(InventoryField.PRICE, InventoryError.Validation.Reason.INVALID)
+            )
+        )
+
+        composeTestRule.onNodeWithContentDescription("Precio (opcional)").assertExists()
+        composeTestRule.onNodeWithText("Escribe un precio en pesos, sin decimales, mayor que 0 y hasta 99.999.999.")
+            .assertIsDisplayed()
+    }
 }

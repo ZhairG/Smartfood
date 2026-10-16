@@ -70,6 +70,7 @@ sealed interface EditorDialog {
  * @property category Categoría elegida.
  * @property quantityText Cantidad tal como se escribió; vacía si no tiene (CA-INV-02-08).
  * @property unit Unidad elegida; sin elegir se usa "unidades".
+ * @property priceText Precio tal como se escribió; vacío si no tiene (CA-INV-02-10).
  * @property photo Foto que muestra la zona de imagen.
  * @property isSaveEnabled `true` cuando están el nombre, la fecha y la categoría (CA-INV-02-02).
  * @property isSaving `true` mientras se guarda o se elimina.
@@ -85,6 +86,7 @@ data class ProductEditorUiState(
     val category: FoodCategory? = null,
     val quantityText: String = "",
     val unit: QuantityUnit? = null,
+    val priceText: String = "",
     val photo: PhotoUiState = PhotoUiState.None,
     val isSaveEnabled: Boolean = false,
     val isSaving: Boolean = false,
@@ -110,6 +112,7 @@ sealed interface ProductEditorEvent {
     data class QuantityChanged(val value: String) : ProductEditorEvent
     data object UnitClicked : ProductEditorEvent
     data class UnitPicked(val unit: QuantityUnit) : ProductEditorEvent
+    data class PriceChanged(val value: String) : ProductEditorEvent
     data object CameraClicked : ProductEditorEvent
     data class PhotoCaptured(val path: String) : ProductEditorEvent
     data object RemovePhotoClicked : ProductEditorEvent

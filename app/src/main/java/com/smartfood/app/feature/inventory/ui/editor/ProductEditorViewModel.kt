@@ -85,6 +85,7 @@ class ProductEditorViewModel @Inject constructor(
             is ProductEditorEvent.QuantityChanged -> edit { it.copy(quantityText = event.value) }
             ProductEditorEvent.UnitClicked -> openDialog(EditorDialog.UnitSheet)
             is ProductEditorEvent.UnitPicked -> edit { it.copy(unit = event.unit, dialog = null) }
+            is ProductEditorEvent.PriceChanged -> edit { it.copy(priceText = event.value) }
             ProductEditorEvent.CameraClicked -> sendEffect(ProductEditorEffect.NavigateToCamera)
             is ProductEditorEvent.PhotoCaptured -> onPhotoCaptured(event.path)
             ProductEditorEvent.RemovePhotoClicked -> openDialog(EditorDialog.ConfirmRemovePhoto)
@@ -113,6 +114,7 @@ class ProductEditorViewModel @Inject constructor(
                             category = item.category,
                             quantityText = item.quantity?.let { quantity -> formatAmount(quantity.amount) }.orEmpty(),
                             unit = item.quantity?.unit,
+                            priceText = item.price?.toString().orEmpty(),
                             photo = item.photo?.let { photo -> PhotoUiState.Remote(photo.url) } ?: PhotoUiState.None,
                         ).withSaveEnabled()
                     }
@@ -209,6 +211,7 @@ class ProductEditorViewModel @Inject constructor(
         category = category,
         quantityText = quantityText,
         unit = unit,
+        priceText = priceText,
     )
 
     private fun sendEffect(effect: ProductEditorEffect) {

@@ -89,6 +89,7 @@
     <string name="error_inventory_expiry_empty">Elige la fecha de vencimiento.</string>
     <string name="error_inventory_past_date">La fecha no puede ser anterior a hoy.</string>
     <string name="error_inventory_category_empty">Elige una categoría.</string>
+    <string name="error_inventory_price_invalid">Escribe un precio en pesos, sin decimales, mayor que 0 y hasta 99.999.999.</string>
     <string name="error_inventory_quantity_invalid">Escribe una cantidad mayor que 0, hasta 9999 y con 2 decimales como máximo.</string>
 
     <!-- Editor de producto (HU-INV-02 a HU-INV-05, Figma 476:3664 y 476:3689) -->
@@ -103,6 +104,8 @@
     <string name="editor_category_placeholder">Seleccionar categoría</string>
     <string name="editor_quantity_placeholder">Cantidad</string>
     <string name="editor_unit_label">Unidad</string>
+    <string name="editor_price_placeholder">Precio (opcional)</string>
+    <string name="inventory_price_format">$ %1$s</string>
     <string name="cd_editor_take_photo">Tomar foto</string>
     <string name="cd_editor_remove_photo">Eliminar la foto</string>
     <string name="cd_editor_photo">Foto del producto</string>
