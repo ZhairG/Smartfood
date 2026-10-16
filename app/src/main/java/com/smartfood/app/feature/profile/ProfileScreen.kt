@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.profile
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,14 +25,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.ManageAccounts
-import androidx.compose.material.icons.outlined.NotificationsNone
-import androidx.compose.material.icons.outlined.PhotoCamera
-import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -136,9 +129,10 @@ fun ProfileScreen(
                     .height(dimens.logoutHeight)
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.Logout,
+                    painter = painterResource(id = R.drawable.ic_figma_logout),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondary
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(dimens.logoutIcon)
                 )
                 Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
                 Text(
@@ -196,7 +190,7 @@ private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens) {
                     .semantics { contentDescription = changePhoto }
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.PhotoCamera,
+                    painter = painterResource(id = R.drawable.ic_figma_camera),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSecondary,
                     modifier = Modifier.size(dimens.cameraBadge * CameraIconFraction)
@@ -261,10 +255,10 @@ private fun StatCard(value: String, label: String, dimens: ProfileDimens, modifi
 @Composable
 private fun OptionsCard(dimens: ProfileDimens) {
     val options = listOf(
-        Icons.Outlined.ManageAccounts to R.string.profile_option_edit,
-        Icons.Outlined.Tune to R.string.profile_option_preferences,
-        Icons.Outlined.NotificationsNone to R.string.profile_option_notifications,
-        Icons.Outlined.Lock to R.string.profile_option_password,
+        R.drawable.ic_figma_profile_edit to R.string.profile_option_edit,
+        R.drawable.ic_figma_profile_preferences to R.string.profile_option_preferences,
+        R.drawable.ic_figma_profile_notifications to R.string.profile_option_notifications,
+        R.drawable.ic_figma_profile_security to R.string.profile_option_password,
     )
     Column(
         modifier = Modifier
@@ -280,7 +274,7 @@ private fun OptionsCard(dimens: ProfileDimens) {
 }
 
 @Composable
-private fun OptionRow(icon: ImageVector, text: String, dimens: ProfileDimens) {
+private fun OptionRow(@DrawableRes icon: Int, text: String, dimens: ProfileDimens) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -296,7 +290,7 @@ private fun OptionRow(icon: ImageVector, text: String, dimens: ProfileDimens) {
                 .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(OptionIconRadius))
         ) {
             Icon(
-                imageVector = icon,
+                painter = painterResource(id = icon),
                 contentDescription = null,
                 tint = GreenCheck,
                 modifier = Modifier.size(dimens.optionIconBox * OptionIconFraction)
@@ -312,9 +306,10 @@ private fun OptionRow(icon: ImageVector, text: String, dimens: ProfileDimens) {
             modifier = Modifier.weight(1f)
         )
         Icon(
-            imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+            painter = painterResource(id = R.drawable.ic_figma_chevron_right),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(dimens.chevron)
         )
     }
 }
@@ -344,6 +339,8 @@ private data class ProfileDimens(
     val optionText: TextUnit,
     val logoutHeight: Dp,
     val logoutText: TextUnit,
+    val logoutIcon: Dp,
+    val chevron: Dp,
 )
 
 private fun profileDimens(width: Dp, height: Dp): ProfileDimens {
@@ -370,6 +367,8 @@ private fun profileDimens(width: Dp, height: Dp): ProfileDimens {
         optionText = 15.sp * scale,
         logoutHeight = 48.dp * scale,
         logoutText = 18.sp * scale,
+        logoutIcon = 22.dp * scale,
+        chevron = 15.dp * scale,
     )
 }
 

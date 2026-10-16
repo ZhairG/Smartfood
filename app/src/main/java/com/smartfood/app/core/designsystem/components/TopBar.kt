@@ -6,10 +6,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -60,9 +60,11 @@ fun SmartFoodTopBar(
     ) {
         IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart).padding(start = TopBarSidePadding)) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                // Ícono del Figma (`476:3670`, flecha "átras"), teñido con el tema.
+                painter = painterResource(id = R.drawable.ic_figma_back),
                 contentDescription = stringResource(id = R.string.cd_navigate_back),
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(TopBarIconSize)
             )
         }
         Text(
@@ -88,6 +90,7 @@ fun SmartFoodTopBar(
 private val TopBarHeight = 56.dp
 private val TopBarSidePadding = 12.dp
 private val TitleSidePadding = 64.dp
+private val TopBarIconSize = 20.dp
 
 @Preview(showBackground = true)
 @Composable

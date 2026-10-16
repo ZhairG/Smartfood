@@ -13,6 +13,7 @@
  */
 package com.smartfood.app.feature.inventory.ui.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -22,9 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -39,8 +37,8 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -91,7 +89,7 @@ fun PhotoSlot(
             )
         }
         SlotButton(
-            icon = Icons.Outlined.Delete,
+            icon = R.drawable.ic_figma_delete,
             contentDescription = stringResource(id = R.string.cd_editor_remove_photo),
             // Figma: gris sin foto (deshabilitada) y roja cuando hay una foto que borrar.
             containerColor = MaterialTheme.colorScheme.error,
@@ -104,7 +102,7 @@ fun PhotoSlot(
                 .padding(start = TrashInsetStart, top = TrashInsetTop)
         )
         SlotButton(
-            icon = Icons.Outlined.PhotoCamera,
+            icon = R.drawable.ic_figma_camera,
             contentDescription = stringResource(id = R.string.cd_editor_take_photo),
             containerColor = MaterialTheme.colorScheme.primary,
             iconSize = CameraIconSize,
@@ -119,7 +117,7 @@ fun PhotoSlot(
 /** Botón redondo con sombra de la zona de foto (Figma: círculo de 50 px con sombra de 4 px). */
 @Composable
 private fun SlotButton(
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     contentDescription: String,
     containerColor: Color,
     iconSize: Dp,
@@ -141,7 +139,7 @@ private fun SlotButton(
             .size(SlotButtonSize)
             .shadow(elevation = ButtonShadow, shape = CircleShape)
     ) {
-        Icon(imageVector = icon, contentDescription = contentDescription, modifier = Modifier.size(iconSize))
+        Icon(painter = painterResource(id = icon), contentDescription = contentDescription, modifier = Modifier.size(iconSize))
     }
 }
 

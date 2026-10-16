@@ -12,6 +12,7 @@
  */
 package com.smartfood.app.feature.inventory.ui.editor
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,14 +31,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.Scale
-import androidx.compose.material.icons.outlined.Sell
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -49,6 +46,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -56,6 +54,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodConfirmDialog
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
@@ -161,22 +161,22 @@ private fun EditorForm(state: ProductEditorUiState, onEvent: (ProductEditorEvent
             onValueChange = { onEvent(ProductEditorEvent.NameChanged(it)) },
             placeholder = stringResource(id = R.string.editor_name_placeholder),
             accessibilityLabel = stringResource(id = R.string.editor_name_label),
-            leadingContent = { FieldIcon(Icons.Outlined.ShoppingCart) },
+            leadingContent = { FieldIcon(R.drawable.ic_figma_cart) },
             isError = errorField == InventoryField.NAME
         )
         SmartFoodSelectorField(
             value = state.expiresOn?.format(DateFormatter).orEmpty(),
             onClick = { onEvent(ProductEditorEvent.ExpiryClicked) },
             placeholder = stringResource(id = R.string.editor_expiry_placeholder),
-            leadingContent = { FieldIcon(Icons.Outlined.CalendarMonth) },
+            leadingContent = { FieldIcon(R.drawable.ic_figma_calendar) },
             isError = errorField == InventoryField.EXPIRY
         )
         SmartFoodSelectorField(
             value = state.category?.let { stringResource(id = it.titleRes) }.orEmpty(),
             onClick = { onEvent(ProductEditorEvent.CategoryClicked) },
             placeholder = stringResource(id = R.string.editor_category_placeholder),
-            leadingContent = { FieldIcon(Icons.Outlined.Sell) },
-            trailingContent = { FieldIcon(Icons.AutoMirrored.Outlined.KeyboardArrowRight) },
+            leadingContent = { FieldIcon(R.drawable.ic_figma_tag) },
+            trailingContent = { FieldIcon(R.drawable.ic_figma_chevron_right, size = ChevronSize) },
             isError = errorField == InventoryField.CATEGORY
         )
         // Fila opcional "Cantidad" (T002, desviación de la spec §8): número y unidad.
@@ -309,6 +309,15 @@ private fun FieldIcon(icon: ImageVector) {
     Icon(imageVector = icon, contentDescription = null)
 }
 
+/**
+ * Ícono del Figma de un campo (carrito, calendario, etiqueta y flecha, `476:3664`). Es un PNG de un solo color,
+ * teñido con el gris del campo; sin tamaño explícito, `Icon` usaría el de la imagen.
+ */
+@Composable
+private fun FieldIcon(@DrawableRes icon: Int, size: Dp = LocalFormMetrics.current.fieldIconSize) {
+    Icon(painter = painterResource(id = icon), contentDescription = null, modifier = Modifier.size(size))
+}
+
 /** Ícono de un diálogo: el glifo ocupa el 40 % del círculo, como en el Figma (T025). */
 @Composable
 private fun DialogIcon(icon: ImageVector, tint: androidx.compose.ui.graphics.Color) {
@@ -326,6 +335,9 @@ private val DateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/M
 private const val QuantityWeight = 0.6f
 private const val UnitWeight = 0.4f
 private const val DialogGlyphFraction = 0.4f
+
+// Flecha de la categoría del Figma (`476:4200`): 15 px.
+private val ChevronSize = 15.dp
 
 @Preview(showBackground = true, heightDp = 800)
 @Composable

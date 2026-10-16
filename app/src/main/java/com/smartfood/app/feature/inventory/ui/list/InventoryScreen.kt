@@ -20,14 +20,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -37,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -85,8 +84,9 @@ fun InventoryScreen(
                 shape = CircleShape
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.cd_add_button)
+                    painter = painterResource(id = R.drawable.ic_figma_add),
+                    contentDescription = stringResource(id = R.string.cd_add_button),
+                    modifier = Modifier.size(FigmaIconSize)
                 )
             }
         }
@@ -131,9 +131,10 @@ private fun InventoryTopBar(
                 .padding(end = MaterialTheme.spacing.small)
         ) {
             Icon(
-                imageVector = Icons.Default.Search,
+                painter = painterResource(id = R.drawable.ic_figma_search),
                 contentDescription = stringResource(id = R.string.cd_search_button),
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(FigmaIconSize)
             )
         }
     }
@@ -245,3 +246,6 @@ private val TopBarTitleSize = 20.sp
 /** Espacio al final de la lista para que el botón "+" no tape la última fila (FAB de 56 px más su margen). */
 private val FloatingActionButtonSpace = 88.dp
 private val SectionGap = 34.dp
+
+// Íconos del Figma (476:3100 lupa y 476:3125 "+"): 20 y 22 px.
+private val FigmaIconSize = 22.dp

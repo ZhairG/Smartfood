@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -80,8 +77,9 @@ fun MainTabScaffold(
 
 private val MainTab.icon
     get() = when (this) {
-        MainTab.INVENTORY -> Icons.Outlined.Inventory2
-        MainTab.PROFILE -> Icons.Outlined.Person
+        // Íconos del Figma (barra 476:4177): inventario y perfil, teñidos según la pestaña.
+        MainTab.INVENTORY -> R.drawable.ic_figma_tab_inventory
+        MainTab.PROFILE -> R.drawable.ic_figma_tab_profile
     }
 
 /**

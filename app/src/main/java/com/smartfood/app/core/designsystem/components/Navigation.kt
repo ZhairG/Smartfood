@@ -1,5 +1,6 @@
 package com.smartfood.app.core.designsystem.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,9 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,12 +22,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
@@ -53,7 +52,7 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 @Immutable
 data class SmartFoodTab(
     val label: String,
-    val icon: ImageVector,
+    @DrawableRes val icon: Int,
     val selected: Boolean,
     val onClick: () -> Unit,
 )
@@ -97,7 +96,7 @@ private fun BottomBarTab(tab: SmartFoodTab) {
             .padding(horizontal = TabTouchPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(imageVector = tab.icon, contentDescription = null, tint = color, modifier = Modifier.size(TabIconSize))
+        Icon(painter = painterResource(id = tab.icon), contentDescription = null, tint = color, modifier = Modifier.size(TabIconSize))
         Text(
             text = tab.label,
             color = color,
@@ -119,8 +118,8 @@ private fun SmartFoodBottomBarPreview() {
     SmartfoodTheme {
         SmartFoodBottomBar(
             tabs = listOf(
-                SmartFoodTab("Inventario", Icons.Outlined.Inventory2, selected = true, onClick = {}),
-                SmartFoodTab("Perfil", Icons.Outlined.Person, selected = false, onClick = {}),
+                SmartFoodTab("Inventario", R.drawable.ic_figma_tab_inventory, selected = true, onClick = {}),
+                SmartFoodTab("Perfil", R.drawable.ic_figma_tab_profile, selected = false, onClick = {}),
             )
         )
     }
