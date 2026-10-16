@@ -107,7 +107,7 @@ class InventorySearchViewModelTest {
         viewModel.onEvent(InventorySearchEvent.QueryChanged("manz"))
         viewModel.uiState.first { !it.isLoading && it.query == "manz" }
 
-        viewModel.onEvent(InventorySearchEvent.ClearQueryClicked)
+        viewModel.onEvent(InventorySearchEvent.ClearQuery)
 
         val state = viewModel.uiState.first { !it.isLoading && it.query.isEmpty() }
         assertEquals(FoodCategory.FRUITS, state.selectedCategory)

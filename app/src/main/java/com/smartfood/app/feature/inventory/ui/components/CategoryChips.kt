@@ -1,13 +1,13 @@
 /**
- * Nombre: CategoryFilterChips.kt
+ * Nombre: CategoryChips.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Filtros de categoría de la búsqueda (spec 006, CA-INV-06-01 y CA-INV-06-03). El chip activo se
- * anuncia como seleccionado para TalkBack, igual que en el resto de la app (RNF-INV-04).
+ * Descripción: Filtros por categoría del inventario (spec 006, CA-INV-06-01 y CA-INV-06-03). El chip activo se
+ * anuncia como seleccionado para TalkBack, igual que en el resto de la app (RNF-INV-04). Vive en `ui/components/`
+ * porque lo comparten las pantallas del inventario (la búsqueda, #42).
  */
-package com.smartfood.app.feature.inventory.ui.search
+package com.smartfood.app.feature.inventory.ui.components
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,27 +25,14 @@ import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 
 /**
- * Nombre visible de cada categoría del inventario.
- */
-@get:StringRes
-internal val FoodCategory.titleRes: Int
-    get() = when (this) {
-        FoodCategory.FRUITS -> R.string.category_fruits
-        FoodCategory.DAIRY -> R.string.category_dairy
-        FoodCategory.PROTEINS -> R.string.category_proteins
-        FoodCategory.VEGETABLES -> R.string.category_vegetables
-        FoodCategory.GRAINS -> R.string.category_grains
-        FoodCategory.OTHER -> R.string.category_other
-    }
-
-/**
- * Muestra la fila de filtros por categoría de la búsqueda.
+ * Muestra la fila de filtros por categoría con "Todos" al inicio.
  *
  * @param selectedCategory Categoría elegida, o `null` si el filtro activo es "Todos".
  * @param onCategorySelected Se llama cuando el usuario toca un filtro; `null` para "Todos".
+ * @param modifier Modificador opcional.
  */
 @Composable
-fun CategoryFilterChips(
+fun CategoryChips(
     selectedCategory: FoodCategory?,
     onCategorySelected: (FoodCategory?) -> Unit,
     modifier: Modifier = Modifier,

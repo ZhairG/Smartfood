@@ -35,6 +35,9 @@ import com.smartfood.app.core.navigation.Route
 import com.smartfood.app.core.navigation.navigateToTab
 import com.smartfood.app.feature.inventory.ui.camera.CAPTURED_PHOTO_KEY
 import com.smartfood.app.feature.inventory.ui.camera.ProductCameraRoute
+import com.smartfood.app.feature.inventory.ui.list.InventoryEffect
+import com.smartfood.app.feature.inventory.ui.list.InventoryScreen
+import com.smartfood.app.feature.inventory.ui.list.InventoryViewModel
 import com.smartfood.app.feature.inventory.ui.search.InventorySearchEffect
 import com.smartfood.app.feature.inventory.ui.search.InventorySearchScreen
 import com.smartfood.app.feature.inventory.ui.search.InventorySearchViewModel
@@ -44,11 +47,10 @@ import java.io.File
  * Nombre: InventoryNavGraph.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Destinos del inventario dentro de `MainGraph` (spec 006, plan §7). Ya son reales la cámara (#41) y la
- * búsqueda (#42, CA-INV-06-01 a 06-08); la lista y el editor siguen siendo **pantallas provisionales** que cada Issue
- * reemplaza sin tocar las rutas (lista → #39, editor → #40). Los botones provisionales permiten probar las pantallas
- * reales hasta que lleguen la lista y el editor. "Mi Inventario" es una pestaña con barra inferior; las demás son
- * pantallas internas, con empuje y sin barra (CA-INV-09-04).
+ * Descripción: Destinos del inventario dentro de `MainGraph` (spec 006, plan §7). La cámara (#41), la lista (#39) y
+ * la búsqueda (#42, CA-INV-06-01 a 06-08) ya son las reales; el editor sigue siendo una **pantalla provisional** que
+ * el #40 reemplaza sin tocar las rutas. "Mi Inventario" es una pestaña con barra inferior; las demás son pantallas
+ * internas, con empuje y sin barra (CA-INV-09-04).
  *
  * @param navController Controlador de navegación de la app.
  */
@@ -60,18 +62,16 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
         popExitTransition = NavTransitions.tabPopExit
     ) {
         MainTabScaffold(currentTab = MainTab.INVENTORY, onTabSelected = navController::navigateToTab) {
-            // Provisional: la lista llega con el #39.
-            PlaceholderScreen(title = stringResource(id = R.string.inventory_title)) {
-                SmartFoodPrimaryButton(
-                    text = stringResource(id = R.string.placeholder_add_product),
-                    onClick = { navController.navigate(Route.ProductEditor()) }
-                )
-                // Provisional: la lupa de la lista real llega con el #39; este botón permite probar la búsqueda.
-                SmartFoodPrimaryButton(
-                    text = stringResource(id = R.string.placeholder_search_title),
-                    onClick = { navController.navigate(Route.InventorySearch) }
-                )
+            val viewModel: InventoryViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveEffects(viewModel.effects) { effect ->
+                when (effect) {
+                    is InventoryEffect.NavigateToEditor ->
+                        navController.navigate(Route.ProductEditor(itemId = effect.itemId))
+                    InventoryEffect.NavigateToSearch -> navController.navigate(Route.InventorySearch)
+                }
             }
+            InventoryScreen(state = state, onEvent = viewModel::onEvent)
         }
     }
     composable<Route.InventorySearch> {
@@ -81,7 +81,7 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
         ObserveEffects(viewModel.effects) { effect ->
             when (effect) {
                 is InventorySearchEffect.NavigateToEditor ->
-                    navController.navigate(Route.ProductEditor(effect.itemId))
+                    navController.navigate(Route.ProductEditor(effect.id))
 
                 InventorySearchEffect.NavigateBack -> navController.popBackStack()
             }

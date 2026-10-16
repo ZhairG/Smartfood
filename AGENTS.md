@@ -140,6 +140,8 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 Cada agente mantiene al día el checklist del Issue en el que trabaja, sin que nadie se lo pida. En cuanto se cumple un paso, cambia `- [ ]` por `- [x]` **solo en la línea de ese paso** y no toca el resto del texto.
 
 - **Cómo:** `gh issue view <n> --json body --jq .body > <archivo temporal>`, editar solo la casilla y `gh issue edit <n> --body-file <archivo temporal>`. Siempre con `--body-file`, para evitar problemas de comillas en PowerShell y Git Bash.
+- **El archivo temporal va en UTF-8.** En Git Bash o PowerShell 7 (`pwsh`) sirve `>`. En **Windows PowerShell 5.1** no se usa `>`, porque guarda con otra codificación y daña "§", "→" y las tildes (pasó en el #32 y el #33): se usa `gh issue view <n> --json body --jq .body | Out-File -Encoding utf8 <archivo temporal>`. Lo mismo vale para los comentarios y PR que se publican con `--body-file`.
+- **Comprobar después de editar:** volver a leer el cuerpo y confirmar que no aparecen secuencias como "┬", "Ô" o "├". Si aparecen, se corrigen antes de seguir.
 - **Cuándo se marca cada casilla:**
 
 | Casilla | Se marca cuando… |

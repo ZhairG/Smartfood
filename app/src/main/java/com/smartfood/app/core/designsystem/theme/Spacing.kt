@@ -23,10 +23,12 @@ import androidx.compose.ui.unit.dp
  * @property topPanel Margen superior del panel inferior (47dp).
  * @property buttonRadius Radio de curvatura de esquinas de botón (10dp).
  * @property inputRadius Radio de curvatura de esquinas de caja de texto (10dp).
- * @property panelRadius Radio de curvatura de esquinas de panel o diálogo (45dp).
+ * @property panelRadius Radio de curvatura de la tarjeta de los diálogos de inventario (50dp, Figma `476:3810`). El
+ * diálogo de desconexión usa el suyo, de 45dp (Figma `700:1913`, spec 001).
  * @property buttonHeight Alto del botón primario (51dp).
  * @property inputHeight Alto de los campos de texto (50dp).
- * @property iconDialogSize Tamaño de íconos en diálogos (72dp).
+ * @property iconDialogSize Tamaño del círculo del ícono de los diálogos de inventario (100dp, Figma `476:3811`). El
+ * diálogo de desconexión usa el suyo, de 72dp (Figma `700:1913`).
  */
 data class Spacing(
     val extraSmall: Dp = 4.dp,
@@ -38,10 +40,10 @@ data class Spacing(
     val topPanel: Dp = 47.dp,
     val buttonRadius: Dp = 10.dp,
     val inputRadius: Dp = 10.dp,
-    val panelRadius: Dp = 45.dp,
+    val panelRadius: Dp = 50.dp,
     val buttonHeight: Dp = 51.dp,
     val inputHeight: Dp = 50.dp,
-    val iconDialogSize: Dp = 72.dp
+    val iconDialogSize: Dp = 100.dp
 )
 
 /** CompositionLocal para proveer el objeto de espaciado en la jerarquía de Composables. */

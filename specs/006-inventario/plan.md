@@ -16,14 +16,16 @@ feature/inventory/
 │   ├── repository/
 │   │   ├── InventoryRepository.kt
 │   │   ├── PhotoRepository.kt                LocalPhoto (ruta de archivo local) y operaciones en la nube
+│   │   ├── PhotoSync.kt                      subida y borrado de fotos en segundo plano (§13)
 │   │   ├── SpeechToText.kt
 │   │   └── ExpiryReminderScheduler.kt
 │   └── usecase/
 │       ├── ClassifyExpiryUseCase.kt          umbral de 3 días; recibe un Clock
 │       ├── ObserveInventoryUseCase.kt        agrupa por estado y ordena (CA-INV-01-01, 01-04)
 │       ├── ValidateItemUseCase.kt            reglas del formulario (único lugar)
-│       ├── SaveItemUseCases.kt               AddItemUseCase, UpdateItemUseCase (foto + documento, con rollback)
+│       ├── SaveItemUseCases.kt               AddItemUseCase, UpdateItemUseCase (documento + foto encolada, §13)
 │       ├── DeleteItemUseCase.kt
+│       ├── HasPendingChangesUseCase.kt       cambios o fotos sin subir, para el aviso al cerrar sesión (§13)
 │       ├── SearchInventoryUseCase.kt         normaliza, divide por comas, OR + categoría, plural simple
 │       ├── ParseSpokenIngredientsUseCase.kt  dictado → lista de ingredientes
 │       └── GetExpiringItemsUseCase.kt        para el aviso diario
@@ -34,6 +36,10 @@ feature/inventory/
 │   ├── reminder/WorkManagerExpiryReminderScheduler.kt
 │   ├── reminder/ExpiryReminderWorker.kt
 │   ├── reminder/ExpiryNotifier.kt            canal y construcción de la notificación
+│   ├── sync/PendingPhotoStore.kt             fotos que esperan subirse, en filesDir/pending/{itemId}.jpg (§13)
+│   ├── sync/WorkManagerPhotoSync.kt          implementación de PhotoSync
+│   ├── sync/PhotoUploadWorker.kt             sube la foto y actualiza el producto (@HiltWorker)
+│   ├── sync/PhotoDeleteWorker.kt             borra una foto de Storage cuando hay red (@HiltWorker)
 │   ├── mapper/InventoryErrorMapper.kt        único lugar que conoce excepciones de Firebase en esta feature
 │   └── di/InventoryDataModule.kt
 └── ui/
@@ -49,7 +55,8 @@ feature/inventory/
 feature/profile/                              hoy feature/home: HomeScreen → ProfileScreen (sin cambios de lógica)
 core/navigation/                              rutas nuevas, MainGraph con barra inferior
 core/designsystem/components/                 SmartFoodSelectorField, SmartFoodBottomBar, SmartFoodConfirmDialog,
-                                              SmartFoodResultDialog; SmartFoodTextField ampliado
+                                              SmartFoodResultDialog, SmartFoodTopBar (barra de las pantallas internas,
+                                              Figma `476:5960`); SmartFoodTextField ampliado
 res/values/strings_inventory.xml              todos los textos de la feature
 ```
 
@@ -82,8 +89,14 @@ data class InventoryItem(
     val expiresOn: LocalDate,
     val quantity: Quantity? = null,
     val photo: ItemPhoto? = null,
+    val localPhotoPath: String? = null,   // foto que espera subirse (CA-INV-10-04, T046)
+    val isPendingSync: Boolean = false,   // cambios o foto sin subir (CA-INV-10-02, T046)
     // El precio se agregará aquí como campo opcional en la spec de presupuesto (spec §7).
 )
+
+/** Cómo terminó una escritura: confirmada por el servidor o guardada en el teléfono (§13, T046). */
+enum class WriteOutcome { SYNCED, PENDING }
+data class SavedItem(val item: InventoryItem, val outcome: WriteOutcome)
 data class InventorySection(val status: ExpiryStatus, val items: List<InventoryItem>)
 
 /** Borrador del formulario: lo que valida ValidateItemUseCase. La cantidad llega como texto, tal como se escribió. */
@@ -123,19 +136,21 @@ enum class SpeechError { NO_MATCH, NOT_AVAILABLE, PERMISSION_DENIED, NETWORK }
 
 | Interfaz | Firma |
 |---|---|
-| `InventoryRepository` | `observeItems(): Flow<List<InventoryItem>>`, `getItem(id): Result<InventoryItem>`, `newItemId(): String`, `saveItem(item): Result<Unit>` (crea o reemplaza), `deleteItem(id): Result<Unit>` |
-| `PhotoRepository` | `upload(itemId: String, photo: LocalPhoto): Result<ItemPhoto>`, `delete(path: String): Result<Unit>` |
+| `InventoryRepository` | `observeItems(): Flow<List<InventoryItem>>` (con `isPendingSync`), `getItem(id): Result<InventoryItem>`, `newItemId(): String`, `createItem(item): Result<WriteOutcome>`, `updateItem(item, photoChanged: Boolean): Result<WriteOutcome>`, `deleteItem(id): Result<WriteOutcome>`, `setPhoto(id, photo: ItemPhoto?): Result<Unit>` (lo usa el worker) y `hasPendingWrites(): Boolean`. Reemplazan a `saveItem(item): Result<Unit>` (§13, T046 y T047). |
+| `PhotoRepository` | `upload(itemId: String, photo: LocalPhoto): Result<ItemPhoto>`, `delete(path: String): Result<Unit>`. Desde el #71 solo la usan los workers. |
+| `PhotoSync` (§13) | `enqueueUpload(itemId, photo: LocalPhoto, replacedPath: String?)`, `enqueueDelete(path)`, `cancelUpload(itemId)`, `pendingPhotos(): Flow<Map<String, String>>` (id → ruta local), `hasPending(): Boolean` y `clearAll()` |
 | `SpeechToText` | `isAvailable(): Boolean`, `listen(): Flow<SpeechEvent>` (terminar de recolectar cancela la escucha) |
 | `ExpiryReminderScheduler` | `schedule()`, `cancel()` |
 
 | UseCase | Responsabilidad |
 |---|---|
 | `ClassifyExpiryUseCase(clock)` | `invoke(expiresOn): ExpiryStatus`. Días = `ChronoUnit.DAYS.between(hoy, expiresOn)`; < 0 vencido, 0..3 próximo, > 3 fresco (CA-INV-01-06). |
-| `ObserveInventoryUseCase` | `Flow<List<InventorySection>>` en orden EXPIRED, EXPIRING_SOON, FRESH, sin secciones vacías, ordenado por fecha y nombre. |
+| `ObserveInventoryUseCase` | `Flow<List<InventorySection>>` en orden EXPIRED, EXPIRING_SOON, FRESH, sin secciones vacías, ordenado por fecha y nombre. Combina `observeItems()` con `PhotoSync.pendingPhotos()`: un producto con foto pendiente lleva `localPhotoPath` e `isPendingSync = true` (CA-INV-10-04, T046). |
 | `ValidateItemUseCase(clock)` | `invoke(draft, originalExpiresOn: LocalDate?): Result<ValidItem>`. El nombre recortado debe tener entre 1 y 50 caracteres; la fecha y la categoría son obligatorias; la fecha no puede ser anterior a hoy, salvo si es igual a `originalExpiresOn` (CA-INV-03-03). Cantidad: el texto recortado vacío da `quantity = null` (la unidad se descarta); si no, se cambia la coma por punto y debe ser un número > 0, ≤ 9999 y con 2 decimales como máximo, o falla con `Validation(QUANTITY, INVALID)` (CA-INV-02-09). Sin unidad se usa `UNITS` (CA-INV-02-08). Además expone `isComplete(draft)`, que solo mira nombre, fecha y categoría, para habilitar el botón (CA-INV-02-02). |
-| `AddItemUseCase` | `invoke(draft, photo: LocalPhoto?): Result<InventoryItem>`. Valida → `newItemId()` → sube la foto si hay → `saveItem`. Si `saveItem` falla, borra la foto subida (CA-INV-05-06). Con éxito llama a `schedule()`, que es idempotente. |
-| `UpdateItemUseCase` | `invoke(original, draft, photoEdit: PhotoEdit): Result<InventoryItem>`, con `PhotoEdit` = `Keep`, `Remove` o `Replace(LocalPhoto)`. Valida → sube la foto nueva si cambió → `saveItem` → borra la foto anterior si se reemplazó o se quitó. Si `saveItem` falla, borra la foto nueva. Que falle el borrado de la foto anterior no falla la operación (queda en el log). |
-| `DeleteItemUseCase` | `invoke(item)`: `deleteItem` → borra la foto si había (CA-INV-04-02). Si falla el borrado de la foto, el producto queda eliminado. |
+| `AddItemUseCase` | `invoke(draft, photo: LocalPhoto?): Result<SavedItem>`, con `SavedItem(item, outcome: WriteOutcome)`. Valida → `newItemId()` → `createItem` → si hay foto, `PhotoSync.enqueueUpload(id, photo, replacedPath = null)`. La foto ya no se sube aquí (§13, CA-INV-05-06). Con éxito llama a `schedule()`, que es idempotente. |
+| `UpdateItemUseCase` | `invoke(original, draft, photoEdit: PhotoEdit): Result<SavedItem>`, con `PhotoEdit` = `Keep`, `Remove` o `Replace(LocalPhoto)`. Valida → `updateItem(item, photoChanged = photoEdit != Keep)`. Con `Keep`, el documento conserva los campos de la foto. Con `Replace`, `enqueueUpload(id, foto, replacedPath = original.photo?.path)`: el worker borra la anterior después de subir la nueva (CA-INV-05-05). Con `Remove`, `cancelUpload(id)` y `enqueueDelete(original.photo.path)` si había (CA-INV-05-04). |
+| `DeleteItemUseCase` | `invoke(item): Result<WriteOutcome>`: `deleteItem` → `cancelUpload(item.id)` → `enqueueDelete(path)` si tenía foto en la nube (CA-INV-04-02, CA-INV-10-03). |
+| `HasPendingChangesUseCase` | `invoke(): Boolean` = `InventoryRepository.hasPendingWrites() \|\| PhotoSync.hasPending()` (CA-INV-10-07, T046). `LogoutUseCase` llama además a `PhotoSync.clearAll()`. |
 | `SearchInventoryUseCase` | `invoke(items, query, category?): List<InventoryItem>`. Normaliza (minúsculas y sin tildes con `java.text.Normalizer`), divide por comas, descarta los términos vacíos y aplica OR por "contiene". Cada término coincide también sin la `s` o `es` final (CA-INV-07-04). Orden por fecha. |
 | `ParseSpokenIngredientsUseCase` | `invoke(alternatives): List<String>`. Toma la primera alternativa no vacía, la divide por comas y por las palabras " y " y " e ", recorta, quita los artículos iniciales ("el", "la", "los", "las", "un", "una", "unos", "unas") y los duplicados. "carne pollo y leche" → `[carne pollo, leche]`, porque sin pausa ni conector no se puede separar con seguridad. El reconocedor suele insertar las comas en las pausas. |
 | `GetExpiringItemsUseCase` | `invoke(items): List<InventoryItem>`. Los productos en estado `EXPIRING_SOON`, ordenados por fecha y nombre (CA-INV-08-01, 02). El worker se lo aplica a la primera emisión del repositorio. |
@@ -147,6 +162,12 @@ enum class SpeechError { NO_MATCH, NOT_AVAILABLE, PERMISSION_DENIED, NETWORK }
 | `InventoryScreen` | `isLoading`, `sections`, `error` | `AddClicked`, `SearchClicked`, `EditClicked(id)`, `RetryClicked` | `NavigateToEditor(id?)`, `NavigateToSearch` |
 | `InventorySearchScreen` | `query`, `selectedCategory`, `results`, `isVoiceAvailable`, `voice: VoiceUiState {Hidden, Listening, Processing, Failed(error)}` | `QueryChanged`, `ClearQuery`, `CategorySelected(c?)`, `VoiceClicked`, `VoicePermissionResult(granted)`, `VoiceRetry`, `VoiceDismissed`, `ResultClicked(id)` | `RequestMicPermission`, `NavigateToEditor(id)`, `ShowPermissionRationale` |
 | `ProductEditorScreen` | `mode {Add, Edit}`, `name`, `expiresOn`, `category`, `quantityText`, `unit`, `photo: PhotoUiState {None, Local(path), Remote(url)}`, `isSaveEnabled`, `isSaving`, `error`, `dialog: EditorDialog?` | `NameChanged`, `ExpiryPicked`, `CategoryPicked`, `QuantityChanged`, `UnitPicked`, `CameraClicked`, `PhotoCaptured(path)`, `RemovePhotoClicked`, `RemovePhotoConfirmed`, `SaveClicked`, `DeleteClicked`, `DeleteConfirmed`, `DialogDismissed` | `RequestCameraPermission`, `NavigateToCamera`, `RequestNotificationPermission`, `NavigateBack` |
+| `ProfileScreen` (§13) | lo actual + `dialog: ProfileDialog?` (`ConfirmLogoutWithPending`) | `LogoutClicked`, `LogoutConfirmed`, `DialogDismissed` | `NavigateToLogin` |
+
+- **Sin conexión (§13):** con `WriteOutcome.PENDING`, el editor muestra el diálogo de resultado "Guardado en tu
+  teléfono" en lugar de "Producto Guardado" o "Guardado" (CA-INV-10-02). La fila de la lista muestra el ícono de
+  pendiente si `isPendingSync`, y la miniatura y la zona de foto usan `localPhotoPath` antes que `photo.url`
+  (CA-INV-10-04).
 
 - Los campos en rojo se **derivan** de `error` (`InventoryError.Validation.field`), como en autenticación.
 - `isSaveEnabled` viene de `ValidateItemUseCase.isComplete`; el ViewModel no repite reglas.
@@ -178,11 +199,22 @@ Se escribe y se lee con `Map` (sin reflexión, por R8), igual que `FirestoreUser
 `quantity` y `unit` no se escriben. Agregar `price` más adelante es agregar otra clave opcional: los documentos viejos
 siguen siendo válidos.
 
-Guardar y borrar usan **transacciones** (`runTransaction`). Sin conexión, una transacción falla con `UNAVAILABLE` →
-`Network` (RNF-INV-05), mientras que `set().await()` se quedaría esperando a que vuelva la red. Además, al leer el
-documento dentro de la transacción se sabe si ya existe: `createdAt` se escribe con la hora del servidor solo al
-crear y se conserva al editar, como piden las reglas. Cada guardado es un `set` completo, así que una cantidad o una
-foto que se quitaron desaparecen del documento. La lectura es tolerante: una categoría desconocida pasa a `OTHER`,
+**Escritura (desde el #71, T047).** Hasta el #71, guardar y borrar usaban transacciones (`runTransaction`) para
+fallar con `Network` sin conexión, como pedía la versión anterior de RNF-INV-05. Ahora se escribe en la cola de
+Firestore, que funciona sin red (§13):
+- **Crear:** `set` con todos los campos, y `createdAt` y `updatedAt` con `FieldValue.serverTimestamp()`.
+- **Editar:** `update` con los campos del producto y `updatedAt`. La cantidad que se quitó se borra con
+  `FieldValue.delete()`, y `createdAt` no se toca, como piden las reglas. Los campos de la foto solo se escriben si
+  `photoChanged` (con `Remove` se borran); así no se pisa lo que escribió `PhotoUploadWorker`.
+- **Borrar:** `delete`.
+- **Espera:** cada escritura espera la confirmación del servidor como mucho 3 s
+  (`withTimeoutOrNull { task.await() }`). Si llega, es `SYNCED`; si no, es `PENDING`, y la escritura sigue en la cola
+  aunque la corrutina deje de esperar. Un error que llega antes (por ejemplo, `PERMISSION_DENIED`) se devuelve como
+  fallo (CA-INV-02-07).
+- Las reglas no cambian: `serverTimestamp` se resuelve cuando la escritura llega al servidor, así que
+  `createdAt == request.time` y `updatedAt == request.time` se siguen cumpliendo al sincronizar.
+
+La lectura es tolerante: una categoría desconocida pasa a `OTHER`,
 una cantidad o unidad inválida se descarta y un documento sin nombre o sin fecha válida se omite de la lista.
 
 Reglas (`firestore.rules`):
@@ -255,13 +287,14 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
    - comprime en JPEG con calidad 80 (RNF-INV-02);
    - sube con `putBytes` y `contentType = image/jpeg`;
    - devuelve `ItemPhoto(path, downloadUrl)`.
-5. El archivo temporal se borra después de subirlo o al descartar el formulario. El repositorio lo borra **solo si la
-   subida sale bien**: si falla, el formulario lo conserva para reintentar (CA-INV-05-06). Una foto ilegible da
+5. **Desde el #71, `upload` solo lo llama `PhotoUploadWorker`** (§13): el producto se guarda primero y la foto se
+   sube en segundo plano. El archivo temporal se borra después de subirlo o al descartar el formulario. El repositorio lo borra **solo si la
+   subida sale bien**: si falla, el archivo se conserva y el worker reintenta (CA-INV-05-06). Una foto ilegible da
    `PhotoUploadFailed`. `delete(path)` es idempotente: una foto que ya no existe cuenta como borrada. Los cálculos
    (muestreo, tamaño final y orientación EXIF) viven en `data/photo/PhotoScaling.kt`, sin Android, y se prueban en la
    JVM; `PhotoCompressor` los aplica con `BitmapFactory`, `ExifInterface` y una sola `Matrix`.
 6. Las miniaturas y la zona de foto cargan `photoUrl` con Coil 3 (`AsyncImage`), con el color del estado como
-   marcador (CA-INV-01-03).
+   marcador (CA-INV-01-03). Si hay `localPhotoPath`, cargan ese archivo (CA-INV-10-04).
 
 ## 5. Voz
 
@@ -310,6 +343,8 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 - **`SmartfoodApp`:**
   - implementa `Configuration.Provider` con `HiltWorkerFactory`;
   - en el manifiesto se quita `androidx.work.WorkManagerInitializer` del `InitializationProvider`.
+  - Desde el #71 esto lo hace la **T048** (workers de fotos), que llega antes que los avisos; la T038 ya lo
+    encuentra hecho.
 
 ## 7. Navegación
 
@@ -347,7 +382,7 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 | `SmartFoodBottomBar` (nuevo, `Navigation.kt`) | Barra de 2 pestañas del Figma (`476:5570`): fondo `surfaceVariant` (blanco), línea superior `outline`, pestañas con ícono y texto (Poppins SemiBold de 12 sp) y rol `Tab`. La seleccionada va en `GreenCheck` (el `#16A34A` del Figma) y las demás en `onSurfaceVariant`. Recibe las pestañas por parámetro (`SmartFoodTab`). Los íconos son de Material hasta T027. |
 | `SmartFoodConfirmDialog` (nuevo, `Dialogs.kt`) | Ícono en círculo, pregunta, botón destructivo ("Eliminar", `error`) y "Cancelar" (`secondary`). Usa la forma de `SmartFoodOfflineDialog`. |
 | `SmartFoodResultDialog` (nuevo, `Dialogs.kt`) | Ícono de check, título y cuerpo opcional ("Producto Guardado" / "Te avisaremos…"). Se anuncia como `liveRegion`. |
-| `SmartFoodPrimaryButton` | Ya es naranja (`secondary`) habilitado y gris deshabilitado, como "Añadir al Inventario" (`476:5726`), así que no hace falta una variante de acento. Suma `leadingIcon` opcional para el "+". |
+| `SmartFoodPrimaryButton` | Ya es naranja (`secondary`) habilitado y gris deshabilitado, como "Añadir al Inventario" (`476:5726`), así que no hace falta una variante de acento. Suma `leadingIcon` opcional para el "+" y `destructive` (Boolean) para el botón rojo de confirmación (`error`/`onError`, Figma `476:3815`, CA-INV-04-01), con los colores cerrados: nadie pasa colores sueltos (#80). |
 
 - **Cantidad (T002, desviación de la spec §8):** en el editor, debajo de la categoría, una fila con un
   `SmartFoodTextField` numérico (`KeyboardType.Decimal`) y un `SmartFoodSelectorField` de unidad que abre una hoja
@@ -365,7 +400,8 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 | Cambio | Detalle |
 |---|---|
 | `libs.versions.toml` | `firebase-storage` (BOM), `androidx.camera:camera-core`, `camera-camera2`, `camera-lifecycle` y `camera-view` (misma versión), `io.coil-kt.coil3:coil-compose` y `coil-network-okhttp`, `androidx.work:work-runtime-ktx`, `androidx.hilt:hilt-work` (+ `androidx.hilt:hilt-compiler` en KSP), `com.android.tools:desugar_jdk_libs`, `androidx.exifinterface:exifinterface` (1.4.2, la que ya traían CameraX y Coil; se declara porque la usa la compresión de fotos, T018). Se usa la última versión estable de cada una al implementar, salvo dos excepciones: Coil queda en 3.4.0 (desde la 3.5 exige `kotlin-stdlib` 2.4 y el proyecto compila con Kotlin 2.2) y `androidx.hilt` en 1.2.0, alineado con `hilt-navigation-compose`. |
-| `app/build.gradle.kts` | `compileOptions.isCoreLibraryDesugaringEnabled = true` y `coreLibraryDesugaring(libs.desugar.jdk.libs)`. |
+| `app/build.gradle.kts` | `compileOptions.isCoreLibraryDesugaringEnabled = true` y `coreLibraryDesugaring(libs.desugar.jdk.libs)`. Desde el #71, `androidTestImplementation(libs.androidx.work.testing)` para probar los workers (T048). |
+| `libs.versions.toml` (#71) | `androidx.work:work-testing`, con la misma versión que `work-runtime-ktx` (T048). |
 | `AndroidManifest.xml` | Permisos `CAMERA`, `RECORD_AUDIO` y `POST_NOTIFICATIONS`; `<uses-feature android:name="android.hardware.camera" android:required="false"/>`; `<queries>` del servicio de voz; quitar el inicializador por defecto de WorkManager. |
 | `CoreDataModule` | `provideFirebaseStorage()`, no nulo, con `useEmulator(host, 9199)` en modo emulador. Cada SDK se conecta al emulador **una sola vez por proceso** (`connectEmulatorOnce`): Firebase lanza `IllegalStateException` si `useEmulator` se repite, y Hilt arma el grafo en cada `@HiltAndroidTest` (#69). |
 | `firebase.json` | `"storage": { "rules": "storage.rules" }` y `"emulators.storage": { "port": 9199 }`. |
@@ -396,6 +432,7 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 | ADR-INV-06 | Avisos locales con WorkManager | FCM desde Cloud Functions | No necesita servidor ni tokens; el cálculo es el mismo del dominio. |
 | ADR-INV-07 | Campos con borde del design system | Línea inferior del Figma | Consistencia con autenticación y adaptabilidad ya probada (spec 002). Aprobado por el equipo. |
 | ADR-INV-08 | Filtrado de la búsqueda en el cliente | Consultas de Firestore por término | El inventario de un hogar es pequeño (cientos de productos como mucho); Firestore no permite "contiene" ni OR entre subcadenas. |
+| ADR-INV-09 | Uso sin conexión con la cola de Firestore y WorkManager para las fotos (#71) | Base local propia (Room) sincronizada a mano; error de red al guardar sin conexión | Firestore ya trae caché persistente y cola de escrituras; Room duplicaría el modelo y la sincronización. WorkManager sobrevive a cerrar la app y reintenta solo. Las fotos pendientes viven solo en el teléfono, así que las reglas no cambian. |
 
 ## 12. Estrategia de pruebas
 
@@ -410,9 +447,64 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 - **Instrumentadas (Compose):**
   - `InventoryScreenTest`: secciones, orden, vacío y descripciones accesibles.
   - `ProductEditorScreenTest`: botón deshabilitado/habilitado, errores, hoja de categoría y diálogos.
-  - `InventorySearchScreenTest`: chips, sin resultados, aviso de voz y "x".
+  - `InventorySearchScreenTest`: `CategoryChips`, sin resultados, aviso de voz con el micrófono desactivado y "x";
+    los resultados reutilizan `InventoryItemRow` y la pantalla usa `SmartFoodTopBar`.
   - `MainNavigationTest`: barra inferior, pestañas y "atrás".
   - `AppNavigationTest` actualizado y `AdaptiveLayoutTest` para el editor en 360×720.
 - **Manual** (checklist en `tasks.md`): cámara real, voz real en es-CO, permisos negados, notificación a la hora
   (forzada con `adb shell cmd jobscheduler run`), reglas con los emuladores (otro uid → denegado; foto > 2 MB →
   denegado) y producción.
+- **Sin conexión (§13):** `FakePhotoSync` en `testutil/` y pruebas U de los casos de uso (`WriteOutcome`, fotos
+  encoladas, `HasPendingChangesUseCase`, `LogoutUseCase` con `clearAll`). Pruebas I de los workers con
+  `work-testing` (`TestListenableWorkerBuilder`) y de `FirestoreInventoryRepository` con el emulador apagando la red
+  (`firestore.disableNetwork()`): guardar devuelve `PENDING`, `isPendingSync` es verdadero y, al encender la red,
+  pasa a falso. Manual: modo avión (checklist, punto 7).
+
+## 13. Uso sin conexión (HU-INV-10, #71)
+
+**Principio.** El teléfono es la fuente inmediata y la nube se pone al día sola. Los documentos van por la cola de
+Firestore (§3) y las fotos por WorkManager. Ninguna escritura muestra un error por falta de red.
+
+**Indicador de pendiente.**
+- `FirestoreInventoryRepository.observeItems()` usa `snapshots(MetadataChanges.INCLUDE)`, y cada documento con
+  `metadata.hasPendingWrites()` sale con `isPendingSync = true`.
+- `ObserveInventoryUseCase` también marca pendientes los productos con foto en `PhotoSync.pendingPhotos()`.
+- `hasPendingWrites()` consulta la colección en la caché (`Source.CACHE`) y mira `metadata.hasPendingWrites()`.
+
+**Fotos (`data/sync/`).**
+1. `WorkManagerPhotoSync.enqueueUpload` mueve la captura a `filesDir/pending/{itemId}.jpg` (`PendingPhotoStore`).
+   No va en `cacheDir`, porque Android puede borrarla. Después encola `PhotoUploadWorker` como trabajo único
+   `photo-upload-{itemId}` (`ExistingWorkPolicy.REPLACE`), con `NetworkType.CONNECTED` y reintento exponencial. Los
+   datos del trabajo son `itemId` y `replacedPath`.
+2. `PhotoUploadWorker` (`@HiltWorker`, `CoroutineWorker`):
+   1. sube con `PhotoRepository.upload`, que comprime y borra el archivo solo si sale bien;
+   2. si el error es de red, `Result.retry()`;
+   3. si el archivo no se puede leer (`PhotoUploadFailed`), lo borra y deja el producto sin foto (CA-INV-05-06);
+   4. con la foto subida, llama a `setPhoto(itemId, foto)`. Si el producto ya no existe (`NotFound`), borra la foto
+      recién subida y termina;
+   5. si había `replacedPath`, borra esa foto (CA-INV-05-05);
+   6. sin sesión, termina sin hacer nada.
+3. `enqueueDelete(path)` encola `PhotoDeleteWorker` (`photo-delete-{path}`, con red y reintentos), que llama a
+   `PhotoRepository.delete`, que es idempotente (CA-INV-04-02, CA-INV-10-03).
+4. `cancelUpload(itemId)` cancela el trabajo y borra el archivo pendiente.
+5. `pendingPhotos()` emite el mapa id → ruta de los archivos de `filesDir/pending`, y se actualiza al encolar,
+   subir o cancelar.
+6. `clearAll()` cancela todos los trabajos de fotos (etiqueta común `photo-sync`) y vacía `filesDir/pending`.
+
+**Cerrar sesión (CA-INV-10-07).**
+- El ViewModel de Perfil llama a `HasPendingChangesUseCase` al tocar "Cerrar sesión".
+- Si hay pendientes, muestra `SmartFoodConfirmDialog`: "Tienes cambios sin subir. Si cierras sesión ahora, podrían
+  perderse", con "Cerrar sesión" y "Cancelar".
+- `LogoutUseCase` cancela los avisos y llama a `PhotoSync.clearAll()` antes de `logout()`.
+- Las escrituras de Firestore que siguen en la cola quedan guardadas para esa cuenta: se suben si la misma persona
+  vuelve a iniciar sesión, y por eso el aviso dice "podrían perderse".
+
+**Diseño.** Ninguno de estos elementos está en el Figma (spec §8):
+- el ícono `Icons.Outlined.CloudUpload` en `onSurfaceVariant`, del tamaño de los íconos de la fila, junto a la fecha,
+  con la descripción "Pendiente de sincronizar";
+- el diálogo de guardado en el teléfono, con el ícono de nube y "Guardado en tu teléfono: se subirá cuando vuelva la
+  conexión";
+- los textos van en `strings_inventory.xml`.
+
+**Fuera de alcance.** Resolver conflictos entre dos teléfonos (gana la última escritura, como hoy) y mostrar en otro
+teléfono una foto que aún no se sube (spec §7).

@@ -1,6 +1,7 @@
 package com.smartfood.app.core.designsystem.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,7 +35,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.ShadowColorModal
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
 /**
@@ -81,6 +92,7 @@ private fun SmartFoodOfflineDialogContent(
     onReconnect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Radio propio de este diálogo (45 dp, Figma `700:1913`), no el de `panelRadius` (50 dp, diálogos de inventario).
     val dialogShape = RoundedCornerShape(45.dp)
 
     Box(
@@ -100,7 +112,7 @@ private fun SmartFoodOfflineDialogContent(
             )
     ) {
         // Medidas del frame "Mensaje_Claro" de Figma (nodo 700:1913): ícono a 6 dp del borde, título justo debajo
-        // y botón a 111 dp del borde superior.
+        // y botón a 111 dp del borde superior. El ícono (72 dp) también es el suyo, no `iconDialogSize` (100 dp).
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,6 +151,199 @@ private fun SmartFoodOfflineDialogContent(
     }
 }
 
+/**
+ * Muestra una confirmación para una acción destructiva, como eliminar un producto o su imagen.
+ *
+ * Figma: "Eliminar Producto" `476:3809` y "Eliminar Imagen Inventario" `476:4021` (spec 006, CA-INV-04-01 y 05-04).
+ *
+ * @param icon Contenido que dibuja el ícono de la acción a confirmar.
+ * @param question Pregunta mostrada al usuario.
+ * @param confirmText Texto del botón destructivo.
+ * @param dismissText Texto del botón para cancelar.
+ * @param onConfirm Callback invocado al confirmar la acción.
+ * @param onDismiss Callback invocado al cancelar o cerrar el diálogo.
+ * @param modifier Modificador opcional para el contenido del diálogo.
+ */
+@Composable
+fun SmartFoodConfirmDialog(
+    icon: @Composable () -> Unit,
+    question: String,
+    confirmText: String,
+    dismissText: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        SmartFoodConfirmDialogContent(
+            icon = icon,
+            question = question,
+            confirmText = confirmText,
+            dismissText = dismissText,
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+            modifier = modifier
+        )
+    }
+}
+
+/** Muestra el contenido de [SmartFoodConfirmDialog] para reutilizarlo en vistas previas. */
+@Composable
+private fun SmartFoodConfirmDialogContent(
+    icon: @Composable () -> Unit,
+    question: String,
+    confirmText: String,
+    dismissText: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = MaterialTheme.spacing
+    val metrics = LocalFormMetrics.current
+    val dialogShape = RoundedCornerShape(spacing.panelRadius)
+
+    Column(
+        modifier = modifier
+            .widthIn(max = 480.dp)
+            .fillMaxWidth()
+            .padding(horizontal = spacing.extraSmall, vertical = spacing.small)
+            .figmaShadow(
+                color = ShadowColorModal,
+                borderRadius = spacing.panelRadius,
+                blurRadius = spacing.extraSmall,
+                offsetY = spacing.extraSmall
+            )
+            .background(MaterialTheme.colorScheme.surfaceVariant, dialogShape)
+            .padding(
+                horizontal = metrics.formHorizontalPadding,
+                vertical = metrics.sectionSpacing
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(spacing.iconDialogSize)
+                .background(MaterialTheme.colorScheme.error.copy(alpha = 0.22f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            icon()
+        }
+
+        Text(
+            text = question,
+            color = MaterialTheme.colorScheme.primary,
+            // Figma 476:3814: pregunta en Poppins Bold de 20 sp.
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+            textAlign = TextAlign.Center
+        )
+
+        // Figma 476:3815 y 476:3817: los dos botones del Figma son el mismo botón primario, el de confirmar en su
+        // variante destructiva (`destructive`, `error`).
+        SmartFoodPrimaryButton(
+            text = confirmText,
+            onClick = onConfirm,
+            destructive = true
+        )
+        SmartFoodPrimaryButton(
+            text = dismissText,
+            onClick = onDismiss
+        )
+    }
+}
+
+/**
+ * Muestra el resultado de una acción completada para informar al usuario.
+ *
+ * Figma: "Guardar Producto" `476:3926` (spec 006, CA-INV-02-06 y 03-02).
+ *
+ * El diálogo **no** se cierra solo: ni con atrás ni tocando fuera. Lo quita de la composición quien lo muestra
+ * (el editor lo retira cuando navega de vuelta a la lista), junto con la acción que lo abrió.
+ *
+ * @param icon Contenido que dibuja el ícono del resultado.
+ * @param title Título del resultado.
+ * @param body Mensaje adicional opcional.
+ * @param modifier Modificador opcional para el contenido del diálogo.
+ */
+@Composable
+fun SmartFoodResultDialog(
+    icon: @Composable () -> Unit,
+    title: String,
+    body: String? = null,
+    modifier: Modifier = Modifier
+) {
+    // Sin cierre propio: atrás y el toque fuera no lo cierran (ver el KDoc); lo quita quien lo muestra.
+    Dialog(onDismissRequest = {}) {
+        SmartFoodResultDialogContent(
+            icon = icon,
+            title = title,
+            body = body,
+            modifier = modifier
+        )
+    }
+}
+
+/** Muestra el contenido de [SmartFoodResultDialog] para reutilizarlo en vistas previas. */
+@Composable
+private fun SmartFoodResultDialogContent(
+    icon: @Composable () -> Unit,
+    title: String,
+    body: String?,
+    modifier: Modifier = Modifier
+) {
+    val spacing = MaterialTheme.spacing
+    val metrics = LocalFormMetrics.current
+    val dialogShape = RoundedCornerShape(spacing.panelRadius)
+
+    Column(
+        modifier = modifier
+            .widthIn(max = 480.dp)
+            .fillMaxWidth()
+            .padding(horizontal = spacing.extraSmall, vertical = spacing.small)
+            .figmaShadow(
+                color = ShadowColorModal,
+                borderRadius = spacing.panelRadius,
+                blurRadius = spacing.extraSmall,
+                offsetY = spacing.extraSmall
+            )
+            .background(MaterialTheme.colorScheme.surfaceVariant, dialogShape)
+            .padding(
+                horizontal = metrics.formHorizontalPadding,
+                vertical = metrics.sectionSpacing
+            )
+            .semantics { liveRegion = LiveRegionMode.Polite },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(spacing.iconDialogSize)
+                .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            icon()
+        }
+
+        Text(
+            text = title,
+            color = MaterialTheme.colorScheme.primary,
+            // Figma 476:3932: título en Poppins Bold de 20 sp.
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+            textAlign = TextAlign.Center
+        )
+
+        body?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.secondary,
+                // Figma 476:3933: cuerpo en Poppins Bold de 15 sp, el tamaño de `bodyLarge`.
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true, backgroundColor = 0xFF556B2F)
 @Composable
 private fun SmartFoodOfflineDialogPreview() {
@@ -157,6 +362,49 @@ private fun SmartFoodOfflineDialogConnectingPreview() {
         SmartFoodOfflineDialogContent(
             isReconnecting = true,
             onReconnect = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SmartFoodConfirmDialogPreview() {
+    SmartfoodTheme {
+        SmartFoodConfirmDialogContent(
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    // Figma 476:3813: el glifo ocupa el 40 % del círculo. Los vectores llegan con el #37 (T027).
+                    modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * 0.4f)
+                )
+            },
+            question = "¿Desea eliminar el producto?",
+            confirmText = "Eliminar",
+            dismissText = "Cancelar",
+            onConfirm = {},
+            onDismiss = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SmartFoodResultDialogPreview() {
+    SmartfoodTheme {
+        SmartFoodResultDialogContent(
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Check,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    // Figma 476:3928: el glifo ocupa el 40 % del círculo. Los vectores llegan con el #37 (T027).
+                    modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * 0.4f)
+                )
+            },
+            title = "Producto Guardado",
+            body = "Te avisaremos antes de que caduque para que no se desperdicie."
         )
     }
 }

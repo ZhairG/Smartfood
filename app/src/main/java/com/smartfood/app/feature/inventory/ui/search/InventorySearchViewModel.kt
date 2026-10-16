@@ -67,11 +67,11 @@ class InventorySearchViewModel @Inject constructor(
     fun onEvent(event: InventorySearchEvent) {
         when (event) {
             is InventorySearchEvent.QueryChanged -> query.value = event.query
-            InventorySearchEvent.ClearQueryClicked -> query.value = ""
+            InventorySearchEvent.ClearQuery -> query.value = ""
             is InventorySearchEvent.CategorySelected -> selectedCategory.value = event.category
             // La tarjeta "Usa tu voz" todavía no escucha: la voz es del #43 (T035).
             InventorySearchEvent.VoiceClicked -> Unit
-            is InventorySearchEvent.ResultClicked -> send(InventorySearchEffect.NavigateToEditor(event.itemId))
+            is InventorySearchEvent.ResultClicked -> send(InventorySearchEffect.NavigateToEditor(event.id))
             InventorySearchEvent.BackClicked -> send(InventorySearchEffect.NavigateBack)
         }
     }

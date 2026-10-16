@@ -1,18 +1,23 @@
 package com.smartfood.app.feature.inventory.data
 
+import com.smartfood.app.feature.inventory.data.local.DataStoreInventoryPreferences
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
 import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
+import com.smartfood.app.feature.inventory.domain.repository.InventoryPreferences
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
 import com.smartfood.app.feature.inventory.domain.repository.SpeechToText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.Clock
+import java.time.ZoneId
 import javax.inject.Inject
 
 /**
@@ -20,7 +25,8 @@ import javax.inject.Inject
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Comprueba que el grafo de Hilt de la app provee los repositorios del inventario con sus
- * implementaciones reales (spec 006, T015 y T021, Issue #69). No usa la red: solo construye el grafo.
+ * implementaciones reales (spec 006, T015 y T021, Issue #69) y el reloj del dominio (T031, Issue #39). No usa la
+ * red: solo construye el grafo.
  */
 @HiltAndroidTest
 class InventoryDataModuleTest {
@@ -39,6 +45,15 @@ class InventoryDataModuleTest {
 
     @Inject
     lateinit var speechToText: SpeechToText
+
+    @Inject
+    lateinit var inventoryPreferences: InventoryPreferences
+
+    @Inject
+    lateinit var clock: Clock
+
+    @Inject
+    lateinit var otroClock: Clock
 
     @Before
     fun inyectar() {
@@ -59,5 +74,16 @@ class InventoryDataModuleTest {
     @Test
     fun t019_reconocimientoDeVozSeInyectaConLaImplementacionDeAndroid() {
         assertTrue(speechToText is AndroidSpeechToText)
+    }
+
+    @Test
+    fun t020_lasPreferenciasDeInventarioSeInyectanSobreElDataStore() {
+        assertTrue(inventoryPreferences is DataStoreInventoryPreferences)
+    }
+
+    @Test
+    fun t031_elRelojDelDominioSeInyectaConLaZonaDelTelefonoYEsUnico() {
+        assertEquals(ZoneId.systemDefault(), clock.zone)
+        assertSame(clock, otroClock)
     }
 }

@@ -4,6 +4,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -21,7 +23,8 @@ import java.time.LocalDate
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas de la pantalla de búsqueda sin estado (spec 006, HU-INV-06, T034). La pantalla recibe un
- * `InventorySearchUiState` construido a mano, así que no hace falta inventario ni voz.
+ * `InventorySearchUiState` construido a mano, así que no hace falta inventario ni voz. Los resultados reutilizan
+ * `InventoryItemRow` y los filtros `CategoryChips` de `ui/components/` (revisión de Zhair).
  */
 class InventorySearchScreenTest {
 
@@ -66,11 +69,12 @@ class InventorySearchScreenTest {
             )
         )
 
-        composeTestRule.onNodeWithContentDescription("Buscar producto.").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Buscar producto…").assertIsDisplayed()
         composeTestRule.onNodeWithText("Usa tu voz").assertIsDisplayed()
         composeTestRule.onNodeWithText("Dicta muchos ingredientes al mismo tiempo").assertIsDisplayed()
         composeTestRule.onNodeWithText("Todos").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Frutas").assertIsDisplayed()
+        // "Frutas" aparece en el filtro y, además, como etiqueta de la categoría del resultado.
+        composeTestRule.onAllNodesWithText("Frutas").onFirst().assertIsDisplayed()
 
         composeTestRule.onNodeWithText("Leche Entera").assertIsDisplayed()
         composeTestRule.onNodeWithText("Vence: 01/09/2026").assertIsDisplayed()
@@ -108,7 +112,7 @@ class InventorySearchScreenTest {
 
         composeTestRule.onNodeWithContentDescription("Limpiar búsqueda").performClick()
 
-        assertEquals(listOf<InventorySearchEvent>(InventorySearchEvent.ClearQueryClicked), eventos)
+        assertEquals(listOf<InventorySearchEvent>(InventorySearchEvent.ClearQuery), eventos)
     }
 
     @Test
@@ -145,8 +149,8 @@ class InventorySearchScreenTest {
             )
         )
 
-        // El estado lleva su nombre visible, además del punto de color (RNF-INV-04).
-        composeTestRule.onNodeWithText("Próximo a vencer").assertIsDisplayed()
+        // La fila reutilizada anuncia el estado en su descripción, además del color (RNF-INV-04).
+        composeTestRule.onNodeWithContentDescription("Próximo a vencer").assertExists()
         composeTestRule.onNodeWithContentDescription("Editar Yogur").assertExists()
 
         composeTestRule.onNodeWithContentDescription("Volver").performClick()
