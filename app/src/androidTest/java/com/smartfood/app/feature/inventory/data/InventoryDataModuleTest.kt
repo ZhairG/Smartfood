@@ -1,9 +1,11 @@
 package com.smartfood.app.feature.inventory.data
 
 import com.smartfood.app.feature.inventory.data.local.DataStoreInventoryPreferences
+import com.smartfood.app.feature.inventory.data.reminder.WorkManagerExpiryReminderScheduler
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
 import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
+import com.smartfood.app.feature.inventory.domain.repository.ExpiryReminderScheduler
 import com.smartfood.app.feature.inventory.domain.repository.InventoryPreferences
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
@@ -25,8 +27,8 @@ import javax.inject.Inject
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Comprueba que el grafo de Hilt de la app provee los repositorios del inventario con sus
- * implementaciones reales (spec 006, T015 y T021, Issue #69) y el reloj del dominio (T031, Issue #39). No usa la
- * red: solo construye el grafo.
+ * implementaciones reales (spec 006, T015 y T021, Issue #69), el reloj del dominio (T031, Issue #39) y el aviso de
+ * vencimiento (T038, Issue #44). No usa la red: solo construye el grafo.
  */
 @HiltAndroidTest
 class InventoryDataModuleTest {
@@ -54,6 +56,12 @@ class InventoryDataModuleTest {
 
     @Inject
     lateinit var otroClock: Clock
+
+    @Inject
+    lateinit var expiryReminderScheduler: ExpiryReminderScheduler
+
+    @Inject
+    lateinit var otroExpiryReminderScheduler: ExpiryReminderScheduler
 
     @Before
     fun inyectar() {
@@ -85,5 +93,11 @@ class InventoryDataModuleTest {
     fun t031_elRelojDelDominioSeInyectaConLaZonaDelTelefonoYEsUnico() {
         assertEquals(ZoneId.systemDefault(), clock.zone)
         assertSame(clock, otroClock)
+    }
+
+    @Test
+    fun t038_elAvisoDeVencimientoSeInyectaConWorkManagerYEsUnico() {
+        assertTrue(expiryReminderScheduler is WorkManagerExpiryReminderScheduler)
+        assertSame(expiryReminderScheduler, otroExpiryReminderScheduler)
     }
 }

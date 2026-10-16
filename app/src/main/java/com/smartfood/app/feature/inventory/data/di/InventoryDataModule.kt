@@ -1,7 +1,7 @@
 package com.smartfood.app.feature.inventory.data.di
 
 import com.smartfood.app.feature.inventory.data.local.DataStoreInventoryPreferences
-import com.smartfood.app.feature.inventory.data.reminder.NoOpExpiryReminderScheduler
+import com.smartfood.app.feature.inventory.data.reminder.WorkManagerExpiryReminderScheduler
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
 import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
@@ -23,9 +23,9 @@ import javax.inject.Singleton
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Enlaza los contratos del dominio del inventario con sus implementaciones de la capa de datos. Cada
- * Issue enlaza aquí la implementación que crea (spec 006, `tasks.md`): Firestore y fotos (#69), voz (#32) y
- * preferencias (#33). El aviso de vencimiento usa una implementación vacía hasta T038 (WorkManager). El reloj del
- * teléfono, que solo usa el dominio del inventario, lo provee este mismo módulo (T031, #39).
+ * Issue enlaza aquí la implementación que crea (spec 006, `tasks.md`): Firestore y fotos (#69), voz (#32),
+ * preferencias (#33) y avisos (#44). El reloj del teléfono, que solo usa el dominio del inventario, lo provee este
+ * mismo módulo (T031, #39).
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -51,10 +51,12 @@ abstract class InventoryDataModule {
     @Singleton
     abstract fun bindInventoryPreferences(impl: DataStoreInventoryPreferences): InventoryPreferences
 
-    /** Temporal hasta T038: sin avisos reales, cerrar sesión no tiene nada que cancelar. */
+    /** Aviso diario de vencimiento sobre WorkManager (CA-INV-08-01, T038). */
     @Binds
     @Singleton
-    abstract fun bindExpiryReminderScheduler(impl: NoOpExpiryReminderScheduler): ExpiryReminderScheduler
+    abstract fun bindExpiryReminderScheduler(
+        impl: WorkManagerExpiryReminderScheduler
+    ): ExpiryReminderScheduler
 
     companion object {
 

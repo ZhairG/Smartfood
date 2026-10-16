@@ -130,4 +130,13 @@
     <string name="editor_photo_removed">Imagen eliminada</string>
     <string name="editor_confirm">Eliminar</string>
     <string name="editor_cancel">Cancelar</string>
+
+    <!-- Aviso de vencimiento (HU-INV-08, plan §6). Es una notificación del sistema, no una pantalla. -->
+    <string name="notification_channel_expiry_name">Vencimientos</string>
+    <string name="notification_channel_expiry_description">Avisos de los productos que están por vencer</string>
+    <string name="notification_expiry_title">Productos por vencer</string>
+    <plurals name="notification_expiry_body">
+        <item quantity="one">«%1$s» vence pronto</item>
+        <item quantity="other">«%1$s» y %2$d productos más vencen pronto</item>
+    </plurals>
 </resources>

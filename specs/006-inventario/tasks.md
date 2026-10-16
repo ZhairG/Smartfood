@@ -67,9 +67,9 @@
 - [x] T054 Editor adaptable: botón fijo abajo con el aviso "⚠ Los campos no pueden estar vacíos" (CA-INV-02-02), medidas sin el inset del teclado y pruebas reales con adb en 360×640, 360×804, 412×917 dp y fuente al 130 % (RNF-INV-06). Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `AdaptiveLayoutTest.t036_*`, M (capturas de adb). → #40
 
 ## Fase 6: Avisos
-- [ ] T037 `ExpiryNotifier` (canal, plurales y `PendingIntent`) y `ExpiryReminderWorker` (`@HiltWorker`) (CA-INV-08-01 a 08-04). → #44
-- [ ] T038 `WorkManagerExpiryReminderScheduler` (próxima 9:00, `UPDATE`). `SmartfoodApp` como `Configuration.Provider`, sin el inicializador por defecto (desde el #71 lo hace la T048; si ya está, no se repite). `SplashViewModel` reprograma los avisos con sesión activa. Reemplaza el enlace a `NoOpExpiryReminderScheduler` en `InventoryDataModule` y borra esa clase. → #44
-- [ ] T039 Permiso `POST_NOTIFICATIONS` después del primer guardado, pedido una sola vez (CA-INV-08-05). → #44
+- [x] T037 `ExpiryNotifier` (canal, plurales y `PendingIntent`) y `ExpiryReminderWorker` (`@HiltWorker`) (CA-INV-08-01 a 08-04). → #44
+- [x] T038 `WorkManagerExpiryReminderScheduler` (próxima 9:00, `UPDATE`). `SmartfoodApp` como `Configuration.Provider`, sin el inicializador por defecto (lo hace esta tarea: `ExpiryReminderWorker` es `@HiltWorker`, decisión del 16/10/2026; la T048 ya lo encuentra hecho). `work-testing` en `libs.versions.toml` y `app/build.gradle.kts` para la prueba del worker (autorizado en el #44). `SplashViewModel` reprograma los avisos con sesión activa. Reemplaza el enlace a `NoOpExpiryReminderScheduler` en `InventoryDataModule` y borra esa clase. → #44
+- [x] T039 Permiso `POST_NOTIFICATIONS` después del primer guardado, pedido una sola vez (CA-INV-08-05). → #44
 
 ## Fase 7: Cierre
 - [ ] T040 `proguard-rules.pro` revisado y `assembleRelease` compilado (Coil, WorkManager). → #45
@@ -85,7 +85,7 @@
 - [x] T045 Spec, plan y tareas del uso sin conexión: §7, RNF-INV-05, CA-INV-02-07, 04-02, 05-02, 05-04 a 05-06, HU-INV-10, RF-INV-09 y ADR-INV-09. → #71
 - [ ] T046 Dominio: `WriteOutcome`, `SavedItem`, `isPendingSync` y `localPhotoPath` en `InventoryItem`; `InventoryRepository` con `createItem`, `updateItem`, `setPhoto` y `hasPendingWrites`; la interfaz `PhotoSync`; los casos de uso de agregar, editar, eliminar y observar sin subir fotos, `HasPendingChangesUseCase` y `LogoutUseCase` con `clearAll()`. Fakes: `FakeInventoryRepository` actualizado y `FakePhotoSync`. Pruebas U que citan CA-INV-10-xx (plan §2 y §13).
 - [ ] T047 [P] `FirestoreInventoryRepository` sin transacciones: `set`/`update`/`delete` con espera de 3 s → `WriteOutcome`, `MetadataChanges.INCLUDE` → `isPendingSync`, `setPhoto` y `hasPendingWrites` (plan §3). Las reglas no cambian. Pruebas: U `InventoryDocumentTest`, I `FirestoreInventoryRepositoryEmulatorTest` con `disableNetwork()` (CA-INV-10-02, 10-05).
-- [ ] T048 [P] `PendingPhotoStore`, `PhotoUploadWorker`, `PhotoDeleteWorker` y `WorkManagerPhotoSync` (`@HiltWorker`), con su `@Binds` en `InventoryDataModule`. `SmartfoodApp` como `Configuration.Provider` y sin el inicializador del manifiesto (sale de la T038). `work-testing` en `libs.versions.toml` y `app/build.gradle.kts`. Pruebas I de los workers (CA-INV-05-05, 05-06, 10-03, 10-04).
+- [ ] T048 [P] `PendingPhotoStore`, `PhotoUploadWorker`, `PhotoDeleteWorker` y `WorkManagerPhotoSync` (`@HiltWorker`), con su `@Binds` en `InventoryDataModule`. `SmartfoodApp` como `Configuration.Provider` y sin el inicializador del manifiesto (sale de la T038, #44). `work-testing` ya está declarado desde la T038. Pruebas I de los workers (CA-INV-05-05, 05-06, 10-03, 10-04).
 - [ ] T049 Lista: ícono de pendiente y foto local en `InventoryItemRow`, con la descripción "Pendiente de sincronizar" (CA-INV-10-02, 10-04, 10-06). Va después del #39. Pruebas: I `InventoryScreenTest`.
 - [ ] T050 Editor: diálogo "Guardado en tu teléfono" con `WriteOutcome.PENDING` y la foto local en `PhotoSlot` (CA-INV-10-02, 10-04). Salió del #40 el 16/10: se hace después de la entrega, con el resto de la fase 8. Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`.
 - [ ] T051 Perfil: aviso al cerrar sesión con cambios pendientes, con `SmartFoodConfirmDialog` (CA-INV-10-07). Pruebas: U `ProfileViewModelTest`, I `ProfileScreenTest`.
@@ -147,12 +147,12 @@ verificación manual (checklist).
 | CA-INV-07-07 | U `InventorySearchViewModelTest` (cancela la recolección del fake) |
 | CA-INV-07-08 | U `AndroidSpeechToTextTest`, U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
 | CA-INV-07-09 | U `InventorySearchViewModelTest` |
-| CA-INV-08-01 | U `GetExpiringItemsUseCaseTest`, U `AddItemUseCaseTest` (programa el aviso), M 8 |
-| CA-INV-08-02 | U `GetExpiringItemsUseCaseTest`, M 8 |
-| CA-INV-08-03 | U `GetExpiringItemsUseCaseTest` |
-| CA-INV-08-04 | M 8 |
+| CA-INV-08-01 | U `GetExpiringItemsUseCaseTest`, U `AddItemUseCaseTest` (programa el aviso), U `WorkManagerExpiryReminderSchedulerTest` (próxima 9:00), U `SplashViewModelTest` (reprograma el aviso), I `ExpiryReminderWorkerTest` (publica el aviso), M 8 |
+| CA-INV-08-02 | U `GetExpiringItemsUseCaseTest`, I `ExpiryReminderWorkerTest` (nombra el más próximo), M 8 |
+| CA-INV-08-03 | U `GetExpiringItemsUseCaseTest`, I `ExpiryReminderWorkerTest` (sin productos por vencer no publica) |
+| CA-INV-08-04 | I `ExpiryReminderWorkerTest` (la notificación abre la app), M 8 |
 | CA-INV-08-05 | U `DataStoreInventoryPreferencesTest`, U `ProductEditorViewModelTest`, I `InventoryDataModuleTest`, M 8 |
-| CA-INV-08-06 | U `LogoutUseCaseTest` |
+| CA-INV-08-06 | U `SessionUseCasesTest` (cerrar sesión cancela los avisos), U `SplashViewModelTest` (sin sesión no reprograma), I `InventoryDataModuleTest` |
 | CA-INV-09-01 | I `MainNavigationTest` |
 | CA-INV-09-02 | I `MainNavigationTest`, I `SmartFoodNavigationTest` |
 | CA-INV-09-03 | I `MainNavigationTest`, U `ProfileViewModelTest`, I `ProfileScreenTest` |
