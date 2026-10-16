@@ -35,7 +35,7 @@
 - [x] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). Pruebas: U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (con `-PuseFirebaseEmulator=true`). → #31
 - [x] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5), y su `@Binds` en `InventoryDataModule`. Pruebas: U `AndroidSpeechToTextTest`, I `InventoryDataModuleTest`. → #32
 - [x] T020 [P] `InventoryPreferences` sobre el DataStore existente, y su `@Binds` en `InventoryDataModule`. Pruebas: U `DataStoreInventoryPreferencesTest`, I `InventoryDataModuleTest`. → #33
-- [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. Cada implementación se enlaza en su Issue: Firestore y fotos → #69 (hecho; I `InventoryDataModuleTest`), voz → #32, preferencias → #33. Se marca cuando las tres estén enlazadas.
+- [x] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. Cada implementación se enlazó en su Issue: Firestore y fotos → #69, voz → #32 y preferencias → #33, las tres enlazadas. Prueba: I `InventoryDataModuleTest`.
 - [x] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). Pruebas: R `rules-test/` (Firestore y Storage), I `FirestoreInventoryRepositoryEmulatorTest` (de punta a punta con `-PuseFirebaseEmulator=true`). → #34
 
 ## Fase 3: Design system
