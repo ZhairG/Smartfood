@@ -202,10 +202,11 @@ private fun ItemThumbnail(
 }
 
 /**
- * Etiqueta verde con la categoría del producto y, si tiene, su cantidad (CA-INV-01-02 y CA-INV-01-08).
+ * Etiqueta verde con la categoría del producto y, si tiene, su cantidad (CA-INV-01-02 y CA-INV-01-08). También la
+ * usan los resultados de la búsqueda (`SearchResultRow`).
  */
 @Composable
-private fun CategoryLabel(item: InventoryItem) {
+internal fun CategoryLabel(item: InventoryItem) {
     val category = stringResource(id = item.category.titleRes)
     val quantityText = item.quantity?.let { quantity ->
         stringResource(

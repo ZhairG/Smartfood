@@ -241,6 +241,10 @@ Desviaciones aprobadas por el equipo:
 - **Fila opcional "Cantidad"** debajo de "Seleccionar categoría" (campo numérico más selector de unidad), y la
   cantidad en la fila de la lista junto a la etiqueta de categoría. El Figma no tiene estos elementos; se ajustan
   cuando exista un frame (T002).
+- **Pantallas internas sin barra inferior** (CA-INV-09-04): los frames del editor (`476:3664`, `476:3689`) y de la
+  búsqueda (`476:3190`) muestran la barra inferior, pero son pantallas internas y no la llevan (#40). La búsqueda y
+  el aviso de voz se ajustaron al Figma el 16/10: barra en píldora, tarjeta de voz con borde verde, filtros redondos,
+  resultados sin miniatura ni lápiz y ecualizador naranja.
 - **Uso sin conexión** (HU-INV-10, #71): el Figma no tiene el ícono de pendiente ni el aviso de guardado en el
   teléfono. La fila usa el ícono `CloudUpload` de Material en gris, y el aviso usa `SmartFoodResultDialog`, el mismo
   de "Producto Guardado". Se ajustan cuando exista un frame.

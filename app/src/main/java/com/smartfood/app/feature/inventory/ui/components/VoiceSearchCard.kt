@@ -8,6 +8,7 @@
  */
 package com.smartfood.app.feature.inventory.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,10 +48,11 @@ fun VoiceSearchCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = MaterialTheme.spacing.small)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(MaterialTheme.spacing.inputRadius),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+        // Figma 476:3190: tarjeta blanca con borde verde y esquinas de 20 px.
+        shape = RoundedCornerShape(CardRadius),
+        border = BorderStroke(CardBorder, MaterialTheme.colorScheme.primary),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(
             modifier = Modifier
@@ -61,14 +63,15 @@ fun VoiceSearchCard(
         ) {
             Text(
                 text = stringResource(id = R.string.search_voice_card_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = stringResource(id = R.string.search_voice_card_subtitle),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center
             )
             FilledIconButton(
@@ -92,3 +95,5 @@ fun VoiceSearchCard(
 // Medidas del Figma (`476:3190`): el micrófono es un círculo de 60 px centrado en la tarjeta. No son medidas de
 // formulario, así que no van en FormMetrics.
 private val MicButtonSize = 60.dp
+private val CardRadius = 20.dp
+private val CardBorder = 1.dp
