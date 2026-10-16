@@ -1,10 +1,12 @@
 package com.smartfood.app.feature.inventory.data.di
 
+import com.smartfood.app.feature.inventory.data.local.DataStoreInventoryPreferences
 import com.smartfood.app.feature.inventory.data.reminder.NoOpExpiryReminderScheduler
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
 import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
 import com.smartfood.app.feature.inventory.domain.repository.ExpiryReminderScheduler
+import com.smartfood.app.feature.inventory.domain.repository.InventoryPreferences
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
 import com.smartfood.app.feature.inventory.domain.repository.SpeechToText
@@ -40,6 +42,11 @@ abstract class InventoryDataModule {
     @Binds
     @Singleton
     abstract fun bindSpeechToText(impl: AndroidSpeechToText): SpeechToText
+
+    /** Preferencias locales del inventario sobre el DataStore existente (CA-INV-08-05, T020). */
+    @Binds
+    @Singleton
+    abstract fun bindInventoryPreferences(impl: DataStoreInventoryPreferences): InventoryPreferences
 
     /** Temporal hasta T038: sin avisos reales, cerrar sesión no tiene nada que cancelar. */
     @Binds

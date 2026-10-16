@@ -34,7 +34,7 @@
 - [x] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). Guardar y borrar con transacción (RNF-INV-05). Prueba: U `InventoryDocumentTest`; de punta a punta con las reglas en T022. → #30
 - [x] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). Pruebas: U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (con `-PuseFirebaseEmulator=true`). → #31
 - [x] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5), y su `@Binds` en `InventoryDataModule`. Pruebas: U `AndroidSpeechToTextTest`, I `InventoryDataModuleTest`. → #32
-- [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente, y su `@Binds` en `InventoryDataModule`. → #33
+- [x] T020 [P] `InventoryPreferences` sobre el DataStore existente, y su `@Binds` en `InventoryDataModule`. Pruebas: U `DataStoreInventoryPreferencesTest`, I `InventoryDataModuleTest`. → #33
 - [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. Cada implementación se enlaza en su Issue: Firestore y fotos → #69 (hecho; I `InventoryDataModuleTest`), voz → #32, preferencias → #33. Se marca cuando las tres estén enlazadas.
 - [x] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). Pruebas: R `rules-test/` (Firestore y Storage), I `FirestoreInventoryRepositoryEmulatorTest` (de punta a punta con `-PuseFirebaseEmulator=true`). → #34
 
@@ -132,7 +132,7 @@ verificación manual (checklist).
 | CA-INV-08-02 | U `GetExpiringItemsUseCaseTest`, M 8 |
 | CA-INV-08-03 | U `GetExpiringItemsUseCaseTest` |
 | CA-INV-08-04 | M 8 |
-| CA-INV-08-05 | U `ProductEditorViewModelTest`, M 8 |
+| CA-INV-08-05 | U `DataStoreInventoryPreferencesTest`, U `ProductEditorViewModelTest`, I `InventoryDataModuleTest`, M 8 |
 | CA-INV-08-06 | U `LogoutUseCaseTest` |
 | CA-INV-09-01 | I `MainNavigationTest` |
 | CA-INV-09-02 | I `MainNavigationTest`, I `SmartFoodNavigationTest` |
