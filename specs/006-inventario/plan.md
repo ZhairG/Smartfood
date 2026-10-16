@@ -347,8 +347,9 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 - **`SmartfoodApp`:**
   - implementa `Configuration.Provider` con `HiltWorkerFactory`;
   - en el manifiesto se quita `androidx.work.WorkManagerInitializer` del `InitializationProvider`.
-  - Desde el #71 esto lo hace la **T048** (workers de fotos), que llega antes que los avisos; la T038 ya lo
-    encuentra hecho.
+  - Lo hace la **T038 (#44)**, no la T048: `ExpiryReminderWorker` es `@HiltWorker` y sin el `HiltWorkerFactory`
+    WorkManager no puede instanciarlo. El aviso del #71 que lo movía a la T048 se corrige porque la T048 llega
+    después de los avisos, no antes (decisión del 16/10/2026).
 
 ## 7. Navegación
 
