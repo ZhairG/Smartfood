@@ -74,7 +74,7 @@ tengo.
 | CA-INV-02-03 | **Dado** el nombre, **cuando** tiene solo espacios o más de 50 caracteres, **entonces** el campo se marca en rojo con su mensaje y no se guarda. Los espacios al inicio y al final se ignoran. |
 | CA-INV-02-04 | **Dado** "Fecha de vencimiento", **cuando** la toco, **entonces** elijo la fecha en un calendario que no permite días anteriores a hoy. |
 | CA-INV-02-05 | **Dado** "Seleccionar categoría", **cuando** la toco, **entonces** aparece la hoja "Seleccione una categoría" con las seis categorías; "Guardar" aplica la elegida y "Cancelar" deja la anterior. |
-| CA-INV-02-06 | **Dado** un formulario válido, **cuando** toco "Añadir al Inventario", **entonces** veo "Producto Guardado: Te avisaremos antes de que caduque para que no se desperdicie." y regreso a "Mi Inventario" con el producto en su sección. |
+| CA-INV-02-06 | **Dado** un formulario válido, **cuando** toco "Añadir al Inventario", **entonces** regreso a "Mi Inventario" con el producto en su sección y, encima de la lista, veo "Producto Guardado: Te avisaremos antes de que caduque para que no se desperdicie." (Figma `476:3851`). |
 | CA-INV-02-07 | **Dado** que el guardado falla por un motivo distinto de la conexión (por ejemplo, el servidor lo rechaza), **entonces** veo un mensaje de error, el formulario conserva lo que escribí y puedo reintentar. Sin conexión no hay error: se guarda en el teléfono (CA-INV-10-02). |
 | CA-INV-02-08 | **Dado** el formulario, **entonces** el campo "Cantidad" es opcional y no cambia el estado del botón "Añadir al Inventario" (CA-INV-02-02). **Cuando** escribo una cantidad, **entonces** la unidad empieza en "unidades" y puedo cambiarla por g, kg, lb, ml o L; si dejo la cantidad vacía, el producto se guarda sin cantidad ni unidad. |
 | CA-INV-02-09 | **Dado** el campo "Cantidad", **cuando** escribo un valor que no es un número, que es 0 o menor, mayor que 9999 o con más de 2 decimales, **entonces** el campo se marca en rojo con su mensaje y no se guarda. |
@@ -87,7 +87,7 @@ tengo.
 | Código | Criterio |
 |---|---|
 | CA-INV-03-01 | **Dado** un producto de la lista, **cuando** toco su lápiz, **entonces** se abre "Editar Producto" con su foto, nombre, fecha, categoría y cantidad (si tiene) cargados. |
-| CA-INV-03-02 | **Dado** "Editar Producto", **cuando** toco "Guardar" en la barra superior con datos válidos, **entonces** veo "Guardado: «Carne» se actualizó" y regreso a la lista con el cambio. |
+| CA-INV-03-02 | **Dado** "Editar Producto", **cuando** toco "Guardar" en la barra superior con datos válidos, **entonces** regreso a la lista con el cambio y, encima, veo "Guardado: «Carne» se actualizó". |
 | CA-INV-03-03 | **Dado** "Editar Producto", **entonces** se aplican las mismas validaciones del alta (CA-INV-02-02, 02-03 y 02-09), salvo que se puede conservar una fecha ya vencida; solo una fecha **nueva** no puede ser anterior a hoy. |
 | CA-INV-03-04 | **Dado** que cambié datos, **cuando** vuelvo atrás sin tocar "Guardar", **entonces** el producto queda como estaba. |
 
@@ -97,7 +97,7 @@ tengo.
 | Código | Criterio |
 |---|---|
 | CA-INV-04-01 | **Dado** "Editar Producto", **cuando** toco "Eliminar", **entonces** aparece "¿Desea eliminar el producto?" con "Eliminar" y "Cancelar". |
-| CA-INV-04-02 | **Dado** la confirmación, **cuando** toco "Eliminar", **entonces** veo "Producto eliminado", regreso a la lista y el producto ya no está; si tenía foto, la foto también se borra de la nube (en ese momento o cuando vuelva la conexión, CA-INV-10-03). |
+| CA-INV-04-02 | **Dado** la confirmación, **cuando** toco "Eliminar", **entonces** regreso a la lista, el producto ya no está y, encima, veo "Producto eliminado: El producto ha sido eliminado exitosamente."; si tenía foto, la foto también se borra de la nube (en ese momento o cuando vuelva la conexión, CA-INV-10-03). |
 | CA-INV-04-03 | **Dado** la confirmación, **cuando** toco "Cancelar", **entonces** sigo en "Editar Producto" sin cambios. |
 
 ### HU-INV-05: Foto del producto
@@ -108,7 +108,7 @@ tengo.
 | CA-INV-05-01 | **Dado** el formulario de un producto, **cuando** toco el botón de cámara, **entonces** se abre el visor de la app con un recuadro de encuadre y el botón de captura. |
 | CA-INV-05-02 | **Dado** el visor, **cuando** capturo, **entonces** vuelvo al formulario con la foto en la zona de imagen; se guarda con el producto al tocar "Añadir al Inventario" o "Guardar", y se sube a la nube en segundo plano (CA-INV-10-04). |
 | CA-INV-05-03 | **Dado** que es la primera vez que uso la cámara, **entonces** la app me pide permiso; **si** lo niego, **entonces** veo un mensaje que explica para qué se usa, con un acceso a los ajustes del teléfono, y puedo guardar el producto sin foto. |
-| CA-INV-05-04 | **Dado** un producto con foto, **cuando** toco la papelera de la zona de imagen, **entonces** aparece "¿Desea eliminar la imagen?"; al confirmar veo "Imagen eliminada" y la zona queda vacía. En la edición, la foto se borra de la nube al guardar (o cuando vuelva la conexión). |
+| CA-INV-05-04 | **Dado** un producto con foto, **cuando** toco la papelera de la zona de imagen, **entonces** aparece "¿Desea eliminar la imagen?"; al confirmar veo "Imagen Eliminada: La imagen ha sido eliminada exitosamente." (Figma `476:3960`) y la zona queda vacía. En la edición, la foto se borra de la nube al guardar (o cuando vuelva la conexión). |
 | CA-INV-05-05 | **Dado** un producto con foto, **cuando** tomo otra, **entonces** la nueva la reemplaza y la anterior se borra de la nube después de que la nueva se sube. |
 | CA-INV-05-06 | **Dado** que la foto no se pudo subir, **entonces** el producto queda guardado con la foto del teléfono, marcado como pendiente de sincronizar, y la subida se reintenta sola; nunca queda un producto con una foto rota. **Si** el archivo no se puede leer, **entonces** el producto queda sin foto. |
 
@@ -133,7 +133,7 @@ tengo.
 |---|---|
 | CA-INV-07-01 | **Dado** la búsqueda, **cuando** toco el micrófono de "Usa tu voz — Dicta muchos ingredientes al mismo tiempo", **entonces** aparece sobre la pantalla el aviso "Habla ahora" con la animación de ondas. |
 | CA-INV-07-02 | **Dado** que dicté, **mientras** se procesa, **entonces** el aviso muestra "…". |
-| CA-INV-07-03 | **Dado** que dije "carne, pollo y leche", **entonces** el aviso se cierra, la barra muestra "carne, pollo, leche" y veo los productos que coinciden con cualquiera de los tres (CA-INV-06-05). Los separadores reconocidos son las pausas, las comas, "y" y "e". |
+| CA-INV-07-03 | **Dado** que dije "carne, pollo y leche", **entonces** el aviso muestra un momento lo que entendió ("Carne Pollo Leche", con las ondas), se cierra, la barra muestra "carne, pollo, leche" y veo los productos que coinciden con cualquiera de los tres (CA-INV-06-05). Los separadores reconocidos son las pausas, las comas, "y" y "e". |
 | CA-INV-07-04 | **Dado** un término en plural simple ("tomates", "limones"), **entonces** también coincide con el singular (Tomate, Limón). |
 | CA-INV-07-05 | **Dado** que no se entendió nada, **entonces** el aviso muestra "No se entendió. Reinténtalo" con el botón "Reintentar", que vuelve a escuchar. |
 | CA-INV-07-06 | **Dado** que es la primera vez, **entonces** se me pide permiso de micrófono; **si** lo niego, **entonces** veo un mensaje que explica para qué se usa, con un acceso a los ajustes, y la búsqueda por texto sigue funcionando. |
@@ -159,9 +159,9 @@ tengo.
 | Código | Criterio |
 |---|---|
 | CA-INV-09-01 | **Dado** que inicio sesión o abro la app con sesión activa, **entonces** llego a "Mi Inventario". |
-| CA-INV-09-02 | **Dado** "Mi Inventario" o "Perfil", **entonces** veo la barra inferior con "Inventario" y "Perfil", con la pestaña actual resaltada; tocar una pestaña cambia de pantalla sin apilar. |
+| CA-INV-09-02 | **Dado** "Mi Inventario" o "Perfil", **entonces** veo la barra inferior del Figma (`476:4176`) con "Inventario", "Recetas", "Guardadas" y "Perfil", con la pestaña actual resaltada; tocar Inventario o Perfil cambia de pantalla sin apilar. Recetas y Guardadas se ven deshabilitadas hasta que exista el agente de recetas. |
 | CA-INV-09-03 | **Dado** "Perfil", **entonces** veo el saludo con mi nombre y el botón "Cerrar sesión" (CA-05-01 a CA-05-03 siguen vigentes en esta pestaña). |
-| CA-INV-09-04 | **Dado** una pantalla interna (búsqueda, añadir, editar o cámara), **entonces** se abre con la transición de empuje, tiene la flecha atrás y no muestra la barra inferior. |
+| CA-INV-09-04 | **Dado** una pantalla interna (búsqueda, añadir, editar o cámara), **entonces** se abre con la transición de empuje y tiene la flecha atrás. La búsqueda y el editor muestran la barra inferior con Inventario resaltado, como el Figma; la cámara se ve a pantalla completa. |
 | CA-INV-09-05 | **Dado** "Mi Inventario", **cuando** uso "atrás" del sistema, **entonces** la app se cierra (no vuelve a la pantalla de carga ni al inicio de sesión). |
 
 ### HU-INV-10: Usar el inventario sin conexión
@@ -234,20 +234,17 @@ comprueba que el acceso al archivo funciona leyendo uno de estos frames. Si no f
 hasta configurarlo (ver `AGENTS.md`, "Implementar diseños de Figma").
 
 Desviaciones aprobadas por el equipo:
-- **Barra inferior de 2 pestañas** (Inventario y Perfil), tomada de la sección "Natalia" del Figma, porque Recetas y
-  Guardadas todavía no existen.
+- **Barra inferior de 4 pestañas** (16/10, T055): se volvió al Figma (`476:4176`). Recetas y Guardadas se ven
+  deshabilitadas porque todavía no existen.
 - **Botón "Añadir al Inventario" habilitado en naranja** (sección "Natalia"); los frames principales solo lo muestran
   deshabilitado.
-- **Campos con borde** del design system en lugar de la línea inferior del Figma, por consistencia con
-  autenticación y la adaptabilidad de la spec 002. Se conserva el ícono a la izquierda de cada campo, gris y con
-  el tamaño y la separación del Figma. El texto de los campos usa el mismo tamaño que en autenticación, no el más
-  pequeño del Figma de inventario (#62).
+- **Campos del editor con línea inferior** (16/10, T055): se volvió al Figma (`476:4106` y `476:4197`), sin la caja
+  con borde de autenticación; queda sin efecto el ADR-INV-07. Los campos de autenticación no cambian.
 - **Fila opcional "Cantidad"** debajo de "Seleccionar categoría" (campo numérico más selector de unidad), y la
   cantidad en la fila de la lista junto a la etiqueta de categoría. El Figma no tiene estos elementos; se ajustan
   cuando exista un frame (T002).
-- **Pantallas internas sin barra inferior** (CA-INV-09-04): los frames del editor (`476:3664`, `476:3689`) y de la
-  búsqueda (`476:3190`) muestran la barra inferior, pero son pantallas internas y no la llevan (#40). La búsqueda y
-  el aviso de voz se ajustaron al Figma el 16/10: barra en píldora, tarjeta de voz con borde verde, filtros redondos,
+- **Barra inferior en la búsqueda y el editor** (16/10, T055): como el Figma (`476:3664`, `476:3689` y `476:3190`).
+  La búsqueda y el aviso de voz se ajustaron al Figma el 16/10: barra en píldora, tarjeta de voz con borde verde, filtros redondos,
   resultados sin miniatura ni lápiz y ecualizador naranja.
 - **Perfil del Figma** (`306:369`, 16/10): encabezado con iniciales, nombre y correo; tres tarjetas de cifras; las
   opciones de la cuenta y "Cerrar Sesión". Por ahora solo "Cerrar Sesión" funciona: las opciones y la cámara del
@@ -255,9 +252,10 @@ Desviaciones aprobadas por el equipo:
   0 y "Ahorrados este mes", "—"). Las medidas del Figma se escalan al ancho del teléfono (spec 002).
 - **Editor y lista ajustados al Figma** (16/10): fondo verde claro, zona de foto con la papelera siempre visible (gris
   sin foto, roja con foto), lápiz de contorno y espacios entre filas y secciones del Figma.
-- **Editor con botón fijo abajo** (16/10, RNF-INV-06): con el precio, el formulario ya no cabe en pantallas
-  pequeñas. Los campos se desplazan y el botón "Añadir al Inventario" / "Eliminar", con el aviso de error encima,
-  queda fijo abajo y sobre el teclado. El Figma lo pone dentro del formulario.
+- **Botón del editor dentro del formulario** (16/10, T055): como el Figma, debajo de los campos y con el aviso de
+  error encima. En pantallas pequeñas se alcanza desplazando (RNF-INV-06).
+- **Fondo desenfocado** de los diálogos y del aviso de voz (Figma `476:3851`, `476:4021` y `476:4507`): con API 31+
+  se desenfoca lo de atrás; en API 24 a 30 se usa un velo claro.
 - **Uso sin conexión** (HU-INV-10, #71): el Figma no tiene el ícono de pendiente ni el aviso de guardado en el
   teléfono. La fila usa el ícono `CloudUpload` de Material en gris, y el aviso usa `SmartFoodResultDialog`, el mismo
   de "Producto Guardado". Se ajustan cuando exista un frame.
