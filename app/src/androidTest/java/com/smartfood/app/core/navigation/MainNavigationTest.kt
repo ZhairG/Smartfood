@@ -103,6 +103,34 @@ class MainNavigationTest {
     }
 
     @Test
+    fun caInv0904_tocarInventarioEnLaBusquedaVuelveALaLista() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.InventorySearch) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Inventario").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.Inventory>() == true)
+        composeTestRule.onNodeWithText("Mi Inventario").assertIsDisplayed()
+    }
+
+    @Test
+    fun caInv0904_tocarInventarioEnElEditorVuelveALaLista() {
+        composeTestRule.runOnUiThread {
+            navController.navigate(Route.InventorySearch)
+            navController.navigate(Route.ProductEditor(null))
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Inventario").performClick()
+        composeTestRule.waitForIdle()
+
+        // Pasa por el descarte de "atrás" y llega a la lista, no a la búsqueda de la que vino.
+        assertTrue(navController.currentDestination?.hasRoute<Route.Inventory>() == true)
+        composeTestRule.onNodeWithText("Mi Inventario").assertIsDisplayed()
+    }
+
+    @Test
     fun caInv0905_enMiInventarioNoHayNadaDebajo_atrasCierraLaApp() {
         composeTestRule.onNodeWithText("Mi Inventario").assertIsDisplayed()
 

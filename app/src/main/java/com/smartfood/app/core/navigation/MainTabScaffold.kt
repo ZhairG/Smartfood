@@ -39,6 +39,8 @@ enum class MainTab(val enabled: Boolean = true) { INVENTORY, RECIPES(enabled = f
  *
  * @param currentTab Pestaña que se está mostrando (resaltada en la barra).
  * @param onTabSelected Acción al tocar una pestaña.
+ * @param onCurrentTabReselected Acción al volver a tocar la pestaña resaltada desde una pantalla interna: vuelve a la
+ * pantalla principal de la pestaña (CA-INV-09-04). En las pantallas de pestaña no hace nada.
  * @param content Contenido de la pestaña. Recibe el margen de la barra ya marcado como consumido, así que su propio
  * `windowInsetsPadding(systemBars)` no suma dos veces la barra de navegación.
  */
@@ -46,6 +48,7 @@ enum class MainTab(val enabled: Boolean = true) { INVENTORY, RECIPES(enabled = f
 fun MainTabScaffold(
     currentTab: MainTab,
     onTabSelected: (MainTab) -> Unit,
+    onCurrentTabReselected: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     val labels = mapOf(
@@ -64,7 +67,7 @@ fun MainTabScaffold(
                         label = labels.getValue(tab),
                         icon = tab.icon,
                         selected = tab == currentTab,
-                        onClick = { if (tab != currentTab) onTabSelected(tab) },
+                        onClick = { if (tab != currentTab) onTabSelected(tab) else onCurrentTabReselected() },
                         enabled = tab.enabled
                     )
                 }

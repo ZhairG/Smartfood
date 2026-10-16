@@ -1,6 +1,10 @@
 package com.smartfood.app.feature.inventory.ui
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -56,8 +60,13 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
         }
     }
     // La búsqueda y el editor muestran la barra inferior con Inventario resaltado, como el Figma (CA-INV-09-04, T055).
+    // Volver a tocar "Inventario" desde ellas regresa a la lista.
     composable<Route.InventorySearch> { entry ->
-        MainTabScaffold(currentTab = MainTab.INVENTORY, onTabSelected = navController::navigateToTab) {
+        MainTabScaffold(
+            currentTab = MainTab.INVENTORY,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Inventory>(inclusive = false) }
+        ) {
             InventorySearchRoute(
                 onNavigateToEditor = { id -> navController.navigate(Route.ProductEditor(id)) },
                 onBack = { navController.popBackStack() }
@@ -66,11 +75,27 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
         }
     }
     composable<Route.ProductEditor> { entry ->
-        MainTabScaffold(currentTab = MainTab.INVENTORY, onTabSelected = navController::navigateToTab) {
+        // Desde el editor pasa por el mismo descarte de "atrás" (borra la foto sin guardar) y vuelve a la lista.
+        val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+        var leaveToList by remember { mutableStateOf(false) }
+        MainTabScaffold(
+            currentTab = MainTab.INVENTORY,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = {
+                leaveToList = true
+                backDispatcher?.onBackPressed()
+            }
+        ) {
             ProductEditorRoute(
                 savedStateHandle = entry.savedStateHandle,
                 onNavigateToCamera = { navController.navigate(Route.ProductCamera) },
-                onBack = { navController.popBackStack() },
+                onBack = {
+                    if (leaveToList) {
+                        navController.popBackStack<Route.Inventory>(inclusive = false)
+                    } else {
+                        navController.popBackStack()
+                    }
+                },
                 onBackWithResult = { result ->
                     navController.previousBackStackEntry?.savedStateHandle?.set(EDITOR_RESULT_KEY, result.encode())
                     navController.popBackStack()

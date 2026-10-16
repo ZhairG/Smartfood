@@ -162,7 +162,7 @@ tengo.
 | CA-INV-09-01 | **Dado** que inicio sesión o abro la app con sesión activa, **entonces** llego a "Mi Inventario". |
 | CA-INV-09-02 | **Dado** "Mi Inventario" o "Perfil", **entonces** veo la barra inferior del Figma (`476:4176`) con "Inventario", "Recetas", "Guardadas" y "Perfil", con la pestaña actual resaltada; tocar Inventario o Perfil cambia de pantalla sin apilar. Recetas y Guardadas se ven deshabilitadas hasta que exista el agente de recetas. |
 | CA-INV-09-03 | **Dado** "Perfil", **entonces** veo el saludo con mi nombre y el botón "Cerrar sesión" (CA-05-01 a CA-05-03 siguen vigentes en esta pestaña). |
-| CA-INV-09-04 | **Dado** una pantalla interna (búsqueda, añadir, editar o cámara), **entonces** se abre con la transición de empuje y tiene la flecha atrás. La búsqueda y el editor muestran la barra inferior con Inventario resaltado, como el Figma; la cámara se ve a pantalla completa. |
+| CA-INV-09-04 | **Dado** una pantalla interna (búsqueda, añadir, editar o cámara), **entonces** se abre con la transición de empuje y tiene la flecha atrás. La búsqueda y el editor muestran la barra inferior con Inventario resaltado, como el Figma, y volver a tocar "Inventario" regresa a la lista (desde el editor, con el mismo descarte de "atrás"); la cámara se ve a pantalla completa. |
 | CA-INV-09-05 | **Dado** "Mi Inventario", **cuando** uso "atrás" del sistema, **entonces** la app se cierra (no vuelve a la pantalla de carga ni al inicio de sesión). |
 
 ### HU-INV-10: Usar el inventario sin conexión
