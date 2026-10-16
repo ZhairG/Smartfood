@@ -180,7 +180,7 @@ class InventoryScreenTest {
     }
 
     @Test
-    fun CA_INV_01_08_conCantidadSeMuestraJuntoALaCategoria() {
+    fun CA_INV_01_08_conCantidadSeMuestraJuntoAlNombre() {
         show(
             InventoryUiState(
                 isLoading = false,
@@ -201,8 +201,32 @@ class InventoryScreenTest {
             )
         )
 
-        composeTestRule.onNodeWithText("Lácteos · 1,5 L").assertIsDisplayed()
+        // La etiqueta solo lleva la categoría y la cantidad va aparte, después del nombre.
+        composeTestRule.onNodeWithText("Lácteos").assertIsDisplayed()
+        composeTestRule.onNodeWithText("1,5 L").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Leche Entera").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cereales").assertIsDisplayed()
+    }
+
+    @Test
+    fun CA_INV_01_08_unaUnidadVaEnSingularYVariasEnPlural() {
+        show(
+            InventoryUiState(
+                isLoading = false,
+                sections = listOf(
+                    InventorySection(
+                        status = ExpiryStatus.EXPIRING_SOON,
+                        items = listOf(
+                            item(id = "1", name = "Pollo", quantity = Quantity(amount = 1.0, unit = QuantityUnit.UNITS)),
+                            item(id = "2", name = "Huevos", quantity = Quantity(amount = 12.0, unit = QuantityUnit.UNITS))
+                        )
+                    )
+                )
+            )
+        )
+
+        composeTestRule.onNodeWithText("1 unidad").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12 unidades").assertIsDisplayed()
     }
 
     @Test

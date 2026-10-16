@@ -1,6 +1,10 @@
 package com.smartfood.app.feature.inventory.ui
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -14,7 +18,10 @@ import com.smartfood.app.core.navigation.Route
 import com.smartfood.app.core.navigation.navigateToTab
 import com.smartfood.app.feature.inventory.ui.camera.CAPTURED_PHOTO_KEY
 import com.smartfood.app.feature.inventory.ui.camera.ProductCameraRoute
+import com.smartfood.app.feature.inventory.ui.editor.EDITOR_RESULT_KEY
+import com.smartfood.app.feature.inventory.ui.editor.EditorResultHost
 import com.smartfood.app.feature.inventory.ui.editor.ProductEditorRoute
+import com.smartfood.app.feature.inventory.ui.editor.encode
 import com.smartfood.app.feature.inventory.ui.list.InventoryEffect
 import com.smartfood.app.feature.inventory.ui.list.InventoryScreen
 import com.smartfood.app.feature.inventory.ui.list.InventoryViewModel
@@ -36,7 +43,7 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
         exitTransition = NavTransitions.tabExit,
         popEnterTransition = NavTransitions.tabPopEnter,
         popExitTransition = NavTransitions.tabPopExit
-    ) {
+    ) { entry ->
         MainTabScaffold(currentTab = MainTab.INVENTORY, onTabSelected = navController::navigateToTab) {
             val viewModel: InventoryViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -48,20 +55,53 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
                 }
             }
             InventoryScreen(state = state, onEvent = viewModel::onEvent)
+            // El resultado del editor se ve encima de la lista, como el Figma (476:3851, T055).
+            EditorResultHost(savedStateHandle = entry.savedStateHandle)
         }
     }
-    composable<Route.InventorySearch> {
-        InventorySearchRoute(
-            onNavigateToEditor = { id -> navController.navigate(Route.ProductEditor(id)) },
-            onBack = { navController.popBackStack() }
-        )
+    // La búsqueda y el editor muestran la barra inferior con Inventario resaltado, como el Figma (CA-INV-09-04, T055).
+    // Volver a tocar "Inventario" desde ellas regresa a la lista.
+    composable<Route.InventorySearch> { entry ->
+        MainTabScaffold(
+            currentTab = MainTab.INVENTORY,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Inventory>(inclusive = false) }
+        ) {
+            InventorySearchRoute(
+                onNavigateToEditor = { id -> navController.navigate(Route.ProductEditor(id)) },
+                onBack = { navController.popBackStack() }
+            )
+            EditorResultHost(savedStateHandle = entry.savedStateHandle)
+        }
     }
     composable<Route.ProductEditor> { entry ->
-        ProductEditorRoute(
-            savedStateHandle = entry.savedStateHandle,
-            onNavigateToCamera = { navController.navigate(Route.ProductCamera) },
-            onBack = { navController.popBackStack() }
-        )
+        // Desde el editor pasa por el mismo descarte de "atrás" (borra la foto sin guardar) y vuelve a la lista.
+        val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+        var leaveToList by remember { mutableStateOf(false) }
+        MainTabScaffold(
+            currentTab = MainTab.INVENTORY,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = {
+                leaveToList = true
+                backDispatcher?.onBackPressed()
+            }
+        ) {
+            ProductEditorRoute(
+                savedStateHandle = entry.savedStateHandle,
+                onNavigateToCamera = { navController.navigate(Route.ProductCamera) },
+                onBack = {
+                    if (leaveToList) {
+                        navController.popBackStack<Route.Inventory>(inclusive = false)
+                    } else {
+                        navController.popBackStack()
+                    }
+                },
+                onBackWithResult = { result ->
+                    navController.previousBackStackEntry?.savedStateHandle?.set(EDITOR_RESULT_KEY, result.encode())
+                    navController.popBackStack()
+                }
+            )
+        }
     }
     composable<Route.ProductCamera> {
         ProductCameraRoute(

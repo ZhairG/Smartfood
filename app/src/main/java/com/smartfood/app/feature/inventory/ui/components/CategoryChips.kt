@@ -22,7 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.GreyDivider
+import com.smartfood.app.core.designsystem.theme.SurfaceLight
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 
@@ -77,12 +80,17 @@ private fun CategoryChip(
     FilterChip(
         selected = selected,
         onClick = onClick,
+        // Figma 476:3213: 13 px, SemiBold en la elegida y Medium en las demás.
         label = {
-            Text(text = text, fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium)
+            Text(
+                text = text,
+                fontSize = 13.sp,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium
+            )
         },
         shape = CircleShape,
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = SurfaceLight,
             labelColor = MaterialTheme.colorScheme.onSurface,
             selectedContainerColor = MaterialTheme.colorScheme.primary,
             selectedLabelColor = MaterialTheme.colorScheme.onPrimary
@@ -90,7 +98,7 @@ private fun CategoryChip(
         border = FilterChipDefaults.filterChipBorder(
             enabled = true,
             selected = selected,
-            borderColor = MaterialTheme.colorScheme.outline,
+            borderColor = GreyDivider,
             selectedBorderColor = MaterialTheme.colorScheme.primary
         )
     )

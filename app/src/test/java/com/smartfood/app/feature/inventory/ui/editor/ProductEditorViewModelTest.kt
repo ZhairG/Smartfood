@@ -95,7 +95,7 @@ class ProductEditorViewModelTest {
     }
 
     @Test
-    fun `CA-INV-02-06 guardar un alta muestra Producto Guardado y vuelve a la lista`() = runTest {
+    fun `CA-INV-02-06 guardar un alta vuelve a la lista con Producto Guardado`() = runTest {
         val viewModel = createViewModel()
         viewModel.fillValidForm()
         viewModel.onEvent(ProductEditorEvent.QuantityChanged("1,5"))
@@ -103,16 +103,16 @@ class ProductEditorViewModelTest {
 
         viewModel.onEvent(ProductEditorEvent.SaveClicked)
 
-        assertEquals(EditorDialog.ProductSaved, viewModel.uiState.value.dialog)
         val saved = repository.savedItems.single()
         assertEquals("Carne", saved.name)
         assertEquals(Quantity(1.5, QuantityUnit.KILOGRAMS), saved.quantity)
         assertEquals(1, scheduler.scheduleCalls)
 
-        advanceResultDialog()
-        assertNull(viewModel.uiState.value.dialog)
         assertEquals(
-            listOf(ProductEditorEffect.RequestNotificationPermission, ProductEditorEffect.NavigateBack),
+            listOf(
+                ProductEditorEffect.RequestNotificationPermission,
+                ProductEditorEffect.NavigateBackWithResult(EditorResult.Saved)
+            ),
             viewModel.effects.take(2).toList()
         )
     }
@@ -169,14 +169,17 @@ class ProductEditorViewModelTest {
     }
 
     @Test
-    fun `CA-INV-03-02 guardar una edicion muestra Guardado con el nombre`() {
+    fun `CA-INV-03-02 guardar una edicion vuelve a la lista con Guardado y el nombre`() = runTest {
         repository.items.value = listOf(inventoryItem(id = "carne", name = "Carne", expiresOn = today.plusDays(3)))
         val viewModel = createViewModel(itemId = "carne")
         viewModel.onEvent(ProductEditorEvent.NameChanged("Carne molida"))
 
         viewModel.onEvent(ProductEditorEvent.SaveClicked)
 
-        assertEquals(EditorDialog.ProductUpdated("Carne molida"), viewModel.uiState.value.dialog)
+        assertEquals(
+            ProductEditorEffect.NavigateBackWithResult(EditorResult.Updated("Carne molida")),
+            viewModel.effects.take(2).toList().last()
+        )
         assertEquals("Carne molida", repository.savedItems.single().name)
     }
 
@@ -216,11 +219,9 @@ class ProductEditorViewModelTest {
         viewModel.onEvent(ProductEditorEvent.DeleteClicked)
         viewModel.onEvent(ProductEditorEvent.DeleteConfirmed)
 
-        assertEquals(EditorDialog.ProductDeleted, viewModel.uiState.value.dialog)
         assertEquals(listOf("carne"), repository.deletedIds)
         assertEquals(listOf(photo.path), photos.deletedPaths)
-        advanceResultDialog()
-        assertEquals(ProductEditorEffect.NavigateBack, viewModel.effects.first())
+        assertEquals(ProductEditorEffect.NavigateBackWithResult(EditorResult.Deleted), viewModel.effects.first())
     }
 
     @Test
@@ -283,7 +284,7 @@ class ProductEditorViewModelTest {
     @Test
     fun `CA-INV-05-01 la camara navega al visor`() = runTest {
         val viewModel = createViewModel()
-        viewModel.onEvent(ProductEditorEvent.CameraClicked)
+        viewModel.onEvent(ProductEditorEvent.CameraChosen)
         assertEquals(ProductEditorEffect.NavigateToCamera, viewModel.effects.first())
     }
 
@@ -353,7 +354,7 @@ class ProductEditorViewModelTest {
         segundo.onEvent(ProductEditorEvent.SaveClicked)
         advanceResultDialog()
 
-        assertEquals(ProductEditorEffect.NavigateBack, segundo.effects.first())
+        assertEquals(ProductEditorEffect.NavigateBackWithResult(EditorResult.Saved), segundo.effects.first())
     }
 
     @Test
@@ -365,5 +366,36 @@ class ProductEditorViewModelTest {
         viewModel.onEvent(ProductEditorEvent.SaveClicked)
 
         assertFalse(preferences.notificationPermissionRequested)
+    }
+
+    @Test
+    fun `el resultado del editor se guarda y se lee como texto para la lista`() {
+        listOf(EditorResult.Saved, EditorResult.Updated("Carne molida"), EditorResult.Deleted).forEach { result ->
+            assertEquals(result, decodeEditorResult(result.encode()))
+        }
+        assertNull(decodeEditorResult(null))
+    }
+
+    @Test
+    fun `CA-INV-05-07 tocar la foto abre la hoja y la galeria cierra la hoja y abre el selector`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onEvent(ProductEditorEvent.AddPhotoClicked)
+        assertEquals(EditorDialog.PhotoSourceSheet, viewModel.uiState.value.dialog)
+
+        viewModel.onEvent(ProductEditorEvent.GalleryChosen)
+        assertNull(viewModel.uiState.value.dialog)
+        assertEquals(ProductEditorEffect.OpenGallery, viewModel.effects.first())
+    }
+
+    @Test
+    fun `CA-INV-05-07 elegir la camara cierra la hoja y abre el visor`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.onEvent(ProductEditorEvent.AddPhotoClicked)
+
+        viewModel.onEvent(ProductEditorEvent.CameraChosen)
+
+        assertNull(viewModel.uiState.value.dialog)
+        assertEquals(ProductEditorEffect.NavigateToCamera, viewModel.effects.first())
     }
 }

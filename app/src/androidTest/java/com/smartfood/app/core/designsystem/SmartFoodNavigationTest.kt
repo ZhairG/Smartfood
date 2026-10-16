@@ -76,4 +76,27 @@ class SmartFoodNavigationTest {
 
         assertEquals(1, toques)
     }
+
+    @Test
+    fun caInv0902_unaPestanaDeshabilitadaNoResponde() {
+        var recetas = 0
+        mostrar {
+            SmartFoodBottomBar(
+                tabs = listOf(
+                    SmartFoodTab("Inventario", R.drawable.ic_figma_tab_inventory, selected = true, onClick = {}),
+                    SmartFoodTab(
+                        "Recetas",
+                        R.drawable.ic_figma_tab_recipes,
+                        selected = false,
+                        onClick = { recetas++ },
+                        enabled = false
+                    ),
+                )
+            )
+        }
+
+        composeTestRule.onNodeWithText("Recetas").assertIsNotEnabled().performClick()
+
+        assertEquals(0, recetas)
+    }
 }

@@ -26,7 +26,12 @@
 
     <!-- Categoría y cantidad de la fila (CA-INV-01-02 y CA-INV-01-08) -->
     <string name="inventory_quantity_format">%1$s %2$s</string>
-    <string name="inventory_category_with_quantity">%1$s · %2$s</string>
+    <!-- "unidades" concuerda con la cantidad en la fila de la lista (CA-INV-01-08). -->
+    <plurals name="inventory_quantity_units">
+        <item quantity="one">%1$s unidad</item>
+        <item quantity="many">%1$s unidades</item>
+        <item quantity="other">%1$s unidades</item>
+    </plurals>
 
     <!-- Reintento cuando la carga falla -->
     <string name="inventory_retry">Reintentar</string>
@@ -97,6 +102,7 @@
     <string name="editor_title_edit">Editar Producto</string>
     <string name="editor_save">Guardar</string>
     <string name="editor_add_button">Añadir al Inventario</string>
+    <string name="editor_saving">Registrando</string>
     <string name="editor_delete_button">Eliminar</string>
     <string name="editor_name_placeholder">Ej. Carne</string>
     <string name="editor_name_label">Nombre del producto</string>
@@ -110,6 +116,10 @@
     <string name="cd_editor_take_photo">Tomar foto</string>
     <string name="cd_editor_remove_photo">Eliminar la foto</string>
     <string name="cd_editor_photo">Foto del producto</string>
+    <string name="cd_editor_add_photo">Agregar foto</string>
+    <string name="editor_photo_source_title">Agregar foto</string>
+    <string name="editor_photo_source_gallery">Galería</string>
+    <string name="editor_photo_source_camera">Cámara</string>
 
     <!-- Hojas y calendario (CA-INV-02-04, 02-05, 02-08) -->
     <string name="editor_category_sheet_title">Seleccione una categoría</string>
@@ -125,9 +135,11 @@
     <string name="editor_updated_title">Guardado</string>
     <string name="editor_updated_body">«%1$s» se actualizó</string>
     <string name="editor_deleted_title">Producto eliminado</string>
+    <string name="editor_deleted_body">El producto ha sido eliminado exitosamente.</string>
     <string name="editor_confirm_delete">¿Desea eliminar el producto?</string>
     <string name="editor_confirm_remove_photo">¿Desea eliminar la imagen?</string>
-    <string name="editor_photo_removed">Imagen eliminada</string>
+    <string name="editor_photo_removed">Imagen Eliminada</string>
+    <string name="editor_photo_removed_body">La imagen ha sido eliminada exitosamente.</string>
     <string name="editor_confirm">Eliminar</string>
     <string name="editor_cancel">Cancelar</string>
 

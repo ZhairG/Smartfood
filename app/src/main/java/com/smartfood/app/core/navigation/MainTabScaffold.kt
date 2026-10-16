@@ -28,13 +28,19 @@ import com.smartfood.app.core.designsystem.components.SmartFoodTab
  */
 
 /** Pestañas de la barra inferior, en orden. */
-enum class MainTab { INVENTORY, PROFILE }
+/**
+ * Pestañas de la barra inferior del Figma (`476:4176`), en orden. Recetas y Guardadas todavía no existen: se ven
+ * deshabilitadas (spec 006, CA-INV-09-02, T055).
+ */
+enum class MainTab(val enabled: Boolean = true) { INVENTORY, RECIPES(enabled = false), SAVED(enabled = false), PROFILE }
 
 /**
  * Pantalla de pestaña con la barra inferior.
  *
  * @param currentTab Pestaña que se está mostrando (resaltada en la barra).
  * @param onTabSelected Acción al tocar una pestaña.
+ * @param onCurrentTabReselected Acción al volver a tocar la pestaña resaltada desde una pantalla interna: vuelve a la
+ * pantalla principal de la pestaña (CA-INV-09-04). En las pantallas de pestaña no hace nada.
  * @param content Contenido de la pestaña. Recibe el margen de la barra ya marcado como consumido, así que su propio
  * `windowInsetsPadding(systemBars)` no suma dos veces la barra de navegación.
  */
@@ -42,10 +48,13 @@ enum class MainTab { INVENTORY, PROFILE }
 fun MainTabScaffold(
     currentTab: MainTab,
     onTabSelected: (MainTab) -> Unit,
+    onCurrentTabReselected: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     val labels = mapOf(
         MainTab.INVENTORY to stringResource(id = R.string.tab_inventory),
+        MainTab.RECIPES to stringResource(id = R.string.tab_recipes),
+        MainTab.SAVED to stringResource(id = R.string.tab_saved),
         MainTab.PROFILE to stringResource(id = R.string.tab_profile),
     )
     Scaffold(
@@ -58,7 +67,8 @@ fun MainTabScaffold(
                         label = labels.getValue(tab),
                         icon = tab.icon,
                         selected = tab == currentTab,
-                        onClick = { if (tab != currentTab) onTabSelected(tab) }
+                        onClick = { if (tab != currentTab) onTabSelected(tab) else onCurrentTabReselected() },
+                        enabled = tab.enabled
                     )
                 }
             )
@@ -79,6 +89,8 @@ private val MainTab.icon
     get() = when (this) {
         // Íconos del Figma (barra 476:4177): inventario y perfil, teñidos según la pestaña.
         MainTab.INVENTORY -> R.drawable.ic_figma_tab_inventory
+        MainTab.RECIPES -> R.drawable.ic_figma_tab_recipes
+        MainTab.SAVED -> R.drawable.ic_figma_tab_saved
         MainTab.PROFILE -> R.drawable.ic_figma_tab_profile
     }
 
@@ -90,6 +102,8 @@ fun NavHostController.navigateToTab(tab: MainTab) {
     val route: Route = when (tab) {
         MainTab.INVENTORY -> Route.Inventory
         MainTab.PROFILE -> Route.Profile
+        // Todavía no tienen pantalla: la pestaña está deshabilitada y nunca llega aquí.
+        MainTab.RECIPES, MainTab.SAVED -> return
     }
     navigate(route) {
         popUpTo<Route.Inventory> { saveState = true }

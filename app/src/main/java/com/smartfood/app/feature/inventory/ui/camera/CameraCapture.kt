@@ -1,12 +1,14 @@
 package com.smartfood.app.feature.inventory.ui.camera
 
 import android.content.Context
+import android.net.Uri
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.LifecycleCameraController
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
+import java.io.IOException
 import java.util.UUID
 import kotlin.coroutines.resume
 
@@ -50,5 +52,26 @@ suspend fun LifecycleCameraController.takePhoto(context: Context): Result<File> 
                 }
             }
         )
+    }
+}
+
+/**
+ * Copia la foto elegida en la galería a `filesDir/photos/{uuid}.jpg`, la misma carpeta de la cámara, para que siga el
+ * mismo camino: compresión, subida y borrado (CA-INV-05-07). Se llama fuera del hilo principal.
+ *
+ * @param context Contexto de la app.
+ * @param uri Foto elegida en el selector de fotos.
+ * @return El archivo copiado, o `null` si no se pudo leer.
+ */
+fun copyPickedPhoto(context: Context, uri: Uri): File? {
+    val directory = File(context.filesDir, PHOTOS_DIR).apply { mkdirs() }
+    val file = File(directory, "${UUID.randomUUID()}.jpg")
+    return try {
+        val input = context.contentResolver.openInputStream(uri) ?: return null
+        input.use { source -> file.outputStream().use { target -> source.copyTo(target) } }
+        file
+    } catch (e: IOException) {
+        file.delete()
+        null
     }
 }

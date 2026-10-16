@@ -11,6 +11,7 @@
 package com.smartfood.app.feature.inventory.ui.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,13 +20,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -35,14 +36,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
+import com.smartfood.app.core.designsystem.theme.GreyDivider
+import com.smartfood.app.core.designsystem.theme.SurfaceLight
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.ui.components.CategoryChips
 import com.smartfood.app.feature.inventory.ui.components.PermissionRationale
@@ -69,7 +75,9 @@ fun InventorySearchScreen(
     onDismissPermissionRationale: () -> Unit = {},
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        // Con el aviso de voz abierto, la búsqueda se desenfoca detrás (Figma 476:4507; API 31+).
+        val blurRadius = if (state.voice == VoiceUiState.Hidden) 0.dp else VoiceBlur
+        Column(modifier = Modifier.fillMaxSize().blur(blurRadius)) {
             SmartFoodTopBar(
                 title = stringResource(id = R.string.inventory_title),
                 onBack = { onEvent(InventorySearchEvent.BackClicked) }
@@ -77,10 +85,10 @@ fun InventorySearchScreen(
 
             // Figma 476:3190: la barra, la tarjeta de voz y los filtros van separados unos 24 dp.
             Column(
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
+                verticalArrangement = Arrangement.spacedBy(BlockGap),
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = MaterialTheme.spacing.medium)
+                    .padding(horizontal = SidePadding)
                     .padding(top = MaterialTheme.spacing.medium)
             ) {
                 SearchField(
@@ -157,7 +165,8 @@ private fun SearchField(
     onClearQuery: () -> Unit,
 ) {
     val placeholder = stringResource(id = R.string.inventory_search_placeholder)
-    val textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
+    // Figma 476:3203: Poppins Regular de 14 px.
+    val textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
 
     // Figma 476:3190: píldora gris sin borde, con la lupa a la izquierda y la "x" al escribir (CA-INV-06-07).
     BasicTextField(
@@ -175,13 +184,16 @@ private fun SearchField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = SearchBarHeight)
-                    .background(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = CircleShape)
+                    // Figma 476:3200: relleno #F3F4F6 con borde #E5E7EB de 1 px y radio 24.
+                    .background(color = SurfaceLight, shape = CircleShape)
+                    .border(width = SearchBarBorder, color = GreyDivider, shape = CircleShape)
                     .padding(horizontal = MaterialTheme.spacing.medium)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Search,
+                    painter = painterResource(id = R.drawable.ic_figma_search_bar),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(SearchIconSize)
                 )
                 Box(
                     modifier = Modifier
@@ -209,3 +221,12 @@ private fun SearchField(
 
 // Medida del Figma (476:3190): barra de búsqueda de 48 px de alto. No es de formulario, así que no va en FormMetrics.
 private val SearchBarHeight = 48.dp
+
+// Desenfoque del contenido con el aviso de voz abierto.
+private val VoiceBlur = 8.dp
+
+// Medidas del Figma (476:3190): 22 px entre bloques, márgenes de 20, lupa de 20 y borde de 1.
+private val BlockGap = 22.dp
+private val SidePadding = 20.dp
+private val SearchIconSize = 20.dp
+private val SearchBarBorder = 1.dp

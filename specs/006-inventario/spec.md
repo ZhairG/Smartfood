@@ -60,7 +60,7 @@ El inventario es también la entrada del futuro agente de recomendación de rece
 | CA-INV-01-05 | **Dado** que no tengo productos, **entonces** veo un mensaje que me invita a añadir el primero con el botón "+". |
 | CA-INV-01-06 | **Dado** que hoy es 10/09/2026, **entonces** un producto que vence el 09/09/2026 está en "Vencido", uno que vence el 10/09/2026 o el 13/09/2026 está en "Próximo a vencer" y uno que vence el 14/09/2026 está en "Fresco". |
 | CA-INV-01-07 | **Dado** que añadí, edité o eliminé un producto, **cuando** vuelvo a la lista, **entonces** veo el cambio sin recargar manualmente. |
-| CA-INV-01-08 | **Dado** un producto con cantidad, **entonces** su fila muestra la cantidad y la unidad junto a la etiqueta de la categoría (por ejemplo, "1,5 kg"); **dado** uno sin cantidad, **entonces** no se muestra nada en su lugar. |
+| CA-INV-01-08 | **Dado** un producto con cantidad, **entonces** su fila muestra la cantidad y la unidad en gris después del nombre (por ejemplo, "Leche Entera 1,5 L"; "unidad" en singular si la cantidad es 1), y la etiqueta solo lleva la categoría (spec §8); **dado** uno sin cantidad, **entonces** no se muestra nada en su lugar. |
 | CA-INV-01-09 | **Dado** un producto con precio, **entonces** su fila muestra el precio en pesos (por ejemplo, "$ 12.500") junto a la fecha; **dado** uno sin precio, **entonces** no se muestra nada en su lugar. |
 
 ### HU-INV-02: Añadir un producto
@@ -74,7 +74,7 @@ tengo.
 | CA-INV-02-03 | **Dado** el nombre, **cuando** tiene solo espacios o más de 50 caracteres, **entonces** el campo se marca en rojo con su mensaje y no se guarda. Los espacios al inicio y al final se ignoran. |
 | CA-INV-02-04 | **Dado** "Fecha de vencimiento", **cuando** la toco, **entonces** elijo la fecha en un calendario que no permite días anteriores a hoy. |
 | CA-INV-02-05 | **Dado** "Seleccionar categoría", **cuando** la toco, **entonces** aparece la hoja "Seleccione una categoría" con las seis categorías; "Guardar" aplica la elegida y "Cancelar" deja la anterior. |
-| CA-INV-02-06 | **Dado** un formulario válido, **cuando** toco "Añadir al Inventario", **entonces** veo "Producto Guardado: Te avisaremos antes de que caduque para que no se desperdicie." y regreso a "Mi Inventario" con el producto en su sección. |
+| CA-INV-02-06 | **Dado** un formulario válido, **cuando** toco "Añadir al Inventario", **entonces** regreso a "Mi Inventario" con el producto en su sección y, encima de la lista, veo "Producto Guardado: Te avisaremos antes de que caduque para que no se desperdicie." (Figma `476:3851`). |
 | CA-INV-02-07 | **Dado** que el guardado falla por un motivo distinto de la conexión (por ejemplo, el servidor lo rechaza), **entonces** veo un mensaje de error, el formulario conserva lo que escribí y puedo reintentar. Sin conexión no hay error: se guarda en el teléfono (CA-INV-10-02). |
 | CA-INV-02-08 | **Dado** el formulario, **entonces** el campo "Cantidad" es opcional y no cambia el estado del botón "Añadir al Inventario" (CA-INV-02-02). **Cuando** escribo una cantidad, **entonces** la unidad empieza en "unidades" y puedo cambiarla por g, kg, lb, ml o L; si dejo la cantidad vacía, el producto se guarda sin cantidad ni unidad. |
 | CA-INV-02-09 | **Dado** el campo "Cantidad", **cuando** escribo un valor que no es un número, que es 0 o menor, mayor que 9999 o con más de 2 decimales, **entonces** el campo se marca en rojo con su mensaje y no se guarda. |
@@ -87,7 +87,7 @@ tengo.
 | Código | Criterio |
 |---|---|
 | CA-INV-03-01 | **Dado** un producto de la lista, **cuando** toco su lápiz, **entonces** se abre "Editar Producto" con su foto, nombre, fecha, categoría y cantidad (si tiene) cargados. |
-| CA-INV-03-02 | **Dado** "Editar Producto", **cuando** toco "Guardar" en la barra superior con datos válidos, **entonces** veo "Guardado: «Carne» se actualizó" y regreso a la lista con el cambio. |
+| CA-INV-03-02 | **Dado** "Editar Producto", **cuando** toco "Guardar" en la barra superior con datos válidos, **entonces** regreso a la lista con el cambio y, encima, veo "Guardado: «Carne» se actualizó". |
 | CA-INV-03-03 | **Dado** "Editar Producto", **entonces** se aplican las mismas validaciones del alta (CA-INV-02-02, 02-03 y 02-09), salvo que se puede conservar una fecha ya vencida; solo una fecha **nueva** no puede ser anterior a hoy. |
 | CA-INV-03-04 | **Dado** que cambié datos, **cuando** vuelvo atrás sin tocar "Guardar", **entonces** el producto queda como estaba. |
 
@@ -97,7 +97,7 @@ tengo.
 | Código | Criterio |
 |---|---|
 | CA-INV-04-01 | **Dado** "Editar Producto", **cuando** toco "Eliminar", **entonces** aparece "¿Desea eliminar el producto?" con "Eliminar" y "Cancelar". |
-| CA-INV-04-02 | **Dado** la confirmación, **cuando** toco "Eliminar", **entonces** veo "Producto eliminado", regreso a la lista y el producto ya no está; si tenía foto, la foto también se borra de la nube (en ese momento o cuando vuelva la conexión, CA-INV-10-03). |
+| CA-INV-04-02 | **Dado** la confirmación, **cuando** toco "Eliminar", **entonces** regreso a la lista, el producto ya no está y, encima, veo "Producto eliminado: El producto ha sido eliminado exitosamente."; si tenía foto, la foto también se borra de la nube (en ese momento o cuando vuelva la conexión, CA-INV-10-03). |
 | CA-INV-04-03 | **Dado** la confirmación, **cuando** toco "Cancelar", **entonces** sigo en "Editar Producto" sin cambios. |
 
 ### HU-INV-05: Foto del producto
@@ -108,9 +108,10 @@ tengo.
 | CA-INV-05-01 | **Dado** el formulario de un producto, **cuando** toco el botón de cámara, **entonces** se abre el visor de la app con un recuadro de encuadre y el botón de captura. |
 | CA-INV-05-02 | **Dado** el visor, **cuando** capturo, **entonces** vuelvo al formulario con la foto en la zona de imagen; se guarda con el producto al tocar "Añadir al Inventario" o "Guardar", y se sube a la nube en segundo plano (CA-INV-10-04). |
 | CA-INV-05-03 | **Dado** que es la primera vez que uso la cámara, **entonces** la app me pide permiso; **si** lo niego, **entonces** veo un mensaje que explica para qué se usa, con un acceso a los ajustes del teléfono, y puedo guardar el producto sin foto. |
-| CA-INV-05-04 | **Dado** un producto con foto, **cuando** toco la papelera de la zona de imagen, **entonces** aparece "¿Desea eliminar la imagen?"; al confirmar veo "Imagen eliminada" y la zona queda vacía. En la edición, la foto se borra de la nube al guardar (o cuando vuelva la conexión). |
+| CA-INV-05-04 | **Dado** un producto con foto, **cuando** toco la papelera de la zona de imagen, **entonces** aparece "¿Desea eliminar la imagen?"; al confirmar veo "Imagen Eliminada: La imagen ha sido eliminada exitosamente." (Figma `476:3960`) y la zona queda vacía. En la edición, la foto se borra de la nube al guardar (o cuando vuelva la conexión). |
 | CA-INV-05-05 | **Dado** un producto con foto, **cuando** tomo otra, **entonces** la nueva la reemplaza y la anterior se borra de la nube después de que la nueva se sube. |
 | CA-INV-05-06 | **Dado** que la foto no se pudo subir, **entonces** el producto queda guardado con la foto del teléfono, marcado como pendiente de sincronizar, y la subida se reintenta sola; nunca queda un producto con una foto rota. **Si** el archivo no se puede leer, **entonces** el producto queda sin foto. |
+| CA-INV-05-07 | **Dado** el formulario de un producto, **cuando** toco el recuadro de la foto o su botón de cámara, **entonces** aparece la hoja "Agregar foto" con "Galería", "Cámara" y "Cancelar". "Galería" abre el selector de fotos del teléfono (sin pedir permisos) y la foto elegida queda en la zona de imagen y se guarda como la de la cámara (CA-INV-05-02); "Cámara" abre el visor (CA-INV-05-01). |
 
 ### HU-INV-06: Buscar y filtrar
 **Como** usuario **quiero** buscar por nombre y filtrar por categoría **para** encontrar rápido un producto.
@@ -133,7 +134,7 @@ tengo.
 |---|---|
 | CA-INV-07-01 | **Dado** la búsqueda, **cuando** toco el micrófono de "Usa tu voz — Dicta muchos ingredientes al mismo tiempo", **entonces** aparece sobre la pantalla el aviso "Habla ahora" con la animación de ondas. |
 | CA-INV-07-02 | **Dado** que dicté, **mientras** se procesa, **entonces** el aviso muestra "…". |
-| CA-INV-07-03 | **Dado** que dije "carne, pollo y leche", **entonces** el aviso se cierra, la barra muestra "carne, pollo, leche" y veo los productos que coinciden con cualquiera de los tres (CA-INV-06-05). Los separadores reconocidos son las pausas, las comas, "y" y "e". |
+| CA-INV-07-03 | **Dado** que dije "carne, pollo y leche", **entonces** el aviso muestra un momento lo que entendió ("Carne Pollo Leche", con las ondas), se cierra, la barra muestra "carne, pollo, leche" y veo los productos que coinciden con cualquiera de los tres (CA-INV-06-05). Los separadores reconocidos son las pausas, las comas, "y" y "e". |
 | CA-INV-07-04 | **Dado** un término en plural simple ("tomates", "limones"), **entonces** también coincide con el singular (Tomate, Limón). |
 | CA-INV-07-05 | **Dado** que no se entendió nada, **entonces** el aviso muestra "No se entendió. Reinténtalo" con el botón "Reintentar", que vuelve a escuchar. |
 | CA-INV-07-06 | **Dado** que es la primera vez, **entonces** se me pide permiso de micrófono; **si** lo niego, **entonces** veo un mensaje que explica para qué se usa, con un acceso a los ajustes, y la búsqueda por texto sigue funcionando. |
@@ -159,9 +160,9 @@ tengo.
 | Código | Criterio |
 |---|---|
 | CA-INV-09-01 | **Dado** que inicio sesión o abro la app con sesión activa, **entonces** llego a "Mi Inventario". |
-| CA-INV-09-02 | **Dado** "Mi Inventario" o "Perfil", **entonces** veo la barra inferior con "Inventario" y "Perfil", con la pestaña actual resaltada; tocar una pestaña cambia de pantalla sin apilar. |
+| CA-INV-09-02 | **Dado** "Mi Inventario" o "Perfil", **entonces** veo la barra inferior del Figma (`476:4176`) con "Inventario", "Recetas", "Guardadas" y "Perfil", con la pestaña actual resaltada; tocar Inventario o Perfil cambia de pantalla sin apilar. Recetas y Guardadas se ven deshabilitadas hasta que exista el agente de recetas. |
 | CA-INV-09-03 | **Dado** "Perfil", **entonces** veo el saludo con mi nombre y el botón "Cerrar sesión" (CA-05-01 a CA-05-03 siguen vigentes en esta pestaña). |
-| CA-INV-09-04 | **Dado** una pantalla interna (búsqueda, añadir, editar o cámara), **entonces** se abre con la transición de empuje, tiene la flecha atrás y no muestra la barra inferior. |
+| CA-INV-09-04 | **Dado** una pantalla interna (búsqueda, añadir, editar o cámara), **entonces** se abre con la transición de empuje y tiene la flecha atrás. La búsqueda y el editor muestran la barra inferior con Inventario resaltado, como el Figma, y volver a tocar "Inventario" regresa a la lista (desde el editor, con el mismo descarte de "atrás"); la cámara se ve a pantalla completa. |
 | CA-INV-09-05 | **Dado** "Mi Inventario", **cuando** uso "atrás" del sistema, **entonces** la app se cierra (no vuelve a la pantalla de carga ni al inicio de sesión). |
 
 ### HU-INV-10: Usar el inventario sin conexión
@@ -210,7 +211,6 @@ en la tienda o en la cocina.
 - Presupuesto, gastos y ahorro (spec de presupuesto). El precio opcional del producto sí está en esta spec desde el
   2026-10-16 (CA-INV-02-10, T052); el 2026-10-14 se habían incluido la cantidad y la unidad (T002).
 - Convertir entre unidades o descontar cantidades al cocinar.
-- Elegir fotos de la galería.
 - Escáner de código de barras y reconocimiento del alimento por la foto.
 - Añadir productos por voz (la voz solo busca).
 - Inventario compartido entre varias personas del hogar.
@@ -234,20 +234,17 @@ comprueba que el acceso al archivo funciona leyendo uno de estos frames. Si no f
 hasta configurarlo (ver `AGENTS.md`, "Implementar diseños de Figma").
 
 Desviaciones aprobadas por el equipo:
-- **Barra inferior de 2 pestañas** (Inventario y Perfil), tomada de la sección "Natalia" del Figma, porque Recetas y
-  Guardadas todavía no existen.
+- **Barra inferior de 4 pestañas** (16/10, T055): se volvió al Figma (`476:4176`). Recetas y Guardadas se ven
+  deshabilitadas porque todavía no existen.
 - **Botón "Añadir al Inventario" habilitado en naranja** (sección "Natalia"); los frames principales solo lo muestran
   deshabilitado.
-- **Campos con borde** del design system en lugar de la línea inferior del Figma, por consistencia con
-  autenticación y la adaptabilidad de la spec 002. Se conserva el ícono a la izquierda de cada campo, gris y con
-  el tamaño y la separación del Figma. El texto de los campos usa el mismo tamaño que en autenticación, no el más
-  pequeño del Figma de inventario (#62).
+- **Campos del editor con línea inferior** (16/10, T055): se volvió al Figma (`476:4106` y `476:4197`), sin la caja
+  con borde de autenticación; queda sin efecto el ADR-INV-07. Los campos de autenticación no cambian.
 - **Fila opcional "Cantidad"** debajo de "Seleccionar categoría" (campo numérico más selector de unidad), y la
   cantidad en la fila de la lista junto a la etiqueta de categoría. El Figma no tiene estos elementos; se ajustan
   cuando exista un frame (T002).
-- **Pantallas internas sin barra inferior** (CA-INV-09-04): los frames del editor (`476:3664`, `476:3689`) y de la
-  búsqueda (`476:3190`) muestran la barra inferior, pero son pantallas internas y no la llevan (#40). La búsqueda y
-  el aviso de voz se ajustaron al Figma el 16/10: barra en píldora, tarjeta de voz con borde verde, filtros redondos,
+- **Barra inferior en la búsqueda y el editor** (16/10, T055): como el Figma (`476:3664`, `476:3689` y `476:3190`).
+  La búsqueda y el aviso de voz se ajustaron al Figma el 16/10: barra en píldora, tarjeta de voz con borde verde, filtros redondos,
   resultados sin miniatura ni lápiz y ecualizador naranja.
 - **Perfil del Figma** (`306:369`, 16/10): encabezado con iniciales, nombre y correo; tres tarjetas de cifras; las
   opciones de la cuenta y "Cerrar Sesión". Por ahora solo "Cerrar Sesión" funciona: las opciones y la cámara del
@@ -255,9 +252,17 @@ Desviaciones aprobadas por el equipo:
   0 y "Ahorrados este mes", "—"). Las medidas del Figma se escalan al ancho del teléfono (spec 002).
 - **Editor y lista ajustados al Figma** (16/10): fondo verde claro, zona de foto con la papelera siempre visible (gris
   sin foto, roja con foto), lápiz de contorno y espacios entre filas y secciones del Figma.
-- **Editor con botón fijo abajo** (16/10, RNF-INV-06): con el precio, el formulario ya no cabe en pantallas
-  pequeñas. Los campos se desplazan y el botón "Añadir al Inventario" / "Eliminar", con el aviso de error encima,
-  queda fijo abajo y sobre el teclado. El Figma lo pone dentro del formulario.
+- **Botón del editor dentro del formulario** (16/10, T055): como el Figma, debajo de los campos y con el aviso de
+  error encima. En pantallas pequeñas se alcanza desplazando (RNF-INV-06).
+- **Hoja "Agregar foto"** (16/10, T055, CA-INV-05-07): el Figma no tiene un frame para elegir entre la galería y
+  la cámara. Se usa una hoja inferior con el estilo de la hoja de categoría (`476:4113`): ícono de imágenes de
+  Material para "Galería" y la cámara del Figma para "Cámara".
+- **Cantidad junto al nombre** (16/10, T055, CA-INV-01-08): el Figma (`476:3116`) no tiene cantidad ni precio. Con
+  el precio junto a la fecha, la etiqueta con la cantidad no cabía en la primera línea y se cruzaba con el precio.
+  La etiqueta queda como la del Figma (`476:4258`, solo la categoría, 10 px y relleno de 5 px a los lados) y la
+  cantidad va en gris después del nombre.
+- **Fondo desenfocado** de los diálogos y del aviso de voz (Figma `476:3851`, `476:4021` y `476:4507`): con API 31+
+  se desenfoca lo de atrás; en API 24 a 30 se usa un velo claro.
 - **Uso sin conexión** (HU-INV-10, #71): el Figma no tiene el ícono de pendiente ni el aviso de guardado en el
   teléfono. La fila usa el ícono `CloudUpload` de Material en gris, y el aviso usa `SmartFoodResultDialog`, el mismo
   de "Producto Guardado". Se ajustan cuando exista un frame.
@@ -272,4 +277,4 @@ Desviaciones aprobadas por el equipo:
 - Un producto se guarda con un solo vencimiento; si hay dos paquetes con fechas distintas, se registran como dos
   productos.
 - La plantilla de la Política de privacidad (spec 005) se amplía para mencionar las fotos de productos (que se
-  guardan en el teléfono hasta que se suben), el uso del micrófono y los avisos.
+  guardan en el teléfono hasta que se suben, y las que se eligen de la galería), el uso del micrófono y los avisos.

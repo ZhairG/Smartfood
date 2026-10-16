@@ -13,6 +13,7 @@
 package com.smartfood.app.feature.inventory.ui.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,9 +37,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.GreenMain20
 import com.smartfood.app.core.designsystem.theme.spacing
-import com.smartfood.app.feature.inventory.ui.components.CategoryLabel
 import com.smartfood.app.feature.inventory.ui.components.color
 import com.smartfood.app.feature.inventory.ui.components.titleRes
 import java.time.format.DateTimeFormatter
@@ -71,18 +74,29 @@ internal fun SearchResultRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = item.name,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    // Figma 476:3233: Poppins SemiBold de 16 px.
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = stringResource(id = R.string.inventory_expires_on, item.expiresOn.format(DateFormatter)),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            CategoryLabel(item = item)
+            // Etiqueta propia de la búsqueda (Figma 476:3235): verde muy claro con borde, Bold de 11 px.
+            Text(
+                text = stringResource(id = item.category.titleRes),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
+                maxLines = 1,
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primaryContainer, TagShape)
+                    .border(TagBorder, GreenMain20, TagShape)
+                    .padding(horizontal = TagHorizontalPadding, vertical = TagVerticalPadding)
+            )
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
     }
@@ -90,5 +104,9 @@ internal fun SearchResultRow(
 
 private val DateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-// Medida del Figma (476:3190): punto de estado de 12 px. No es de formulario, así que no va en FormMetrics.
-private val StatusDotSize = 12.dp
+// Medidas del Figma (476:3190): punto de estado de 16 px y etiqueta de radio 6 con márgenes de 10 × 4. No es de formulario, así que no va en FormMetrics.
+private val StatusDotSize = 16.dp
+private val TagShape = RoundedCornerShape(6.dp)
+private val TagBorder = 1.dp
+private val TagHorizontalPadding = 10.dp
+private val TagVerticalPadding = 4.dp

@@ -1,5 +1,7 @@
 package com.smartfood.app.core.designsystem.components
 
+import android.os.Build
+import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,9 +21,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -34,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.ShadowColorModal
@@ -141,10 +146,12 @@ private fun SmartFoodOfflineDialogContent(
                     .fillMaxWidth()
                     .padding(start = 29.dp, end = 29.dp)
             ) {
+                // Figma 281:333: mientras reconecta, el botón sigue naranja y anima "Conectando…".
                 SmartFoodPrimaryButton(
-                    text = if (isReconnecting) stringResource(id = R.string.offline_dialog_connecting)
-                           else stringResource(id = R.string.offline_dialog_button),
-                    onClick = onReconnect
+                    text = stringResource(id = R.string.offline_dialog_button),
+                    onClick = onReconnect,
+                    isLoading = isReconnecting,
+                    loadingText = stringResource(id = R.string.offline_dialog_connecting)
                 )
             }
         }
@@ -175,6 +182,7 @@ fun SmartFoodConfirmDialog(
     modifier: Modifier = Modifier
 ) {
     Dialog(onDismissRequest = onDismiss) {
+        BlurBehindDialog()
         SmartFoodConfirmDialogContent(
             icon = icon,
             question = question,
@@ -263,6 +271,8 @@ private fun SmartFoodConfirmDialogContent(
  * @param icon Contenido que dibuja el ícono del resultado.
  * @param title Título del resultado.
  * @param body Mensaje adicional opcional.
+ * @param destructive `true` para un resultado de borrado ("Imagen Eliminada", "Producto eliminado"): el círculo del
+ * ícono va en rosado (`error` al 22 %), como el Figma `476:3960`.
  * @param modifier Modificador opcional para el contenido del diálogo.
  */
 @Composable
@@ -270,14 +280,17 @@ fun SmartFoodResultDialog(
     icon: @Composable () -> Unit,
     title: String,
     body: String? = null,
+    destructive: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     // Sin cierre propio: atrás y el toque fuera no lo cierran (ver el KDoc); lo quita quien lo muestra.
     Dialog(onDismissRequest = {}) {
+        BlurBehindDialog()
         SmartFoodResultDialogContent(
             icon = icon,
             title = title,
             body = body,
+            destructive = destructive,
             modifier = modifier
         )
     }
@@ -289,6 +302,7 @@ private fun SmartFoodResultDialogContent(
     icon: @Composable () -> Unit,
     title: String,
     body: String?,
+    destructive: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val spacing = MaterialTheme.spacing
@@ -318,7 +332,11 @@ private fun SmartFoodResultDialogContent(
         Box(
             modifier = Modifier
                 .size(spacing.iconDialogSize)
-                .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+                .background(
+                    if (destructive) MaterialTheme.colorScheme.error.copy(alpha = 0.22f)
+                    else MaterialTheme.colorScheme.primaryContainer,
+                    CircleShape
+                ),
             contentAlignment = Alignment.Center
         ) {
             icon()
@@ -408,3 +426,25 @@ private fun SmartFoodResultDialogPreview() {
         )
     }
 }
+
+/**
+ * Desenfoca lo que queda detrás del diálogo, como el Figma (`476:3851` y `476:4021`), con un velo muy claro. El
+ * desenfoque de ventanas existe desde Android 12 (API 31); antes solo queda el velo.
+ */
+@Composable
+private fun BlurBehindDialog() {
+    val window = (LocalView.current.parent as? DialogWindowProvider)?.window ?: return
+    SideEffect {
+        window.setDimAmount(DialogDimAmount)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+            window.attributes = window.attributes.apply { blurBehindRadius = DialogBlurRadiusPx }
+        }
+    }
+}
+
+/** Velo detrás de los diálogos: muy claro, porque el fondo ya va desenfocado (Figma). */
+private const val DialogDimAmount = 0.15f
+
+/** Radio del desenfoque detrás de los diálogos, en píxeles. */
+private const val DialogBlurRadiusPx = 40
