@@ -111,6 +111,7 @@ tengo.
 | CA-INV-05-04 | **Dado** un producto con foto, **cuando** toco la papelera de la zona de imagen, **entonces** aparece "¿Desea eliminar la imagen?"; al confirmar veo "Imagen Eliminada: La imagen ha sido eliminada exitosamente." (Figma `476:3960`) y la zona queda vacía. En la edición, la foto se borra de la nube al guardar (o cuando vuelva la conexión). |
 | CA-INV-05-05 | **Dado** un producto con foto, **cuando** tomo otra, **entonces** la nueva la reemplaza y la anterior se borra de la nube después de que la nueva se sube. |
 | CA-INV-05-06 | **Dado** que la foto no se pudo subir, **entonces** el producto queda guardado con la foto del teléfono, marcado como pendiente de sincronizar, y la subida se reintenta sola; nunca queda un producto con una foto rota. **Si** el archivo no se puede leer, **entonces** el producto queda sin foto. |
+| CA-INV-05-07 | **Dado** el formulario de un producto, **cuando** toco el recuadro de la foto o su botón de cámara, **entonces** aparece la hoja "Agregar foto" con "Galería", "Cámara" y "Cancelar". "Galería" abre el selector de fotos del teléfono (sin pedir permisos) y la foto elegida queda en la zona de imagen y se guarda como la de la cámara (CA-INV-05-02); "Cámara" abre el visor (CA-INV-05-01). |
 
 ### HU-INV-06: Buscar y filtrar
 **Como** usuario **quiero** buscar por nombre y filtrar por categoría **para** encontrar rápido un producto.
@@ -210,7 +211,6 @@ en la tienda o en la cocina.
 - Presupuesto, gastos y ahorro (spec de presupuesto). El precio opcional del producto sí está en esta spec desde el
   2026-10-16 (CA-INV-02-10, T052); el 2026-10-14 se habían incluido la cantidad y la unidad (T002).
 - Convertir entre unidades o descontar cantidades al cocinar.
-- Elegir fotos de la galería.
 - Escáner de código de barras y reconocimiento del alimento por la foto.
 - Añadir productos por voz (la voz solo busca).
 - Inventario compartido entre varias personas del hogar.
@@ -254,6 +254,9 @@ Desviaciones aprobadas por el equipo:
   sin foto, roja con foto), lápiz de contorno y espacios entre filas y secciones del Figma.
 - **Botón del editor dentro del formulario** (16/10, T055): como el Figma, debajo de los campos y con el aviso de
   error encima. En pantallas pequeñas se alcanza desplazando (RNF-INV-06).
+- **Hoja "Agregar foto"** (16/10, T055, CA-INV-05-07): el Figma no tiene un frame para elegir entre la galería y
+  la cámara. Se usa una hoja inferior con el estilo de la hoja de categoría (`476:4113`): ícono de imágenes de
+  Material para "Galería" y la cámara del Figma para "Cámara".
 - **Fondo desenfocado** de los diálogos y del aviso de voz (Figma `476:3851`, `476:4021` y `476:4507`): con API 31+
   se desenfoca lo de atrás; en API 24 a 30 se usa un velo claro.
 - **Uso sin conexión** (HU-INV-10, #71): el Figma no tiene el ícono de pendiente ni el aviso de guardado en el
@@ -270,4 +273,4 @@ Desviaciones aprobadas por el equipo:
 - Un producto se guarda con un solo vencimiento; si hay dos paquetes con fechas distintas, se registran como dos
   productos.
 - La plantilla de la Política de privacidad (spec 005) se amplía para mencionar las fotos de productos (que se
-  guardan en el teléfono hasta que se suben), el uso del micrófono y los avisos.
+  guardan en el teléfono hasta que se suben, y las que se eligen de la galería), el uso del micrófono y los avisos.

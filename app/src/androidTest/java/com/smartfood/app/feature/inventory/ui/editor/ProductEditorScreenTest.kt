@@ -180,4 +180,23 @@ class ProductEditorScreenTest {
 
         composeTestRule.onNodeWithText("⚠ Los campos no pueden estar vacíos").assertIsDisplayed()
     }
+
+    @Test
+    fun t055_caInv0507_tocarElRecuadroDeLaFotoPideAgregarFoto() {
+        mostrar(ProductEditorUiState())
+
+        composeTestRule.onNodeWithContentDescription("Tomar foto").performClick()
+
+        assertEquals(listOf<ProductEditorEvent>(ProductEditorEvent.AddPhotoClicked), eventos)
+    }
+
+    @Test
+    fun t055_caInv0507_laHojaOfreceGaleriaYCamara() {
+        mostrar(ProductEditorUiState(dialog = EditorDialog.PhotoSourceSheet))
+
+        composeTestRule.onNodeWithText("Agregar foto").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Galería").performClick()
+
+        assertEquals(listOf<ProductEditorEvent>(ProductEditorEvent.GalleryChosen), eventos)
+    }
 }

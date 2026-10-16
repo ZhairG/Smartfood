@@ -30,6 +30,9 @@ sealed interface PhotoUiState {
 
 /** Hoja, calendario o diálogo abierto sobre el editor. */
 sealed interface EditorDialog {
+    /** Hoja "Agregar foto" con "Galería" y "Cámara" (CA-INV-05-07). */
+    data object PhotoSourceSheet : EditorDialog
+
     /** Hoja "Seleccione una categoría" (CA-INV-02-05). */
     data object CategorySheet : EditorDialog
 
@@ -123,7 +126,9 @@ sealed interface ProductEditorEvent {
     data object UnitClicked : ProductEditorEvent
     data class UnitPicked(val unit: QuantityUnit) : ProductEditorEvent
     data class PriceChanged(val value: String) : ProductEditorEvent
-    data object CameraClicked : ProductEditorEvent
+    data object AddPhotoClicked : ProductEditorEvent
+    data object GalleryChosen : ProductEditorEvent
+    data object CameraChosen : ProductEditorEvent
     data class PhotoCaptured(val path: String) : ProductEditorEvent
     data object RemovePhotoClicked : ProductEditorEvent
     data object RemovePhotoConfirmed : ProductEditorEvent
@@ -138,6 +143,9 @@ sealed interface ProductEditorEvent {
 sealed interface ProductEditorEffect {
     /** Abre el visor de la cámara (CA-INV-05-01). */
     data object NavigateToCamera : ProductEditorEffect
+
+    /** Abre el selector de fotos del teléfono (CA-INV-05-07). */
+    data object OpenGallery : ProductEditorEffect
 
     /** Vuelve a la lista. */
     data object NavigateBack : ProductEditorEffect

@@ -111,6 +111,10 @@
     <string name="cd_editor_take_photo">Tomar foto</string>
     <string name="cd_editor_remove_photo">Eliminar la foto</string>
     <string name="cd_editor_photo">Foto del producto</string>
+    <string name="cd_editor_add_photo">Agregar foto</string>
+    <string name="editor_photo_source_title">Agregar foto</string>
+    <string name="editor_photo_source_gallery">Galería</string>
+    <string name="editor_photo_source_camera">Cámara</string>
 
     <!-- Hojas y calendario (CA-INV-02-04, 02-05, 02-08) -->
     <string name="editor_category_sheet_title">Seleccione una categoría</string>

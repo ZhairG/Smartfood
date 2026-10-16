@@ -284,7 +284,7 @@ class ProductEditorViewModelTest {
     @Test
     fun `CA-INV-05-01 la camara navega al visor`() = runTest {
         val viewModel = createViewModel()
-        viewModel.onEvent(ProductEditorEvent.CameraClicked)
+        viewModel.onEvent(ProductEditorEvent.CameraChosen)
         assertEquals(ProductEditorEffect.NavigateToCamera, viewModel.effects.first())
     }
 
@@ -374,5 +374,28 @@ class ProductEditorViewModelTest {
             assertEquals(result, decodeEditorResult(result.encode()))
         }
         assertNull(decodeEditorResult(null))
+    }
+
+    @Test
+    fun `CA-INV-05-07 tocar la foto abre la hoja y la galeria cierra la hoja y abre el selector`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onEvent(ProductEditorEvent.AddPhotoClicked)
+        assertEquals(EditorDialog.PhotoSourceSheet, viewModel.uiState.value.dialog)
+
+        viewModel.onEvent(ProductEditorEvent.GalleryChosen)
+        assertNull(viewModel.uiState.value.dialog)
+        assertEquals(ProductEditorEffect.OpenGallery, viewModel.effects.first())
+    }
+
+    @Test
+    fun `CA-INV-05-07 elegir la camara cierra la hoja y abre el visor`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.onEvent(ProductEditorEvent.AddPhotoClicked)
+
+        viewModel.onEvent(ProductEditorEvent.CameraChosen)
+
+        assertNull(viewModel.uiState.value.dialog)
+        assertEquals(ProductEditorEffect.NavigateToCamera, viewModel.effects.first())
     }
 }

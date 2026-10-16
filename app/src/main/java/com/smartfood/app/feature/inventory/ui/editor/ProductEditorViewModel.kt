@@ -89,7 +89,15 @@ class ProductEditorViewModel @Inject constructor(
             ProductEditorEvent.UnitClicked -> openDialog(EditorDialog.UnitSheet)
             is ProductEditorEvent.UnitPicked -> edit { it.copy(unit = event.unit, dialog = null) }
             is ProductEditorEvent.PriceChanged -> edit { it.copy(priceText = event.value) }
-            ProductEditorEvent.CameraClicked -> sendEffect(ProductEditorEffect.NavigateToCamera)
+            ProductEditorEvent.AddPhotoClicked -> openDialog(EditorDialog.PhotoSourceSheet)
+            ProductEditorEvent.GalleryChosen -> {
+                _uiState.update { it.copy(dialog = null) }
+                sendEffect(ProductEditorEffect.OpenGallery)
+            }
+            ProductEditorEvent.CameraChosen -> {
+                _uiState.update { it.copy(dialog = null) }
+                sendEffect(ProductEditorEffect.NavigateToCamera)
+            }
             is ProductEditorEvent.PhotoCaptured -> onPhotoCaptured(event.path)
             ProductEditorEvent.RemovePhotoClicked -> openDialog(EditorDialog.ConfirmRemovePhoto)
             ProductEditorEvent.RemovePhotoConfirmed -> removePhoto()

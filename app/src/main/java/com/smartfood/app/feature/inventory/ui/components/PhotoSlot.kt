@@ -7,7 +7,8 @@
  * el Figma: gris y deshabilitada sin foto, y roja cuando hay una foto que borrar.
  *
  * @param photo Foto que se muestra.
- * @param onCameraClick Abre el visor de la cámara (CA-INV-05-01).
+ * @param onAddPhotoClick Abre la hoja "Agregar foto" con la galería y la cámara (CA-INV-05-07). La llaman todo el
+ * recuadro y su botón de cámara.
  * @param onRemoveClick Pide quitar la foto (CA-INV-05-04).
  * @param modifier Modificador opcional.
  */
@@ -15,6 +16,7 @@ package com.smartfood.app.feature.inventory.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +42,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -51,11 +54,12 @@ import java.io.File
 @Composable
 fun PhotoSlot(
     photo: PhotoUiState,
-    onCameraClick: () -> Unit,
+    onAddPhotoClick: () -> Unit,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(SlotRadius)
+    val addPhotoLabel = stringResource(id = R.string.cd_editor_add_photo)
     val borderColor = MaterialTheme.colorScheme.onSurfaceVariant
     val model: Any? = when (photo) {
         is PhotoUiState.Local -> File(photo.path)
@@ -69,6 +73,8 @@ fun PhotoSlot(
             .aspectRatio(SlotAspectRatio)
             .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceVariant)
+            // Todo el recuadro abre las opciones de la foto (CA-INV-05-07).
+            .clickable(onClickLabel = addPhotoLabel, role = Role.Button, onClick = onAddPhotoClick)
             .drawBehind {
                 drawRoundRect(
                     color = borderColor,
@@ -106,7 +112,7 @@ fun PhotoSlot(
             contentDescription = stringResource(id = R.string.cd_editor_take_photo),
             containerColor = MaterialTheme.colorScheme.primary,
             iconSize = CameraIconSize,
-            onClick = onCameraClick,
+            onClick = onAddPhotoClick,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = CameraInsetEnd, bottom = CameraInsetBottom)

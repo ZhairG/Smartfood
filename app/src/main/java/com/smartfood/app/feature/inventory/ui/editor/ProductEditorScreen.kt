@@ -77,6 +77,7 @@ import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
 import com.smartfood.app.feature.inventory.ui.components.ExpiryDatePicker
 import com.smartfood.app.feature.inventory.ui.components.OptionSheet
 import com.smartfood.app.feature.inventory.ui.components.PhotoSlot
+import com.smartfood.app.feature.inventory.ui.components.PhotoSourceSheet
 import com.smartfood.app.feature.inventory.ui.components.titleRes
 import com.smartfood.app.feature.inventory.ui.messageRes
 import java.time.LocalDate
@@ -182,7 +183,7 @@ private fun EditorFields(
     val metrics = LocalFormMetrics.current
     PhotoSlot(
         photo = state.photo,
-        onCameraClick = { onEvent(ProductEditorEvent.CameraClicked) },
+        onAddPhotoClick = { onEvent(ProductEditorEvent.AddPhotoClicked) },
         onRemoveClick = { onEvent(ProductEditorEvent.RemovePhotoClicked) }
     )
 
@@ -291,6 +292,11 @@ private fun EditorBottom(state: ProductEditorUiState, onEvent: (ProductEditorEve
 private fun EditorDialogs(state: ProductEditorUiState, onEvent: (ProductEditorEvent) -> Unit) {
     val dismiss = { onEvent(ProductEditorEvent.DialogDismissed) }
     when (val dialog = state.dialog) {
+        EditorDialog.PhotoSourceSheet -> PhotoSourceSheet(
+            onGallery = { onEvent(ProductEditorEvent.GalleryChosen) },
+            onCamera = { onEvent(ProductEditorEvent.CameraChosen) },
+            onDismiss = dismiss
+        )
         EditorDialog.CategorySheet -> OptionSheet(
             title = stringResource(id = R.string.editor_category_sheet_title),
             options = CategoryOptions,
