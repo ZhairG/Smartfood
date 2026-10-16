@@ -88,6 +88,8 @@ coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp"
 
 # WorkManager con Hilt (avisos de vencimiento)
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
+# Pruebas instrumentadas de los workers con WorkManagerTestInitHelper (spec 006, T038, #44)
+androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "workManager" }
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidxHilt" }
 androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidxHilt" }
 

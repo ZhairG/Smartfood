@@ -2,6 +2,7 @@ package com.smartfood.app.feature.splash
 
 import com.smartfood.app.feature.auth.domain.usecase.ResolveSessionUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
+import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeSessionPreferences
 import com.smartfood.app.testutil.MainDispatcherRule
 import org.junit.Assert.assertEquals
@@ -12,7 +13,7 @@ import org.junit.Test
  * Nombre: SplashViewModelTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [SplashViewModel] (HU-03).
+ * Descripción: Pruebas unitarias de [SplashViewModel] (HU-03 y HU-INV-08).
  */
 class SplashViewModelTest {
 
@@ -21,8 +22,12 @@ class SplashViewModelTest {
 
     private val authRepository = FakeAuthRepository()
     private val sessionPreferences = FakeSessionPreferences()
+    private val reminderScheduler = FakeExpiryReminderScheduler()
 
-    private fun crearViewModel() = SplashViewModel(ResolveSessionUseCase(authRepository, sessionPreferences))
+    private fun crearViewModel() = SplashViewModel(
+        ResolveSessionUseCase(authRepository, sessionPreferences),
+        reminderScheduler
+    )
 
     @Test
     fun `CA-03-01 con sesion recordada el destino es Home`() {
@@ -42,5 +47,21 @@ class SplashViewModelTest {
     @Test
     fun `CA-03-03 sin sesion el destino es Login`() {
         assertEquals(SplashDestination.LOGIN, crearViewModel().destination.value)
+    }
+
+    @Test
+    fun `CA-INV-08-01 con sesion activa se reprograma el aviso de vencimiento`() {
+        authRepository.signedInUserId = FakeAuthRepository.DEFAULT_UID
+
+        crearViewModel()
+
+        assertEquals(1, reminderScheduler.scheduleCalls)
+    }
+
+    @Test
+    fun `CA-INV-08-06 sin sesion activa no se reprograma el aviso de vencimiento`() {
+        crearViewModel()
+
+        assertEquals(0, reminderScheduler.scheduleCalls)
     }
 }
