@@ -180,7 +180,7 @@ class InventoryScreenTest {
     }
 
     @Test
-    fun CA_INV_01_08_conCantidadSeMuestraJuntoALaCategoria() {
+    fun CA_INV_01_08_conCantidadSeMuestraJuntoAlNombre() {
         show(
             InventoryUiState(
                 isLoading = false,
@@ -201,7 +201,10 @@ class InventoryScreenTest {
             )
         )
 
-        composeTestRule.onNodeWithText("Lácteos · 1,5 L").assertIsDisplayed()
+        // La etiqueta solo lleva la categoría y la cantidad va aparte, después del nombre.
+        composeTestRule.onNodeWithText("Lácteos").assertIsDisplayed()
+        composeTestRule.onNodeWithText("1,5 L").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Leche Entera").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cereales").assertIsDisplayed()
     }
 

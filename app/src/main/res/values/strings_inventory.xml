@@ -26,7 +26,6 @@
 
     <!-- Categoría y cantidad de la fila (CA-INV-01-02 y CA-INV-01-08) -->
     <string name="inventory_quantity_format">%1$s %2$s</string>
-    <string name="inventory_category_with_quantity">%1$s · %2$s</string>
 
     <!-- Reintento cuando la carga falla -->
     <string name="inventory_retry">Reintentar</string>

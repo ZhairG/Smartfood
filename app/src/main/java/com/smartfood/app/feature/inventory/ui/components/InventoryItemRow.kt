@@ -38,6 +38,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -123,26 +124,37 @@ fun InventoryItemRow(
                     Text(
                         text = if (priceText == null) dateText else "$dateText · $priceText",
                         style = MaterialTheme.typography.bodyLarge.copy(fontSize = DateFontSize),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        softWrap = false
                     )
-                    CategoryLabel(item = item)
+                    Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
+                    CategoryLabel(item = item, modifier = Modifier.weight(1f, fill = false))
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = item.name,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontSize = NameFontSize,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
-                    )
+                    // La cantidad va después del nombre y nunca se recorta; el nombre largo termina en "…"
+                    // (CA-INV-01-08, spec §8).
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = item.name,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontSize = NameFontSize,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+                        QuantityText(item = item)
+                    }
                     IconButton(
                         onClick = { onEditClicked(item.id) },
                         modifier = Modifier.size(EditButtonSize)
@@ -209,38 +221,42 @@ private fun ItemThumbnail(
 }
 
 /**
- * Etiqueta verde con la categoría del producto y, si tiene, su cantidad (CA-INV-01-02 y CA-INV-01-08). También la
- * usan los resultados de la búsqueda (`SearchResultRow`).
+ * Etiqueta verde con la categoría del producto (CA-INV-01-02), como la del Figma `476:4258`: Bold de 10 px con alto
+ * de línea normal y relleno de 5 px solo a los lados. Si no cabe, termina en "…".
  */
 @Composable
-internal fun CategoryLabel(item: InventoryItem) {
-    val category = stringResource(id = item.category.titleRes)
-    val quantityText = item.quantity?.let { quantity ->
-        stringResource(
-            id = R.string.inventory_quantity_format,
-            quantity.formattedAmount(),
-            stringResource(id = quantity.unit.titleRes)
-        )
-    }
-    val label = if (quantityText == null) {
-        category
-    } else {
-        stringResource(id = R.string.inventory_category_with_quantity, category, quantityText)
-    }
+private fun CategoryLabel(item: InventoryItem, modifier: Modifier = Modifier) {
     Text(
-        text = label,
+        text = stringResource(id = item.category.titleRes),
         style = MaterialTheme.typography.labelLarge.copy(
             fontSize = CategoryFontSize,
+            lineHeight = TextUnit.Unspecified,
             fontWeight = FontWeight.Bold
         ),
         color = GreenCheck,
         maxLines = 1,
-        modifier = Modifier
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
             .background(color = GreenMain20, shape = CategoryLabelShape)
-            .padding(
-                horizontal = MaterialTheme.spacing.extraSmall,
-                vertical = MaterialTheme.spacing.extraSmall
-            )
+            .padding(horizontal = CategoryLabelPadding)
+    )
+}
+
+/** Cantidad y unidad del producto en gris, después del nombre (CA-INV-01-08); nada si no tiene. */
+@Composable
+private fun QuantityText(item: InventoryItem) {
+    val quantity = item.quantity ?: return
+    Text(
+        text = stringResource(
+            id = R.string.inventory_quantity_format,
+            quantity.formattedAmount(),
+            stringResource(id = quantity.unit.titleRes)
+        ),
+        style = MaterialTheme.typography.bodyLarge.copy(fontSize = DateFontSize, fontWeight = FontWeight.Medium),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 1,
+        softWrap = false,
+        modifier = Modifier.padding(start = MaterialTheme.spacing.small)
     )
 }
 
@@ -276,6 +292,7 @@ private val DateFontSize = 13.sp
 private val NameFontSize = 20.sp
 private val CategoryFontSize = 10.sp
 private val CategoryLabelShape = RoundedCornerShape(5.dp)
+private val CategoryLabelPadding = 5.dp
 private val LeadingThumbnailShape = RoundedCornerShape(
     topStart = ThumbnailRadius,
     bottomStart = ThumbnailRadius
