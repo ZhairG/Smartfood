@@ -38,9 +38,7 @@ import com.smartfood.app.feature.inventory.ui.camera.ProductCameraRoute
 import com.smartfood.app.feature.inventory.ui.list.InventoryEffect
 import com.smartfood.app.feature.inventory.ui.list.InventoryScreen
 import com.smartfood.app.feature.inventory.ui.list.InventoryViewModel
-import com.smartfood.app.feature.inventory.ui.search.InventorySearchEffect
-import com.smartfood.app.feature.inventory.ui.search.InventorySearchScreen
-import com.smartfood.app.feature.inventory.ui.search.InventorySearchViewModel
+import com.smartfood.app.feature.inventory.ui.search.InventorySearchRoute
 import java.io.File
 
 /**
@@ -75,19 +73,10 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
         }
     }
     composable<Route.InventorySearch> {
-        val viewModel: InventorySearchViewModel = hiltViewModel()
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
-
-        ObserveEffects(viewModel.effects) { effect ->
-            when (effect) {
-                is InventorySearchEffect.NavigateToEditor ->
-                    navController.navigate(Route.ProductEditor(effect.id))
-
-                InventorySearchEffect.NavigateBack -> navController.popBackStack()
-            }
-        }
-
-        InventorySearchScreen(state = state, onEvent = viewModel::onEvent)
+        InventorySearchRoute(
+            onNavigateToEditor = { id -> navController.navigate(Route.ProductEditor(id)) },
+            onBack = { navController.popBackStack() }
+        )
     }
     composable<Route.ProductEditor> { entry ->
         // Provisional (#40): recibe la foto de la cámara por el savedStateHandle, como lo hará el editor real.

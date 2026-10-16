@@ -10,6 +10,7 @@ package com.smartfood.app.feature.inventory.ui.search
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
+import com.smartfood.app.feature.inventory.domain.model.SpeechError
 
 /**
  * Un resultado de la búsqueda con el estado de vencimiento del producto, que pinta su estado y su descripción
@@ -24,13 +25,31 @@ data class SearchResultUi(
 )
 
 /**
+ * Estado del aviso de voz, dibujado encima de la pantalla (HU-INV-07).
+ */
+sealed interface VoiceUiState {
+    /** No hay aviso de voz en pantalla. */
+    data object Hidden : VoiceUiState
+
+    /** El reconocedor escucha: el aviso muestra "Habla ahora" con las ondas (CA-INV-07-01). */
+    data object Listening : VoiceUiState
+
+    /** Se procesa el audio: el aviso muestra "…" (CA-INV-07-02). */
+    data object Processing : VoiceUiState
+
+    /** La escucha falló: el aviso muestra el error y, si no se entendió, "Reintentar" (CA-INV-07-05). */
+    data class Failed(val error: SpeechError) : VoiceUiState
+}
+
+/**
  * Estado de la búsqueda (CA-INV-06-01).
  *
  * @property query Texto de la barra de búsqueda.
  * @property selectedCategory Categoría elegida en los filtros, o `null` para "Todos" (CA-INV-06-03).
  * @property results Productos que cumplen el texto y la categoría a la vez (CA-INV-06-04).
- * @property isVoiceAvailable Si el micrófono está disponible. En el #42 siempre es `false`: el botón queda visible y
- *   desactivado hasta que el #43 (T035) enlaza la voz.
+ * @property isVoiceAvailable Si el teléfono tiene servicio de reconocimiento de voz; si no, la tarjeta "Usa tu voz"
+ *   no se muestra (CA-INV-07-08).
+ * @property voice Estado del aviso de voz (CA-INV-07-01, CA-INV-07-02, CA-INV-07-05).
  * @property isLoading `true` hasta que llega el primer resultado del inventario.
  */
 data class InventorySearchUiState(
@@ -38,6 +57,7 @@ data class InventorySearchUiState(
     val selectedCategory: FoodCategory? = null,
     val results: List<SearchResultUi> = emptyList(),
     val isVoiceAvailable: Boolean = false,
+    val voice: VoiceUiState = VoiceUiState.Hidden,
     val isLoading: Boolean = false,
 ) {
     /** No hay nada que mostrar una vez terminada la carga (CA-INV-06-06). */
@@ -58,8 +78,17 @@ sealed interface InventorySearchEvent {
     /** El usuario eligió un filtro de categoría; `null` es "Todos" (CA-INV-06-03). */
     data class CategorySelected(val category: FoodCategory?) : InventorySearchEvent
 
-    /** El usuario tocó el micrófono de "Usa tu voz". La escucha llega con el #43 (T035). */
+    /** El usuario tocó el micrófono de "Usa tu voz" (CA-INV-07-01). */
     data object VoiceClicked : InventorySearchEvent
+
+    /** Resultado de pedir el permiso de micrófono (CA-INV-07-06). */
+    data class VoicePermissionResult(val granted: Boolean) : InventorySearchEvent
+
+    /** El usuario tocó "Reintentar" en el aviso de error: vuelve a escuchar (CA-INV-07-05). */
+    data object VoiceRetry : InventorySearchEvent
+
+    /** El usuario tocó fuera del aviso o volvió atrás: cancela la escucha (CA-INV-07-07). */
+    data object VoiceDismissed : InventorySearchEvent
 
     /** El usuario tocó un resultado (CA-INV-06-08). */
     data class ResultClicked(val id: String) : InventorySearchEvent
@@ -74,6 +103,12 @@ sealed interface InventorySearchEvent {
 sealed interface InventorySearchEffect {
     /** Abrir "Editar Producto" del producto tocado (CA-INV-06-08). */
     data class NavigateToEditor(val id: String) : InventorySearchEffect
+
+    /** Pedir el permiso de micrófono; la pantalla decide si ya está concedido (CA-INV-07-06). */
+    data object RequestMicPermission : InventorySearchEffect
+
+    /** Mostrar el aviso de que el permiso de micrófono fue denegado, con acceso a Ajustes (CA-INV-07-06). */
+    data object ShowPermissionRationale : InventorySearchEffect
 
     /** Volver a la pantalla anterior. */
     data object NavigateBack : InventorySearchEffect
