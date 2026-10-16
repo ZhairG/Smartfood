@@ -23,6 +23,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -63,7 +64,9 @@ class InventorySearchViewModel @Inject constructor(
      * que alimentan la lista, así que no se vuelve a clasificar por producto.
      */
     val uiState: StateFlow<InventorySearchUiState> = combine(
-        observeInventoryUseCase(),
+        // Si el inventario no se puede leer (por ejemplo, la sesión venció), la búsqueda queda sin resultados en
+        // lugar de cerrar la app: el error no debe llegar sin atrapar hasta la UI.
+        observeInventoryUseCase().catch { emit(emptyList()) },
         query,
         selectedCategory,
         voice

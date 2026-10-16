@@ -10,18 +10,24 @@ package com.smartfood.app.feature.inventory.ui.search
 
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
+import com.smartfood.app.feature.inventory.domain.model.InventoryError
+import com.smartfood.app.feature.inventory.domain.model.InventoryException
+import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.model.SpeechError
 import com.smartfood.app.feature.inventory.domain.model.SpeechEvent
+import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ParseSpokenIngredientsUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.SearchInventoryUseCase
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakeSpeechToText
-import com.smartfood.app.testutil.MainDispatcherRule
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
+import com.smartfood.app.testutil.MainDispatcherRule
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -285,5 +291,24 @@ class InventorySearchViewModelTest {
         val state = viewModel.uiState.first { it.query == "manzana, pera" }
         assertEquals(listOf("item-2", "item-3"), state.results.map { it.item.id })
         assertEquals(VoiceUiState.Hidden, state.voice)
+    }
+
+    @Test
+    fun `CA-INV-06-01 si el inventario no se puede leer la busqueda queda vacia sin cerrar la app`() = runTest {
+        // Sin sesión, el repositorio real falla con NotAuthenticated al observar (MainNavigationTest.caInv0904).
+        val sinSesion = object : InventoryRepository by repository {
+            override fun observeItems(): Flow<List<InventoryItem>> =
+                flow { throw InventoryException(InventoryError.NotAuthenticated) }
+        }
+        val viewModel = InventorySearchViewModel(
+            observeInventoryUseCase = ObserveInventoryUseCase(sinSesion, ClassifyExpiryUseCase(fixedClock(today))),
+            searchInventoryUseCase = SearchInventoryUseCase(),
+            speechToText = speech,
+            parseSpokenIngredientsUseCase = ParseSpokenIngredientsUseCase()
+        )
+
+        val state = viewModel.uiState.first { !it.isLoading }
+
+        assertTrue(state.results.isEmpty())
     }
 }
