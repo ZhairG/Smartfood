@@ -10,6 +10,7 @@ package com.smartfood.app.feature.inventory.ui
 import androidx.annotation.StringRes
 import com.smartfood.app.R
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
+import com.smartfood.app.feature.inventory.domain.model.InventoryField
 import com.smartfood.app.feature.inventory.domain.model.SpeechError
 
 /**
@@ -22,8 +23,21 @@ fun InventoryError.messageRes(): Int = when (this) {
     InventoryError.NotFound -> R.string.error_inventory_not_found
     InventoryError.PhotoUploadFailed -> R.string.error_inventory_photo_upload
     InventoryError.NotAuthenticated -> R.string.error_inventory_permission
-    is InventoryError.Validation -> R.string.error_inventory_unknown
+    is InventoryError.Validation -> validationMessageRes()
     is InventoryError.Unknown -> R.string.error_inventory_unknown
+}
+
+/** Mensaje del campo en rojo del editor (CA-INV-02-03, 02-09 y 03-03). */
+@StringRes
+private fun InventoryError.Validation.validationMessageRes(): Int = when (field) {
+    InventoryField.NAME ->
+        if (reason == InventoryError.Validation.Reason.TOO_LONG) R.string.error_inventory_name_too_long
+        else R.string.error_inventory_name_empty
+    InventoryField.EXPIRY ->
+        if (reason == InventoryError.Validation.Reason.PAST_DATE) R.string.error_inventory_past_date
+        else R.string.error_inventory_expiry_empty
+    InventoryField.CATEGORY -> R.string.error_inventory_category_empty
+    InventoryField.QUANTITY -> R.string.error_inventory_quantity_invalid
 }
 
 /**

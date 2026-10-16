@@ -1,0 +1,242 @@
+/**
+ * Nombre: ProductEditorViewModel.kt
+ * Autor: SmartFood Team
+ * Fecha: Octubre 2026
+ * Descripción: ViewModel del editor de producto (spec 006, HU-INV-02 a HU-INV-05, plan §2). Las reglas viven en
+ * los casos de uso: el ViewModel solo arma el borrador, decide qué pasa con la foto y muestra el resultado. Los
+ * efectos de un solo uso salen por un `Channel` que la ruta recolecta con `ObserveEffects`.
+ */
+package com.smartfood.app.feature.inventory.ui.editor
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.smartfood.app.feature.inventory.domain.model.FoodCategory
+import com.smartfood.app.feature.inventory.domain.model.InventoryItem
+import com.smartfood.app.feature.inventory.domain.model.ItemDraft
+import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
+import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
+import com.smartfood.app.feature.inventory.domain.model.toInventoryError
+import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
+import com.smartfood.app.feature.inventory.domain.usecase.AddItemUseCase
+import com.smartfood.app.feature.inventory.domain.usecase.DeleteItemUseCase
+import com.smartfood.app.feature.inventory.domain.usecase.PhotoEdit
+import com.smartfood.app.feature.inventory.domain.usecase.UpdateItemUseCase
+import com.smartfood.app.feature.inventory.domain.usecase.ValidateItemUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import javax.inject.Inject
+
+/**
+ * @param savedStateHandle Argumentos de `Route.ProductEditor`: `itemId` es `null` al añadir.
+ * @param repository Repositorio del que se carga el producto a editar.
+ * @param validate Reglas del formulario; aquí solo se usa `isComplete` para habilitar el botón.
+ * @param addItem Alta de un producto (CA-INV-02-06).
+ * @param updateItem Edición de un producto (CA-INV-03-02).
+ * @param deleteItem Eliminación de un producto (CA-INV-04-02).
+ */
+@HiltViewModel
+class ProductEditorViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val repository: InventoryRepository,
+    private val validate: ValidateItemUseCase,
+    private val addItem: AddItemUseCase,
+    private val updateItem: UpdateItemUseCase,
+    private val deleteItem: DeleteItemUseCase,
+) : ViewModel() {
+
+    private val itemId: String? = savedStateHandle.get<String>(ITEM_ID_KEY)
+
+    private val _uiState = MutableStateFlow(
+        ProductEditorUiState(mode = if (itemId == null) EditorMode.ADD else EditorMode.EDIT)
+    )
+    val uiState: StateFlow<ProductEditorUiState> = _uiState.asStateFlow()
+
+    private val _effects = Channel<ProductEditorEffect>(Channel.BUFFERED)
+    val effects = _effects.receiveAsFlow()
+
+    /** Producto tal como está guardado; `null` al añadir. */
+    private var original: InventoryItem? = null
+
+    init {
+        itemId?.let(::loadItem)
+    }
+
+    /**
+     * Atiende lo que el usuario hace en el editor.
+     *
+     * @param event Evento de la UI.
+     */
+    fun onEvent(event: ProductEditorEvent) {
+        when (event) {
+            is ProductEditorEvent.NameChanged -> edit { it.copy(name = event.value) }
+            ProductEditorEvent.ExpiryClicked -> openDialog(EditorDialog.DatePicker)
+            is ProductEditorEvent.ExpiryPicked -> edit { it.copy(expiresOn = event.date, dialog = null) }
+            ProductEditorEvent.CategoryClicked -> openDialog(EditorDialog.CategorySheet)
+            is ProductEditorEvent.CategoryPicked -> edit { it.copy(category = event.category, dialog = null) }
+            is ProductEditorEvent.QuantityChanged -> edit { it.copy(quantityText = event.value) }
+            ProductEditorEvent.UnitClicked -> openDialog(EditorDialog.UnitSheet)
+            is ProductEditorEvent.UnitPicked -> edit { it.copy(unit = event.unit, dialog = null) }
+            ProductEditorEvent.CameraClicked -> sendEffect(ProductEditorEffect.NavigateToCamera)
+            is ProductEditorEvent.PhotoCaptured -> onPhotoCaptured(event.path)
+            ProductEditorEvent.RemovePhotoClicked -> openDialog(EditorDialog.ConfirmRemovePhoto)
+            ProductEditorEvent.RemovePhotoConfirmed -> removePhoto()
+            ProductEditorEvent.SaveClicked -> save()
+            ProductEditorEvent.DeleteClicked -> openDialog(EditorDialog.ConfirmDelete)
+            ProductEditorEvent.DeleteConfirmed -> delete()
+            ProductEditorEvent.DialogDismissed -> _uiState.update { it.copy(dialog = null) }
+            ProductEditorEvent.BackClicked -> discardAndLeave()
+        }
+    }
+
+    /** Carga el producto a editar con sus datos (CA-INV-03-01). */
+    private fun loadItem(id: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            repository.getItem(id)
+                .onSuccess { item ->
+                    original = item
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            name = item.name,
+                            expiresOn = item.expiresOn,
+                            originalExpiresOn = item.expiresOn,
+                            category = item.category,
+                            quantityText = item.quantity?.let { quantity -> formatAmount(quantity.amount) }.orEmpty(),
+                            unit = item.quantity?.unit,
+                            photo = item.photo?.let { photo -> PhotoUiState.Remote(photo.url) } ?: PhotoUiState.None,
+                        ).withSaveEnabled()
+                    }
+                }
+                .onFailure { cause -> _uiState.update { it.copy(isLoading = false, error = cause.toInventoryError()) } }
+        }
+    }
+
+    /** Aplica un cambio del formulario: borra el error anterior y recalcula el botón (CA-INV-02-02). */
+    private fun edit(change: (ProductEditorUiState) -> ProductEditorUiState) {
+        _uiState.update { change(it).copy(error = null).withSaveEnabled() }
+    }
+
+    private fun openDialog(dialog: EditorDialog) {
+        _uiState.update { it.copy(dialog = dialog) }
+    }
+
+    /** La foto nueva reemplaza a la anterior; si la anterior tampoco se guardó, se borra del teléfono. */
+    private fun onPhotoCaptured(path: String) {
+        (_uiState.value.photo as? PhotoUiState.Local)?.let { sendEffect(ProductEditorEffect.DeleteLocalPhoto(it.path)) }
+        _uiState.update { it.copy(photo = PhotoUiState.Local(path)) }
+    }
+
+    /** Quita la foto de la zona; en la edición, la de la nube se borra al guardar (CA-INV-05-04). */
+    private fun removePhoto() {
+        (_uiState.value.photo as? PhotoUiState.Local)?.let { sendEffect(ProductEditorEffect.DeleteLocalPhoto(it.path)) }
+        _uiState.update { it.copy(photo = PhotoUiState.None, dialog = EditorDialog.PhotoRemoved) }
+        viewModelScope.launch {
+            delay(RESULT_DIALOG_MILLIS)
+            _uiState.update { if (it.dialog == EditorDialog.PhotoRemoved) it.copy(dialog = null) else it }
+        }
+    }
+
+    /** Guarda el alta o la edición. Si falla, el formulario conserva lo escrito (CA-INV-02-07, CA-INV-05-06). */
+    private fun save() {
+        val state = _uiState.value
+        if (!state.isSaveEnabled || state.isSaving) return
+        val draft = state.toDraft()
+        val localPhoto = (state.photo as? PhotoUiState.Local)?.let { LocalPhoto(it.path) }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true, error = null) }
+            val current = original
+            val result = if (current == null) {
+                addItem(draft, localPhoto)
+            } else {
+                updateItem(current, draft, photoEditFor(current, state.photo))
+            }
+            result
+                .onSuccess { item ->
+                    val dialog = if (current == null) EditorDialog.ProductSaved else EditorDialog.ProductUpdated(item.name)
+                    _uiState.update { it.copy(isSaving = false, dialog = dialog) }
+                    closeResultAndLeave()
+                }
+                .onFailure { cause -> _uiState.update { it.copy(isSaving = false, error = cause.toInventoryError()) } }
+        }
+    }
+
+    /** Elimina el producto con su foto (CA-INV-04-02). */
+    private fun delete() {
+        val current = original ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true, dialog = null, error = null) }
+            deleteItem(current)
+                .onSuccess {
+                    (_uiState.value.photo as? PhotoUiState.Local)?.let {
+                        sendEffect(ProductEditorEffect.DeleteLocalPhoto(it.path))
+                    }
+                    _uiState.update { it.copy(isSaving = false, dialog = EditorDialog.ProductDeleted) }
+                    closeResultAndLeave()
+                }
+                .onFailure { cause -> _uiState.update { it.copy(isSaving = false, error = cause.toInventoryError()) } }
+        }
+    }
+
+    /** Muestra el resultado unos segundos y vuelve a la lista. */
+    private suspend fun closeResultAndLeave() {
+        delay(RESULT_DIALOG_MILLIS)
+        _uiState.update { it.copy(dialog = null) }
+        _effects.send(ProductEditorEffect.NavigateBack)
+    }
+
+    /** Vuelve atrás sin guardar: el producto queda como estaba (CA-INV-03-04) y la foto nueva se descarta. */
+    private fun discardAndLeave() {
+        if (_uiState.value.isSaving) return
+        (_uiState.value.photo as? PhotoUiState.Local)?.let { sendEffect(ProductEditorEffect.DeleteLocalPhoto(it.path)) }
+        sendEffect(ProductEditorEffect.NavigateBack)
+    }
+
+    private fun ProductEditorUiState.withSaveEnabled() = copy(isSaveEnabled = validate.isComplete(toDraft()))
+
+    private fun ProductEditorUiState.toDraft() = ItemDraft(
+        name = name,
+        expiresOn = expiresOn,
+        category = category,
+        quantityText = quantityText,
+        unit = unit,
+    )
+
+    private fun sendEffect(effect: ProductEditorEffect) {
+        viewModelScope.launch { _effects.send(effect) }
+    }
+
+    companion object {
+        /** Nombre del argumento de `Route.ProductEditor` en el `SavedStateHandle`. */
+        const val ITEM_ID_KEY = "itemId"
+
+        /** Tiempo que se ve un diálogo de resultado antes de cerrarse solo. */
+        const val RESULT_DIALOG_MILLIS = 2_000L
+
+        /** Qué pasa con la foto al guardar una edición (CA-INV-05-04, CA-INV-05-05). */
+        internal fun photoEditFor(original: InventoryItem, photo: PhotoUiState): PhotoEdit = when (photo) {
+            is PhotoUiState.Local -> PhotoEdit.Replace(LocalPhoto(photo.path))
+            PhotoUiState.None -> if (original.photo != null) PhotoEdit.Remove else PhotoEdit.Keep
+            is PhotoUiState.Remote -> PhotoEdit.Keep
+        }
+
+        /** Cantidad guardada como texto, sin ceros decimales sobrantes ("1.5", "2"). */
+        internal fun formatAmount(amount: Double): String =
+            BigDecimal.valueOf(amount).stripTrailingZeros().toPlainString()
+    }
+}
+
+/** Categorías en el orden del Figma (`476:4113`). */
+internal val CategoryOptions: List<FoodCategory> = FoodCategory.entries
+
+/** Unidades en el orden de la spec (CA-INV-02-08). */
+internal val UnitOptions: List<QuantityUnit> = QuantityUnit.entries

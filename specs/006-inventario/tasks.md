@@ -56,11 +56,11 @@
 > Requiere el MCP de Figma comprobado (ver la nota del inicio).
 
 - [x] T031 Lista: `InventoryContract`, `InventoryViewModel` e `InventoryScreen` con `InventoryItemRow` y `ExpirySectionHeader`, y sus pruebas (HU-INV-01). Pruebas: U `InventoryViewModelTest`, I `InventoryScreenTest`. → #39
-- [ ] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel` y `ProductEditorScreen` con `PhotoSlot`, `CategorySheet`, `DatePicker` sin días pasados y la fila de cantidad con su hoja de unidad, y sus pruebas (HU-INV-02, 03, 04; CA-INV-02-08, 02-09). La fila de la lista muestra la cantidad (CA-INV-01-08, en T031). → #40
+- [x] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel`, `ProductEditorScreen` y `ProductEditorRoute` con `PhotoSlot`, `OptionSheet` (categoría y unidad), `ExpiryDatePicker` sin días pasados y la fila de cantidad, y sus pruebas (HU-INV-02, 03, 04; CA-INV-02-08, 02-09). La fila de la lista muestra la cantidad (CA-INV-01-08, en T031). El permiso de notificaciones queda declarado en el contrato y lo conecta la T039 (#44). Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`. → #40
 - [x] T033 Cámara: `ProductCameraScreen` (CameraX, recuadro de encuadre, resultado por `savedStateHandle`), con el permiso y la explicación (HU-INV-05). Incluye `SmartFoodTopBar`. Pruebas: I `ProductCameraScreenTest`, I `SmartFoodTopBarTest`. → #41
 - [x] T034 Búsqueda: `InventorySearchContract`, `InventorySearchViewModel` e `InventorySearchScreen` con `SmartFoodTopBar`, los `CategoryChips` (en `ui/components/`) y "x", y sus pruebas (HU-INV-06). Los resultados reutilizan `InventoryItemRow`. → #42
 - [x] T035 Voz: `VoiceSearchCard` y `VoiceSearchOverlay` ("Habla ahora", "…", error con "Reintentar"), el permiso de micrófono y la cancelación, con pruebas del ViewModel y de la pantalla (HU-INV-07). → #43
-- [ ] T036 `AdaptiveLayoutTest` cubre el editor en 360×720, con el teclado abierto y cerrado (RNF-INV-06). → #40
+- [x] T036 `AdaptiveLayoutTest` cubre el editor (alta y edición) en 360×720, 384×857 y 412×917 con el teclado cerrado; con el teclado abierto se comprueba a mano (RNF-INV-06). Prueba: I `AdaptiveLayoutTest.t036_*`. → #40
 
 ## Fase 6: Avisos
 - [ ] T037 `ExpiryNotifier` (canal, plurales y `PendingIntent`) y `ExpiryReminderWorker` (`@HiltWorker`) (CA-INV-08-01 a 08-04). → #44
@@ -83,7 +83,7 @@
 - [ ] T047 [P] `FirestoreInventoryRepository` sin transacciones: `set`/`update`/`delete` con espera de 3 s → `WriteOutcome`, `MetadataChanges.INCLUDE` → `isPendingSync`, `setPhoto` y `hasPendingWrites` (plan §3). Las reglas no cambian. Pruebas: U `InventoryDocumentTest`, I `FirestoreInventoryRepositoryEmulatorTest` con `disableNetwork()` (CA-INV-10-02, 10-05).
 - [ ] T048 [P] `PendingPhotoStore`, `PhotoUploadWorker`, `PhotoDeleteWorker` y `WorkManagerPhotoSync` (`@HiltWorker`), con su `@Binds` en `InventoryDataModule`. `SmartfoodApp` como `Configuration.Provider` y sin el inicializador del manifiesto (sale de la T038). `work-testing` en `libs.versions.toml` y `app/build.gradle.kts`. Pruebas I de los workers (CA-INV-05-05, 05-06, 10-03, 10-04).
 - [ ] T049 Lista: ícono de pendiente y foto local en `InventoryItemRow`, con la descripción "Pendiente de sincronizar" (CA-INV-10-02, 10-04, 10-06). Va después del #39. Pruebas: I `InventoryScreenTest`.
-- [ ] T050 Editor: diálogo "Guardado en tu teléfono" con `WriteOutcome.PENDING` y la foto local en `PhotoSlot` (CA-INV-10-02, 10-04). Se integra en el editor (#40). Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`.
+- [ ] T050 Editor: diálogo "Guardado en tu teléfono" con `WriteOutcome.PENDING` y la foto local en `PhotoSlot` (CA-INV-10-02, 10-04). Salió del #40 el 16/10: se hace después de la entrega, con el resto de la fase 8. Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`.
 - [ ] T051 Perfil: aviso al cerrar sesión con cambios pendientes, con `SmartFoodConfirmDialog` (CA-INV-10-07). Pruebas: U `ProfileViewModelTest`, I `ProfileScreenTest`.
 
 ## Matriz de trazabilidad
@@ -115,7 +115,7 @@ verificación manual (checklist).
 | CA-INV-03-03 | U `ValidateItemUseCaseTest` |
 | CA-INV-03-04 | U `ProductEditorViewModelTest` |
 | CA-INV-04-01 | I `ProductEditorScreenTest`, I `SmartFoodDialogsTest`, I `SmartFoodPrimaryButtonTest` (botón destructivo) |
-| CA-INV-04-02 | U `DeleteItemUseCaseTest` (encola el borrado de la foto), I `PhotoDeleteWorkerTest`, M 3 |
+| CA-INV-04-02 | U `DeleteItemUseCaseTest` (encola el borrado de la foto), U `ProductEditorViewModelTest`, I `PhotoDeleteWorkerTest`, M 3 |
 | CA-INV-04-03 | I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
 | CA-INV-05-01 | I `ProductCameraScreenTest`, M 2 |
 | CA-INV-05-02 | U `ProductEditorViewModelTest`, M 2 |
@@ -162,7 +162,7 @@ verificación manual (checklist).
 | RNF-INV-02 | U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest`, R `storage.test.js`, M 9 (foto > 2 MB denegada), M 2 (tamaño subido) |
 | RNF-INV-04 | I `InventoryScreenTest`, I `InventorySearchScreenTest` (descripciones y estado de los chips) |
 | RNF-INV-05 | Las de CA-INV-10-01 a 10-05, M 7 |
-| RNF-INV-06 | I `AdaptiveLayoutTest` |
+| RNF-INV-06 | I `AdaptiveLayoutTest` (editor, T036), M (teclado abierto) |
 
 ### Checklist de verificación manual
 

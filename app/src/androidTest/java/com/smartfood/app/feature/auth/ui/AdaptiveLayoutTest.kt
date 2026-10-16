@@ -25,12 +25,17 @@ import com.smartfood.app.feature.auth.ui.recovery.PasswordRecoveryUiState
 import com.smartfood.app.feature.auth.ui.recovery.RecoveryStep
 import com.smartfood.app.feature.auth.ui.register.RegisterScreen
 import com.smartfood.app.feature.auth.ui.register.RegisterUiState
+import com.smartfood.app.feature.inventory.domain.model.FoodCategory
+import com.smartfood.app.feature.inventory.ui.editor.EditorMode
+import com.smartfood.app.feature.inventory.ui.editor.ProductEditorScreen
+import com.smartfood.app.feature.inventory.ui.editor.ProductEditorUiState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import java.time.LocalDate
 import kotlin.math.ceil
 
 /**
@@ -180,5 +185,29 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
             )
         }
         composeTestRule.onNode(hasText("Continuar") and hasClickAction()).assertIsDisplayed()
+    }
+
+    // T036 (spec 006, RNF-INV-06): el editor de producto cabe con el teclado cerrado, en alta y en edición.
+    @Test
+    fun t036_rnfInv06_editorAlta_cabeSinScroll() {
+        mostrar { ProductEditorScreen(ProductEditorUiState(), {}) }
+        assertCabeSinScroll("Añadir al Inventario")
+    }
+
+    @Test
+    fun t036_rnfInv06_editorEdicion_cabeSinScroll() {
+        mostrar {
+            ProductEditorScreen(
+                ProductEditorUiState(
+                    mode = EditorMode.EDIT,
+                    name = "Carne",
+                    expiresOn = LocalDate.of(2026, 9, 20),
+                    category = FoodCategory.PROTEINS,
+                    isSaveEnabled = true
+                ),
+                {}
+            )
+        }
+        assertCabeSinScroll("Eliminar")
     }
 }
