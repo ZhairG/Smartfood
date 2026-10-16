@@ -55,7 +55,8 @@ feature/inventory/
 feature/profile/                              hoy feature/home: HomeScreen → ProfileScreen (sin cambios de lógica)
 core/navigation/                              rutas nuevas, MainGraph con barra inferior
 core/designsystem/components/                 SmartFoodSelectorField, SmartFoodBottomBar, SmartFoodConfirmDialog,
-                                              SmartFoodResultDialog; SmartFoodTextField ampliado
+                                              SmartFoodResultDialog, SmartFoodTopBar (barra de las pantallas internas,
+                                              Figma `476:5960`); SmartFoodTextField ampliado
 res/values/strings_inventory.xml              todos los textos de la feature
 ```
 
@@ -446,7 +447,8 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 - **Instrumentadas (Compose):**
   - `InventoryScreenTest`: secciones, orden, vacío y descripciones accesibles.
   - `ProductEditorScreenTest`: botón deshabilitado/habilitado, errores, hoja de categoría y diálogos.
-  - `InventorySearchScreenTest`: chips, sin resultados, aviso de voz y "x".
+  - `InventorySearchScreenTest`: `CategoryChips`, sin resultados, aviso de voz con el micrófono desactivado y "x";
+    los resultados reutilizan `InventoryItemRow` y la pantalla usa `SmartFoodTopBar`.
   - `MainNavigationTest`: barra inferior, pestañas y "atrás".
   - `AppNavigationTest` actualizado y `AdaptiveLayoutTest` para el editor en 360×720.
 - **Manual** (checklist en `tasks.md`): cámara real, voz real en es-CO, permisos negados, notificación a la hora

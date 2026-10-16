@@ -38,17 +38,19 @@ import com.smartfood.app.feature.inventory.ui.camera.ProductCameraRoute
 import com.smartfood.app.feature.inventory.ui.list.InventoryEffect
 import com.smartfood.app.feature.inventory.ui.list.InventoryScreen
 import com.smartfood.app.feature.inventory.ui.list.InventoryViewModel
+import com.smartfood.app.feature.inventory.ui.search.InventorySearchEffect
+import com.smartfood.app.feature.inventory.ui.search.InventorySearchScreen
+import com.smartfood.app.feature.inventory.ui.search.InventorySearchViewModel
 import java.io.File
 
 /**
  * Nombre: InventoryNavGraph.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Destinos del inventario dentro de `MainGraph` (spec 006, plan §7). La cámara (#41) y la lista (#39)
- * ya son las reales; el editor y la búsqueda siguen siendo **pantallas provisionales** que cada Issue reemplaza sin
- * tocar las rutas (editor → #40, búsqueda → #42). Los botones provisionales permiten probar la cámara hasta que
- * llegue el editor real. "Mi Inventario" es una pestaña con barra inferior; las demás son pantallas internas, con
- * empuje y sin barra (CA-INV-09-04).
+ * Descripción: Destinos del inventario dentro de `MainGraph` (spec 006, plan §7). La cámara (#41), la lista (#39) y
+ * la búsqueda (#42, CA-INV-06-01 a 06-08) ya son las reales; el editor sigue siendo una **pantalla provisional** que
+ * el #40 reemplaza sin tocar las rutas. "Mi Inventario" es una pestaña con barra inferior; las demás son pantallas
+ * internas, con empuje y sin barra (CA-INV-09-04).
  *
  * @param navController Controlador de navegación de la app.
  */
@@ -73,7 +75,19 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
         }
     }
     composable<Route.InventorySearch> {
-        PlaceholderScreen(title = stringResource(id = R.string.placeholder_search_title)) // #42
+        val viewModel: InventorySearchViewModel = hiltViewModel()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+        ObserveEffects(viewModel.effects) { effect ->
+            when (effect) {
+                is InventorySearchEffect.NavigateToEditor ->
+                    navController.navigate(Route.ProductEditor(effect.id))
+
+                InventorySearchEffect.NavigateBack -> navController.popBackStack()
+            }
+        }
+
+        InventorySearchScreen(state = state, onEvent = viewModel::onEvent)
     }
     composable<Route.ProductEditor> { entry ->
         // Provisional (#40): recibe la foto de la cámara por el savedStateHandle, como lo hará el editor real.

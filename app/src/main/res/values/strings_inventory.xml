@@ -39,6 +39,20 @@
     <string name="category_grains">Cereales</string>
     <string name="category_other">Otro</string>
 
+    <!-- Búsqueda de inventario (HU-INV-06, CA-INV-06-01) -->
+    <string name="inventory_search_placeholder">Buscar producto…</string>
+    <string name="cd_clear_search">Limpiar búsqueda</string>
+    <string name="search_no_results">No hay productos que coincidan</string>
+    <string name="inventory_expires_on">Vence: %1$s</string>
+
+    <!-- Filtros por categoría (CA-INV-06-01, CA-INV-06-03) -->
+    <string name="category_all">Todos</string>
+
+    <!-- Tarjeta "Usa tu voz" (CA-INV-06-01). La escucha y su aviso llegan con el #43 (T035). -->
+    <string name="search_voice_card_title">Usa tu voz</string>
+    <string name="search_voice_card_subtitle">Dicta muchos ingredientes al mismo tiempo</string>
+    <string name="cd_mic_button">Buscar por voz</string>
+
     <!-- Unidades de cantidad (CA-INV-01-08) -->
     <string name="unit_units">unidades</string>
     <string name="unit_grams">g</string>

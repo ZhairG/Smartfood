@@ -85,6 +85,8 @@ val QuantityUnit.titleRes: Int
  * @param status Estado de vencimiento de la sección a la que pertenece.
  * @param onEditClicked Acción al tocar la fila o su lápiz, con el identificador del producto.
  * @param modifier Modificador opcional.
+ * @param showExpiryLabel `true` para anteponer "Vence:" a la fecha (los resultados de la búsqueda, CA-INV-06-01);
+ *   por defecto la lista muestra solo la fecha (CA-INV-01-02).
  */
 @Composable
 fun InventoryItemRow(
@@ -92,6 +94,7 @@ fun InventoryItemRow(
     status: ExpiryStatus,
     onEditClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
+    showExpiryLabel: Boolean = false,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -109,8 +112,13 @@ fun InventoryItemRow(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val formattedDate = item.expiresOn.format(DateFormatter)
                     Text(
-                        text = item.expiresOn.format(DateFormatter),
+                        text = if (showExpiryLabel) {
+                            stringResource(id = R.string.inventory_expires_on, formattedDate)
+                        } else {
+                            formattedDate
+                        },
                         style = MaterialTheme.typography.bodyLarge.copy(fontSize = DateFontSize),
                         color = MaterialTheme.colorScheme.onSurface
                     )

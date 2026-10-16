@@ -58,7 +58,7 @@
 - [x] T031 Lista: `InventoryContract`, `InventoryViewModel` e `InventoryScreen` con `InventoryItemRow` y `ExpirySectionHeader`, y sus pruebas (HU-INV-01). Pruebas: U `InventoryViewModelTest`, I `InventoryScreenTest`. → #39
 - [ ] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel` y `ProductEditorScreen` con `PhotoSlot`, `CategorySheet`, `DatePicker` sin días pasados y la fila de cantidad con su hoja de unidad, y sus pruebas (HU-INV-02, 03, 04; CA-INV-02-08, 02-09). La fila de la lista muestra la cantidad (CA-INV-01-08, en T031). → #40
 - [x] T033 Cámara: `ProductCameraScreen` (CameraX, recuadro de encuadre, resultado por `savedStateHandle`), con el permiso y la explicación (HU-INV-05). Incluye `SmartFoodTopBar`. Pruebas: I `ProductCameraScreenTest`, I `SmartFoodTopBarTest`. → #41
-- [ ] T034 Búsqueda: `InventorySearchContract`, `InventorySearchViewModel` e `InventorySearchScreen` con `CategoryChips` y "x", y sus pruebas (HU-INV-06). → #42
+- [x] T034 Búsqueda: `InventorySearchContract`, `InventorySearchViewModel` e `InventorySearchScreen` con `SmartFoodTopBar`, los `CategoryChips` (en `ui/components/`) y "x", y sus pruebas (HU-INV-06). Los resultados reutilizan `InventoryItemRow`. → #42
 - [ ] T035 Voz: `VoiceSearchCard` y `VoiceSearchOverlay` ("Habla ahora", "…", error con "Reintentar"), el permiso de micrófono y la cancelación, con pruebas del ViewModel y de la pantalla (HU-INV-07). → #43
 - [ ] T036 `AdaptiveLayoutTest` cubre el editor en 360×720, con el teclado abierto y cerrado (RNF-INV-06). → #40
 
@@ -123,14 +123,14 @@ verificación manual (checklist).
 | CA-INV-05-04 | U `UpdateItemUseCaseTest`, I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
 | CA-INV-05-05 | U `UpdateItemUseCaseTest`, I `PhotoUploadWorkerTest` (borra la anterior después de subir), M 2 |
 | CA-INV-05-06 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (conserva el archivo si falla), I `PhotoUploadWorkerTest` (reintenta; archivo ilegible → sin foto) |
-| CA-INV-06-01 | I `InventorySearchScreenTest` |
-| CA-INV-06-02 | U `SearchInventoryUseCaseTest` |
-| CA-INV-06-03 | U `SearchInventoryUseCaseTest`, I `InventorySearchScreenTest` |
+| CA-INV-06-01 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
+| CA-INV-06-02 | U `SearchInventoryUseCaseTest`, U `InventorySearchViewModelTest` |
+| CA-INV-06-03 | U `SearchInventoryUseCaseTest`, U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
 | CA-INV-06-04 | U `SearchInventoryUseCaseTest` |
 | CA-INV-06-05 | U `SearchInventoryUseCaseTest` |
 | CA-INV-06-06 | I `InventorySearchScreenTest` |
 | CA-INV-06-07 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
-| CA-INV-06-08 | U `InventorySearchViewModelTest` |
+| CA-INV-06-08 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
 | CA-INV-07-01 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
 | CA-INV-07-02 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
 | CA-INV-07-03 | U `ParseSpokenIngredientsUseCaseTest`, U `InventorySearchViewModelTest`, M 5 |
