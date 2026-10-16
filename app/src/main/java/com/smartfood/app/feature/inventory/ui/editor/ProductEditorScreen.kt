@@ -138,7 +138,7 @@ fun ProductEditorScreen(
     EditorDialogs(state = state, onEvent = onEvent)
 }
 
-/** Foto, campos y botón inferior del editor. */
+/** Foto, campos, aviso y botón del editor, todo dentro del desplazable como el Figma (`476:3664`, T055). */
 @Composable
 private fun EditorForm(state: ProductEditorUiState, onEvent: (ProductEditorEvent) -> Unit) {
     val metrics = LocalFormMetrics.current
@@ -151,23 +151,22 @@ private fun EditorForm(state: ProductEditorUiState, onEvent: (ProductEditorEvent
         else -> null
     }
 
-    // Los campos se desplazan; el aviso y el botón quedan fijos abajo, sobre el teclado (T054, spec §8).
-    Column(modifier = Modifier.fillMaxSize()) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(metrics.fieldSpacing),
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = metrics.formHorizontalPadding, vertical = metrics.sectionSpacing)
-        ) {
-            EditorFields(state = state, onEvent = onEvent, errorField = errorField, missing = missing)
-        }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(metrics.fieldSpacing),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = metrics.formHorizontalPadding, vertical = metrics.sectionSpacing)
+    ) {
+        EditorFields(state = state, onEvent = onEvent, errorField = errorField, missing = missing)
+        // Figma 476:3664: el botón queda debajo de los campos, con el aviso de error encima (476:3688).
+        Spacer(modifier = Modifier.height(metrics.sectionSpacing))
         EditorBottom(state = state, onEvent = onEvent, errorText = errorText)
     }
 }
 
-/** Foto y campos del formulario, dentro del desplazable. */
+/** Foto y campos con línea inferior del formulario. */
 @Composable
 private fun EditorFields(
     state: ProductEditorUiState,
@@ -182,110 +181,101 @@ private fun EditorFields(
         onRemoveClick = { onEvent(ProductEditorEvent.RemovePhotoClicked) }
     )
 
-    SmartFoodTextField(
+    EditorLineTextField(
         value = state.name,
         onValueChange = { onEvent(ProductEditorEvent.NameChanged(it)) },
         placeholder = stringResource(id = R.string.editor_name_placeholder),
         accessibilityLabel = stringResource(id = R.string.editor_name_label),
-        leadingContent = { FieldIcon(R.drawable.ic_figma_cart) },
+        icon = { FieldIcon(R.drawable.ic_figma_cart) },
         isError = errorField == InventoryField.NAME || InventoryField.NAME in missing
     )
-    SmartFoodSelectorField(
+    EditorLineSelector(
         value = state.expiresOn?.format(DateFormatter).orEmpty(),
         onClick = { onEvent(ProductEditorEvent.ExpiryClicked) },
         placeholder = stringResource(id = R.string.editor_expiry_placeholder),
-        leadingContent = { FieldIcon(R.drawable.ic_figma_calendar) },
+        icon = { FieldIcon(R.drawable.ic_figma_calendar) },
         isError = errorField == InventoryField.EXPIRY || InventoryField.EXPIRY in missing
     )
-    SmartFoodSelectorField(
+    EditorLineSelector(
         value = state.category?.let { stringResource(id = it.titleRes) }.orEmpty(),
         onClick = { onEvent(ProductEditorEvent.CategoryClicked) },
         placeholder = stringResource(id = R.string.editor_category_placeholder),
-        leadingContent = { FieldIcon(R.drawable.ic_figma_tag) },
-        trailingContent = { FieldIcon(R.drawable.ic_figma_chevron_right, size = ChevronSize) },
+        icon = { FieldIcon(R.drawable.ic_figma_tag) },
+        trailing = { FieldIcon(R.drawable.ic_figma_chevron_right, size = ChevronSize) },
         isError = errorField == InventoryField.CATEGORY || InventoryField.CATEGORY in missing
     )
     // Fila opcional "Cantidad" (T002, desviación de la spec §8): número y unidad.
     Row(horizontalArrangement = Arrangement.spacedBy(metrics.fieldIconSpacing)) {
-        SmartFoodTextField(
+        EditorLineTextField(
             value = state.quantityText,
             onValueChange = { onEvent(ProductEditorEvent.QuantityChanged(it)) },
             placeholder = stringResource(id = R.string.editor_quantity_placeholder),
-            leadingContent = { FieldIcon(Icons.Outlined.Scale) },
+            icon = { FieldIcon(Icons.Outlined.Scale) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             isError = errorField == InventoryField.QUANTITY,
             modifier = Modifier.weight(QuantityWeight)
         )
-        SmartFoodSelectorField(
+        EditorLineSelector(
             value = stringResource(id = (state.unit ?: QuantityUnit.UNITS).titleRes),
             onClick = { onEvent(ProductEditorEvent.UnitClicked) },
+            placeholder = null,
             accessibilityLabel = stringResource(id = R.string.editor_unit_label),
+            trailing = { FieldIcon(R.drawable.ic_figma_chevron_right, size = ChevronSize) },
             modifier = Modifier.weight(UnitWeight)
         )
     }
     // Precio opcional en pesos (T052, CA-INV-02-10): teclado numérico, sin decimales.
-    SmartFoodTextField(
+    EditorLineTextField(
         value = state.priceText,
         onValueChange = { onEvent(ProductEditorEvent.PriceChanged(it)) },
         placeholder = stringResource(id = R.string.editor_price_placeholder),
-        leadingContent = { FieldIcon(Icons.Outlined.Payments) },
+        icon = { FieldIcon(Icons.Outlined.Payments) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         isError = errorField == InventoryField.PRICE
     )
-
 }
 
-/** Aviso de error y botón fijos abajo (Figma `476:3688` y `476:3687`). */
+/** Aviso de error y botón (Figma `476:3688` y `476:3687`). */
 @Composable
 private fun EditorBottom(state: ProductEditorUiState, onEvent: (ProductEditorEvent) -> Unit, errorText: String?) {
-    val metrics = LocalFormMetrics.current
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(metrics.fieldSpacing),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = metrics.formHorizontalPadding)
-            .padding(top = metrics.fieldSpacing, bottom = metrics.sectionSpacing)
-    ) {
-        if (errorText != null) {
-            // Aviso rojo centrado encima del botón, en SemiBold de 15 sp, como el Figma.
-            Text(
-                text = errorText,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
-            )
-        }
+    if (errorText != null) {
+        // Aviso rojo centrado encima del botón, en SemiBold de 15 sp, como el Figma.
+        Text(
+            text = errorText,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+        )
+    }
 
-        if (state.mode == EditorMode.ADD) {
-            // El botón se ve gris mientras falte algo, pero al tocarlo muestra el aviso (CA-INV-02-02).
-            Box {
-                SmartFoodPrimaryButton(
-                    text = stringResource(id = R.string.editor_add_button),
-                    onClick = { onEvent(ProductEditorEvent.SaveClicked) },
-                    enabled = state.isSaveEnabled,
-                    isLoading = state.isSaving,
-                    leadingIcon = Icons.Rounded.Add
-                )
-                if (!state.isSaveEnabled && !state.isSaving) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .clickable(interactionSource = null, indication = null) {
-                                onEvent(ProductEditorEvent.SaveClicked)
-                            }
-                    )
-                }
-            }
-        } else {
+    if (state.mode == EditorMode.ADD) {
+        // El botón se ve gris mientras falte algo, pero al tocarlo muestra el aviso (CA-INV-02-02).
+        Box {
             SmartFoodPrimaryButton(
-                text = stringResource(id = R.string.editor_delete_button),
-                onClick = { onEvent(ProductEditorEvent.DeleteClicked) },
-                enabled = !state.isSaving,
-                destructive = true
+                text = stringResource(id = R.string.editor_add_button),
+                onClick = { onEvent(ProductEditorEvent.SaveClicked) },
+                enabled = state.isSaveEnabled,
+                isLoading = state.isSaving,
+                leadingIcon = Icons.Rounded.Add
             )
+            if (!state.isSaveEnabled && !state.isSaving) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable(interactionSource = null, indication = null) {
+                            onEvent(ProductEditorEvent.SaveClicked)
+                        }
+                )
+            }
         }
+    } else {
+        SmartFoodPrimaryButton(
+            text = stringResource(id = R.string.editor_delete_button),
+            onClick = { onEvent(ProductEditorEvent.DeleteClicked) },
+            enabled = !state.isSaving,
+            destructive = true
+        )
     }
 }
 

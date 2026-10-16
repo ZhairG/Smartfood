@@ -214,12 +214,12 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
     }
 
     /**
-     * T054 (RNF-INV-06): con el precio, el editor puede necesitar desplazarse en pantallas bajas. El botón queda fijo
-     * abajo y siempre visible, y el último campo (el precio) se alcanza desplazando.
+     * T054 y T055 (RNF-INV-06): con el precio, el editor puede necesitar desplazarse en pantallas bajas. El último
+     * campo (el precio) y el botón, que va dentro del formulario como el Figma, se alcanzan desplazando.
      */
     private fun assertEditorAdaptable(buttonText: String) {
-        composeTestRule.onNode(hasText(buttonText) and hasClickAction()).assertIsDisplayed()
+        // Como el Figma (T055), el botón va dentro del formulario: el último campo y el botón se alcanzan desplazando.
         composeTestRule.onNodeWithContentDescription("Precio (opcional)").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNode(hasText(buttonText) and hasClickAction()).assertIsDisplayed()
+        composeTestRule.onNode(hasText(buttonText) and hasClickAction()).performScrollTo().assertIsDisplayed()
     }
 }
