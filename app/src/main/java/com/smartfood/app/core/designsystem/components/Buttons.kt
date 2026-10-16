@@ -55,6 +55,9 @@ import com.smartfood.app.core.designsystem.util.figmaShadow
  * @param loadingText Texto base a mostrar durante la animación de carga.
  * @param leadingIcon Ícono opcional a la izquierda del texto, como el "+" de "Añadir al Inventario" (Figma
  * `476:5726`, spec 006 T026). El color naranja habilitado y gris deshabilitado ya es el del Figma de inventario.
+ * @param containerColor Color de fondo del botón habilitado. Por defecto el naranja del tema; el diálogo de
+ * confirmación pasa `error` para su botón destructivo (Figma `476:3815`, CA-INV-04-01).
+ * @param contentColor Color del texto y del ícono. Por defecto el que corresponde a [containerColor].
  */
 @Composable
 fun SmartFoodPrimaryButton(
@@ -64,7 +67,9 @@ fun SmartFoodPrimaryButton(
     enabled: Boolean = true,
     isLoading: Boolean = false,
     loadingText: String = text,
-    leadingIcon: ImageVector? = null
+    leadingIcon: ImageVector? = null,
+    containerColor: Color = MaterialTheme.colorScheme.secondary,
+    contentColor: Color = MaterialTheme.colorScheme.onSecondary
 ) {
     val buttonShape = RoundedCornerShape(10.dp)
     
@@ -100,11 +105,11 @@ fun SmartFoodPrimaryButton(
             onClick = onClick,
             enabled = enabled && !isLoading,
             shape = buttonShape,
-            // Figma (CA-UI-07-07): deshabilitado en gris; mientras carga conserva el naranja y no es clicable.
+            // Figma (CA-UI-07-07): deshabilitado en gris; mientras carga conserva su color y no es clicable.
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondary,
-                disabledContainerColor = if (isLoading) MaterialTheme.colorScheme.secondary else GreyDark,
+                containerColor = containerColor,
+                contentColor = contentColor,
+                disabledContainerColor = if (isLoading) containerColor else GreyDark,
                 disabledContentColor = MaterialTheme.colorScheme.onSecondary,
             ),
             elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp, 0.dp, 0.dp, 0.dp),
