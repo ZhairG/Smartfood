@@ -244,6 +244,10 @@ Desviaciones aprobadas por el equipo:
 - **Uso sin conexión** (HU-INV-10, #71): el Figma no tiene el ícono de pendiente ni el aviso de guardado en el
   teléfono. La fila usa el ícono `CloudUpload` de Material en gris, y el aviso usa `SmartFoodResultDialog`, el mismo
   de "Producto Guardado". Se ajustan cuando exista un frame.
+- **Íconos de Material Icons** (#37): el Figma solo tiene la lupa como vector; cámara, micrófono, el ícono de la
+  pestaña Inventario, los íconos de los campos y las ondas de la voz son imágenes PNG. Se usan los íconos de
+  `material-icons-extended`, que escalan y toman el color del tema. El amarillo de "Próximo a vencer" es el token
+  `YellowExpiring` (`#F6E938`, nodo `476:3121`); Vencido y Fresco conservan `ErrorRed` y `GreenCheck`.
 
 ## 9. Supuestos
 

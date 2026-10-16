@@ -45,7 +45,7 @@
 - [x] T024 [P] `SmartFoodSelectorField` (comparte la caja con el campo de texto) (CA-INV-02-04, 02-05). Prueba: I `SmartFoodFieldsTest.t024_*` (etiqueta y valor en un solo nodo desde #62). → #35
 - [x] T025 [P] `SmartFoodConfirmDialog` y `SmartFoodResultDialog` (CA-INV-02-06, 03-02, 04-01, 05-04). Ícono, pregunta, título y cuerpo por parámetro; el resultado se anuncia como `liveRegion` (RNF-INV-04). Prueba: I `SmartFoodDialogsTest.t025_*` y I `SmartFoodPrimaryButtonTest.t025_*`. La variante destructiva del botón se cerró en el #80. → #36
 - [x] T026 [P] `SmartFoodBottomBar` y la variante de acento de `SmartFoodPrimaryButton` (CA-INV-02-02, 09-02). Pasó del #36 al #38 para no bloquear la navegación. El botón ya era naranja: solo se agregó `leadingIcon`. Prueba: I `SmartFoodNavigationTest`. → #38
-- [ ] T027 [P] Íconos vectoriales exportados del Figma y `strings_inventory.xml` (RNF-INV-08). Rol de color `ExpiringSoon` si hace falta (plan §8). → #37
+- [x] T027 [P] Colores de estado del inventario y documentación de íconos y textos (CA-INV-01-01, RNF-INV-08). El amarillo es `YellowExpiring` (`#F6E938`, Figma `476:3121`); Vencido y Fresco siguen con `ErrorRed` y `GreenCheck`. Los íconos son de Material porque el Figma solo los tiene como PNG (plan §8), y los textos los entrega cada pantalla: el #39 creó `strings_inventory.xml` y su cabecera lo documenta. Prueba: I `ExpiringSoonColorTest`. → #37
 
 ## Fase 4: Navegación
 - [x] T028 Renombrar `feature/home` → `feature/profile` (`ProfileScreen`, `ProfileViewModel`, `Route.Profile`). Se ajustan sus pruebas (CA-INV-09-03). Prueba: U `ProfileViewModelTest`. → #38
@@ -93,7 +93,7 @@ verificación manual (checklist).
 
 | Criterio | Pruebas |
 |---|---|
-| CA-INV-01-01 | U `ObserveInventoryUseCaseTest`, U `InventoryViewModelTest`, I `InventoryScreenTest` |
+| CA-INV-01-01 | U `ObserveInventoryUseCaseTest`, U `InventoryViewModelTest`, I `InventoryScreenTest`, I `ExpiringSoonColorTest` (color de las secciones) |
 | CA-INV-01-02 | I `InventoryScreenTest` |
 | CA-INV-01-03 | I `InventoryScreenTest` (sin foto), M 2 (con foto) |
 | CA-INV-01-04 | U `ObserveInventoryUseCaseTest` |
