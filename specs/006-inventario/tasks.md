@@ -55,7 +55,7 @@
 ## Fase 5: Pantallas
 > Requiere el MCP de Figma comprobado (ver la nota del inicio).
 
-- [ ] T031 Lista: `InventoryContract`, `InventoryViewModel` e `InventoryScreen` con `InventoryItemRow` y `ExpirySectionHeader`, y sus pruebas (HU-INV-01). → #39
+- [x] T031 Lista: `InventoryContract`, `InventoryViewModel` e `InventoryScreen` con `InventoryItemRow` y `ExpirySectionHeader`, y sus pruebas (HU-INV-01). Pruebas: U `InventoryViewModelTest`, I `InventoryScreenTest`. → #39
 - [ ] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel` y `ProductEditorScreen` con `PhotoSlot`, `CategorySheet`, `DatePicker` sin días pasados y la fila de cantidad con su hoja de unidad, y sus pruebas (HU-INV-02, 03, 04; CA-INV-02-08, 02-09). La fila de la lista muestra la cantidad (CA-INV-01-08, en T031). → #40
 - [x] T033 Cámara: `ProductCameraScreen` (CameraX, recuadro de encuadre, resultado por `savedStateHandle`), con el permiso y la explicación (HU-INV-05). Incluye `SmartFoodTopBar`. Pruebas: I `ProductCameraScreenTest`, I `SmartFoodTopBarTest`. → #41
 - [ ] T034 Búsqueda: `InventorySearchContract`, `InventorySearchViewModel` e `InventorySearchScreen` con `CategoryChips` y "x", y sus pruebas (HU-INV-06). → #42
@@ -93,7 +93,7 @@ verificación manual (checklist).
 
 | Criterio | Pruebas |
 |---|---|
-| CA-INV-01-01 | U `ObserveInventoryUseCaseTest`, I `InventoryScreenTest` |
+| CA-INV-01-01 | U `ObserveInventoryUseCaseTest`, U `InventoryViewModelTest`, I `InventoryScreenTest` |
 | CA-INV-01-02 | I `InventoryScreenTest` |
 | CA-INV-01-03 | I `InventoryScreenTest` (sin foto), M 2 (con foto) |
 | CA-INV-01-04 | U `ObserveInventoryUseCaseTest` |
