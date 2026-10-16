@@ -81,7 +81,7 @@ verificación manual (checklist).
 
 | Criterio | Pruebas |
 |---|---|
-| CA-INV-01-01 | U `ObserveInventoryUseCaseTest`, I `InventoryScreenTest` |
+| CA-INV-01-01 | U `ObserveInventoryUseCaseTest`, U `InventoryViewModelTest`, I `InventoryScreenTest` |
 | CA-INV-01-02 | I `InventoryScreenTest` |
 | CA-INV-01-03 | I `InventoryScreenTest` (sin foto), M 2 (con foto) |
 | CA-INV-01-04 | U `ObserveInventoryUseCaseTest` |
