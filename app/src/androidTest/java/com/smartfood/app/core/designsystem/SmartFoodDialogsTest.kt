@@ -58,7 +58,7 @@ class SmartFoodDialogsTest {
 
     // CA-INV-04-03 y CA-INV-05-04: "Cancelar" descarta la acción destructiva.
     @Test
-    fun t025_caInv0401_confirmacionCancelaEliminacion() {
+    fun t025_caInv0403_confirmacionCancelaEliminacion() {
         var cancelaciones = 0
 
         val visible = mostrarConfirmacion(

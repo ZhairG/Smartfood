@@ -55,9 +55,8 @@ import com.smartfood.app.core.designsystem.util.figmaShadow
  * @param loadingText Texto base a mostrar durante la animación de carga.
  * @param leadingIcon Ícono opcional a la izquierda del texto, como el "+" de "Añadir al Inventario" (Figma
  * `476:5726`, spec 006 T026). El color naranja habilitado y gris deshabilitado ya es el del Figma de inventario.
- * @param containerColor Color de fondo del botón habilitado. Por defecto el naranja del tema; el diálogo de
- * confirmación pasa `error` para su botón destructivo (Figma `476:3815`, CA-INV-04-01).
- * @param contentColor Color del texto y del ícono. Por defecto el que corresponde a [containerColor].
+ * @param destructive Variante destructiva: fondo `error` y contenido `onError`, para el botón de confirmar de
+ * `SmartFoodConfirmDialog` (Figma `476:3815`, CA-INV-04-01). Por defecto es el naranja del tema.
  */
 @Composable
 fun SmartFoodPrimaryButton(
@@ -68,10 +67,15 @@ fun SmartFoodPrimaryButton(
     isLoading: Boolean = false,
     loadingText: String = text,
     leadingIcon: ImageVector? = null,
-    containerColor: Color = MaterialTheme.colorScheme.secondary,
-    contentColor: Color = MaterialTheme.colorScheme.onSecondary
+    destructive: Boolean = false
 ) {
     val buttonShape = RoundedCornerShape(10.dp)
+
+    // Colores cerrados: nadie pasa colores sueltos al botón (plan §8, #80).
+    val containerColor =
+        if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+    val contentColor =
+        if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onSecondary
     
     // La animación de los puntos solo existe mientras carga: en reposo el botón no recompone cada frame.
     val displayText = if (isLoading) {
@@ -110,7 +114,8 @@ fun SmartFoodPrimaryButton(
                 containerColor = containerColor,
                 contentColor = contentColor,
                 disabledContainerColor = if (isLoading) containerColor else GreyDark,
-                disabledContentColor = MaterialTheme.colorScheme.onSecondary,
+                // Mientras carga conserva su texto (`onError` o `onSecondary`); deshabilitado en reposo, el gris.
+                disabledContentColor = if (isLoading) contentColor else MaterialTheme.colorScheme.onSecondary,
             ),
             elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp, 0.dp, 0.dp, 0.dp),
             contentPadding = PaddingValues(0.dp),
@@ -139,6 +144,19 @@ private fun SmartFoodPrimaryButtonPreview() {
         SmartFoodPrimaryButton(
             text = "Iniciar Sesión",
             onClick = {},
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SmartFoodPrimaryButtonDestructivePreview() {
+    SmartfoodTheme {
+        SmartFoodPrimaryButton(
+            text = "Eliminar",
+            onClick = {},
+            destructive = true,
             modifier = Modifier.padding(16.dp)
         )
     }
