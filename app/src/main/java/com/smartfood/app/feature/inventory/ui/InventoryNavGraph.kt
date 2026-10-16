@@ -14,7 +14,10 @@ import com.smartfood.app.core.navigation.Route
 import com.smartfood.app.core.navigation.navigateToTab
 import com.smartfood.app.feature.inventory.ui.camera.CAPTURED_PHOTO_KEY
 import com.smartfood.app.feature.inventory.ui.camera.ProductCameraRoute
+import com.smartfood.app.feature.inventory.ui.editor.EDITOR_RESULT_KEY
+import com.smartfood.app.feature.inventory.ui.editor.EditorResultHost
 import com.smartfood.app.feature.inventory.ui.editor.ProductEditorRoute
+import com.smartfood.app.feature.inventory.ui.editor.encode
 import com.smartfood.app.feature.inventory.ui.list.InventoryEffect
 import com.smartfood.app.feature.inventory.ui.list.InventoryScreen
 import com.smartfood.app.feature.inventory.ui.list.InventoryViewModel
@@ -36,7 +39,7 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
         exitTransition = NavTransitions.tabExit,
         popEnterTransition = NavTransitions.tabPopEnter,
         popExitTransition = NavTransitions.tabPopExit
-    ) {
+    ) { entry ->
         MainTabScaffold(currentTab = MainTab.INVENTORY, onTabSelected = navController::navigateToTab) {
             val viewModel: InventoryViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -48,15 +51,18 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
                 }
             }
             InventoryScreen(state = state, onEvent = viewModel::onEvent)
+            // El resultado del editor se ve encima de la lista, como el Figma (476:3851, T055).
+            EditorResultHost(savedStateHandle = entry.savedStateHandle)
         }
     }
     // La búsqueda y el editor muestran la barra inferior con Inventario resaltado, como el Figma (CA-INV-09-04, T055).
-    composable<Route.InventorySearch> {
+    composable<Route.InventorySearch> { entry ->
         MainTabScaffold(currentTab = MainTab.INVENTORY, onTabSelected = navController::navigateToTab) {
             InventorySearchRoute(
                 onNavigateToEditor = { id -> navController.navigate(Route.ProductEditor(id)) },
                 onBack = { navController.popBackStack() }
             )
+            EditorResultHost(savedStateHandle = entry.savedStateHandle)
         }
     }
     composable<Route.ProductEditor> { entry ->
@@ -64,7 +70,11 @@ fun NavGraphBuilder.inventoryDestinations(navController: NavHostController) {
             ProductEditorRoute(
                 savedStateHandle = entry.savedStateHandle,
                 onNavigateToCamera = { navController.navigate(Route.ProductCamera) },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onBackWithResult = { result ->
+                    navController.previousBackStackEntry?.savedStateHandle?.set(EDITOR_RESULT_KEY, result.encode())
+                    navController.popBackStack()
+                }
             )
         }
     }

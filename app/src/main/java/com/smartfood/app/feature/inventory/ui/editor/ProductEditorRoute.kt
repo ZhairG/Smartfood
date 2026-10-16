@@ -10,6 +10,7 @@
  * @param savedStateHandle `savedStateHandle` del destino del editor, donde la cámara deja la foto.
  * @param onNavigateToCamera Abre el visor de la cámara.
  * @param onBack Vuelve a la pantalla anterior.
+ * @param onBackWithResult Vuelve a la lista con el resultado para mostrarlo encima.
  * @param viewModel ViewModel del editor.
  */
 package com.smartfood.app.feature.inventory.ui.editor
@@ -40,6 +41,7 @@ fun ProductEditorRoute(
     savedStateHandle: SavedStateHandle,
     onNavigateToCamera: () -> Unit,
     onBack: () -> Unit,
+    onBackWithResult: (EditorResult) -> Unit,
     viewModel: ProductEditorViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -67,6 +69,7 @@ fun ProductEditorRoute(
         when (effect) {
             ProductEditorEffect.NavigateToCamera -> onNavigateToCamera()
             ProductEditorEffect.NavigateBack -> onBack()
+            is ProductEditorEffect.NavigateBackWithResult -> onBackWithResult(effect.result)
             is ProductEditorEffect.DeleteLocalPhoto -> scope.launch(Dispatchers.IO) { File(effect.path).delete() }
             ProductEditorEffect.RequestNotificationPermission -> {
                 // El permiso existe desde Android 13; en versiones anteriores no hay nada que pedir (CA-INV-08-05).

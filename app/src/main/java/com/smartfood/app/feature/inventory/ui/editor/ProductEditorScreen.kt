@@ -47,6 +47,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -69,6 +70,7 @@ import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.formMetricsFor
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.core.designsystem.util.clearFocusOnTap
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryField
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
@@ -87,9 +89,12 @@ fun ProductEditorScreen(
 ) {
     val isEdit = state.mode == EditorMode.EDIT
 
+    val focusManager = LocalFocusManager.current
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // Tocar fuera de un campo le quita el enfoque y cierra el teclado.
+            .clearFocusOnTap(focusManager)
             // Figma 476:3664: fondo verde claro (#F0FDF4), que en el tema es `surface`; `background` es el verde
             // oscuro de autenticación.
             .background(MaterialTheme.colorScheme.surface)

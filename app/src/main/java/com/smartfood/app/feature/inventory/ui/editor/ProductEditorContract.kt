@@ -142,6 +142,9 @@ sealed interface ProductEditorEffect {
     /** Vuelve a la lista. */
     data object NavigateBack : ProductEditorEffect
 
+    /** Vuelve a la lista y le pide mostrar el resultado encima (Figma `476:3851`, CA-INV-02-06, 03-02, 04-02). */
+    data class NavigateBackWithResult(val result: EditorResult) : ProductEditorEffect
+
     /** Borra del teléfono una foto que ya no se va a guardar (descartada o reemplazada). */
     data class DeleteLocalPhoto(val path: String) : ProductEditorEffect
 
@@ -150,4 +153,16 @@ sealed interface ProductEditorEffect {
      * pero lo emite y lo atiende la T039 (#44).
      */
     data object RequestNotificationPermission : ProductEditorEffect
+}
+
+/** Resultado del editor que la lista muestra encima al volver (spec 006, T055). */
+sealed interface EditorResult {
+    /** "Producto Guardado" (CA-INV-02-06). */
+    data object Saved : EditorResult
+
+    /** "Guardado: «nombre» se actualizó" (CA-INV-03-02). */
+    data class Updated(val name: String) : EditorResult
+
+    /** "Producto eliminado" (CA-INV-04-02). */
+    data object Deleted : EditorResult
 }

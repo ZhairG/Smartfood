@@ -172,10 +172,11 @@ class ProductEditorViewModel @Inject constructor(
             }
             result
                 .onSuccess { item ->
-                    val dialog = if (current == null) EditorDialog.ProductSaved else EditorDialog.ProductUpdated(item.name)
-                    _uiState.update { it.copy(isSaving = false, dialog = dialog) }
+                    _uiState.update { it.copy(isSaving = false) }
                     requestNotificationPermissionOnce()
-                    closeResultAndLeave()
+                    // El resultado se ve encima de la lista, como el Figma (476:3851).
+                    val saved = if (current == null) EditorResult.Saved else EditorResult.Updated(item.name)
+                    _effects.send(ProductEditorEffect.NavigateBackWithResult(saved))
                 }
                 .onFailure { cause -> _uiState.update { it.copy(isSaving = false, error = cause.toInventoryError()) } }
         }
@@ -191,8 +192,8 @@ class ProductEditorViewModel @Inject constructor(
                     (_uiState.value.photo as? PhotoUiState.Local)?.let {
                         sendEffect(ProductEditorEffect.DeleteLocalPhoto(it.path))
                     }
-                    _uiState.update { it.copy(isSaving = false, dialog = EditorDialog.ProductDeleted) }
-                    closeResultAndLeave()
+                    _uiState.update { it.copy(isSaving = false) }
+                    _effects.send(ProductEditorEffect.NavigateBackWithResult(EditorResult.Deleted))
                 }
                 .onFailure { cause -> _uiState.update { it.copy(isSaving = false, error = cause.toInventoryError()) } }
         }
@@ -207,13 +208,6 @@ class ProductEditorViewModel @Inject constructor(
         if (preferences.wasNotificationPermissionRequested()) return
         preferences.markNotificationPermissionRequested()
         _effects.send(ProductEditorEffect.RequestNotificationPermission)
-    }
-
-    /** Muestra el resultado unos segundos y vuelve a la lista. */
-    private suspend fun closeResultAndLeave() {
-        delay(RESULT_DIALOG_MILLIS)
-        _uiState.update { it.copy(dialog = null) }
-        _effects.send(ProductEditorEffect.NavigateBack)
     }
 
     /** Vuelve atrás sin guardar: el producto queda como estaba (CA-INV-03-04) y la foto nueva se descarta. */
