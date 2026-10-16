@@ -10,6 +10,7 @@ package com.smartfood.app.feature.inventory.ui
 import androidx.annotation.StringRes
 import com.smartfood.app.R
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
+import com.smartfood.app.feature.inventory.domain.model.SpeechError
 
 /**
  * @return El identificador de texto del error, para mostrarlo bajo el nombre de la pantalla.
@@ -23,4 +24,15 @@ fun InventoryError.messageRes(): Int = when (this) {
     InventoryError.NotAuthenticated -> R.string.error_inventory_permission
     is InventoryError.Validation -> R.string.error_inventory_unknown
     is InventoryError.Unknown -> R.string.error_inventory_unknown
+}
+
+/**
+ * @return El identificador de texto del error de voz, para mostrarlo en el aviso (CA-INV-07-05, CA-INV-07-06).
+ */
+@StringRes
+fun SpeechError.messageRes(): Int = when (this) {
+    SpeechError.NO_MATCH -> R.string.search_voice_no_match
+    SpeechError.NOT_AVAILABLE -> R.string.search_voice_not_available
+    SpeechError.PERMISSION_DENIED -> R.string.search_voice_permission_denied
+    SpeechError.NETWORK -> R.string.search_voice_network
 }

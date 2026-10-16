@@ -48,10 +48,25 @@
     <!-- Filtros por categoría (CA-INV-06-01, CA-INV-06-03) -->
     <string name="category_all">Todos</string>
 
-    <!-- Tarjeta "Usa tu voz" (CA-INV-06-01). La escucha y su aviso llegan con el #43 (T035). -->
+    <!-- Tarjeta "Usa tu voz" (CA-INV-06-01, CA-INV-07-01) -->
     <string name="search_voice_card_title">Usa tu voz</string>
     <string name="search_voice_card_subtitle">Dicta muchos ingredientes al mismo tiempo</string>
     <string name="cd_mic_button">Buscar por voz</string>
+
+    <!-- Aviso de voz (CA-INV-07-01, 07-02, 07-05, 07-07) -->
+    <string name="search_voice_listening">Habla ahora</string>
+    <string name="search_voice_processing">…</string>
+    <string name="search_voice_no_match">No se entendió. Reinténtalo</string>
+    <string name="search_voice_not_available">Tu teléfono no tiene reconocimiento de voz.</string>
+    <string name="search_voice_permission_denied">Falta el permiso del micrófono.</string>
+    <string name="search_voice_network">La voz necesita conexión a Internet.</string>
+    <string name="search_voice_retry">Reintentar</string>
+    <string name="cd_voice_dismiss">Cerrar el aviso de voz</string>
+
+    <!-- Permiso de micrófono denegado (CA-INV-07-06) -->
+    <string name="search_voice_permission_title">Necesitamos tu micrófono</string>
+    <string name="search_voice_permission_body">Usamos el micrófono solo para dictar los ingredientes y buscar tus productos. Puedes activarlo en los ajustes del teléfono o buscar escribiendo.</string>
+    <string name="search_voice_open_settings">Abrir ajustes</string>
 
     <!-- Unidades de cantidad (CA-INV-01-08) -->
     <string name="unit_units">unidades</string>

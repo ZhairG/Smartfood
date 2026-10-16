@@ -1,19 +1,24 @@
 package com.smartfood.app.feature.inventory.ui.search
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
+import com.smartfood.app.feature.inventory.domain.model.SpeechError
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDate
@@ -22,9 +27,12 @@ import java.time.LocalDate
  * Nombre: InventorySearchScreenTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pruebas de la pantalla de búsqueda sin estado (spec 006, HU-INV-06, T034). La pantalla recibe un
- * `InventorySearchUiState` construido a mano, así que no hace falta inventario ni voz. Los resultados reutilizan
- * `InventoryItemRow` y los filtros `CategoryChips` de `ui/components/` (revisión de Zhair).
+ * Descripción: Pruebas de la pantalla de búsqueda sin estado (spec 006, HU-INV-06 y HU-INV-07, T034 y T035). La
+ * pantalla recibe un `InventorySearchUiState` construido a mano, así que no hace falta inventario ni voz. Los
+ * resultados reutilizan `InventoryItemRow` y los filtros `CategoryChips` de `ui/components/` (revisión de Zhair).
+ *
+ * Las pruebas con el aviso de voz desactivan `autoAdvance`: las ondas de "Habla ahora" son una animación infinita y,
+ * si no, la prueba esperaría a que la pantalla quedara quieta.
  */
 class InventorySearchScreenTest {
 
@@ -35,11 +43,18 @@ class InventorySearchScreenTest {
 
     private fun mostrar(
         state: InventorySearchUiState = InventorySearchUiState(),
+        showPermissionRationale: Boolean = false,
+        onOpenSettings: () -> Unit = {},
         onEvent: (InventorySearchEvent) -> Unit = { eventos += it }
     ) {
         composeTestRule.setContent {
             SmartfoodTheme {
-                InventorySearchScreen(state = state, onEvent = onEvent)
+                InventorySearchScreen(
+                    state = state,
+                    onEvent = onEvent,
+                    showPermissionRationale = showPermissionRationale,
+                    onOpenSettings = onOpenSettings
+                )
             }
         }
     }
@@ -57,6 +72,7 @@ class InventorySearchScreenTest {
     fun caInv0601_laBusquedaMuestraLaBarraLaVozLosFiltrosYLosResultados() {
         mostrar(
             InventorySearchUiState(
+                isVoiceAvailable = true,
                 results = listOf(
                     resultado(status = ExpiryStatus.EXPIRED, expiresOn = LocalDate.of(2026, 9, 1)),
                     resultado(
@@ -133,6 +149,74 @@ class InventorySearchScreenTest {
         composeTestRule.onNodeWithText("Manzana").performClick()
 
         assertEquals(listOf<InventorySearchEvent>(InventorySearchEvent.ResultClicked("item-2")), eventos)
+    }
+
+    @Test
+    fun caInv0701_elAvisoMuestraHablaAhoraMientrasEscucha() {
+        composeTestRule.mainClock.autoAdvance = false
+        mostrar(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Listening))
+
+        composeTestRule.onNodeWithText("Habla ahora").assertIsDisplayed()
+    }
+
+    @Test
+    fun caInv0702_elAvisoMuestraPuntosSuspensivosMientrasProcesa() {
+        composeTestRule.mainClock.autoAdvance = false
+        mostrar(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Processing))
+
+        composeTestRule.onNodeWithText("…").assertIsDisplayed()
+    }
+
+    @Test
+    fun caInv0705_elAvisoDeErrorPermiteReintentar() {
+        mostrar(
+            InventorySearchUiState(
+                isVoiceAvailable = true,
+                voice = VoiceUiState.Failed(SpeechError.NO_MATCH)
+            )
+        )
+
+        composeTestRule.onNodeWithText("No se entendió. Reinténtalo").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Reintentar").performClick()
+
+        assertEquals(listOf<InventorySearchEvent>(InventorySearchEvent.VoiceRetry), eventos)
+    }
+
+    @Test
+    fun caInv0707_tocarFueraDelAvisoCancelaLaEscucha() {
+        composeTestRule.mainClock.autoAdvance = false
+        mostrar(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Listening))
+
+        composeTestRule.onNodeWithContentDescription("Cerrar el aviso de voz")
+            .performTouchInput { click(Offset(5f, 5f)) }
+
+        assertEquals(listOf<InventorySearchEvent>(InventorySearchEvent.VoiceDismissed), eventos)
+    }
+
+    @Test
+    fun caInv0708_sinServicioDeVozLaTarjetaNoSeMuestra() {
+        mostrar(InventorySearchUiState(isVoiceAvailable = false))
+
+        composeTestRule.onNodeWithText("Usa tu voz").assertDoesNotExist()
+    }
+
+    @Test
+    fun caInv0708_conServicioDeVozLaTarjetaSeMuestra() {
+        mostrar(InventorySearchUiState(isVoiceAvailable = true))
+
+        composeTestRule.onNodeWithText("Usa tu voz").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Buscar por voz").assertIsDisplayed()
+    }
+
+    @Test
+    fun caInv0706_elAvisoDePermisoExplicaYAbreAjustes() {
+        var abrioAjustes = false
+        mostrar(showPermissionRationale = true, onOpenSettings = { abrioAjustes = true })
+
+        composeTestRule.onNodeWithText("Necesitamos tu micrófono").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Abrir ajustes").performClick()
+
+        assertTrue(abrioAjustes)
     }
 
     @Test
