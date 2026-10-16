@@ -32,7 +32,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.Scale
@@ -291,7 +290,7 @@ private fun EditorBottom(state: ProductEditorUiState, onEvent: (ProductEditorEve
 @Composable
 private fun EditorDialogs(state: ProductEditorUiState, onEvent: (ProductEditorEvent) -> Unit) {
     val dismiss = { onEvent(ProductEditorEvent.DialogDismissed) }
-    when (val dialog = state.dialog) {
+    when (state.dialog) {
         EditorDialog.PhotoSourceSheet -> PhotoSourceSheet(
             onGallery = { onEvent(ProductEditorEvent.GalleryChosen) },
             onCamera = { onEvent(ProductEditorEvent.CameraChosen) },
@@ -335,23 +334,8 @@ private fun EditorDialogs(state: ProductEditorUiState, onEvent: (ProductEditorEv
             onConfirm = { onEvent(ProductEditorEvent.RemovePhotoConfirmed) },
             onDismiss = dismiss
         )
-        EditorDialog.ProductSaved -> SmartFoodResultDialog(
-            icon = { DialogIcon(Icons.Outlined.Check, MaterialTheme.colorScheme.primary) },
-            title = stringResource(id = R.string.editor_saved_title),
-            body = stringResource(id = R.string.editor_saved_body)
-        )
-        is EditorDialog.ProductUpdated -> SmartFoodResultDialog(
-            icon = { DialogIcon(Icons.Outlined.Check, MaterialTheme.colorScheme.primary) },
-            title = stringResource(id = R.string.editor_updated_title),
-            body = stringResource(id = R.string.editor_updated_body, dialog.name)
-        )
-        // Resultados de borrado como el Figma (476:3960): círculo rosado con la papelera roja y cuerpo naranja.
-        EditorDialog.ProductDeleted -> SmartFoodResultDialog(
-            icon = { DialogIcon(Icons.Outlined.Delete, MaterialTheme.colorScheme.error) },
-            title = stringResource(id = R.string.editor_deleted_title),
-            body = stringResource(id = R.string.editor_deleted_body),
-            destructive = true
-        )
+        // Guardado, actualizado y eliminado se muestran sobre la lista (EditorResultHost, T055).
+        // Resultado de borrado como el Figma (476:3960): círculo rosado con la papelera roja y cuerpo naranja.
         EditorDialog.PhotoRemoved -> SmartFoodResultDialog(
             icon = { DialogIcon(Icons.Outlined.Delete, MaterialTheme.colorScheme.error) },
             title = stringResource(id = R.string.editor_photo_removed),

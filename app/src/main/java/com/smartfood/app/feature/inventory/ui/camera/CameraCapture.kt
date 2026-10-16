@@ -61,7 +61,7 @@ suspend fun LifecycleCameraController.takePhoto(context: Context): Result<File> 
  *
  * @param context Contexto de la app.
  * @param uri Foto elegida en el selector de fotos.
- * @return El archivo copiado, o `null` si no se pudo leer.
+ * @return El archivo copiado, o `null` si no se pudo leer o el permiso sobre la foto ya no está vigente.
  */
 fun copyPickedPhoto(context: Context, uri: Uri): File? {
     val directory = File(context.filesDir, PHOTOS_DIR).apply { mkdirs() }
@@ -71,6 +71,10 @@ fun copyPickedPhoto(context: Context, uri: Uri): File? {
         input.use { source -> file.outputStream().use { target -> source.copyTo(target) } }
         file
     } catch (e: IOException) {
+        file.delete()
+        null
+    } catch (e: SecurityException) {
+        // El selector da permiso temporal sobre la foto; si se revocó, se ignora como una foto ilegible.
         file.delete()
         null
     }
