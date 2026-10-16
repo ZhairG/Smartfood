@@ -2,8 +2,8 @@
  * Nombre: InventorySearchContract.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Contrato de la búsqueda del inventario (spec 006, HU-INV-06): estado de la pantalla, eventos y efectos.
- * Los nombres siguen `plan.md` §2 para que el #43 (voz, HU-INV-07) solo los amplíe, sin renombrar nada.
+ * Descripción: Contrato de la búsqueda del inventario (spec 006, HU-INV-06 y HU-INV-07): estado de la pantalla,
+ * eventos y efectos. Los nombres siguen `plan.md` §2.
  */
 package com.smartfood.app.feature.inventory.ui.search
 
