@@ -157,9 +157,13 @@ private fun InventoryList(
             bottom = FloatingActionButtonSpace
         )
     ) {
-        sections.forEach { section ->
+        sections.forEachIndexed { index, section ->
             item(key = "section_${section.status.name}") {
-                ExpirySectionHeader(status = section.status)
+                // Figma 476:3095: unos 42 px entre el final de una sección y el encabezado de la siguiente.
+                ExpirySectionHeader(
+                    status = section.status,
+                    modifier = if (index > 0) Modifier.padding(top = SectionGap) else Modifier
+                )
             }
             items(items = section.items, key = { item -> item.id }) { item ->
                 InventoryItemRow(
@@ -240,3 +244,4 @@ private val TopBarTitleSize = 20.sp
 
 /** Espacio al final de la lista para que el botón "+" no tape la última fila (FAB de 56 px más su margen). */
 private val FloatingActionButtonSpace = 88.dp
+private val SectionGap = 34.dp

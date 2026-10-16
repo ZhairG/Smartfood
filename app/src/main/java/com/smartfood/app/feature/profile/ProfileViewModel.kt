@@ -5,12 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartfood.app.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.smartfood.app.feature.auth.domain.usecase.LogoutUseCase
+import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,16 +22,19 @@ import javax.inject.Inject
  * Nombre: ProfileViewModel.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: ViewModel de la pestaña Perfil (spec 001 HU-05; spec 006 CA-INV-09-03). Lee el perfil del usuario
- * para saludarlo y gestiona el cierre de sesión.
+ * Descripción: ViewModel de la pestaña Perfil (spec 001 HU-05; spec 006 CA-INV-09-03; Figma `306:369`). Lee el perfil
+ * del usuario (nombre, correo e iniciales), cuenta los productos del inventario y gestiona el cierre de sesión, que
+ * es la única acción que funciona por ahora.
  *
  * @param getCurrentUser Caso de uso que obtiene el perfil del usuario actual.
  * @param logout Caso de uso de cierre de sesión.
+ * @param observeInventory Inventario del usuario, para la tarjeta "Ingredientes en inventario".
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val getCurrentUser: GetCurrentUserUseCase,
-    private val logout: LogoutUseCase
+    private val logout: LogoutUseCase,
+    private val observeInventory: ObserveInventoryUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -45,8 +50,23 @@ class ProfileViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             // Si el perfil no se puede leer, se muestra un saludo genérico (CA-05-02).
-            val firstName = getCurrentUser().getOrNull()?.fullName?.trim()?.substringBefore(' ')
-            _uiState.update { it.copy(isLoading = false, firstName = firstName?.ifBlank { null }) }
+            val user = getCurrentUser().getOrNull()
+            val fullName = user?.fullName?.trim()?.ifBlank { null }
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    firstName = fullName?.substringBefore(' '),
+                    fullName = fullName,
+                    email = user?.email,
+                    initials = fullName?.let(::initialsOf)
+                )
+            }
+        }
+        viewModelScope.launch {
+            // Si el inventario no se puede leer, la tarjeta queda en 0 sin cerrar la pantalla.
+            observeInventory()
+                .catch { emit(emptyList()) }
+                .collect { sections -> _uiState.update { it.copy(inventoryCount = sections.sumOf { s -> s.items.size }) } }
         }
     }
 
@@ -59,26 +79,38 @@ class ProfileViewModel @Inject constructor(
             }
         }
     }
+
+    internal companion object {
+        /** Iniciales del avatar: la primera letra de las dos primeras palabras ("Pepito Perez" → "PP"). */
+        fun initialsOf(fullName: String): String =
+            fullName.split(' ').filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() }
+    }
 }
 
 /**
- * Estado inmutable de [ProfileScreen].
+ * Estado del Perfil.
  *
- * @property isLoading Se está leyendo el perfil.
- * @property firstName Primer nombre del usuario, o `null` si no se pudo leer.
+ * @property isLoading `true` hasta leer el perfil.
+ * @property firstName Primer nombre, para el saludo (CA-05-01).
+ * @property fullName Nombre completo del encabezado.
+ * @property email Correo del encabezado.
+ * @property initials Iniciales del avatar.
+ * @property inventoryCount Productos del inventario, para la tarjeta "Ingredientes en inventario".
  */
 @Immutable
 data class ProfileUiState(
     val isLoading: Boolean = true,
-    val firstName: String? = null
+    val firstName: String? = null,
+    val fullName: String? = null,
+    val email: String? = null,
+    val initials: String? = null,
+    val inventoryCount: Int = 0,
 )
 
-/** Acciones del usuario en [ProfileScreen]. */
 sealed interface ProfileEvent {
     data object LogoutClicked : ProfileEvent
 }
 
-/** Efectos de un solo uso emitidos por [ProfileViewModel]. */
 sealed interface ProfileEffect {
     data object NavigateToLogin : ProfileEffect
 }

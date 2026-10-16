@@ -245,6 +245,12 @@ Desviaciones aprobadas por el equipo:
   búsqueda (`476:3190`) muestran la barra inferior, pero son pantallas internas y no la llevan (#40). La búsqueda y
   el aviso de voz se ajustaron al Figma el 16/10: barra en píldora, tarjeta de voz con borde verde, filtros redondos,
   resultados sin miniatura ni lápiz y ecualizador naranja.
+- **Perfil del Figma** (`306:369`, 16/10): encabezado con iniciales, nombre y correo; tres tarjetas de cifras; las
+  opciones de la cuenta y "Cerrar Sesión". Por ahora solo "Cerrar Sesión" funciona: las opciones y la cámara del
+  avatar se ven deshabilitadas, y de las cifras solo "Ingredientes en inventario" es real ("Recetas guardadas" muestra
+  0 y "Ahorrados este mes", "—"). Las medidas del Figma se escalan al ancho del teléfono (spec 002).
+- **Editor y lista ajustados al Figma** (16/10): fondo verde claro, zona de foto con la papelera siempre visible (gris
+  sin foto, roja con foto), lápiz de contorno y espacios entre filas y secciones del Figma.
 - **Uso sin conexión** (HU-INV-10, #71): el Figma no tiene el ícono de pendiente ni el aviso de guardado en el
   teléfono. La fila usa el ícono `CloudUpload` de Material en gris, y el aviso usa `SmartFoodResultDialog`, el mismo
   de "Producto Guardado". Se ajustan cuando exista un frame.

@@ -14,6 +14,7 @@ package com.smartfood.app.feature.inventory.ui.editor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -63,7 +64,7 @@ import com.smartfood.app.core.designsystem.components.SmartFoodTextField
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.formMetricsForWindow
+import com.smartfood.app.core.designsystem.theme.formMetricsFor
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryField
@@ -86,7 +87,9 @@ fun ProductEditorScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            // Figma 476:3664: fondo verde claro (#F0FDF4), que en el tema es `surface`; `background` es el verde
+            // oscuro de autenticación.
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         SmartFoodTopBar(
             title = stringResource(id = if (isEdit) R.string.editor_title_edit else R.string.editor_title_add),
@@ -109,18 +112,21 @@ fun ProductEditorScreen(
             }
         )
 
-        // El teclado se aplica fuera del desplazable; Compose mantiene visible el campo enfocado (spec 002).
+        // El perfil de medidas se toma con el alto sin el teclado, para que los campos no cambien de tamaño al
+        // abrirlo. El teclado se aplica por dentro, fuera del desplazable; Compose mantiene visible el campo
+        // enfocado (spec 002).
         BoxWithConstraints(
             modifier = Modifier
                 .weight(1f)
-                .imePadding()
                 .navigationBarsPadding()
         ) {
-            CompositionLocalProvider(LocalFormMetrics provides formMetricsForWindow(maxHeight)) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else {
-                    EditorForm(state = state, onEvent = onEvent)
+            CompositionLocalProvider(LocalFormMetrics provides formMetricsFor(maxHeight)) {
+                Box(modifier = Modifier.fillMaxSize().imePadding()) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    } else {
+                        EditorForm(state = state, onEvent = onEvent)
+                    }
                 }
             }
         }
@@ -200,7 +206,8 @@ private fun EditorForm(state: ProductEditorUiState, onEvent: (ProductEditorEvent
             )
         }
 
-        Spacer(modifier = Modifier.height(metrics.sectionSpacing))
+        // Figma 476:3664: el botón queda bastante más abajo que los campos.
+        Spacer(modifier = Modifier.height(metrics.sectionSpacing * 2))
 
         if (state.mode == EditorMode.ADD) {
             SmartFoodPrimaryButton(

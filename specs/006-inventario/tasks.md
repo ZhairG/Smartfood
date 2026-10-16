@@ -48,7 +48,7 @@
 - [x] T027 [P] Colores de estado del inventario y documentación de íconos y textos (CA-INV-01-01, RNF-INV-08). El amarillo es `YellowExpiring` (`#F6E938`, Figma `476:3121`); Vencido y Fresco siguen con `ErrorRed` y `GreenCheck`. Los íconos son de Material porque el Figma solo los tiene como PNG (plan §8), y los textos los entrega cada pantalla: el #39 creó `strings_inventory.xml` y su cabecera lo documenta. Prueba: I `ExpiringSoonColorTest`. → #37
 
 ## Fase 4: Navegación
-- [x] T028 Renombrar `feature/home` → `feature/profile` (`ProfileScreen`, `ProfileViewModel`, `Route.Profile`). Se ajustan sus pruebas (CA-INV-09-03). Prueba: U `ProfileViewModelTest`. → #38
+- [x] T028 Renombrar `feature/home` → `feature/profile` (`ProfileScreen`, `ProfileViewModel`, `Route.Profile`). Se ajustan sus pruebas (CA-INV-09-03). Prueba: U `ProfileViewModelTest`. El 16/10 la pantalla pasó al Figma `306:369` (solo "Cerrar Sesión" funciona; spec §8). Pruebas: U `ProfileViewModelTest`, I `ProfileScreenTest`. → #38
 - [x] T029 Rutas `Inventory`, `InventorySearch`, `ProductEditor(itemId?)` y `ProductCamera`. `MainGraph` arranca en `Inventory`. `MainTabScaffold` con la barra inferior solo en las pestañas (CA-INV-09-01, 09-02, 09-04, 09-05). Destinos del inventario provisionales hasta #39 a #42. → #38
 - [x] T030 `MainNavigationTest` y `AppNavigationTest` actualizados (el inicio de sesión llega a "Mi Inventario" y el cierre de sesión pasa por Perfil). `AppNavigationTest` no necesitó cambios (solo cubre la autenticación); `MainNavigationTest` no toca "Cerrar sesión" para no cerrar la sesión real del dispositivo (CA-05-03 lo cubre `ProfileViewModelTest`). → #38
 
@@ -120,7 +120,7 @@ verificación manual (checklist).
 | CA-INV-05-01 | I `ProductCameraScreenTest`, M 2 |
 | CA-INV-05-02 | U `ProductEditorViewModelTest`, M 2 |
 | CA-INV-05-03 | U `ProductEditorViewModelTest`, I `ProductCameraScreenTest`, M 4 |
-| CA-INV-05-04 | U `UpdateItemUseCaseTest`, I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
+| CA-INV-05-04 | U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest` (papelera), I `SmartFoodDialogsTest` |
 | CA-INV-05-05 | U `UpdateItemUseCaseTest`, I `PhotoUploadWorkerTest` (borra la anterior después de subir), M 2 |
 | CA-INV-05-06 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (conserva el archivo si falla), I `PhotoUploadWorkerTest` (reintenta; archivo ilegible → sin foto) |
 | CA-INV-06-01 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
@@ -148,7 +148,7 @@ verificación manual (checklist).
 | CA-INV-08-06 | U `LogoutUseCaseTest` |
 | CA-INV-09-01 | I `MainNavigationTest` |
 | CA-INV-09-02 | I `MainNavigationTest`, I `SmartFoodNavigationTest` |
-| CA-INV-09-03 | I `MainNavigationTest`, U `ProfileViewModelTest` |
+| CA-INV-09-03 | I `MainNavigationTest`, U `ProfileViewModelTest`, I `ProfileScreenTest` |
 | CA-INV-09-04 | I `MainNavigationTest` |
 | CA-INV-09-05 | I `MainNavigationTest` |
 | CA-INV-10-01 | M 7 |

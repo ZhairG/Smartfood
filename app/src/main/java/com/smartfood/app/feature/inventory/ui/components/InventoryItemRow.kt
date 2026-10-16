@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -145,7 +145,7 @@ fun InventoryItemRow(
                         modifier = Modifier.size(EditButtonSize)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
+                            imageVector = Icons.Outlined.Edit,
                             contentDescription = stringResource(id = R.string.cd_edit_button, item.name),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(EditIconSize)
@@ -154,7 +154,11 @@ fun InventoryItemRow(
                 }
             }
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+        // Figma 476:3110: la línea va 10 px debajo de la fila y la fila siguiente 8 px después.
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.outline,
+            modifier = Modifier.padding(top = RowToDividerGap, bottom = DividerToNextRowGap)
+        )
     }
 }
 
@@ -260,6 +264,8 @@ private val ThumbnailRadius = 15.dp
 private val ThumbnailToTextGap = 14.dp
 private val EditButtonSize = 32.dp
 private val EditIconSize = 20.dp
+private val RowToDividerGap = 10.dp
+private val DividerToNextRowGap = 8.dp
 private val DateFontSize = 13.sp
 private val NameFontSize = 20.sp
 private val CategoryFontSize = 10.sp

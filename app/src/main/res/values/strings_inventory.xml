@@ -101,7 +101,7 @@
     <string name="editor_name_label">Nombre del producto</string>
     <string name="editor_expiry_placeholder">Fecha de vencimiento</string>
     <string name="editor_category_placeholder">Seleccionar categoría</string>
-    <string name="editor_quantity_placeholder">Cantidad (opcional)</string>
+    <string name="editor_quantity_placeholder">Cantidad</string>
     <string name="editor_unit_label">Unidad</string>
     <string name="cd_editor_take_photo">Tomar foto</string>
     <string name="cd_editor_remove_photo">Eliminar la foto</string>

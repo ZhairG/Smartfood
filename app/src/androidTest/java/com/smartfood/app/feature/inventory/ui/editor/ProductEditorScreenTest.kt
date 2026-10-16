@@ -109,7 +109,7 @@ class ProductEditorScreenTest {
     fun t032_caInv0208_laFilaDeCantidadEmpiezaEnUnidades() {
         mostrar(ProductEditorUiState())
 
-        composeTestRule.onNodeWithText("Cantidad (opcional)").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cantidad").assertIsDisplayed()
         composeTestRule.onNodeWithText("unidades").assertIsDisplayed()
     }
 
@@ -133,5 +133,21 @@ class ProductEditorScreenTest {
 
         assertEquals(listOf<ProductEditorEvent>(ProductEditorEvent.DialogDismissed), eventos)
         assertTrue(ProductEditorEvent.DeleteConfirmed !in eventos)
+    }
+
+    @Test
+    fun t032_caInv0504_laPapeleraSeVeSiempreYSinFotoEstaDeshabilitada() {
+        mostrar(ProductEditorUiState())
+
+        composeTestRule.onNodeWithContentDescription("Eliminar la foto").assertIsDisplayed().assertIsNotEnabled()
+    }
+
+    @Test
+    fun t032_caInv0504_conFotoLaPapeleraPideConfirmar() {
+        mostrar(ProductEditorUiState(photo = PhotoUiState.Local("/no/existe.jpg")))
+
+        composeTestRule.onNodeWithContentDescription("Eliminar la foto").assertIsEnabled().performClick()
+
+        assertEquals(listOf<ProductEditorEvent>(ProductEditorEvent.RemovePhotoClicked), eventos)
     }
 }
