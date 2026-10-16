@@ -8,6 +8,8 @@
     <string name="tab_inventory">Inventario</string>
     <string name="tab_profile">Perfil</string>
     <string name="inventory_title">Mi Inventario</string>
+    <!-- Flecha atrás de SmartFoodTopBar (RNF-INV-04). -->
+    <string name="cd_navigate_back">Volver</string>
     <!-- Pantallas provisionales: las reemplazan los Issues de cada pantalla (#39, #40, #41 y #42). -->
     <string name="placeholder_coming_soon">Próximamente</string>
     <string name="placeholder_search_title">Buscar</string>
