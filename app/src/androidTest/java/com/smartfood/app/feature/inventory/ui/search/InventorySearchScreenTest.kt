@@ -5,6 +5,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.click
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
@@ -233,9 +235,10 @@ class InventorySearchScreenTest {
             )
         )
 
-        // La fila reutilizada anuncia el estado en su descripción, además del color (RNF-INV-04).
+        // El punto de estado anuncia el estado, además del color (RNF-INV-04). La fila del Figma no tiene lápiz:
+        // toda la fila es un botón que abre el editor (CA-INV-06-08).
         composeTestRule.onNodeWithContentDescription("Próximo a vencer").assertExists()
-        composeTestRule.onNodeWithContentDescription("Editar Yogur").assertExists()
+        composeTestRule.onNode(hasText("Yogur") and hasClickAction(), useUnmergedTree = false).assertExists()
 
         composeTestRule.onNodeWithContentDescription("Volver").performClick()
 
