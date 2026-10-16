@@ -92,6 +92,7 @@ private fun SmartFoodOfflineDialogContent(
     onReconnect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Radio propio de este diálogo (45 dp, Figma `700:1913`), no el de `panelRadius` (50 dp, diálogos de inventario).
     val dialogShape = RoundedCornerShape(45.dp)
 
     Box(
@@ -111,7 +112,7 @@ private fun SmartFoodOfflineDialogContent(
             )
     ) {
         // Medidas del frame "Mensaje_Claro" de Figma (nodo 700:1913): ícono a 6 dp del borde, título justo debajo
-        // y botón a 111 dp del borde superior.
+        // y botón a 111 dp del borde superior. El ícono (72 dp) también es el suyo, no `iconDialogSize` (100 dp).
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -237,12 +238,12 @@ private fun SmartFoodConfirmDialogContent(
             textAlign = TextAlign.Center
         )
 
-        // Figma 476:3815 y 476:3817: los dos botones del Figma son el mismo botón primario, uno en rojo `error`.
+        // Figma 476:3815 y 476:3817: los dos botones del Figma son el mismo botón primario, el de confirmar en su
+        // variante destructiva (`destructive`, `error`).
         SmartFoodPrimaryButton(
             text = confirmText,
             onClick = onConfirm,
-            containerColor = MaterialTheme.colorScheme.error,
-            contentColor = MaterialTheme.colorScheme.onError
+            destructive = true
         )
         SmartFoodPrimaryButton(
             text = dismissText,
@@ -256,6 +257,9 @@ private fun SmartFoodConfirmDialogContent(
  *
  * Figma: "Guardar Producto" `476:3926` (spec 006, CA-INV-02-06 y 03-02).
  *
+ * El diálogo **no** se cierra solo: ni con atrás ni tocando fuera. Lo quita de la composición quien lo muestra
+ * (el editor lo retira cuando navega de vuelta a la lista), junto con la acción que lo abrió.
+ *
  * @param icon Contenido que dibuja el ícono del resultado.
  * @param title Título del resultado.
  * @param body Mensaje adicional opcional.
@@ -268,6 +272,7 @@ fun SmartFoodResultDialog(
     body: String? = null,
     modifier: Modifier = Modifier
 ) {
+    // Sin cierre propio: atrás y el toque fuera no lo cierran (ver el KDoc); lo quita quien lo muestra.
     Dialog(onDismissRequest = {}) {
         SmartFoodResultDialogContent(
             icon = icon,
