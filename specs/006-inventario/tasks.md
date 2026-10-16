@@ -59,7 +59,7 @@
 - [ ] T032 Editor: `ProductEditorContract`, `ProductEditorViewModel` y `ProductEditorScreen` con `PhotoSlot`, `CategorySheet`, `DatePicker` sin días pasados y la fila de cantidad con su hoja de unidad, y sus pruebas (HU-INV-02, 03, 04; CA-INV-02-08, 02-09). La fila de la lista muestra la cantidad (CA-INV-01-08, en T031). → #40
 - [x] T033 Cámara: `ProductCameraScreen` (CameraX, recuadro de encuadre, resultado por `savedStateHandle`), con el permiso y la explicación (HU-INV-05). Incluye `SmartFoodTopBar`. Pruebas: I `ProductCameraScreenTest`, I `SmartFoodTopBarTest`. → #41
 - [x] T034 Búsqueda: `InventorySearchContract`, `InventorySearchViewModel` e `InventorySearchScreen` con `SmartFoodTopBar`, los `CategoryChips` (en `ui/components/`) y "x", y sus pruebas (HU-INV-06). Los resultados reutilizan `InventoryItemRow`. → #42
-- [ ] T035 Voz: `VoiceSearchCard` y `VoiceSearchOverlay` ("Habla ahora", "…", error con "Reintentar"), el permiso de micrófono y la cancelación, con pruebas del ViewModel y de la pantalla (HU-INV-07). → #43
+- [x] T035 Voz: `VoiceSearchCard` y `VoiceSearchOverlay` ("Habla ahora", "…", error con "Reintentar"), el permiso de micrófono y la cancelación, con pruebas del ViewModel y de la pantalla (HU-INV-07). → #43
 - [ ] T036 `AdaptiveLayoutTest` cubre el editor en 360×720, con el teclado abierto y cerrado (RNF-INV-06). → #40
 
 ## Fase 6: Avisos
