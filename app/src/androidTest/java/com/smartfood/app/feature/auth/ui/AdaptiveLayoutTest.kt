@@ -8,6 +8,8 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
@@ -189,13 +191,13 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
 
     // T036 (spec 006, RNF-INV-06): el editor de producto cabe con el teclado cerrado, en alta y en edición.
     @Test
-    fun t036_rnfInv06_editorAlta_cabeSinScroll() {
+    fun t036_rnfInv06_editorAlta_botonFijoYPrecioAlcanzable() {
         mostrar { ProductEditorScreen(ProductEditorUiState(), {}) }
-        assertCabeSinScroll("Añadir al Inventario")
+        assertEditorAdaptable("Añadir al Inventario")
     }
 
     @Test
-    fun t036_rnfInv06_editorEdicion_cabeSinScroll() {
+    fun t036_rnfInv06_editorEdicion_botonFijoYPrecioAlcanzable() {
         mostrar {
             ProductEditorScreen(
                 ProductEditorUiState(
@@ -208,6 +210,16 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
                 {}
             )
         }
-        assertCabeSinScroll("Eliminar")
+        assertEditorAdaptable("Eliminar")
+    }
+
+    /**
+     * T054 (RNF-INV-06): con el precio, el editor puede necesitar desplazarse en pantallas bajas. El botón queda fijo
+     * abajo y siempre visible, y el último campo (el precio) se alcanza desplazando.
+     */
+    private fun assertEditorAdaptable(buttonText: String) {
+        composeTestRule.onNode(hasText(buttonText) and hasClickAction()).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Precio (opcional)").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNode(hasText(buttonText) and hasClickAction()).assertIsDisplayed()
     }
 }

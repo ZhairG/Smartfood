@@ -151,7 +151,12 @@ class ProductEditorViewModel @Inject constructor(
     /** Guarda el alta o la edición. Si falla, el formulario conserva lo escrito (CA-INV-02-07, CA-INV-05-06). */
     private fun save() {
         val state = _uiState.value
-        if (!state.isSaveEnabled || state.isSaving) return
+        if (state.isSaving) return
+        // El botón gris no guarda: muestra el aviso y marca los campos que faltan (CA-INV-02-02).
+        if (!state.isSaveEnabled) {
+            _uiState.update { it.copy(showMissingFields = true, error = null) }
+            return
+        }
         val draft = state.toDraft()
         val localPhoto = (state.photo as? PhotoUiState.Local)?.let { LocalPhoto(it.path) }
         viewModelScope.launch {
@@ -203,7 +208,11 @@ class ProductEditorViewModel @Inject constructor(
         sendEffect(ProductEditorEffect.NavigateBack)
     }
 
-    private fun ProductEditorUiState.withSaveEnabled() = copy(isSaveEnabled = validate.isComplete(toDraft()))
+    private fun ProductEditorUiState.withSaveEnabled(): ProductEditorUiState {
+        val complete = validate.isComplete(toDraft())
+        // El aviso de campos vacíos desaparece cuando ya están los tres (CA-INV-02-02).
+        return copy(isSaveEnabled = complete, showMissingFields = showMissingFields && !complete)
+    }
 
     private fun ProductEditorUiState.toDraft() = ItemDraft(
         name = name,

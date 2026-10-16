@@ -164,4 +164,20 @@ class ProductEditorScreenTest {
         composeTestRule.onNodeWithText("Escribe un precio en pesos, sin decimales, mayor que 0 y hasta 99.999.999.")
             .assertIsDisplayed()
     }
+
+    @Test
+    fun t054_caInv0202_tocarElBotonGrisEmiteGuardar() {
+        mostrar(ProductEditorUiState(name = "Carne"))
+
+        composeTestRule.onNodeWithText("Añadir al Inventario").performClick()
+
+        assertEquals(listOf<ProductEditorEvent>(ProductEditorEvent.SaveClicked), eventos)
+    }
+
+    @Test
+    fun t054_caInv0202_conCamposVaciosSeVeElAviso() {
+        mostrar(ProductEditorUiState(name = "Carne", showMissingFields = true))
+
+        composeTestRule.onNodeWithText("⚠ Los campos no pueden estar vacíos").assertIsDisplayed()
+    }
 }

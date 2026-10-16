@@ -74,6 +74,7 @@ sealed interface EditorDialog {
  * @property photo Foto que muestra la zona de imagen.
  * @property isSaveEnabled `true` cuando están el nombre, la fecha y la categoría (CA-INV-02-02).
  * @property isSaving `true` mientras se guarda o se elimina.
+ * @property showMissingFields `true` después de tocar el botón gris con campos vacíos (CA-INV-02-02).
  * @property error Último error, de validación o del guardado.
  * @property dialog Hoja, calendario o diálogo abierto.
  */
@@ -90,12 +91,21 @@ data class ProductEditorUiState(
     val photo: PhotoUiState = PhotoUiState.None,
     val isSaveEnabled: Boolean = false,
     val isSaving: Boolean = false,
+    val showMissingFields: Boolean = false,
     val error: InventoryError? = null,
     val dialog: EditorDialog? = null,
 ) {
     /** Campo marcado en rojo, si el error es de validación. */
     val errorField: InventoryField?
         get() = (error as? InventoryError.Validation)?.field
+
+    /** Campos obligatorios vacíos, marcados en rojo después de tocar el botón gris (CA-INV-02-02). */
+    val missingFields: Set<InventoryField>
+        get() = if (!showMissingFields) emptySet() else buildSet {
+            if (name.isBlank()) add(InventoryField.NAME)
+            if (expiresOn == null) add(InventoryField.EXPIRY)
+            if (category == null) add(InventoryField.CATEGORY)
+        }
 
     /** Error que no es de un campo (red, permisos…), para mostrarlo bajo el formulario (CA-INV-02-07). */
     val generalError: InventoryError?

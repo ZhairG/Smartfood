@@ -304,4 +304,29 @@ class ProductEditorViewModelTest {
         assertEquals(InventoryField.PRICE, viewModel.uiState.value.errorField)
         assertTrue(repository.savedItems.isEmpty())
     }
+
+    @Test
+    fun `CA-INV-02-02 tocar el boton gris muestra el aviso y marca los campos que faltan sin guardar`() {
+        val viewModel = createViewModel()
+        viewModel.onEvent(ProductEditorEvent.NameChanged("Carne"))
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        val state = viewModel.uiState.value
+        assertTrue(state.showMissingFields)
+        assertEquals(setOf(InventoryField.EXPIRY, InventoryField.CATEGORY), state.missingFields)
+        assertTrue(repository.savedItems.isEmpty())
+    }
+
+    @Test
+    fun `CA-INV-02-02 el aviso desaparece cuando estan los tres campos`() {
+        val viewModel = createViewModel()
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+        assertTrue(viewModel.uiState.value.showMissingFields)
+
+        viewModel.fillValidForm()
+
+        assertFalse(viewModel.uiState.value.showMissingFields)
+        assertTrue(viewModel.uiState.value.missingFields.isEmpty())
+    }
 }
