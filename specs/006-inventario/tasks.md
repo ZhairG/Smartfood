@@ -33,7 +33,7 @@
 - [x] T016 `InventoryErrorMapper`, con pruebas (plan §10). Prueba: U `InventoryErrorMapperTest`. → #30
 - [x] T017 `FirestoreInventoryRepository` (`Map`, `serverTimestamp`, `snapshots()` → `Flow`; `quantity` y `unit` solo si hay cantidad) (RF-INV-01). Guardar y borrar con transacción (RNF-INV-05). Prueba: U `InventoryDocumentTest`; de punta a punta con las reglas en T022. → #30
 - [x] T018 [P] `FirebaseStoragePhotoRepository`, con la compresión a 1080 px / JPEG 80 y EXIF (RNF-INV-02). Pruebas: U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (con `-PuseFirebaseEmulator=true`). → #31
-- [ ] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5), y su `@Binds` en `InventoryDataModule`. → #32
+- [x] T019 [P] `AndroidSpeechToText` (`callbackFlow`, es-CO) y en el manifiesto `<queries>` y `RECORD_AUDIO` (plan §5), y su `@Binds` en `InventoryDataModule`. Pruebas: U `AndroidSpeechToTextTest`, I `InventoryDataModuleTest`. → #32
 - [ ] T020 [P] `InventoryPreferences` sobre el DataStore existente, y su `@Binds` en `InventoryDataModule`. → #33
 - [ ] T021 `InventoryDataModule` (creado en T013 con el aviso vacío) enlaza también los repositorios. Cada implementación se enlaza en su Issue: Firestore y fotos → #69 (hecho; I `InventoryDataModuleTest`), voz → #32, preferencias → #33. Se marca cuando las tres estén enlazadas.
 - [x] T022 Reglas: subcolección `inventory` en `firestore.rules` (con `validQuantity`) y `storage.rules` nuevo (RNF-INV-01, plan §3). Pruebas: R `rules-test/` (Firestore y Storage), I `FirestoreInventoryRepositoryEmulatorTest` (de punta a punta con `-PuseFirebaseEmulator=true`). → #34
@@ -123,10 +123,10 @@ verificación manual (checklist).
 | CA-INV-07-02 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
 | CA-INV-07-03 | U `ParseSpokenIngredientsUseCaseTest`, U `InventorySearchViewModelTest`, M 5 |
 | CA-INV-07-04 | U `SearchInventoryUseCaseTest` |
-| CA-INV-07-05 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest`, M 5 |
-| CA-INV-07-06 | U `InventorySearchViewModelTest`, M 6 |
+| CA-INV-07-05 | U `AndroidSpeechToTextTest`, U `InventorySearchViewModelTest`, I `InventorySearchScreenTest`, M 5 |
+| CA-INV-07-06 | U `AndroidSpeechToTextTest`, U `InventorySearchViewModelTest`, M 6 |
 | CA-INV-07-07 | U `InventorySearchViewModelTest` (cancela la recolección del fake) |
-| CA-INV-07-08 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
+| CA-INV-07-08 | U `AndroidSpeechToTextTest`, U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
 | CA-INV-07-09 | U `InventorySearchViewModelTest` |
 | CA-INV-08-01 | U `GetExpiringItemsUseCaseTest`, U `AddItemUseCaseTest` (programa el aviso), M 8 |
 | CA-INV-08-02 | U `GetExpiringItemsUseCaseTest`, M 8 |
