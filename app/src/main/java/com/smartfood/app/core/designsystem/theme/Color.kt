@@ -78,6 +78,14 @@ val GreyTransparent60 = Color(0x99CCCCCC)
 /** Rojo semántico para estados de error y validaciones. */
 val ErrorRed = Color(0xFFD92E2E)
 
+// === Estados del inventario ===
+/**
+ * Amarillo del estado "Próximo a vencer" de la lista de inventario (Figma `476:3121`, spec 006 CA-INV-01-01).
+ * Vencido y Fresco siguen con [ErrorRed] y [GreenCheck]: el Figma usa `#DC2626` y `#84CC16`, que no son tokens
+ * (T027, #37).
+ */
+val YellowExpiring = Color(0xFFF6E938)
+
 // === Superficies y Paneles Dark / Light ===
 /** Fondo del panel en modo oscuro. */
 val SurfaceDark = Color(0xFF0E2118)

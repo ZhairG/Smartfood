@@ -379,7 +379,7 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
 | `SmartFoodSelectorField` (nuevo, `Inputs.kt`) | La misma caja que `SmartFoodTextField`: las dos usan el `private @Composable FieldFrame` (etiqueta, caja con `inputBorderAndBackground`, ícono y contenido final). Sin teclado. La etiqueta y la caja forman **un solo nodo** que se toca (`Role.Button`), así que tocar la etiqueta abre el selector y TalkBack anuncia "Categoría, Lácteos, botón". Admite `leadingContent`, `trailingContent` (chevron), `isError` y `accessibilityLabel`. |
 | `SmartFoodTopBar` (nuevo, `TopBar.kt`) | Barra de las pantallas internas (Figma `476:5960`): fondo `primary`, flecha atrás con descripción "Volver", título centrado como encabezado y acción opcional a la derecha (el "Guardar" del editor). La usan la cámara, el editor y la búsqueda. |
 | `FormMetrics` | `fieldIconSize` (Regular 30, Medium 26, Compact 24 dp) y `fieldIconSpacing` (23, 18 y 14 dp): el ícono inicial va en una caja de ese tamaño, en gris `onSurfaceVariant` (el `#9AA39D` del Figma), separado del texto por esa distancia (#62). |
-| `SmartFoodBottomBar` (nuevo, `Navigation.kt`) | Barra de 2 pestañas del Figma (`476:5570`): fondo `surfaceVariant` (blanco), línea superior `outline`, pestañas con ícono y texto (Poppins SemiBold de 12 sp) y rol `Tab`. La seleccionada va en `GreenCheck` (el `#16A34A` del Figma) y las demás en `onSurfaceVariant`. Recibe las pestañas por parámetro (`SmartFoodTab`). Los íconos son de Material hasta T027. |
+| `SmartFoodBottomBar` (nuevo, `Navigation.kt`) | Barra de 2 pestañas del Figma (`476:5570`): fondo `surfaceVariant` (blanco), línea superior `outline`, pestañas con ícono y texto (Poppins SemiBold de 12 sp) y rol `Tab`. La seleccionada va en `GreenCheck` (el `#16A34A` del Figma) y las demás en `onSurfaceVariant`. Recibe las pestañas por parámetro (`SmartFoodTab`). Los íconos son de Material (`Icons.Outlined.Inventory2` y `Person`, T027). |
 | `SmartFoodConfirmDialog` (nuevo, `Dialogs.kt`) | Ícono en círculo, pregunta, botón destructivo ("Eliminar", `error`) y "Cancelar" (`secondary`). Usa la forma de `SmartFoodOfflineDialog`. |
 | `SmartFoodResultDialog` (nuevo, `Dialogs.kt`) | Ícono de check, título y cuerpo opcional ("Producto Guardado" / "Te avisaremos…"). Se anuncia como `liveRegion`. |
 | `SmartFoodPrimaryButton` | Ya es naranja (`secondary`) habilitado y gris deshabilitado, como "Añadir al Inventario" (`476:5726`), así que no hace falta una variante de acento. Suma `leadingIcon` opcional para el "+" y `destructive` (Boolean) para el botón rojo de confirmación (`error`/`onError`, Figma `476:3815`, CA-INV-04-01), con los colores cerrados: nadie pasa colores sueltos (#80). |
@@ -390,10 +390,32 @@ match /b/{bucket}/o/users/{uid}/inventory/{itemId}/{file} {
   configuración regional del teléfono (sin ceros decimales sobrantes).
 - El editor provee `LocalFormMetrics` con `formMetricsForWindow(maxHeight)`. No hacen falta `smaller()` ni medidas
   fijas nuevas (RNF-INV-06).
-- Los colores de estado se toman de los tokens existentes (rojo `error`, amarillo y verde de la paleta). Si falta el
-  amarillo, se agrega un rol `ExpiringSoon` en `Theme.kt`, no un valor suelto.
-- Íconos nuevos en `res/drawable` (carrito, calendario, etiqueta, cámara, papelera, micrófono, ondas), exportados del
-  Figma como vectores.
+- **Colores de estado (T027, #37):** los expone `ExpiryStatus.color`
+  (`feature/inventory/ui/components/ExpirySectionHeader.kt`) y los usan el punto del encabezado y el bloque de la
+  miniatura sin foto. Decidido con el Figma `476:3114`:
+  | Estado | Color | Origen |
+  |---|---|---|
+  | Vencido | `ErrorRed` `#D92E2E` | token existente (el Figma usa `#DC2626`) |
+  | Próximo a vencer | `YellowExpiring` `#F6E938` | token nuevo en `Color.kt`, del nodo `476:3121` |
+  | Fresco | `GreenCheck` `#16A34A` | token existente (el Figma usa `#84CC16`) |
+- **Íconos (T027, #37):** no hay vectores que exportar. Comprobado con el MCP: la lupa (`476:3201`) sí es vector,
+  pero cámara (`476:3680`), micrófono (`476:3211`), el ícono de la pestaña Inventario (`I476:5570;344:2387`), los dos
+  íconos de los campos (`CampoEditable`, 30×30) y las ondas de la Grabadora (`476:4508`) son PNG en el archivo. Se usa
+  `material-icons-extended`, que ya estaba en el proyecto:
+  | Dónde | Ícono |
+  |---|---|
+  | Campo de nombre | `Icons.Outlined.ShoppingCart` |
+  | Campo de categoría | `Icons.Outlined.LocalOffer` |
+  | Foto del producto en el editor | `Icons.Outlined.CameraAlt` y `Icons.Outlined.Delete` |
+  | Editar de la fila | `Icons.Default.Edit` (#39) |
+  | Lupa de la lista | `Icons.Outlined.Search` |
+  | Micrófono de "Usa tu voz" | `Icons.Outlined.Mic` |
+  | Pestañas | `Icons.Outlined.Inventory2` y `Icons.Outlined.Person` (#38) |
+  | Pendiente de subir | `Icons.Outlined.CloudUpload` (T049, #85) |
+  Las ondas de la Grabadora no son un asset: se dibujan con Compose en el #43.
+- **Textos (T027, #37):** `strings_inventory.xml` lo creó la lista (#39) y cada pantalla agrega los suyos: la búsqueda
+  (#42), la voz (#43), el editor (#40) y los avisos (#44). T027 solo documenta la convención; RNF-INV-08 se cumple por
+  pantalla.
 
 ## 9. Dependencias y configuración
 

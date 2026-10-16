@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.ErrorRed
 import com.smartfood.app.core.designsystem.theme.GreenCheck
-import com.smartfood.app.core.designsystem.theme.OrangeMain
+import com.smartfood.app.core.designsystem.theme.YellowExpiring
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 
 /**
@@ -45,14 +45,14 @@ val ExpiryStatus.titleRes: Int
     }
 
 /**
- * Color de cada [ExpiryStatus]. Figma (`476:3114`) usa `#DC2626`, `#F6E938` y `#84CC16`, que todavía no son tokens
- * de la paleta: los roles definitivos llegan con la T027 (#37). Mientras tanto se usan los tokens que ya existen
- * (rojo [ErrorRed], naranja [OrangeMain] y verde [GreenCheck]), como se acordó en el #39.
+ * Color de cada [ExpiryStatus]. El Figma (`476:3114`) usa `#DC2626`, `#F6E938` y `#84CC16`; por acuerdo del equipo
+ * (spec 006 §8) Vencido y Fresco usan los tokens que ya existían, [ErrorRed] y [GreenCheck], y el amarillo de
+ * "Próximo a vencer" es el token nuevo [YellowExpiring] del nodo `476:3121` (T027, #37).
  */
 val ExpiryStatus.color: Color
     get() = when (this) {
         ExpiryStatus.EXPIRED -> ErrorRed
-        ExpiryStatus.EXPIRING_SOON -> OrangeMain
+        ExpiryStatus.EXPIRING_SOON -> YellowExpiring
         ExpiryStatus.FRESH -> GreenCheck
     }
 
