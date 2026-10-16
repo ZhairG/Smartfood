@@ -48,15 +48,6 @@ sealed interface EditorDialog {
     /** "¿Desea eliminar la imagen?" (CA-INV-05-04). */
     data object ConfirmRemovePhoto : EditorDialog
 
-    /** "Producto Guardado" (CA-INV-02-06). */
-    data object ProductSaved : EditorDialog
-
-    /** "Guardado: «nombre» se actualizó" (CA-INV-03-02). */
-    data class ProductUpdated(val name: String) : EditorDialog
-
-    /** "Producto eliminado" (CA-INV-04-02). */
-    data object ProductDeleted : EditorDialog
-
     /** "Imagen eliminada" (CA-INV-05-04). */
     data object PhotoRemoved : EditorDialog
 }
