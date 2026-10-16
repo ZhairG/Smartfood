@@ -2,8 +2,10 @@ package com.smartfood.app.feature.inventory.data
 
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
+import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
+import com.smartfood.app.feature.inventory.domain.repository.SpeechToText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertSame
@@ -35,6 +37,9 @@ class InventoryDataModuleTest {
     @Inject
     lateinit var photoRepository: PhotoRepository
 
+    @Inject
+    lateinit var speechToText: SpeechToText
+
     @Before
     fun inyectar() {
         hiltRule.inject()
@@ -49,5 +54,10 @@ class InventoryDataModuleTest {
     @Test
     fun t021_losRepositoriosSonUnicosEnLaApp() {
         assertSame(inventoryRepository, otroInventoryRepository)
+    }
+
+    @Test
+    fun t019_reconocimientoDeVozSeInyectaConLaImplementacionDeAndroid() {
+        assertTrue(speechToText is AndroidSpeechToText)
     }
 }

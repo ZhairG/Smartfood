@@ -3,9 +3,11 @@ package com.smartfood.app.feature.inventory.data.di
 import com.smartfood.app.feature.inventory.data.reminder.NoOpExpiryReminderScheduler
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
+import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
 import com.smartfood.app.feature.inventory.domain.repository.ExpiryReminderScheduler
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
+import com.smartfood.app.feature.inventory.domain.repository.SpeechToText
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -33,6 +35,11 @@ abstract class InventoryDataModule {
     @Binds
     @Singleton
     abstract fun bindPhotoRepository(impl: FirebaseStoragePhotoRepository): PhotoRepository
+
+    /** Reconocimiento de voz del sistema en español de Colombia (RF-INV-06, T019). */
+    @Binds
+    @Singleton
+    abstract fun bindSpeechToText(impl: AndroidSpeechToText): SpeechToText
 
     /** Temporal hasta T038: sin avisos reales, cerrar sesión no tiene nada que cancelar. */
     @Binds
