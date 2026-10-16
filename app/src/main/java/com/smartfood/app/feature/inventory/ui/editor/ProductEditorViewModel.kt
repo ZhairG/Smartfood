@@ -17,6 +17,7 @@ import com.smartfood.app.feature.inventory.domain.model.ItemDraft
 import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
 import com.smartfood.app.feature.inventory.domain.model.toInventoryError
+import com.smartfood.app.feature.inventory.domain.repository.InventoryPreferences
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.usecase.AddItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.DeleteItemUseCase
@@ -42,6 +43,7 @@ import javax.inject.Inject
  * @param addItem Alta de un producto (CA-INV-02-06).
  * @param updateItem Edición de un producto (CA-INV-03-02).
  * @param deleteItem Eliminación de un producto (CA-INV-04-02).
+ * @param preferences Preferencias locales: recuerdan si ya se pidió el permiso de notificaciones (CA-INV-08-05).
  */
 @HiltViewModel
 class ProductEditorViewModel @Inject constructor(
@@ -51,6 +53,7 @@ class ProductEditorViewModel @Inject constructor(
     private val addItem: AddItemUseCase,
     private val updateItem: UpdateItemUseCase,
     private val deleteItem: DeleteItemUseCase,
+    private val preferences: InventoryPreferences,
 ) : ViewModel() {
 
     private val itemId: String? = savedStateHandle.get<String>(ITEM_ID_KEY)
@@ -171,6 +174,7 @@ class ProductEditorViewModel @Inject constructor(
                 .onSuccess { item ->
                     val dialog = if (current == null) EditorDialog.ProductSaved else EditorDialog.ProductUpdated(item.name)
                     _uiState.update { it.copy(isSaving = false, dialog = dialog) }
+                    requestNotificationPermissionOnce()
                     closeResultAndLeave()
                 }
                 .onFailure { cause -> _uiState.update { it.copy(isSaving = false, error = cause.toInventoryError()) } }
@@ -192,6 +196,17 @@ class ProductEditorViewModel @Inject constructor(
                 }
                 .onFailure { cause -> _uiState.update { it.copy(isSaving = false, error = cause.toInventoryError()) } }
         }
+    }
+
+    /**
+     * Pide el permiso de notificaciones una sola vez, después del primer guardado exitoso (CA-INV-08-05). La marca
+     * se escribe antes de emitir el efecto: si el usuario lo niega, el inventario funciona igual y no se le vuelve a
+     * pedir automáticamente (RNF-INV-07).
+     */
+    private suspend fun requestNotificationPermissionOnce() {
+        if (preferences.wasNotificationPermissionRequested()) return
+        preferences.markNotificationPermissionRequested()
+        _effects.send(ProductEditorEffect.RequestNotificationPermission)
     }
 
     /** Muestra el resultado unos segundos y vuelve a la lista. */

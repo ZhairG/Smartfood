@@ -21,6 +21,7 @@ import com.smartfood.app.feature.inventory.domain.usecase.PhotoEdit
 import com.smartfood.app.feature.inventory.domain.usecase.UpdateItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ValidateItemUseCase
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
+import com.smartfood.app.testutil.FakeInventoryPreferences
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakePhotoRepository
 import com.smartfood.app.testutil.MainDispatcherRule
@@ -47,6 +48,7 @@ class ProductEditorViewModelTest {
     private val repository = FakeInventoryRepository()
     private val photos = FakePhotoRepository()
     private val scheduler = FakeExpiryReminderScheduler()
+    private val preferences = FakeInventoryPreferences()
     private val validate = ValidateItemUseCase(fixedClock(today))
 
     private fun createViewModel(itemId: String? = null) = ProductEditorViewModel(
@@ -56,6 +58,7 @@ class ProductEditorViewModelTest {
         addItem = AddItemUseCase(repository, photos, validate, scheduler),
         updateItem = UpdateItemUseCase(repository, photos, validate),
         deleteItem = DeleteItemUseCase(repository, photos),
+        preferences = preferences,
     )
 
     private fun ProductEditorViewModel.fillValidForm() {
@@ -108,7 +111,10 @@ class ProductEditorViewModelTest {
 
         advanceResultDialog()
         assertNull(viewModel.uiState.value.dialog)
-        assertEquals(ProductEditorEffect.NavigateBack, viewModel.effects.first())
+        assertEquals(
+            listOf(ProductEditorEffect.RequestNotificationPermission, ProductEditorEffect.NavigateBack),
+            viewModel.effects.take(2).toList()
+        )
     }
 
     @Test
@@ -328,5 +334,36 @@ class ProductEditorViewModelTest {
 
         assertFalse(viewModel.uiState.value.showMissingFields)
         assertTrue(viewModel.uiState.value.missingFields.isEmpty())
+    }
+
+    @Test
+    fun `CA-INV-08-05 tras el primer guardado se pide el permiso de notificaciones una sola vez`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.fillValidForm()
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        assertEquals(ProductEditorEffect.RequestNotificationPermission, viewModel.effects.first())
+        assertTrue(preferences.notificationPermissionRequested)
+
+        advanceResultDialog()
+
+        val segundo = createViewModel()
+        segundo.fillValidForm()
+        segundo.onEvent(ProductEditorEvent.SaveClicked)
+        advanceResultDialog()
+
+        assertEquals(ProductEditorEffect.NavigateBack, segundo.effects.first())
+    }
+
+    @Test
+    fun `CA-INV-08-05 si el guardado falla no se pide el permiso`() {
+        repository.saveResult = Result.failure(InventoryException(InventoryError.Network))
+        val viewModel = createViewModel()
+        viewModel.fillValidForm()
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        assertFalse(preferences.notificationPermissionRequested)
     }
 }
