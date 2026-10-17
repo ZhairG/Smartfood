@@ -347,6 +347,8 @@ private fun LoadingIndicator() {
  * @param onConfirm Acción al confirmar.
  * @param onDismiss Acción al cancelar o al usar atrás.
  * @param modifier Modificador opcional para el contenido del diálogo.
+ * @param destructive `true` cuando confirmar puede perder datos (cerrar sesión con cambios sin subir, CA-INV-10-07): el
+ * círculo, el ícono, la explicación y el botón de confirmar van en rojo (`error`).
  */
 @Composable
 fun SmartFoodWarningDialog(
@@ -356,11 +358,12 @@ fun SmartFoodWarningDialog(
     dismissText: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    destructive: Boolean = false
 ) {
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(dismissOnClickOutside = false)) {
         BlurBehindDialog()
-        SmartFoodWarningDialogContent(title, body, confirmText, dismissText, onConfirm, onDismiss, modifier)
+        SmartFoodWarningDialogContent(title, body, confirmText, dismissText, onConfirm, onDismiss, modifier, destructive)
     }
 }
 
@@ -373,11 +376,14 @@ private fun SmartFoodWarningDialogContent(
     dismissText: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    destructive: Boolean = false
 ) {
     val spacing = MaterialTheme.spacing
     val metrics = LocalFormMetrics.current
     val dialogShape = RoundedCornerShape(spacing.panelRadius)
+    // Naranja del Figma; en rojo cuando confirmar puede perder datos.
+    val accent = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
 
     Column(
         modifier = modifier
@@ -400,13 +406,13 @@ private fun SmartFoodWarningDialogContent(
         Box(
             modifier = Modifier
                 .size(spacing.iconDialogSize)
-                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f), CircleShape),
+                .background(accent.copy(alpha = 0.22f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_figma_warning),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary,
+                tint = accent,
                 modifier = Modifier.size(spacing.iconDialogSize * 0.5f)
             )
         }
@@ -421,7 +427,7 @@ private fun SmartFoodWarningDialogContent(
         // Figma 604:2752: Poppins Regular de 13 px en gris.
         Text(
             text = body,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
             // bodyLarge es el estilo del tema con Poppins; bodyMedium usa la fuente del sistema.
             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.Normal),
             textAlign = TextAlign.Center
@@ -434,8 +440,8 @@ private fun SmartFoodWarningDialogContent(
         ) {
             WarningDialogButton(
                 text = confirmText,
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondary,
+                containerColor = accent,
+                contentColor = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onSecondary,
                 onClick = onConfirm,
                 modifier = Modifier.weight(1f)
             )

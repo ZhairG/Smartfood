@@ -213,4 +213,32 @@ class SmartFoodDialogsTest {
             modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * 0.4f)
         )
     }
+
+    // CA-INV-10-07: la variante roja del aviso conserva el texto y los dos botones.
+    @Test
+    fun caInv1007_avisoRojoMuestraLaAdvertenciaYAmbosBotones() {
+        var confirmaciones = 0
+        val visible = mutableStateOf(true)
+        composeTestRule.setContent {
+            SmartfoodTheme {
+                if (visible.value) {
+                    SmartFoodWarningDialog(
+                        title = "¿Cerrar sesión?",
+                        body = "Tienes cambios sin subir.",
+                        confirmText = "Cerrar sesión",
+                        dismissText = "Cancelar",
+                        onConfirm = { confirmaciones++ },
+                        onDismiss = {},
+                        destructive = true
+                    )
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithText("Tienes cambios sin subir.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cerrar sesión").performClick()
+
+        assertEquals(1, confirmaciones)
+        cerrarDialogo(visible)
+    }
 }

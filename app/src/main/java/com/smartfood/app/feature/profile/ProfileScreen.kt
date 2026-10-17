@@ -89,7 +89,9 @@ fun ProfileScreen(
             confirmText = stringResource(id = R.string.profile_logout_pending_confirm),
             dismissText = stringResource(id = R.string.profile_logout_pending_cancel),
             onConfirm = { onEvent(ProfileEvent.LogoutConfirmed) },
-            onDismiss = { onEvent(ProfileEvent.DialogDismissed) }
+            onDismiss = { onEvent(ProfileEvent.DialogDismissed) },
+            // Con cambios sin subir, el aviso va en rojo: confirmar puede perderlos (CA-INV-10-07).
+            destructive = dialog.hasPendingChanges
         )
     }
 

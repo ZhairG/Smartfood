@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -75,7 +74,8 @@ fun InventoryScreen(
         Box(modifier = Modifier.weight(1f)) {
             val error = state.error
             when {
-                state.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                // Skeleton Screen en lugar de un indicador suelto (#45).
+                state.isLoading -> InventorySkeleton()
                 error != null -> ErrorState(error = error, onRetry = { onEvent(InventoryEvent.RetryClicked) })
                 state.isEmpty -> EmptyState(onAddClicked = { onEvent(InventoryEvent.AddClicked) })
                 else -> InventoryList(sections = state.sections, onEvent = onEvent)

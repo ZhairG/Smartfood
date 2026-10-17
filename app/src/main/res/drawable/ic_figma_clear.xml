@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "x-circle" para borrar la búsqueda (Figma 476:3526), convertido del SVG del MCP (#45). Trazo de 2 px; se tiñe con
+     el tema desde la búsqueda. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="18"
+    android:viewportHeight="18">
+    <path
+        android:pathData="M11.2502 6.74982L9 9M9 9L6.74982 11.2502M9 9L6.74982 6.74982M9 9L11.2502 11.2502M16.5006 9C16.5006 13.1425 13.1425 16.5006 9 16.5006C4.85753 16.5006 1.4994 13.1425 1.4994 9C1.4994 4.85753 4.85753 1.4994 9 1.4994C13.1425 1.4994 16.5006 4.85753 16.5006 9Z"
+        android:strokeWidth="2"
+        android:strokeColor="#9AA39D"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+</vector>

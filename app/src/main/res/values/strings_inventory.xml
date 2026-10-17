@@ -28,6 +28,8 @@
     <string name="inventory_quantity_format">%1$s %2$s</string>
     <!-- Ícono de cambios o foto sin subir (CA-INV-10-06, T049) -->
     <string name="cd_pending_sync">Pendiente de sincronizar</string>
+    <!-- Skeleton Screen de la lista mientras carga (#45) -->
+    <string name="inventory_loading">Cargando inventario</string>
     <!-- Aviso al cerrar sesión con cambios sin subir (CA-INV-10-07, T051) -->
     <string name="profile_logout_title">¿Cerrar sesión?</string>
     <string name="profile_logout_body">Tendrás que iniciar sesión nuevamente para acceder a tu inventario y tus recetas guardadas.</string>
