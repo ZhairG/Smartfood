@@ -28,7 +28,7 @@ class ProfileScreenTest {
 
     private val eventos = mutableListOf<ProfileEvent>()
 
-    private fun mostrar() {
+    private fun mostrar(dialog: ProfileDialog? = null) {
         composeTestRule.setContent {
             SmartfoodTheme {
                 ProfileScreen(
@@ -38,7 +38,8 @@ class ProfileScreenTest {
                         fullName = "Pepito Perez",
                         email = "pepito@correo.com",
                         initials = "PP",
-                        inventoryCount = 34
+                        inventoryCount = 34,
+                        dialog = dialog
                     ),
                     onEvent = { eventos += it }
                 )
@@ -82,4 +83,18 @@ class ProfileScreenTest {
 
         assertEquals(listOf<ProfileEvent>(ProfileEvent.LogoutClicked), eventos)
     }
+
+    @Test
+    fun t051_caInv1007_elAvisoDeCambiosSinSubirOfreceCerrarOCancelar() {
+        mostrar(dialog = ProfileDialog.ConfirmLogoutWithPending)
+
+        composeTestRule
+            .onNodeWithText("Tienes cambios sin subir. Si cierras sesión ahora, podrían perderse")
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cancelar").performClick()
+        composeTestRule.onNodeWithText("Cerrar sesión").performClick()
+
+        assertEquals(listOf(ProfileEvent.DialogDismissed, ProfileEvent.LogoutConfirmed), eventos)
+    }
 }
+
