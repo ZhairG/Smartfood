@@ -69,7 +69,7 @@ solo guardan preferencias de Android Studio.
 | 003 Recuperación de contraseña real | [`specs/003-recuperacion-real`](specs/003-recuperacion-real/spec.md) | ✅ Implementado y desplegado |
 | 004 Correo de bienvenida            | [`specs/004-correo-registro`](specs/004-correo-registro/spec.md) | ✅ Implementado y desplegado |
 | 005 Documentos legales              | [`specs/005-documentos-legales`](specs/005-documentos-legales/spec.md) | ✅ Implementado (texto en vista previa) |
-| 006 Inventario                      | [`specs/006-inventario`](specs/006-inventario/spec.md) | 📋 Especificada, en Issues (milestone "Spec 006: Inventario") |
+| 006 Inventario                      | [`specs/006-inventario`](specs/006-inventario/spec.md) | ✅ Implementado (con uso sin conexión) |
 | 007 Catálogo de recetas             | — | Pendiente |
 | 008 Agente recomendador             | — | Pendiente |
 
@@ -219,6 +219,12 @@ com.smartfood.app/
     ├── splash/          Decide si ir a Home o al Login según la sesión
     ├── home/            Saludo y cierre de sesión (punto de entrada de las próximas features)
     ├── legal/           Términos y Política de privacidad (spec 005)
+    ├── profile/         Perfil del Figma: datos de la cuenta y "Cerrar sesión" (avisa si hay cambios sin subir)
+    ├── inventory/       Inventario (spec 006): lista por vencimiento, búsqueda por texto y voz, editor con foto
+    │   ├── domain/      model/ (InventoryItem, WriteOutcome), repository/ (InventoryRepository, PhotoSync…), usecase/
+    │   ├── data/        repository/ (Firestore y Storage), sync/ (fotos con WorkManager), reminder/ (aviso diario),
+    │   │                speech/, photo/ (compresión), di/
+    │   └── ui/          list/, search/, editor/, camera/, components/, InventoryNavGraph
     └── auth/
         ├── domain/      model/ (User, AuthError), repository/ (interfaces), usecase/
         ├── data/        repository/ (Firebase y Cloud Functions), mapper/, local/ (DataStore), demo/, di/
@@ -315,9 +321,13 @@ en Secret Manager, nunca en el repositorio ni en el APK.
 
 ```bash
 cd functions && npm ci && npm test            # pruebas del servidor
-firebase emulators:start --only auth,firestore,functions
+firebase emulators:start --only auth,firestore,functions,storage
 ./gradlew :app:installDebug -PuseFirebaseEmulator=true
 ```
+
+- El inventario usa Firestore y Storage: con `storage` en la lista, las fotos se suben al emulador y se ven en su UI.
+- Las reglas se prueban con `firebase emulators:exec --only firestore,storage "npm --prefix rules-test test"`
+  (antes, una vez: `npm --prefix rules-test ci`).
 
 - El código de recuperación **no se envía**: aparece en la consola de los emuladores como
   `[EMULADOR] Código de recuperación para …`.
@@ -325,7 +335,7 @@ firebase emulators:start --only auth,firestore,functions
   para …`. Al abrirlo, la cuenta queda verificada en el emulador de Auth.
 - Crea `functions/.secret.local` (ignorado por git) con `SMTP_USER=x` y `SMTP_PASS=x` para que el emulador no
   consulte Secret Manager.
-- En un teléfono físico: `adb reverse tcp:9099 tcp:9099`, lo mismo para los puertos 8080 y 5001, y
+- En un teléfono físico: `adb reverse tcp:9099 tcp:9099`, lo mismo para los puertos 8080, 9199 y 5001, y
   `-PfirebaseEmulatorHost=127.0.0.1`.
 - Las cuentas que crees en el emulador no existen en el proyecto real.
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code), Gemini or any other
 
 ## Proyecto
 
-App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, paquete `com.smartfood.app`. Proyecto universitario (UTADEO 2026-2) para reducir el desperdicio de comida en hogares: inventario + vencimientos + presupuesto, con un agente de recomendación de recetas (features futuras). Hoy está implementado el **módulo 1: autenticación**.
+App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, paquete `com.smartfood.app`. Proyecto universitario (UTADEO 2026-2) para reducir el desperdicio de comida en hogares: inventario + vencimientos + presupuesto, con un agente de recomendación de recetas (features futuras). Hoy están implementados la autenticación (módulo 1) y el **inventario** (spec 006), con uso sin conexión.
 
 `compileSdk`/`targetSdk` 37, `minSdk` 24, Java 11. Todas las dependencias van en `gradle/libs.versions.toml`.
 
@@ -12,7 +12,7 @@ App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, pa
 
 Antes de escribir código, leer **`specs/constitution.md`** (principios no negociables) y la spec de la feature.
 
-- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales` y `006-inventario` (especificada, sin implementar). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`).
+- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales` y `006-inventario` (implementada). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`).
 - Cada feature vive en `specs/NNN-nombre/` con `spec.md` (QUÉ: historias, criterios Dado/Cuando/Entonces), `plan.md` (CÓMO: contratos, decisiones) y `tasks.md` (tareas + matriz CA → test).
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
 - Códigos de trazabilidad: `HU-NN`, `CA-NN-MM`, `RF-XXX-NN`, `RNF-NN`. Los nombres de los tests citan el CA que cubren.
@@ -104,7 +104,7 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 
 1. `./gradlew :app:testDebugUnitTest` en verde (y `npm --prefix functions test` si cambió `functions/`, y las pruebas de `rules-test/` con los emuladores si cambiaron `firestore.rules` o `storage.rules`).
 2. `./gradlew :app:assembleDebug` compila y `./gradlew :app:lintDebug` no agrega errores nuevos.
-3. Si el cambio toca `ui/`, `core/designsystem` o `core/navigation`: `./gradlew :app:connectedDebugAndroidTest` en verde en emulador o dispositivo. Las pruebas unitarias no dibujan Compose, así que un componente que se cae al mostrarse pasa el punto 1 sin fallar (Issue #60).
+3. Si el cambio toca `ui/`, `core/designsystem` o `core/navigation`: las pruebas instrumentadas **de las pantallas y componentes que toca** (y las de navegación si cambia la navegación) en verde en emulador o dispositivo, con `-Pandroid.testInstrumentationRunnerArguments.class=…`. Las pruebas unitarias no dibujan Compose, así que un componente que se cae al mostrarse pasa el punto 1 sin fallar (Issue #60). La suite completa (`connectedDebugAndroidTest`) se corre en el Issue de cierre de cada spec; el PR dice qué clases se corrieron. `AppNavigationTest` y `StatusBarAdaptabilityTest` necesitan el dispositivo sin sesión iniciada.
 4. `spec.md` y `tasks.md` de la feature reflejan el cambio, y la matriz CA → test está al día.
 5. La app se probó en emulador o dispositivo.
 
@@ -150,7 +150,7 @@ Cada agente mantiene al día el checklist del Issue en el que trabaja, sin que n
 | Plan del modo plan publicado | el agente publicó el plan como comentario en el Issue. |
 | Plan aprobado por Zhair | Zhair aprueba en el Issue o lo dice explícitamente en la sesión. Nunca se da por supuesto. |
 | Cada tarea `Tnnn` | la tarea quedó hecha y confirmada en la rama del Issue. |
-| Pruebas unitarias en verde… | `testDebugUnitTest`, `assembleDebug` y `lintDebug` pasaron, y `connectedDebugAndroidTest` si el cambio toca la UI (puntos 1 a 3 del paso 3). |
+| Pruebas unitarias en verde… | `testDebugUnitTest`, `assembleDebug` y `lintDebug` pasaron, y las instrumentadas específicas si el cambio toca la UI (la suite completa en el cierre de la spec; puntos 1 a 3 del paso 3). |
 | `spec.md` y `tasks.md` al día | la tarea está `[x]` en `tasks.md` y la matriz CA → test está actualizada. |
 | Probado en emulador o dispositivo | **el integrante confirma** que probó el flujo. El agente puede instalar el APK (`./gradlew :app:installDebug`) y revisar que la app abre sin errores en Logcat, pero eso solo no basta. |
 | PR hacia `master` con `Closes #n` | el PR quedó creado. Si es *draft*, también se marca, y en el PR se indica qué falta. |
@@ -204,6 +204,11 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
   - Las rutas `TermsOfService` y `PrivacyPolicy` se registran en la raíz de `AppNavHost` con `legalDestinations()`.
   - `SmartFoodTermsCheckbox` resuelve el toque por carácter (enlace → abre el documento; resto → alterna) y ofrece los enlaces como `customActions` para TalkBack.
   - Constancia: `UserRepository.createProfile(user, acceptedTermsVersion)` guarda `termsVersion` y `termsAcceptedAt` (hora del servidor); las reglas lo exigen al crear `users/{uid}`.
+- **Inventario (spec 006, `feature/inventory`):** lista por estado de vencimiento, búsqueda por texto y voz (`SpeechToText` sobre `SpeechRecognizer`), editor con foto (cámara o galería) y aviso diario (`ExpiryReminderWorker`).
+  - **Uso sin conexión (§13):** las escrituras van a la cola de Firestore sin transacciones y esperan al servidor como mucho 3 s; devuelven `WriteOutcome` (`SYNCED` o `PENDING`). `observeItems()` marca `isPendingSync` con los metadatos.
+  - **Fotos:** los casos de uso no las suben: las encolan con `PhotoSync` (`data/sync/WorkManagerPhotoSync`). `PendingPhotoStore` las guarda en `filesDir/pending/{itemId}/{uuid}.jpg` y `PhotoUploadWorker`/`PhotoDeleteWorker` (`@HiltWorker`) las suben o borran con red y reintentos. En el editor, una foto que espera subirse es `PhotoUiState.Pending`: se ve desde el teléfono, se conserva al guardar y nunca se borra al salir.
+  - **Resultados del editor:** se muestran sobre la lista con `EditorResultHost` (`savedStateHandle` de la pantalla anterior), incluido "Guardado en tu teléfono" (`EditorResult.SavedOnPhone`).
+  - Textos en `res/values/strings_inventory.xml`; reglas en `firestore.rules` (`users/{uid}/inventory`) y `storage.rules`, probadas en `rules-test/`.
 - **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 600 ms se declaran una sola vez (`NavTransitions`). `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
 - **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore`, `FirebaseFunctions` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
 - **Design system (`core/designsystem`):** `theme/` (tokens), `components/` (prefijo `SmartFood`) y `util/` (modificadores, `SystemBarEffect`, `ClearFocusOnKeyboardDismiss`).
@@ -229,6 +234,8 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 ## Pruebas
 
 - **Unitarias:** JUnit4 + `kotlinx-coroutines-test`, sin librería de mocks. Los fakes compartidos están en `app/src/test/.../testutil/` (`FakeAuthRepository`, `FakeUserRepository`, `FakeSessionPreferences`, `FakePasswordRecoveryRepository`, `MainDispatcherRule`, `Result.authError`). Para probar efectos: `viewModel.effects.first()` dentro de `runTest`.
+- Los fakes del inventario están en `testutil/InventoryFakes.kt` (`FakeInventoryRepository` con `outcome`, `gate` y `pendingWrites`, `FakePhotoSync`, `FakePhotoRepository`, `FakeSpeechToText`…).
+- `CustomTestRunner` inicializa un WorkManager de prueba (`SynchronousExecutor`): ninguna prueba instrumentada encola trabajos en el WorkManager real del dispositivo.
 - `unitTests.isReturnDefaultValues = true` está activo porque los constructores de las excepciones de Firebase usan `TextUtils`.
 - **Instrumentadas:** usan `@HiltAndroidTest`, `CustomTestRunner` (`HiltTestApplication`) y `createAndroidComposeRule<HiltTestActivity>()` (`HiltTestActivity` vive en `app/src/debug`). Las pruebas de pantalla usan la `XScreen` stateless con un `XUiState` construido a mano.
 
