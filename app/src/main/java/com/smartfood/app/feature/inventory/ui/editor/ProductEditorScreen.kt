@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodConfirmDialog
+import com.smartfood.app.core.designsystem.components.SmartFoodLoadingDialog
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.components.SmartFoodResultDialog
 import com.smartfood.app.core.designsystem.components.SmartFoodSelectorField
@@ -290,6 +291,8 @@ private fun EditorBottom(state: ProductEditorUiState, onEvent: (ProductEditorEve
 @Composable
 private fun EditorDialogs(state: ProductEditorUiState, onEvent: (ProductEditorEvent) -> Unit) {
     val dismiss = { onEvent(ProductEditorEvent.DialogDismissed) }
+    // Mientras se guarda, un diálogo deja claro que la app trabaja (CA-INV-02-12, T056).
+    state.savingAction?.let { action -> SmartFoodLoadingDialog(text = stringResource(id = action.textRes)) }
     when (state.dialog) {
         EditorDialog.PhotoSourceSheet -> PhotoSourceSheet(
             onGallery = { onEvent(ProductEditorEvent.GalleryChosen) },
@@ -345,6 +348,14 @@ private fun EditorDialogs(state: ProductEditorUiState, onEvent: (ProductEditorEv
         null -> Unit
     }
 }
+
+/** Texto del diálogo de carga de cada acción (CA-INV-02-12). */
+private val SavingAction.textRes: Int
+    get() = when (this) {
+        SavingAction.ADD -> R.string.editor_saving_add
+        SavingAction.UPDATE -> R.string.editor_saving_update
+        SavingAction.DELETE -> R.string.editor_saving_delete
+    }
 
 /** Ícono gris de un campo; el campo lo dibuja en su caja de `fieldIconSize`. */
 @Composable

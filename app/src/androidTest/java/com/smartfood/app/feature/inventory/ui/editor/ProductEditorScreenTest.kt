@@ -191,6 +191,34 @@ class ProductEditorScreenTest {
     }
 
     @Test
+    fun t056_caInv0212_alGuardarUnAltaSeVeGuardandoProducto() {
+        mostrar(ProductEditorUiState(savingAction = SavingAction.ADD))
+
+        composeTestRule.onNodeWithText("Guardando producto…").assertIsDisplayed()
+    }
+
+    @Test
+    fun t056_caInv0212_alGuardarUnaEdicionSeVeActualizandoProducto() {
+        mostrar(ProductEditorUiState(mode = EditorMode.EDIT, savingAction = SavingAction.UPDATE))
+
+        composeTestRule.onNodeWithText("Actualizando producto…").assertIsDisplayed()
+    }
+
+    @Test
+    fun t056_caInv0212_alEliminarSeVeEliminandoProducto() {
+        mostrar(ProductEditorUiState(mode = EditorMode.EDIT, savingAction = SavingAction.DELETE))
+
+        composeTestRule.onNodeWithText("Eliminando producto…").assertIsDisplayed()
+    }
+
+    @Test
+    fun t056_caInv0212_sinGuardarNoHayDialogoDeCarga() {
+        mostrar(ProductEditorUiState())
+
+        composeTestRule.onNodeWithText("Guardando producto…").assertDoesNotExist()
+    }
+
+    @Test
     fun t055_caInv0507_laHojaOfreceGaleriaYCamara() {
         mostrar(ProductEditorUiState(dialog = EditorDialog.PhotoSourceSheet))
 

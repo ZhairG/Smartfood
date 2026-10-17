@@ -27,6 +27,7 @@ import com.smartfood.app.testutil.FakePhotoRepository
 import com.smartfood.app.testutil.MainDispatcherRule
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -130,6 +131,91 @@ class ProductEditorViewModelTest {
         assertEquals("Carne", state.name)
         assertFalse(state.isSaving)
         assertNull(state.dialog)
+    }
+
+    @Test
+    fun `CA-INV-02-12 mientras se guarda un alta se ve Guardando hasta volver a la lista`() = runTest {
+        val gate = CompletableDeferred<Unit>().also { repository.gate = it }
+        val viewModel = createViewModel()
+        viewModel.fillValidForm()
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+        assertEquals(SavingAction.ADD, viewModel.uiState.value.savingAction)
+        assertTrue(viewModel.uiState.value.isSaving)
+
+        gate.complete(Unit)
+        // Con éxito el diálogo no se cierra: el editor se va con el resultado y no se ve el formulario un instante.
+        assertEquals(SavingAction.ADD, viewModel.uiState.value.savingAction)
+        assertEquals("Carne", repository.savedItems.single().name)
+        assertEquals(
+            ProductEditorEffect.NavigateBackWithResult(EditorResult.Saved),
+            viewModel.effects.take(2).toList().last()
+        )
+    }
+
+    @Test
+    fun `CA-INV-02-12 mientras se guarda una edicion se ve Actualizando`() {
+        repository.items.value = listOf(inventoryItem(id = "carne", name = "Carne", expiresOn = today.plusDays(3)))
+        val viewModel = createViewModel(itemId = "carne")
+        val gate = CompletableDeferred<Unit>().also { repository.gate = it }
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+        assertEquals(SavingAction.UPDATE, viewModel.uiState.value.savingAction)
+
+        gate.complete(Unit)
+        assertEquals(SavingAction.UPDATE, viewModel.uiState.value.savingAction)
+    }
+
+    @Test
+    fun `CA-INV-02-12 mientras se elimina se ve Eliminando`() {
+        repository.items.value = listOf(inventoryItem(id = "carne"))
+        val viewModel = createViewModel(itemId = "carne")
+        val gate = CompletableDeferred<Unit>().also { repository.gate = it }
+
+        viewModel.onEvent(ProductEditorEvent.DeleteClicked)
+        viewModel.onEvent(ProductEditorEvent.DeleteConfirmed)
+        assertEquals(SavingAction.DELETE, viewModel.uiState.value.savingAction)
+
+        gate.complete(Unit)
+        assertEquals(SavingAction.DELETE, viewModel.uiState.value.savingAction)
+        assertEquals(listOf("carne"), repository.deletedIds)
+    }
+
+    @Test
+    fun `CA-INV-02-12 si el guardado falla el indicador desaparece y queda el error`() {
+        val gate = CompletableDeferred<Unit>().also { repository.gate = it }
+        repository.saveResult = Result.failure(InventoryException(InventoryError.Network))
+        val viewModel = createViewModel()
+        viewModel.fillValidForm()
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+        assertEquals(SavingAction.ADD, viewModel.uiState.value.savingAction)
+
+        gate.complete(Unit)
+        val state = viewModel.uiState.value
+        assertNull(state.savingAction)
+        assertEquals(InventoryError.Network, state.generalError)
+        assertEquals("Carne", state.name)
+    }
+
+    @Test
+    fun `CA-INV-02-12 atras no hace nada mientras se guarda`() = runTest {
+        val gate = CompletableDeferred<Unit>().also { repository.gate = it }
+        val viewModel = createViewModel()
+        viewModel.fillValidForm()
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        viewModel.onEvent(ProductEditorEvent.BackClicked)
+        gate.complete(Unit)
+
+        // Solo salen los efectos del guardado; "atrás" no navegó mientras guardaba.
+        assertEquals(
+            listOf(
+                ProductEditorEffect.RequestNotificationPermission,
+                ProductEditorEffect.NavigateBackWithResult(EditorResult.Saved)
+            ),
+            viewModel.effects.take(2).toList()
+        )
     }
 
     @Test

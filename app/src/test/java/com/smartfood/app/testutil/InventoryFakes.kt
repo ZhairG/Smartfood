@@ -14,6 +14,7 @@ import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
 import com.smartfood.app.feature.inventory.domain.repository.SpeechToText
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,6 +62,8 @@ class FakeInventoryRepository(private val log: CallLog = CallLog()) : InventoryR
     var saveResult: Result<Unit>? = null
     /** Si no es `null`, [deleteItem] devuelve este resultado sin borrar nada. */
     var deleteResult: Result<Unit>? = null
+    /** Si no es `null`, [saveItem] y [deleteItem] esperan a que se complete, para ver el estado mientras guardan. */
+    var gate: CompletableDeferred<Unit>? = null
 
     val savedItems = mutableListOf<InventoryItem>()
     val deletedIds = mutableListOf<String>()
@@ -80,6 +83,7 @@ class FakeInventoryRepository(private val log: CallLog = CallLog()) : InventoryR
 
     override suspend fun saveItem(item: InventoryItem): Result<Unit> {
         log.record("saveItem:${item.id}")
+        gate?.await()
         saveResult?.let { return it }
         savedItems += item
         items.value = items.value.filterNot { it.id == item.id } + item
@@ -88,6 +92,7 @@ class FakeInventoryRepository(private val log: CallLog = CallLog()) : InventoryR
 
     override suspend fun deleteItem(id: String): Result<Unit> {
         log.record("deleteItem:$id")
+        gate?.await()
         deleteResult?.let { return it }
         deletedIds += id
         items.value = items.value.filterNot { it.id == id }

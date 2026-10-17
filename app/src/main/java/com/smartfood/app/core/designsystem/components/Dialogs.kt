@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -296,6 +297,36 @@ fun SmartFoodResultDialog(
     }
 }
 
+/**
+ * Indica que una acción está en curso, como guardar un producto, para que el usuario sepa que la app trabaja.
+ *
+ * El Figma no tiene un estado de carga: usa la tarjeta de [SmartFoodResultDialog] con un indicador circular en lugar
+ * del ícono (spec 006, CA-INV-02-12, T056, desviación en §8). No se cierra con atrás ni tocando fuera; lo quita quien
+ * lo muestra cuando la acción termina.
+ *
+ * @param text Acción en curso, como "Guardando producto…". TalkBack la anuncia al aparecer.
+ * @param modifier Modificador opcional para el contenido del diálogo.
+ */
+@Composable
+fun SmartFoodLoadingDialog(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Dialog(onDismissRequest = {}) {
+        BlurBehindDialog()
+        SmartFoodResultDialogContent(icon = { LoadingIndicator() }, title = text, body = null, modifier = modifier)
+    }
+}
+
+/** Indicador circular del diálogo de carga, del mismo tamaño relativo que los íconos de resultado. */
+@Composable
+private fun LoadingIndicator() {
+    CircularProgressIndicator(
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * LoadingIndicatorFraction)
+    )
+}
+
 /** Muestra el contenido de [SmartFoodResultDialog] para reutilizarlo en vistas previas. */
 @Composable
 private fun SmartFoodResultDialogContent(
@@ -427,6 +458,14 @@ private fun SmartFoodResultDialogPreview() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun SmartFoodLoadingDialogPreview() {
+    SmartfoodTheme {
+        SmartFoodResultDialogContent(icon = { LoadingIndicator() }, title = "Guardando producto…", body = null)
+    }
+}
+
 /**
  * Desenfoca lo que queda detrás del diálogo, como el Figma (`476:3851` y `476:4021`), con un velo muy claro. El
  * desenfoque de ventanas existe desde Android 12 (API 31); antes solo queda el velo.
@@ -445,6 +484,9 @@ private fun BlurBehindDialog() {
 
 /** Velo detrás de los diálogos: muy claro, porque el fondo ya va desenfocado (Figma). */
 private const val DialogDimAmount = 0.15f
+
+/** Parte del círculo que ocupa el indicador de carga. */
+private const val LoadingIndicatorFraction = 0.5f
 
 /** Radio del desenfoque detrás de los diálogos, en píxeles. */
 private const val DialogBlurRadiusPx = 40

@@ -171,8 +171,9 @@ class ProductEditorViewModel @Inject constructor(
         val draft = state.toDraft()
         val localPhoto = (state.photo as? PhotoUiState.Local)?.let { LocalPhoto(it.path) }
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true, error = null) }
             val current = original
+            val action = if (current == null) SavingAction.ADD else SavingAction.UPDATE
+            _uiState.update { it.copy(savingAction = action, error = null) }
             val result = if (current == null) {
                 addItem(draft, localPhoto)
             } else {
@@ -180,13 +181,14 @@ class ProductEditorViewModel @Inject constructor(
             }
             result
                 .onSuccess { item ->
-                    _uiState.update { it.copy(isSaving = false) }
+                    // El diálogo de carga sigue hasta que el editor se va, para no dejar ver el formulario un instante
+                    // antes de volver a la lista (CA-INV-02-12).
                     requestNotificationPermissionOnce()
                     // El resultado se ve encima de la lista, como el Figma (476:3851).
                     val saved = if (current == null) EditorResult.Saved else EditorResult.Updated(item.name)
                     _effects.send(ProductEditorEffect.NavigateBackWithResult(saved))
                 }
-                .onFailure { cause -> _uiState.update { it.copy(isSaving = false, error = cause.toInventoryError()) } }
+                .onFailure { cause -> _uiState.update { it.copy(savingAction = null, error = cause.toInventoryError()) } }
         }
     }
 
@@ -194,16 +196,15 @@ class ProductEditorViewModel @Inject constructor(
     private fun delete() {
         val current = original ?: return
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true, dialog = null, error = null) }
+            _uiState.update { it.copy(savingAction = SavingAction.DELETE, dialog = null, error = null) }
             deleteItem(current)
                 .onSuccess {
                     (_uiState.value.photo as? PhotoUiState.Local)?.let {
                         sendEffect(ProductEditorEffect.DeleteLocalPhoto(it.path))
                     }
-                    _uiState.update { it.copy(isSaving = false) }
                     _effects.send(ProductEditorEffect.NavigateBackWithResult(EditorResult.Deleted))
                 }
-                .onFailure { cause -> _uiState.update { it.copy(isSaving = false, error = cause.toInventoryError()) } }
+                .onFailure { cause -> _uiState.update { it.copy(savingAction = null, error = cause.toInventoryError()) } }
         }
     }
 

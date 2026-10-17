@@ -80,6 +80,7 @@ tengo.
 | CA-INV-02-09 | **Dado** el campo "Cantidad", **cuando** escribo un valor que no es un número, que es 0 o menor, mayor que 9999 o con más de 2 decimales, **entonces** el campo se marca en rojo con su mensaje y no se guarda. |
 | CA-INV-02-10 | **Dado** el formulario, **entonces** el campo "Precio" es opcional y no cambia el estado del botón (CA-INV-02-02); **si** escribo un precio válido (por ejemplo, "12.500"), **entonces** se guarda con el producto; **si** lo dejo vacío, **entonces** el producto se guarda sin precio. |
 | CA-INV-02-11 | **Dado** el campo "Precio", **cuando** escribo un valor que no es un número entero, que es 0 o mayor que 99.999.999, **entonces** el campo se marca en rojo con su mensaje y no se guarda. |
+| CA-INV-02-12 | **Dado** que toco "Añadir al Inventario", "Guardar" o confirmo "Eliminar", **mientras** se guarda, **entonces** veo un diálogo con fondo desenfocado, un indicador circular y "Guardando producto…", "Actualizando producto…" o "Eliminando producto…", y no puedo tocar el formulario ni volver atrás. Si sale bien, el diálogo sigue hasta volver a la lista, donde aparece el resultado (CA-INV-02-06, 03-02, 04-02); si falla, el diálogo se cierra, el formulario conserva lo escrito y muestra el error (CA-INV-02-07). |
 
 ### HU-INV-03: Editar un producto
 **Como** usuario **quiero** corregir los datos de un producto **para** que el inventario refleje lo que realmente tengo.
@@ -261,6 +262,9 @@ Desviaciones aprobadas por el equipo:
   el precio junto a la fecha, la etiqueta con la cantidad no cabía en la primera línea y se cruzaba con el precio.
   La etiqueta queda como la del Figma (`476:4258`, solo la categoría, 10 px y relleno de 5 px a los lados) y la
   cantidad va en gris después del nombre.
+- **Diálogo de carga** (16/10, T056, CA-INV-02-12): el Figma no tiene un estado de carga al guardar; en la
+  sustentación se pidió una señal clara. Se usa el estilo de los diálogos de resultado (`476:3851`): tarjeta con
+  fondo desenfocado, círculo verde claro con un indicador circular y el texto de la acción.
 - **Fondo desenfocado** de los diálogos y del aviso de voz (Figma `476:3851`, `476:4021` y `476:4507`): con API 31+
   se desenfoca lo de atrás; en API 24 a 30 se usa un velo claro.
 - **Uso sin conexión** (HU-INV-10, #71): el Figma no tiene el ícono de pendiente ni el aviso de guardado en el
