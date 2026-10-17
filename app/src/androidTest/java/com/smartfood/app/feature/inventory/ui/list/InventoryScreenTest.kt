@@ -356,5 +356,13 @@ class InventoryScreenTest {
 
         composeTestRule.onNodeWithContentDescription("Foto de Leche Entera").assertExists()
     }
-}
 
+    // #45: mientras carga se ve el esqueleto, que TalkBack anuncia como "Cargando inventario".
+    @Test
+    fun caInv0101_mientrasCargaSeVeElEsqueletoDeLaLista() {
+        show(InventoryUiState(isLoading = true))
+
+        composeTestRule.onNodeWithContentDescription("Cargando inventario").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Tu inventario está vacío").assertDoesNotExist()
+    }
+}

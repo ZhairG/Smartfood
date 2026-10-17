@@ -25,8 +25,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,7 +48,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.components.SmartFoodConfirmDialog
+import com.smartfood.app.core.designsystem.components.SmartFoodWarningDialog
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
@@ -81,22 +79,19 @@ fun ProfileScreen(
     // El encabezado es verde oscuro: la barra de estado lleva íconos claros.
     SystemBarEffect(isLightBackground = false)
 
-    // Cambios sin subir al cerrar sesión (CA-INV-10-07, T051).
-    if (state.dialog == ProfileDialog.ConfirmLogoutWithPending) {
-        SmartFoodConfirmDialog(
-            icon = {
-                Icon(
-                    imageVector = Icons.Outlined.CloudUpload,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * DialogGlyphFraction)
-                )
-            },
-            question = stringResource(id = R.string.profile_logout_pending_question),
+    // "¿Cerrar sesión?" del Figma (604:2668); con cambios sin subir, avisa que podrían perderse (CA-INV-10-07).
+    (state.dialog as? ProfileDialog.ConfirmLogout)?.let { dialog ->
+        SmartFoodWarningDialog(
+            title = stringResource(id = R.string.profile_logout_title),
+            body = stringResource(
+                id = if (dialog.hasPendingChanges) R.string.profile_logout_pending_question else R.string.profile_logout_body
+            ),
             confirmText = stringResource(id = R.string.profile_logout_pending_confirm),
             dismissText = stringResource(id = R.string.profile_logout_pending_cancel),
             onConfirm = { onEvent(ProfileEvent.LogoutConfirmed) },
-            onDismiss = { onEvent(ProfileEvent.DialogDismissed) }
+            onDismiss = { onEvent(ProfileEvent.DialogDismissed) },
+            // Con cambios sin subir, el aviso va en rojo: confirmar puede perderlos (CA-INV-10-07).
+            destructive = dialog.hasPendingChanges
         )
     }
 
@@ -423,5 +418,3 @@ private fun ProfileScreenPreview() {
     }
 }
 
-/** El glifo del aviso ocupa el 40 % del círculo, como en los demás diálogos (T025). */
-private const val DialogGlyphFraction = 0.4f

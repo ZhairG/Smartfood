@@ -26,7 +26,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -42,6 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -112,14 +112,16 @@ fun InventorySearchScreen(
                     onCategorySelected = { onEvent(InventorySearchEvent.CategorySelected(it)) }
                 )
 
-                Box(modifier = Modifier.weight(1f)) {
+                // Todo el ancho: así el texto de "sin resultados" queda centrado, como en el Figma (476:3551).
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                     when {
                         state.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
 
+                        // Figma 476:3551: Poppins Bold de 15 px en verde oscuro, centrado en el espacio libre.
                         state.isEmptyResult -> Text(
                             text = stringResource(id = R.string.search_no_results),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.primary,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .align(Alignment.Center)
@@ -212,11 +214,13 @@ private fun SearchField(
                     innerTextField()
                 }
                 if (query.isNotEmpty()) {
+                    // Figma 476:3526: el x-circle gris de 18 px.
                     IconButton(onClick = onClearQuery) {
                         Icon(
-                            imageVector = Icons.Default.Clear,
+                            painter = painterResource(id = R.drawable.ic_figma_clear),
                             contentDescription = stringResource(id = R.string.cd_clear_search),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(ClearIconSize)
                         )
                     }
                 }
@@ -262,3 +266,6 @@ private fun InventorySearchScreenPreview() {
 private fun InventorySearchScreenEmptyPreview() {
     SmartfoodTheme { InventorySearchScreen(state = InventorySearchUiState(query = "pera"), onEvent = {}) }
 }
+
+/** La "x" para borrar la búsqueda: 18 px en el Figma (476:3526). */
+private val ClearIconSize = 18.dp

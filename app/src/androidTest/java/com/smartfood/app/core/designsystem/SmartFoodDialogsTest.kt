@@ -20,6 +20,7 @@ import androidx.compose.ui.test.performClick
 import com.smartfood.app.core.designsystem.components.SmartFoodConfirmDialog
 import com.smartfood.app.core.designsystem.components.SmartFoodLoadingDialog
 import com.smartfood.app.core.designsystem.components.SmartFoodResultDialog
+import com.smartfood.app.core.designsystem.components.SmartFoodWarningDialog
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
 import org.junit.Assert.assertEquals
@@ -98,6 +99,37 @@ class SmartFoodDialogsTest {
         composeTestRule.onNodeWithText("Guardado").assertIsDisplayed()
         composeTestRule.onNodeWithText("Te avisaremos antes de que caduque.").assertDoesNotExist()
 
+        cerrarDialogo(visible)
+    }
+
+    // CA-05-03 (Figma 604:2668): el aviso muestra título, explicación y los dos botones lado a lado.
+    @Test
+    fun ca0503_avisoMuestraTituloCuerpoYAmbosBotones() {
+        var confirmaciones = 0
+        var cancelaciones = 0
+        val visible = mutableStateOf(true)
+        composeTestRule.setContent {
+            SmartfoodTheme {
+                if (visible.value) {
+                    SmartFoodWarningDialog(
+                        title = "¿Cerrar sesión?",
+                        body = "Tendrás que iniciar sesión nuevamente.",
+                        confirmText = "Cerrar sesión",
+                        dismissText = "Cancelar",
+                        onConfirm = { confirmaciones++ },
+                        onDismiss = { cancelaciones++ }
+                    )
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithText("¿Cerrar sesión?").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Tendrás que iniciar sesión nuevamente.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cerrar sesión").performClick()
+        composeTestRule.onNodeWithText("Cancelar").performClick()
+
+        assertEquals(1, confirmaciones)
+        assertEquals(1, cancelaciones)
         cerrarDialogo(visible)
     }
 
@@ -180,5 +212,33 @@ class SmartFoodDialogsTest {
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * 0.4f)
         )
+    }
+
+    // CA-INV-10-07: la variante roja del aviso conserva el texto y los dos botones.
+    @Test
+    fun caInv1007_avisoRojoMuestraLaAdvertenciaYAmbosBotones() {
+        var confirmaciones = 0
+        val visible = mutableStateOf(true)
+        composeTestRule.setContent {
+            SmartfoodTheme {
+                if (visible.value) {
+                    SmartFoodWarningDialog(
+                        title = "¿Cerrar sesión?",
+                        body = "Tienes cambios sin subir.",
+                        confirmText = "Cerrar sesión",
+                        dismissText = "Cancelar",
+                        onConfirm = { confirmaciones++ },
+                        onDismiss = {},
+                        destructive = true
+                    )
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithText("Tienes cambios sin subir.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cerrar sesión").performClick()
+
+        assertEquals(1, confirmaciones)
+        cerrarDialogo(visible)
     }
 }
