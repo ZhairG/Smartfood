@@ -14,6 +14,7 @@ import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeInventoryRepository
+import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.FakeUserRepository
 import com.smartfood.app.testutil.MainDispatcherRule
 import com.smartfood.app.testutil.fixedClock
@@ -53,9 +54,10 @@ class ProfileViewModelTest {
 
     private fun crearViewModel(repository: InventoryRepository = inventoryRepository) = ProfileViewModel(
         getCurrentUser = GetCurrentUserUseCase(authRepository, userRepository),
-        logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler()),
+        logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), FakePhotoSync()),
         observeInventory = ObserveInventoryUseCase(
             repository,
+            FakePhotoSync(),
             ClassifyExpiryUseCase(fixedClock(LocalDate.of(2026, 9, 10)))
         )
     )

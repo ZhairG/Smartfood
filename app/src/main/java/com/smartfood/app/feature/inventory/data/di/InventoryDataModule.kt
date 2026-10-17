@@ -5,10 +5,12 @@ import com.smartfood.app.feature.inventory.data.reminder.WorkManagerExpiryRemind
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
 import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
+import com.smartfood.app.feature.inventory.data.sync.WorkManagerPhotoSync
 import com.smartfood.app.feature.inventory.domain.repository.ExpiryReminderScheduler
 import com.smartfood.app.feature.inventory.domain.repository.InventoryPreferences
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
+import com.smartfood.app.feature.inventory.domain.repository.PhotoSync
 import com.smartfood.app.feature.inventory.domain.repository.SpeechToText
 import dagger.Binds
 import dagger.Module
@@ -40,6 +42,11 @@ abstract class InventoryDataModule {
     @Binds
     @Singleton
     abstract fun bindPhotoRepository(impl: FirebaseStoragePhotoRepository): PhotoRepository
+
+    /** Subida y borrado de fotos en segundo plano con WorkManager, también sin conexión (§13, T048). */
+    @Binds
+    @Singleton
+    abstract fun bindPhotoSync(impl: WorkManagerPhotoSync): PhotoSync
 
     /** Reconocimiento de voz del sistema en español de Colombia (RF-INV-06, T019). */
     @Binds

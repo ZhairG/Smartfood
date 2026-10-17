@@ -2,11 +2,14 @@ package com.smartfood.app.feature.inventory.domain.usecase
 
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.testutil.FakeInventoryRepository
+import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
@@ -21,7 +24,37 @@ class ObserveInventoryUseCaseTest {
 
     private val today = LocalDate.of(2026, 9, 10)
     private val repository = FakeInventoryRepository()
-    private val observe = ObserveInventoryUseCase(repository, ClassifyExpiryUseCase(fixedClock(today)))
+    private val photoSync = FakePhotoSync()
+    private val observe = ObserveInventoryUseCase(repository, photoSync, ClassifyExpiryUseCase(fixedClock(today)))
+
+    @Test
+    fun `CA-INV-10-04 un producto con foto pendiente lleva la foto del telefono y queda pendiente`() = runTest {
+        repository.items.value = listOf(
+            inventoryItem(id = "leche", name = "Leche", expiresOn = today.plusDays(10)),
+            inventoryItem(id = "pasta", name = "Pasta", expiresOn = today.plusDays(10)),
+        )
+        photoSync.pending.value = mapOf("leche" to "/files/pending/leche/a.jpg")
+
+        val items = observe().first().single().items
+
+        val leche = items.first { it.id == "leche" }
+        assertEquals("/files/pending/leche/a.jpg", leche.localPhotoPath)
+        assertTrue(leche.isPendingSync)
+        val pasta = items.first { it.id == "pasta" }
+        assertNull(pasta.localPhotoPath)
+        assertFalse(pasta.isPendingSync)
+    }
+
+    @Test
+    fun `CA-INV-10-05 cuando la foto se sube el producto deja de estar pendiente`() = runTest {
+        repository.items.value = listOf(inventoryItem(id = "leche", expiresOn = today.plusDays(10)))
+        photoSync.pending.value = mapOf("leche" to "/files/pending/leche/a.jpg")
+        assertTrue(observe().first().single().items.single().isPendingSync)
+
+        photoSync.pending.value = emptyMap()
+
+        assertFalse(observe().first().single().items.single().isPendingSync)
+    }
 
     @Test
     fun `CA-INV-01-01 las secciones van en orden vencido, proximo a vencer y fresco`() = runTest {
@@ -72,7 +105,7 @@ class ObserveInventoryUseCaseTest {
         repository.items.value = listOf(inventoryItem(id = "a", expiresOn = today.plusDays(10)))
         assertEquals(1, observe().first().single().items.size)
 
-        repository.saveItem(inventoryItem(id = "b", name = "Arroz", expiresOn = today.plusDays(30)))
+        repository.createItem(inventoryItem(id = "b", name = "Arroz", expiresOn = today.plusDays(30)))
 
         assertEquals(2, observe().first().single().items.size)
     }

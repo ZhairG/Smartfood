@@ -180,12 +180,13 @@ class ProductEditorViewModel @Inject constructor(
                 updateItem(current, draft, photoEditFor(current, state.photo))
             }
             result
-                .onSuccess { item ->
+                .onSuccess { savedItem ->
                     // El diálogo de carga sigue hasta que el editor se va, para no dejar ver el formulario un instante
                     // antes de volver a la lista (CA-INV-02-12).
                     requestNotificationPermissionOnce()
-                    // El resultado se ve encima de la lista, como el Figma (476:3851).
-                    val saved = if (current == null) EditorResult.Saved else EditorResult.Updated(item.name)
+                    // El resultado se ve encima de la lista, como el Figma (476:3851). "Guardado en tu teléfono" con
+                    // WriteOutcome.PENDING llega con la T050.
+                    val saved = if (current == null) EditorResult.Saved else EditorResult.Updated(savedItem.item.name)
                     _effects.send(ProductEditorEffect.NavigateBackWithResult(saved))
                 }
                 .onFailure { cause -> _uiState.update { it.copy(savingAction = null, error = cause.toInventoryError()) } }

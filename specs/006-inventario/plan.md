@@ -36,7 +36,7 @@ feature/inventory/
 │   ├── reminder/WorkManagerExpiryReminderScheduler.kt
 │   ├── reminder/ExpiryReminderWorker.kt
 │   ├── reminder/ExpiryNotifier.kt            canal y construcción de la notificación
-│   ├── sync/PendingPhotoStore.kt             fotos que esperan subirse, en filesDir/pending/{itemId}.jpg (§13)
+│   ├── sync/PendingPhotoStore.kt             fotos que esperan subirse, en filesDir/pending/{itemId}/{uuid}.jpg (§13)
 │   ├── sync/WorkManagerPhotoSync.kt          implementación de PhotoSync
 │   ├── sync/PhotoUploadWorker.kt             sube la foto y actualiza el producto (@HiltWorker)
 │   ├── sync/PhotoDeleteWorker.kt             borra una foto de Storage cuando hay red (@HiltWorker)
@@ -151,7 +151,7 @@ enum class SpeechError { NO_MATCH, NOT_AVAILABLE, PERMISSION_DENIED, NETWORK }
 | `ObserveInventoryUseCase` | `Flow<List<InventorySection>>` en orden EXPIRED, EXPIRING_SOON, FRESH, sin secciones vacías, ordenado por fecha y nombre. Combina `observeItems()` con `PhotoSync.pendingPhotos()`: un producto con foto pendiente lleva `localPhotoPath` e `isPendingSync = true` (CA-INV-10-04, T046). |
 | `ValidateItemUseCase(clock)` | `invoke(draft, originalExpiresOn: LocalDate?): Result<ValidItem>`. El nombre recortado debe tener entre 1 y 50 caracteres; la fecha y la categoría son obligatorias; la fecha no puede ser anterior a hoy, salvo si es igual a `originalExpiresOn` (CA-INV-03-03). Cantidad: el texto recortado vacío da `quantity = null` (la unidad se descarta); si no, se cambia la coma por punto y debe ser un número > 0, ≤ 9999 y con 2 decimales como máximo, o falla con `Validation(QUANTITY, INVALID)` (CA-INV-02-09). Sin unidad se usa `UNITS` (CA-INV-02-08). Además expone `isComplete(draft)`, que solo mira nombre, fecha y categoría, para habilitar el botón (CA-INV-02-02). |
 | `AddItemUseCase` | `invoke(draft, photo: LocalPhoto?): Result<SavedItem>`, con `SavedItem(item, outcome: WriteOutcome)`. Valida → `newItemId()` → `createItem` → si hay foto, `PhotoSync.enqueueUpload(id, photo, replacedPath = null)`. La foto ya no se sube aquí (§13, CA-INV-05-06). Con éxito llama a `schedule()`, que es idempotente. |
-| `UpdateItemUseCase` | `invoke(original, draft, photoEdit: PhotoEdit): Result<SavedItem>`, con `PhotoEdit` = `Keep`, `Remove` o `Replace(LocalPhoto)`. Valida → `updateItem(item, photoChanged = photoEdit != Keep)`. Con `Keep`, el documento conserva los campos de la foto. Con `Replace`, `enqueueUpload(id, foto, replacedPath = original.photo?.path)`: el worker borra la anterior después de subir la nueva (CA-INV-05-05). Con `Remove`, `cancelUpload(id)` y `enqueueDelete(original.photo.path)` si había (CA-INV-05-04). |
+| `UpdateItemUseCase` | `invoke(original, draft, photoEdit: PhotoEdit): Result<SavedItem>`, con `PhotoEdit` = `Keep`, `Remove` o `Replace(LocalPhoto)`. Valida → `updateItem(item, photoChanged = photoEdit == Remove)`. Con `Keep` y `Replace`, el documento conserva los campos de la foto. Con `Replace`, `enqueueUpload(id, foto, replacedPath = original.photo?.path)`: el worker pone la nueva con `setPhoto` y después borra la anterior (CA-INV-05-05); mientras tanto el producto muestra la anterior. Con `Remove`, `cancelUpload(id)` y `enqueueDelete(original.photo.path)` si había (CA-INV-05-04). |
 | `DeleteItemUseCase` | `invoke(item): Result<WriteOutcome>`: `deleteItem` → `cancelUpload(item.id)` → `enqueueDelete(path)` si tenía foto en la nube (CA-INV-04-02, CA-INV-10-03). |
 | `HasPendingChangesUseCase` | `invoke(): Boolean` = `InventoryRepository.hasPendingWrites() \|\| PhotoSync.hasPending()` (CA-INV-10-07, T046). `LogoutUseCase` llama además a `PhotoSync.clearAll()`. |
 | `SearchInventoryUseCase` | `invoke(items, query, category?): List<InventoryItem>`. Normaliza (minúsculas y sin tildes con `java.text.Normalizer`), divide por comas, descarta los términos vacíos y aplica OR por "contiene". Cada término coincide también sin la `s` o `es` final (CA-INV-07-04). Orden por fecha. |
@@ -209,7 +209,10 @@ Firestore, que funciona sin red (§13):
 - **Crear:** `set` con todos los campos, y `createdAt` y `updatedAt` con `FieldValue.serverTimestamp()`.
 - **Editar:** `update` con los campos del producto y `updatedAt`. La cantidad que se quitó se borra con
   `FieldValue.delete()`, y `createdAt` no se toca, como piden las reglas. Los campos de la foto solo se escriben si
-  `photoChanged` (con `Remove` se borran); así no se pisa lo que escribió `PhotoUploadWorker`.
+  `photoChanged`, es decir, con `Remove`, que los borra; así no se pisa lo que escribió `PhotoUploadWorker`.
+- **Poner la foto (`setPhoto`, lo usa el worker con conexión):** primero comprueba en el servidor que el producto
+  exista. Las reglas rechazan un `update` sobre un documento que no existe con `PERMISSION_DENIED`, no con
+  `NOT_FOUND` (lo mostró la prueba con el emulador); sin esa comprobación, el worker reintentaría para siempre.
 - **Borrar:** `delete`.
 - **Espera:** cada escritura espera la confirmación del servidor como mucho 3 s
   (`withTimeoutOrNull { task.await() }`). Si llega, es `SYNCED`; si no, es `PENDING`, y la escritura sigue en la cola
@@ -504,19 +507,22 @@ Firestore (§3) y las fotos por WorkManager. Ninguna escritura muestra un error 
 - `FirestoreInventoryRepository.observeItems()` usa `snapshots(MetadataChanges.INCLUDE)`, y cada documento con
   `metadata.hasPendingWrites()` sale con `isPendingSync = true`.
 - `ObserveInventoryUseCase` también marca pendientes los productos con foto en `PhotoSync.pendingPhotos()`.
-- `hasPendingWrites()` consulta la colección en la caché (`Source.CACHE`) y mira `metadata.hasPendingWrites()`.
+- `hasPendingWrites()` espera `waitForPendingWrites()` como mucho 500 ms: si no termina, hay escrituras sin confirmar.
+  A diferencia de consultar la caché, cubre también los borrados, que ya no aparecen en ella.
 
 **Fotos (`data/sync/`).**
-1. `WorkManagerPhotoSync.enqueueUpload` mueve la captura a `filesDir/pending/{itemId}.jpg` (`PendingPhotoStore`).
-   No va en `cacheDir`, porque Android puede borrarla. Después encola `PhotoUploadWorker` como trabajo único
-   `photo-upload-{itemId}` (`ExistingWorkPolicy.REPLACE`), con `NetworkType.CONNECTED` y reintento exponencial. Los
-   datos del trabajo son `itemId` y `replacedPath`.
+1. `WorkManagerPhotoSync.enqueueUpload` mueve la captura a `filesDir/pending/{itemId}/{uuid}.jpg`
+   (`PendingPhotoStore`) y borra las que esperaban para ese producto. No va en `cacheDir`, porque Android puede
+   borrarla. El nombre único evita que una subida vieja borre la foto nueva. Después encola `PhotoUploadWorker` como
+   trabajo único `photo-upload-{itemId}` (`ExistingWorkPolicy.REPLACE`), con `NetworkType.CONNECTED` y reintento
+   exponencial. Los datos del trabajo son `itemId`, `filePath` y `replacedPath`.
 2. `PhotoUploadWorker` (`@HiltWorker`, `CoroutineWorker`):
-   1. sube con `PhotoRepository.upload`, que comprime y borra el archivo solo si sale bien;
-   2. si el error es de red, `Result.retry()`;
-   3. si el archivo no se puede leer (`PhotoUploadFailed`), lo borra y deja el producto sin foto (CA-INV-05-06);
-   4. con la foto subida, llama a `setPhoto(itemId, foto)`. Si el producto ya no existe (`NotFound`), borra la foto
-      recién subida y termina;
+   1. si el archivo no se puede leer (`PhotoCompressor.isReadable`), lo borra y deja el producto sin foto
+      (CA-INV-05-06);
+   2. sube con `PhotoRepository.upload`, que comprime y ya no borra el archivo: lo borra el worker al final;
+   3. si el error es de red, `Result.retry()`; si es de la foto, reintenta hasta 5 veces y después la descarta;
+   4. con la foto subida, llama a `setPhoto(itemId, foto)`. Si el producto ya no existe (`NotFound`) o las reglas no
+      lo dejan, borra la foto recién subida y termina; con otro error, la borra también y reintenta;
    5. si había `replacedPath`, borra esa foto (CA-INV-05-05);
    6. sin sesión, termina sin hacer nada.
 3. `enqueueDelete(path)` encola `PhotoDeleteWorker` (`photo-delete-{path}`, con red y reintentos), que llama a

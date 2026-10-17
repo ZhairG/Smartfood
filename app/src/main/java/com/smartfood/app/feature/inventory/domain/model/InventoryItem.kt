@@ -43,7 +43,10 @@ data class ItemPhoto(val path: String, val url: String)
  * @property category Categoría del producto.
  * @property expiresOn Día de vencimiento, sin hora (ADR-INV-02).
  * @property quantity Cantidad con su unidad, si se indicó (T002).
- * @property photo Foto del producto, si tiene.
+ * @property photo Foto del producto en la nube, si tiene.
+ * @property localPhotoPath Foto guardada en el teléfono que todavía no se sube; la lista y el editor la muestran antes
+ *   que [photo] (CA-INV-10-04, T046).
+ * @property isPendingSync `true` si el producto tiene cambios o una foto sin subir (CA-INV-10-02, T046).
  */
 data class InventoryItem(
     val id: String,
@@ -54,8 +57,15 @@ data class InventoryItem(
     val photo: ItemPhoto? = null,
     /** Precio en pesos colombianos enteros, opcional (CA-INV-02-10, T052). */
     val price: Long? = null,
-    // El precio se agregará aquí como campo opcional en la spec de presupuesto (spec §7).
+    val localPhotoPath: String? = null,
+    val isPendingSync: Boolean = false,
 )
+
+/** Cómo terminó una escritura: confirmada por el servidor o guardada en el teléfono para subirse después (§13). */
+enum class WriteOutcome { SYNCED, PENDING }
+
+/** Producto guardado y cómo terminó su escritura (CA-INV-10-02). */
+data class SavedItem(val item: InventoryItem, val outcome: WriteOutcome)
 
 /** Sección de la lista: los productos que comparten un [ExpiryStatus] (CA-INV-01-01). */
 data class InventorySection(val status: ExpiryStatus, val items: List<InventoryItem>)

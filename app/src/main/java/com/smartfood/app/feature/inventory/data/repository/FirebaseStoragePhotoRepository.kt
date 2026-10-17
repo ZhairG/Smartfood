@@ -52,9 +52,8 @@ class FirebaseStoragePhotoRepository @Inject constructor(
             val reference = storage.reference.child(path)
             reference.putBytes(bytes, StorageMetadata.Builder().setContentType(JPEG).build()).await()
             val url = reference.downloadUrl.await().toString()
-            // El archivo temporal solo se borra si la subida salió bien: si falla, el formulario lo conserva para
-            // reintentar (CA-INV-05-06).
-            file.delete()
+            // El archivo local no se borra aquí: lo borra PhotoUploadWorker cuando la foto ya quedó en el producto,
+            // para poder reintentar si eso falla (spec 006 §13, CA-INV-05-06).
             ItemPhoto(path, url)
         }.mapInventoryError()
     }

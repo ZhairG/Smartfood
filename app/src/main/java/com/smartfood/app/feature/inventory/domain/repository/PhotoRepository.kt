@@ -7,7 +7,8 @@ import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
  * Nombre: PhotoRepository.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Contrato para subir y borrar las fotos de los productos en la nube (RF-INV-04).
+ * Descripción: Contrato para subir y borrar las fotos de los productos en la nube (RF-INV-04). Solo lo usan los
+ * workers de `PhotoSync`: los casos de uso encolan la foto en lugar de subirla (spec 006 §13).
  */
 interface PhotoRepository {
 

@@ -5,10 +5,12 @@ import com.smartfood.app.feature.inventory.data.reminder.WorkManagerExpiryRemind
 import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
 import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
+import com.smartfood.app.feature.inventory.data.sync.WorkManagerPhotoSync
 import com.smartfood.app.feature.inventory.domain.repository.ExpiryReminderScheduler
 import com.smartfood.app.feature.inventory.domain.repository.InventoryPreferences
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.repository.PhotoRepository
+import com.smartfood.app.feature.inventory.domain.repository.PhotoSync
 import com.smartfood.app.feature.inventory.domain.repository.SpeechToText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -49,6 +51,12 @@ class InventoryDataModuleTest {
     lateinit var speechToText: SpeechToText
 
     @Inject
+    lateinit var photoSync: PhotoSync
+
+    @Inject
+    lateinit var otroPhotoSync: PhotoSync
+
+    @Inject
     lateinit var inventoryPreferences: InventoryPreferences
 
     @Inject
@@ -77,6 +85,12 @@ class InventoryDataModuleTest {
     @Test
     fun t021_losRepositoriosSonUnicosEnLaApp() {
         assertSame(inventoryRepository, otroInventoryRepository)
+    }
+
+    @Test
+    fun t048_lasFotosSeSincronizanConWorkManagerYEsUnico() {
+        assertTrue(photoSync is WorkManagerPhotoSync)
+        assertSame(photoSync, otroPhotoSync)
     }
 
     @Test

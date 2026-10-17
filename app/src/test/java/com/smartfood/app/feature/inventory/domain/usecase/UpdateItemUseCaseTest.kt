@@ -5,10 +5,11 @@ import com.smartfood.app.feature.inventory.domain.model.InventoryError
 import com.smartfood.app.feature.inventory.domain.model.ItemDraft
 import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
 import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.inventory.domain.model.inventoryFailure
 import com.smartfood.app.testutil.CallLog
 import com.smartfood.app.testutil.FakeInventoryRepository
-import com.smartfood.app.testutil.FakePhotoRepository
+import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryError
 import com.smartfood.app.testutil.inventoryItem
@@ -31,8 +32,8 @@ class UpdateItemUseCaseTest {
     private val today = LocalDate.of(2026, 9, 10)
     private val log = CallLog()
     private val repository = FakeInventoryRepository(log)
-    private val photos = FakePhotoRepository(log)
-    private val updateItem = UpdateItemUseCase(repository, photos, ValidateItemUseCase(fixedClock(today)))
+    private val photoSync = FakePhotoSync(log)
+    private val updateItem = UpdateItemUseCase(repository, photoSync, ValidateItemUseCase(fixedClock(today)))
 
     private val oldPhoto = ItemPhoto("users/uid/inventory/carne/vieja.jpg", "https://fotos.test/vieja")
     private val original = inventoryItem(
@@ -43,20 +44,21 @@ class UpdateItemUseCaseTest {
         photo = oldPhoto,
     )
     private val draft = ItemDraft("Carne molida", original.expiresOn, FoodCategory.PROTEINS)
-    private val newPhoto = LocalPhoto("/cache/photos/nueva.jpg")
+    private val newPhoto = LocalPhoto("/files/photos/nueva.jpg")
 
     init {
         repository.items.value = listOf(original)
     }
 
     @Test
-    fun `CA-INV-03-02 guardar con datos validos actualiza el producto y conserva su foto`() = runTest {
+    fun `CA-INV-03-02 guardar con datos validos actualiza el producto sin tocar su foto`() = runTest {
         val updated = updateItem(original, draft, PhotoEdit.Keep).getOrThrow()
 
-        assertEquals("Carne molida", updated.name)
-        assertEquals(oldPhoto, updated.photo)
-        assertEquals(listOf(updated), repository.items.value)
-        assertTrue(photos.deletedPaths.isEmpty())
+        assertEquals("Carne molida", updated.item.name)
+        assertEquals(oldPhoto, updated.item.photo)
+        assertEquals(WriteOutcome.SYNCED, updated.outcome)
+        assertEquals(listOf(false), repository.photoChangedFlags)
+        assertEquals(listOf("updateItem:carne"), log.entries)
     }
 
     @Test
@@ -65,75 +67,62 @@ class UpdateItemUseCaseTest {
 
         val updated = updateItem(expired, draft.copy(expiresOn = expired.expiresOn), PhotoEdit.Keep).getOrThrow()
 
-        assertEquals(expired.expiresOn, updated.expiresOn)
+        assertEquals(expired.expiresOn, updated.item.expiresOn)
     }
 
     @Test
-    fun `CA-INV-05-04 quitar la foto la borra de la nube despues de guardar`() = runTest {
+    fun `CA-INV-05-04 quitar la foto la borra del producto y encola su borrado despues de guardar`() = runTest {
         val updated = updateItem(original, draft, PhotoEdit.Remove).getOrThrow()
 
-        assertNull(updated.photo)
-        assertEquals(listOf("saveItem:carne", "deletePhoto:${oldPhoto.path}"), log.entries)
-    }
-
-    @Test
-    fun `CA-INV-05-05 una foto nueva reemplaza a la anterior y la anterior se borra al guardar`() = runTest {
-        val updated = updateItem(original, draft, PhotoEdit.Replace(newPhoto)).getOrThrow()
-
-        val uploadedPath = updated.photo!!.path
+        assertNull(updated.item.photo)
+        assertEquals(listOf(true), repository.photoChangedFlags)
         assertEquals(
-            listOf("upload:carne", "saveItem:carne", "deletePhoto:${oldPhoto.path}"),
+            listOf("updateItem:carne", "cancelUpload:carne", "enqueueDelete:${oldPhoto.path}"),
             log.entries
         )
-        assertTrue(uploadedPath != oldPhoto.path)
     }
 
     @Test
-    fun `CA-INV-05-05 agregar foto a un producto sin foto no borra nada`() = runTest {
+    fun `CA-INV-05-05 una foto nueva se encola para reemplazar a la anterior despues de subirse`() = runTest {
+        val updated = updateItem(original, draft, PhotoEdit.Replace(newPhoto)).getOrThrow()
+
+        assertEquals(listOf("updateItem:carne", "enqueueUpload:carne"), log.entries)
+        assertEquals(listOf(Triple("carne", newPhoto, oldPhoto.path)), photoSync.uploads)
+        // Mientras la nueva se sube, el producto conserva la anterior y no se borra nada todavía.
+        assertEquals(listOf(false), repository.photoChangedFlags)
+        assertEquals(oldPhoto, repository.items.value.single().photo)
+        assertTrue(photoSync.deletes.isEmpty())
+        assertTrue(updated.item.isPendingSync)
+    }
+
+    @Test
+    fun `CA-INV-05-05 agregar foto a un producto sin foto no reemplaza nada`() = runTest {
         updateItem(original.copy(photo = null), draft, PhotoEdit.Replace(newPhoto)).getOrThrow()
 
-        assertTrue(photos.deletedPaths.isEmpty())
+        assertNull(photoSync.uploads.single().third)
     }
 
     @Test
-    fun `CA-INV-05-06 si el guardado falla se borra la foto nueva y se conserva la anterior`() = runTest {
-        repository.saveResult = inventoryFailure(InventoryError.Network)
+    fun `CA-INV-10-02 sin conexion la edicion queda guardada en el telefono`() = runTest {
+        repository.outcome = WriteOutcome.PENDING
 
-        val result = updateItem(original, draft, PhotoEdit.Replace(newPhoto))
+        val updated = updateItem(original, draft, PhotoEdit.Keep).getOrThrow()
 
-        assertEquals(InventoryError.Network, result.inventoryError)
-        assertEquals(1, photos.deletedPaths.size)
-        assertTrue(photos.deletedPaths.single() != oldPhoto.path)
+        assertEquals(WriteOutcome.PENDING, updated.outcome)
+        assertTrue(updated.item.isPendingSync)
+    }
+
+    @Test
+    fun `CA-INV-02-07 si el guardado falla no se encola ni se borra ninguna foto`() = runTest {
+        repository.saveResult = inventoryFailure(InventoryError.PermissionDenied)
+
+        val replace = updateItem(original, draft, PhotoEdit.Replace(newPhoto))
+        val remove = updateItem(original, draft, PhotoEdit.Remove)
+
+        assertEquals(InventoryError.PermissionDenied, replace.inventoryError)
+        assertEquals(InventoryError.PermissionDenied, remove.inventoryError)
+        assertTrue(photoSync.uploads.isEmpty())
+        assertTrue(photoSync.deletes.isEmpty())
         assertEquals(listOf(original), repository.items.value)
-    }
-
-    @Test
-    fun `CA-INV-05-06 si la foto nueva no se sube no se guarda nada`() = runTest {
-        photos.uploadResult = inventoryFailure(InventoryError.PhotoUploadFailed)
-
-        val result = updateItem(original, draft, PhotoEdit.Replace(newPhoto))
-
-        assertEquals(InventoryError.PhotoUploadFailed, result.inventoryError)
-        assertTrue(repository.savedItems.isEmpty())
-        assertTrue(photos.deletedPaths.isEmpty())
-    }
-
-    @Test
-    fun `CA-INV-05-04 si quitar la foto falla en el guardado la foto anterior no se borra`() = runTest {
-        repository.saveResult = inventoryFailure(InventoryError.Network)
-
-        updateItem(original, draft, PhotoEdit.Remove)
-
-        assertTrue(photos.deletedPaths.isEmpty())
-    }
-
-    @Test
-    fun `CA-INV-05-05 si falla el borrado de la foto anterior el cambio se guarda igual`() = runTest {
-        photos.deleteResult = inventoryFailure(InventoryError.Network)
-
-        val result = updateItem(original, draft, PhotoEdit.Replace(newPhoto))
-
-        assertTrue(result.isSuccess)
-        assertEquals("Carne molida", repository.items.value.single().name)
     }
 }

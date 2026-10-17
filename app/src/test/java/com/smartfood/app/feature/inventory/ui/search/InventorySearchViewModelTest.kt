@@ -21,6 +21,7 @@ import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCas
 import com.smartfood.app.feature.inventory.domain.usecase.ParseSpokenIngredientsUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.SearchInventoryUseCase
 import com.smartfood.app.testutil.FakeInventoryRepository
+import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.FakeSpeechToText
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
@@ -71,7 +72,7 @@ class InventorySearchViewModelTest {
     }
 
     private fun crearViewModel() = InventorySearchViewModel(
-        observeInventoryUseCase = ObserveInventoryUseCase(repository, ClassifyExpiryUseCase(fixedClock(today))),
+        observeInventoryUseCase = ObserveInventoryUseCase(repository, FakePhotoSync(), ClassifyExpiryUseCase(fixedClock(today))),
         searchInventoryUseCase = SearchInventoryUseCase(),
         speechToText = speech,
         parseSpokenIngredientsUseCase = ParseSpokenIngredientsUseCase()
@@ -301,7 +302,7 @@ class InventorySearchViewModelTest {
                 flow { throw InventoryException(InventoryError.NotAuthenticated) }
         }
         val viewModel = InventorySearchViewModel(
-            observeInventoryUseCase = ObserveInventoryUseCase(sinSesion, ClassifyExpiryUseCase(fixedClock(today))),
+            observeInventoryUseCase = ObserveInventoryUseCase(sinSesion, FakePhotoSync(), ClassifyExpiryUseCase(fixedClock(today))),
             searchInventoryUseCase = SearchInventoryUseCase(),
             speechToText = speech,
             parseSpokenIngredientsUseCase = ParseSpokenIngredientsUseCase()
