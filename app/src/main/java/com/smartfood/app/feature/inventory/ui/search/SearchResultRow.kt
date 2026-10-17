@@ -36,14 +36,20 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenMain20
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
+import com.smartfood.app.feature.inventory.domain.model.FoodCategory
+import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.ui.components.PendingSyncIcon
 import com.smartfood.app.feature.inventory.ui.components.color
 import com.smartfood.app.feature.inventory.ui.components.titleRes
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -113,3 +119,17 @@ private val TagShape = RoundedCornerShape(6.dp)
 private val TagBorder = 1.dp
 private val TagHorizontalPadding = 10.dp
 private val TagVerticalPadding = 4.dp
+
+@Preview(showBackground = true)
+@Composable
+private fun SearchResultRowPreview() {
+    SmartfoodTheme {
+        SearchResultRow(
+            result = SearchResultUi(
+                InventoryItem("1", "Leche Entera", FoodCategory.DAIRY, LocalDate.of(2026, 10, 20), isPendingSync = true),
+                ExpiryStatus.EXPIRING_SOON
+            ),
+            onClick = {}
+        )
+    }
+}
