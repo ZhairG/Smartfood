@@ -20,6 +20,17 @@ import javax.inject.Inject
 class PhotoCompressor @Inject constructor() {
 
     /**
+     * `true` si [file] existe y es una imagen que se puede decodificar. `PhotoUploadWorker` lo usa para distinguir una
+     * foto ilegible, que no se va a poder subir nunca, de un fallo pasajero de la subida (CA-INV-05-06).
+     */
+    fun isReadable(file: File): Boolean {
+        if (!file.exists()) return false
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(file.path, bounds)
+        return bounds.outWidth > 0 && bounds.outHeight > 0
+    }
+
+    /**
      * Devuelve los bytes JPEG reducidos de [file].
      *
      * @throws IOException si el archivo no existe o no es una imagen.

@@ -86,9 +86,9 @@
 > el #71. El orden es T046 → T047 y T048 (en paralelo) → T049, T050 y T051.
 
 - [x] T045 Spec, plan y tareas del uso sin conexión: §7, RNF-INV-05, CA-INV-02-07, 04-02, 05-02, 05-04 a 05-06, HU-INV-10, RF-INV-09 y ADR-INV-09. → #71
-- [ ] T046 Dominio: `WriteOutcome`, `SavedItem`, `isPendingSync` y `localPhotoPath` en `InventoryItem`; `InventoryRepository` con `createItem`, `updateItem`, `setPhoto` y `hasPendingWrites`; la interfaz `PhotoSync`; los casos de uso de agregar, editar, eliminar y observar sin subir fotos, `HasPendingChangesUseCase` y `LogoutUseCase` con `clearAll()`. Fakes: `FakeInventoryRepository` actualizado y `FakePhotoSync`. Pruebas U que citan CA-INV-10-xx (plan §2 y §13).
-- [ ] T047 [P] `FirestoreInventoryRepository` sin transacciones: `set`/`update`/`delete` con espera de 3 s → `WriteOutcome`, `MetadataChanges.INCLUDE` → `isPendingSync`, `setPhoto` y `hasPendingWrites` (plan §3). Las reglas no cambian. Pruebas: U `InventoryDocumentTest`, I `FirestoreInventoryRepositoryEmulatorTest` con `disableNetwork()` (CA-INV-10-02, 10-05).
-- [ ] T048 [P] `PendingPhotoStore`, `PhotoUploadWorker`, `PhotoDeleteWorker` y `WorkManagerPhotoSync` (`@HiltWorker`), con su `@Binds` en `InventoryDataModule`. `SmartfoodApp` como `Configuration.Provider` y sin el inicializador del manifiesto (sale de la T038, #44). `work-testing` ya está declarado desde la T038. Pruebas I de los workers (CA-INV-05-05, 05-06, 10-03, 10-04).
+- [x] T046 Dominio: `WriteOutcome`, `SavedItem`, `isPendingSync` y `localPhotoPath` en `InventoryItem`; `InventoryRepository` con `createItem`, `updateItem`, `setPhoto` y `hasPendingWrites`; la interfaz `PhotoSync`; los casos de uso de agregar, editar, eliminar y observar sin subir fotos, `HasPendingChangesUseCase` y `LogoutUseCase` con `clearAll()`. Fakes: `FakeInventoryRepository` actualizado y `FakePhotoSync`. Pruebas U que citan CA-INV-10-xx (plan §2 y §13).
+- [x] T047 [P] `FirestoreInventoryRepository` sin transacciones: `set`/`update`/`delete` con espera de 3 s → `WriteOutcome`, `MetadataChanges.INCLUDE` → `isPendingSync`, `setPhoto` y `hasPendingWrites` (plan §3). Las reglas no cambian. Pruebas: U `InventoryDocumentTest`, I `FirestoreInventoryRepositoryEmulatorTest` con `disableNetwork()` (CA-INV-10-02, 10-05).
+- [x] T048 [P] `PendingPhotoStore`, `PhotoUploadWorker`, `PhotoDeleteWorker` y `WorkManagerPhotoSync` (`@HiltWorker`), con su `@Binds` en `InventoryDataModule`. `SmartfoodApp` como `Configuration.Provider` y sin el inicializador del manifiesto (sale de la T038, #44). `work-testing` ya está declarado desde la T038. Pruebas I de los workers (CA-INV-05-05, 05-06, 10-03, 10-04).
 - [ ] T049 Lista: ícono de pendiente y foto local en `InventoryItemRow`, con la descripción "Pendiente de sincronizar" (CA-INV-10-02, 10-04, 10-06). Va después del #39. Pruebas: I `InventoryScreenTest`.
 - [ ] T050 Editor: diálogo "Guardado en tu teléfono" con `WriteOutcome.PENDING` y la foto local en `PhotoSlot` (CA-INV-10-02, 10-04). Salió del #40 el 16/10: se hace después de la entrega, con el resto de la fase 8. Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`.
 - [ ] T051 Perfil: aviso al cerrar sesión con cambios pendientes, con `SmartFoodConfirmDialog` (CA-INV-10-07). Pruebas: U `ProfileViewModelTest`, I `ProfileScreenTest`.
@@ -126,14 +126,14 @@ verificación manual (checklist).
 | CA-INV-03-03 | U `ValidateItemUseCaseTest` |
 | CA-INV-03-04 | U `ProductEditorViewModelTest` |
 | CA-INV-04-01 | I `ProductEditorScreenTest`, I `SmartFoodDialogsTest`, I `SmartFoodPrimaryButtonTest` (botón destructivo) |
-| CA-INV-04-02 | U `DeleteItemUseCaseTest` (encola el borrado de la foto), U `ProductEditorViewModelTest`, I `PhotoDeleteWorkerTest`, M 3 |
+| CA-INV-04-02 | U `DeleteItemUseCaseTest` (encola el borrado de la foto), U `ProductEditorViewModelTest`, I `PhotoSyncWorkersTest`, M 3 |
 | CA-INV-04-03 | I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
 | CA-INV-05-01 | I `ProductCameraScreenTest`, M 2 |
 | CA-INV-05-02 | U `ProductEditorViewModelTest`, M 2 |
 | CA-INV-05-03 | U `ProductEditorViewModelTest`, I `ProductCameraScreenTest`, M 4 |
 | CA-INV-05-04 | U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest` (papelera), I `SmartFoodDialogsTest` |
-| CA-INV-05-05 | U `UpdateItemUseCaseTest`, I `PhotoUploadWorkerTest` (borra la anterior después de subir), M 2 |
-| CA-INV-05-06 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (conserva el archivo si falla), I `PhotoUploadWorkerTest` (reintenta; archivo ilegible → sin foto) |
+| CA-INV-05-05 | U `UpdateItemUseCaseTest`, I `PhotoSyncWorkersTest` (borra la anterior después de subir), M 2 |
+| CA-INV-05-06 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest` (conserva el archivo si falla), I `PhotoSyncWorkersTest` (reintenta; archivo ilegible → sin foto) |
 | CA-INV-05-07 | U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, M (galería y cámara en el teléfono) |
 | CA-INV-06-01 | U `InventorySearchViewModelTest`, I `InventorySearchScreenTest` |
 | CA-INV-06-02 | U `SearchInventoryUseCaseTest`, U `InventorySearchViewModelTest` |
@@ -165,11 +165,11 @@ verificación manual (checklist).
 | CA-INV-09-05 | I `MainNavigationTest` |
 | CA-INV-10-01 | M 7 |
 | CA-INV-10-02 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `FirestoreInventoryRepositoryEmulatorTest` (sin red → `PENDING`), I `InventoryScreenTest`, M 7 |
-| CA-INV-10-03 | U `DeleteItemUseCaseTest`, I `PhotoDeleteWorkerTest`, M 7 |
-| CA-INV-10-04 | U `ObserveInventoryUseCaseTest`, I `PhotoUploadWorkerTest`, I `InventoryScreenTest`, I `ProductEditorScreenTest` |
+| CA-INV-10-03 | U `DeleteItemUseCaseTest`, I `PhotoSyncWorkersTest`, M 7 |
+| CA-INV-10-04 | U `ObserveInventoryUseCaseTest`, I `PhotoSyncWorkersTest`, I `InventoryScreenTest`, I `ProductEditorScreenTest` |
 | CA-INV-10-05 | I `FirestoreInventoryRepositoryEmulatorTest` (al encender la red, `isPendingSync` pasa a falso), M 7 |
 | CA-INV-10-06 | I `InventoryScreenTest` |
-| CA-INV-10-07 | U `HasPendingChangesUseCaseTest`, U `LogoutUseCaseTest`, U `ProfileViewModelTest`, I `ProfileScreenTest` |
+| CA-INV-10-07 | U `HasPendingChangesUseCaseTest`, U `SessionUseCasesTest`, U `ProfileViewModelTest`, I `ProfileScreenTest` |
 | RNF-INV-01 | R `firestore.test.js`, R `storage.test.js`, I `FirestoreInventoryRepositoryEmulatorTest`, M 9 |
 | RNF-INV-02 | U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest`, R `storage.test.js`, M 9 (foto > 2 MB denegada), M 2 (tamaño subido) |
 | RNF-INV-04 | I `InventoryScreenTest`, I `InventorySearchScreenTest` (descripciones y estado de los chips) |

@@ -55,6 +55,31 @@ internal fun InventoryItem.toDocumentFields(): Map<String, Any> = buildMap {
 }
 
 /**
+ * Campos para editar el producto con `update` (spec 006 §3, T047). La cantidad, la unidad y el precio que ya no tiene
+ * se borran con [delete]. Los campos de la foto solo van si [photoChanged], para no pisar la foto que esté poniendo
+ * `PhotoUploadWorker`.
+ *
+ * @param delete Marcador de borrado de Firestore (`FieldValue.delete()`); llega como parámetro para probarlo en la JVM.
+ */
+internal fun InventoryItem.toUpdateFields(photoChanged: Boolean, delete: Any): Map<String, Any> {
+    val fields = toDocumentFields() - PHOTO_KEYS
+    val removed = OPTIONAL_KEYS.filterNot { it in fields }.associateWith { delete }
+    return fields + removed + if (photoChanged) photo.toPhotoFields(delete) else emptyMap()
+}
+
+/**
+ * Campos de la foto: la ruta y la URL, o los dos borrados con [delete] si no hay foto (CA-INV-05-04).
+ *
+ * @param delete Marcador de borrado de Firestore (`FieldValue.delete()`).
+ */
+internal fun ItemPhoto?.toPhotoFields(delete: Any): Map<String, Any> =
+    if (this == null) PHOTO_KEYS.associateWith { delete }
+    else mapOf(InventoryDocument.PHOTO_PATH to path, InventoryDocument.PHOTO_URL to url)
+
+private val PHOTO_KEYS = listOf(InventoryDocument.PHOTO_PATH, InventoryDocument.PHOTO_URL)
+private val OPTIONAL_KEYS = listOf(InventoryDocument.QUANTITY, InventoryDocument.UNIT, InventoryDocument.PRICE)
+
+/**
  * Lee un documento de forma tolerante: una categoría desconocida pasa a [FoodCategory.OTHER], y una cantidad o
  * unidad inválida se descarta. Devuelve `null` si falta el nombre o la fecha no es válida, para omitir el documento
  * sin romper la lista.

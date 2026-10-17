@@ -2,10 +2,11 @@ package com.smartfood.app.feature.inventory.domain.usecase
 
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
 import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.inventory.domain.model.inventoryFailure
 import com.smartfood.app.testutil.CallLog
 import com.smartfood.app.testutil.FakeInventoryRepository
-import com.smartfood.app.testutil.FakePhotoRepository
+import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.inventoryError
 import com.smartfood.app.testutil.inventoryItem
 import kotlinx.coroutines.test.runTest
@@ -23,43 +24,49 @@ class DeleteItemUseCaseTest {
 
     private val log = CallLog()
     private val repository = FakeInventoryRepository(log)
-    private val photos = FakePhotoRepository(log)
-    private val deleteItem = DeleteItemUseCase(repository, photos)
+    private val photoSync = FakePhotoSync(log)
+    private val deleteItem = DeleteItemUseCase(repository, photoSync)
 
     private val photo = ItemPhoto("users/uid/inventory/carne/foto.jpg", "https://fotos.test/foto")
     private val withPhoto = inventoryItem(id = "carne", name = "Carne", photo = photo)
 
     @Test
-    fun `CA-INV-04-02 eliminar borra el documento y despues su foto`() = runTest {
+    fun `CA-INV-04-02 eliminar borra el documento y despues encola el borrado de su foto`() = runTest {
         repository.items.value = listOf(withPhoto)
 
-        deleteItem(withPhoto).getOrThrow()
+        assertEquals(WriteOutcome.SYNCED, deleteItem(withPhoto).getOrThrow())
 
         assertTrue(repository.items.value.isEmpty())
-        assertEquals(listOf("deleteItem:carne", "deletePhoto:${photo.path}"), log.entries)
+        assertEquals(listOf("deleteItem:carne", "cancelUpload:carne", "enqueueDelete:${photo.path}"), log.entries)
     }
 
     @Test
-    fun `CA-INV-04-02 un producto sin foto no borra nada en la nube`() = runTest {
+    fun `CA-INV-04-02 un producto sin foto en la nube solo cancela una subida pendiente`() = runTest {
         deleteItem(withPhoto.copy(photo = null)).getOrThrow()
 
-        assertTrue(photos.deletedPaths.isEmpty())
+        assertEquals(listOf("carne"), photoSync.cancelled)
+        assertTrue(photoSync.deletes.isEmpty())
+    }
+
+    @Test
+    fun `CA-INV-10-03 sin conexion el producto se borra en el telefono y su foto se borra despues`() = runTest {
+        repository.items.value = listOf(withPhoto)
+        repository.outcome = WriteOutcome.PENDING
+
+        assertEquals(WriteOutcome.PENDING, deleteItem(withPhoto).getOrThrow())
+
+        assertTrue(repository.items.value.isEmpty())
+        assertEquals(listOf(photo.path), photoSync.deletes)
     }
 
     @Test
     fun `CA-INV-04-02 si el documento no se borra la foto se conserva`() = runTest {
-        repository.deleteResult = inventoryFailure(InventoryError.Network)
+        repository.deleteResult = inventoryFailure(InventoryError.PermissionDenied)
 
         val result = deleteItem(withPhoto)
 
-        assertEquals(InventoryError.Network, result.inventoryError)
-        assertTrue(photos.deletedPaths.isEmpty())
-    }
-
-    @Test
-    fun `CA-INV-04-02 si falla el borrado de la foto el producto queda eliminado`() = runTest {
-        photos.deleteResult = inventoryFailure(InventoryError.Network)
-
-        assertTrue(deleteItem(withPhoto).isSuccess)
+        assertEquals(InventoryError.PermissionDenied, result.inventoryError)
+        assertTrue(photoSync.deletes.isEmpty())
+        assertTrue(photoSync.cancelled.isEmpty())
     }
 }

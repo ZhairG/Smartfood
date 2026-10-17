@@ -23,7 +23,7 @@ import com.smartfood.app.feature.inventory.domain.usecase.ValidateItemUseCase
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeInventoryPreferences
 import com.smartfood.app.testutil.FakeInventoryRepository
-import com.smartfood.app.testutil.FakePhotoRepository
+import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.MainDispatcherRule
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
@@ -47,7 +47,7 @@ class ProductEditorViewModelTest {
 
     private val today = LocalDate.of(2026, 9, 10)
     private val repository = FakeInventoryRepository()
-    private val photos = FakePhotoRepository()
+    private val photoSync = FakePhotoSync()
     private val scheduler = FakeExpiryReminderScheduler()
     private val preferences = FakeInventoryPreferences()
     private val validate = ValidateItemUseCase(fixedClock(today))
@@ -56,9 +56,9 @@ class ProductEditorViewModelTest {
         savedStateHandle = SavedStateHandle(mapOf(ProductEditorViewModel.ITEM_ID_KEY to itemId)),
         repository = repository,
         validate = validate,
-        addItem = AddItemUseCase(repository, photos, validate, scheduler),
-        updateItem = UpdateItemUseCase(repository, photos, validate),
-        deleteItem = DeleteItemUseCase(repository, photos),
+        addItem = AddItemUseCase(repository, photoSync, validate, scheduler),
+        updateItem = UpdateItemUseCase(repository, photoSync, validate),
+        deleteItem = DeleteItemUseCase(repository, photoSync),
         preferences = preferences,
     )
 
@@ -306,7 +306,7 @@ class ProductEditorViewModelTest {
         viewModel.onEvent(ProductEditorEvent.DeleteConfirmed)
 
         assertEquals(listOf("carne"), repository.deletedIds)
-        assertEquals(listOf(photo.path), photos.deletedPaths)
+        assertEquals(listOf(photo.path), photoSync.deletes)
         assertEquals(ProductEditorEffect.NavigateBackWithResult(EditorResult.Deleted), viewModel.effects.first())
     }
 
@@ -323,7 +323,7 @@ class ProductEditorViewModelTest {
     }
 
     @Test
-    fun `CA-INV-05-02 la foto tomada aparece en el formulario y se sube al guardar`() {
+    fun `CA-INV-05-02 la foto tomada aparece en el formulario y se encola al guardar`() {
         val viewModel = createViewModel()
         viewModel.fillValidForm()
 
@@ -331,8 +331,8 @@ class ProductEditorViewModelTest {
         assertEquals(PhotoUiState.Local("/fotos/carne.jpg"), viewModel.uiState.value.photo)
 
         viewModel.onEvent(ProductEditorEvent.SaveClicked)
-        assertEquals("/fotos/carne.jpg", photos.uploads.single().second.filePath)
-        assertTrue(repository.savedItems.single().photo != null)
+        assertEquals("/fotos/carne.jpg", photoSync.uploads.single().second.filePath)
+        assertEquals(repository.savedItems.single().id, photoSync.uploads.single().first)
     }
 
     @Test
@@ -352,7 +352,7 @@ class ProductEditorViewModelTest {
 
         viewModel.onEvent(ProductEditorEvent.SaveClicked)
         assertNull(repository.savedItems.single().photo)
-        assertEquals(listOf(photo.path), photos.deletedPaths)
+        assertEquals(listOf(photo.path), photoSync.deletes)
     }
 
     @Test

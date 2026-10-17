@@ -6,6 +6,7 @@ import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeSessionPreferences
+import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.FakeUserRepository
 import com.smartfood.app.testutil.authError
 import kotlinx.coroutines.test.runTest
@@ -74,7 +75,7 @@ class SessionUseCasesTest {
     fun `CA-05-03 cerrar sesion delega en el repositorio`() {
         authRepository.signedInUserId = DEFAULT_UID
 
-        LogoutUseCase(authRepository, FakeExpiryReminderScheduler())()
+        LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), FakePhotoSync())()
 
         assertNull(authRepository.currentUserId())
     }
@@ -84,10 +85,22 @@ class SessionUseCasesTest {
         val scheduler = FakeExpiryReminderScheduler()
         authRepository.signedInUserId = DEFAULT_UID
 
-        LogoutUseCase(authRepository, scheduler)()
+        LogoutUseCase(authRepository, scheduler, FakePhotoSync())()
 
         assertEquals(1, scheduler.cancelCalls)
         assertEquals(0, scheduler.scheduleCalls)
         assertEquals(1, authRepository.logoutCalls)
+    }
+
+    @Test
+    fun `CA-INV-10-07 cerrar sesion descarta las fotos que esperaban subirse`() {
+        val photoSync = FakePhotoSync().apply { pending.value = mapOf("leche" to "/files/pending/leche/a.jpg") }
+        authRepository.signedInUserId = DEFAULT_UID
+
+        LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), photoSync)()
+
+        assertEquals(1, photoSync.clearAllCalls)
+        assertFalse(photoSync.hasPending())
+        assertNull(authRepository.currentUserId())
     }
 }

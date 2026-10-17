@@ -83,7 +83,9 @@ class FirebaseStoragePhotoRepositoryEmulatorTest {
         val photo = repository.upload("item1", LocalPhoto(local.path)).getOrThrow()
         assertTrue(photo.path.startsWith("users/$uid/inventory/item1/"))
         assertTrue(photo.url.isNotBlank())
-        assertFalse("El archivo temporal se borra tras subir", local.exists())
+        // El archivo local se conserva: lo borra PhotoUploadWorker cuando la foto ya quedó en el producto (§13).
+        assertTrue(local.exists())
+        local.delete()
         val metadata = storage.reference.child(photo.path).metadata.await()
         assertEquals("image/jpeg", metadata.contentType)
         assertTrue("Pesa ${metadata.sizeBytes} bytes", metadata.sizeBytes < 2 * 1024 * 1024)

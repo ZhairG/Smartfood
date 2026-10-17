@@ -10,6 +10,7 @@ package com.smartfood.app.feature.inventory.ui.list
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import com.smartfood.app.testutil.FakeInventoryRepository
+import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.MainDispatcherRule
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
@@ -32,6 +33,7 @@ class InventoryViewModelTest {
     private val repository = FakeInventoryRepository()
     private val observeInventoryUseCase = ObserveInventoryUseCase(
         repository = repository,
+        photoSync = FakePhotoSync(),
         classifyExpiry = ClassifyExpiryUseCase(fixedClock(today))
     )
 

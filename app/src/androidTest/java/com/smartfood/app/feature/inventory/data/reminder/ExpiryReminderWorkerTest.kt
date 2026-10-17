@@ -21,6 +21,8 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.smartfood.app.feature.auth.domain.repository.AuthRepository
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
+import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.GetExpiringItemsUseCase
@@ -229,7 +231,14 @@ private class FakeInventoryRepository(private val items: List<InventoryItem>) : 
 
     override fun newItemId(): String = UUID.randomUUID().toString()
 
-    override suspend fun saveItem(item: InventoryItem): Result<Unit> = Result.success(Unit)
+    override suspend fun createItem(item: InventoryItem): Result<WriteOutcome> = Result.success(WriteOutcome.SYNCED)
 
-    override suspend fun deleteItem(id: String): Result<Unit> = Result.success(Unit)
+    override suspend fun updateItem(item: InventoryItem, photoChanged: Boolean): Result<WriteOutcome> =
+        Result.success(WriteOutcome.SYNCED)
+
+    override suspend fun deleteItem(id: String): Result<WriteOutcome> = Result.success(WriteOutcome.SYNCED)
+
+    override suspend fun setPhoto(id: String, photo: ItemPhoto?): Result<Unit> = Result.success(Unit)
+
+    override suspend fun hasPendingWrites(): Boolean = false
 }

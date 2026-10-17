@@ -8,6 +8,8 @@ import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRep
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
+import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
 import com.smartfood.app.feature.inventory.domain.model.toInventoryError
@@ -18,6 +20,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
@@ -82,29 +85,52 @@ class FirestoreInventoryRepositoryEmulatorTest {
             quantity = Quantity(1.5, QuantityUnit.LITERS),
         )
 
-        // Crear: las reglas exigen createdAt y updatedAt con la hora del servidor.
-        assertTrue(repository.saveItem(item).isSuccess)
+        // Una lectura primero calienta la conexión y las reglas del emulador: la primera escritura en frío puede
+        // tardar más que la espera de 3 s y quedar PENDING aunque haya red.
+        repository.getItem("calentar")
+
+        // Crear: las reglas exigen createdAt y updatedAt con la hora del servidor. Con red, el servidor lo confirma.
+        assertEquals(WriteOutcome.SYNCED, repository.createItem(item).getOrThrow())
         assertTrue(item in repository.observeItems().first())
         assertEquals(item, repository.getItem(item.id).getOrNull())
         val creadoEn = createdAt(item.id)
 
-        // Editar quitando la cantidad: el set completo borra quantity y unit, y createdAt no cambia.
+        // Editar quitando la cantidad: `update` borra quantity y unit, y createdAt no cambia (T047).
         val editado = item.copy(name = "Leche Deslactosada", quantity = null)
-        assertTrue(repository.saveItem(editado).isSuccess)
+        assertEquals(WriteOutcome.SYNCED, repository.updateItem(editado, photoChanged = false).getOrThrow())
         val leido = repository.getItem(item.id).getOrThrow()
         assertEquals("Leche Deslactosada", leido.name)
         assertNull(leido.quantity)
         assertEquals(creadoEn, createdAt(item.id))
 
+        // La foto la pone el worker con setPhoto; en un producto que ya no existe falla con NotFound (T048).
+        val foto = ItemPhoto("users/${auth.currentUser!!.uid}/inventory/${item.id}/f.jpg", "https://foto")
+        assertTrue(repository.setPhoto(item.id, foto).isSuccess)
+        assertEquals(foto, repository.getItem(item.id).getOrThrow().photo)
+        assertFalse(repository.hasPendingWrites())
+
+        // Sin conexión, la escritura queda en el teléfono: PENDING, el producto aparece pendiente y se sube al
+        // volver la conexión (CA-INV-10-02, 10-05).
+        firestore.disableNetwork().await()
+        val sinRed = item.copy(id = repository.newItemId(), name = "Arroz")
+        assertEquals(WriteOutcome.PENDING, repository.createItem(sinRed).getOrThrow())
+        assertTrue(repository.observeItems().first().single { it.id == sinRed.id }.isPendingSync)
+        assertTrue(repository.hasPendingWrites())
+        firestore.enableNetwork().await()
+        firestore.waitForPendingWrites().await()
+        assertFalse(repository.hasPendingWrites())
+        assertFalse(repository.observeItems().first().single { it.id == sinRed.id }.isPendingSync)
+
         // Borrar.
-        assertTrue(repository.deleteItem(item.id).isSuccess)
+        assertEquals(WriteOutcome.SYNCED, repository.deleteItem(item.id).getOrThrow())
         assertEquals(InventoryError.NotFound, repository.getItem(item.id).exceptionOrNull()?.toInventoryError())
+        assertEquals(InventoryError.NotFound, repository.setPhoto(item.id, foto).exceptionOrNull()?.toInventoryError())
 
         // Sin sesión, guardar falla con NotAuthenticated en lugar de lanzar.
         auth.signOut()
         assertEquals(
             InventoryError.NotAuthenticated,
-            repository.saveItem(item.copy(id = repository.newItemId())).exceptionOrNull()?.toInventoryError()
+            repository.createItem(item.copy(id = repository.newItemId())).exceptionOrNull()?.toInventoryError()
         )
     }
 }

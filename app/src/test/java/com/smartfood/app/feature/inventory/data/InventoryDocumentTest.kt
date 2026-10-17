@@ -3,6 +3,8 @@ package com.smartfood.app.feature.inventory.data
 import com.smartfood.app.feature.inventory.data.repository.InventoryDocument
 import com.smartfood.app.feature.inventory.data.repository.inventoryItemFromDocument
 import com.smartfood.app.feature.inventory.data.repository.toDocumentFields
+import com.smartfood.app.feature.inventory.data.repository.toPhotoFields
+import com.smartfood.app.feature.inventory.data.repository.toUpdateFields
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
@@ -122,5 +124,43 @@ class InventoryDocumentTest {
     fun `un precio fuera de rango se descarta al leer`() {
         assertNull(inventoryItemFromDocument("x", minimo + mapOf(InventoryDocument.PRICE to 0L))?.price)
         assertNull(inventoryItemFromDocument("x", minimo + mapOf(InventoryDocument.PRICE to "12500"))?.price)
+    }
+
+    // T047: al editar con `update`, lo que el producto ya no tiene se borra y la foto solo va si cambió.
+    private val borrar = Any()
+
+    @Test
+    fun `CA-INV-03-02 al editar se borran la cantidad y el precio que se quitaron`() {
+        val campos = completo.copy(quantity = null, price = null).toUpdateFields(photoChanged = false, delete = borrar)
+
+        assertEquals(borrar, campos[InventoryDocument.QUANTITY])
+        assertEquals(borrar, campos[InventoryDocument.UNIT])
+        assertEquals(borrar, campos[InventoryDocument.PRICE])
+        assertEquals("Leche Entera", campos[InventoryDocument.NAME])
+    }
+
+    @Test
+    fun `T047 sin cambio de foto la edicion no escribe sus campos`() {
+        val campos = completo.toUpdateFields(photoChanged = false, delete = borrar)
+
+        assertFalse(InventoryDocument.PHOTO_PATH in campos)
+        assertFalse(InventoryDocument.PHOTO_URL in campos)
+        assertFalse(InventoryDocument.CREATED_AT in campos)
+    }
+
+    @Test
+    fun `CA-INV-05-04 quitar la foto borra sus dos campos`() {
+        val campos = completo.copy(photo = null).toUpdateFields(photoChanged = true, delete = borrar)
+
+        assertEquals(borrar, campos[InventoryDocument.PHOTO_PATH])
+        assertEquals(borrar, campos[InventoryDocument.PHOTO_URL])
+    }
+
+    @Test
+    fun `T048 poner una foto escribe su ruta y su URL`() {
+        val campos = ItemPhoto("users/u1/inventory/abc/g.jpg", "https://g").toPhotoFields(borrar)
+
+        assertEquals("users/u1/inventory/abc/g.jpg", campos[InventoryDocument.PHOTO_PATH])
+        assertEquals("https://g", campos[InventoryDocument.PHOTO_URL])
     }
 }
