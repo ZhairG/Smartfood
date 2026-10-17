@@ -173,7 +173,7 @@ en la tienda o en la cocina.
 | Código | Criterio |
 |---|---|
 | CA-INV-10-01 | **Dado** que no tengo internet, **cuando** abro "Mi Inventario", **entonces** veo los productos ya cargados, con las fotos que ya había visto. |
-| CA-INV-10-02 | **Dado** que no tengo internet, **cuando** agrego o edito un producto válido, **entonces** veo "Guardado en tu teléfono: se subirá cuando vuelva la conexión", regreso a la lista y el producto aparece con el ícono de pendiente de sincronizar. |
+| CA-INV-10-02 | **Dado** que no tengo internet, **cuando** agrego o edito un producto válido, **entonces** veo sobre la lista "Guardado en tu teléfono" con el cuerpo "Se subirá cuando vuelva la conexión" y el ícono de nube, regreso a la lista y el producto aparece con el ícono de pendiente de sincronizar. |
 | CA-INV-10-03 | **Dado** que no tengo internet, **cuando** elimino un producto, **entonces** desaparece de la lista; si tenía foto, la foto se borra de la nube cuando vuelve la conexión. |
 | CA-INV-10-04 | **Dado** un producto cuya foto todavía no se sube, **entonces** su fila y "Editar Producto" muestran la foto guardada en el teléfono. |
 | CA-INV-10-05 | **Dado** cambios pendientes, **cuando** vuelve la conexión, **entonces** los cambios y las fotos se suben solos y el ícono de pendiente desaparece sin recargar. |
@@ -269,7 +269,7 @@ Desviaciones aprobadas por el equipo:
   se desenfoca lo de atrás; en API 24 a 30 se usa un velo claro.
 - **Uso sin conexión** (HU-INV-10, #71): el Figma no tiene el ícono de pendiente ni el aviso de guardado en el
   teléfono. La fila usa el ícono `CloudUpload` de Material en gris, a la izquierda del lápiz (en la búsqueda, antes
-  de la etiqueta), y el aviso usa `SmartFoodResultDialog`, el mismo
+  de la etiqueta), y el aviso usa `SmartFoodResultDialog` con la nube en el círculo verde claro (T050), el mismo
   de "Producto Guardado". Se ajustan cuando exista un frame.
 - **Íconos del Figma** (#37, actualizado el 16/10 en el #40): se usan los PNG exportados del Figma, teñidos con el
   color del tema para que funcionen en modo oscuro (T053). Donde el Figma no tiene un ícono (el micrófono de la voz,

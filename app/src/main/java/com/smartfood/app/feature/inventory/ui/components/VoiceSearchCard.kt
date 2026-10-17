@@ -31,9 +31,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
 
 /**
@@ -100,3 +102,9 @@ private val MicButtonSize = 60.dp
 private val MicIconSize = 36.dp
 private val CardRadius = 20.dp
 private val CardBorder = 1.dp
+
+@Preview(showBackground = true)
+@Composable
+private fun VoiceSearchCardPreview() {
+    SmartfoodTheme { VoiceSearchCard(onClick = {}) }
+}

@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -31,9 +33,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
 
 /**
@@ -110,3 +114,17 @@ private val ScrimColor = Color.Black.copy(alpha = 0.6f)
 
 /** Tamaño del ícono del aviso; guarda la proporción del aviso de la cámara (`476:5959`). */
 private val RationaleIconSize = 50.dp
+
+@Preview(showBackground = true)
+@Composable
+private fun PermissionRationalePreview() {
+    SmartfoodTheme {
+        PermissionRationale(
+            icon = Icons.Outlined.Mic,
+            title = "Permiso de micrófono",
+            message = "Lo usamos para buscar tus productos por voz.",
+            onOpenSettings = {},
+            onDismiss = {}
+        )
+    }
+}

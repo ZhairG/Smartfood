@@ -22,9 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreyDivider
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.SurfaceLight
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
@@ -102,4 +104,10 @@ private fun CategoryChip(
             selectedBorderColor = MaterialTheme.colorScheme.primary
         )
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CategoryChipsPreview() {
+    SmartfoodTheme { CategoryChips(selectedCategory = FoodCategory.DAIRY, onCategorySelected = {}) }
 }

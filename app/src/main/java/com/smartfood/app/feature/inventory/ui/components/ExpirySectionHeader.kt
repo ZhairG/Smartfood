@@ -26,11 +26,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.ErrorRed
 import com.smartfood.app.core.designsystem.theme.GreenCheck
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.YellowExpiring
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 
@@ -95,3 +97,9 @@ private val SectionDotSize = 25.dp
 private val SectionDotGap = 12.dp
 private val SectionVerticalPadding = 8.dp
 private val SectionTitleSize = 17.sp
+
+@Preview(showBackground = true)
+@Composable
+private fun ExpirySectionHeaderPreview() {
+    SmartfoodTheme { ExpirySectionHeader(status = ExpiryStatus.EXPIRING_SOON) }
+}

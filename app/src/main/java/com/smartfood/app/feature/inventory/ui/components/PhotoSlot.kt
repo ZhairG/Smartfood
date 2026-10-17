@@ -43,11 +43,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreyDark
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.inventory.ui.editor.PhotoUiState
 import java.io.File
 
@@ -63,6 +65,8 @@ fun PhotoSlot(
     val borderColor = MaterialTheme.colorScheme.onSurfaceVariant
     val model: Any? = when (photo) {
         is PhotoUiState.Local -> File(photo.path)
+        // La foto que espera subirse se ve desde el teléfono (CA-INV-10-04).
+        is PhotoUiState.Pending -> File(photo.path)
         is PhotoUiState.Remote -> photo.url
         PhotoUiState.None -> null
     }
@@ -165,3 +169,9 @@ private val CameraInsetEnd = 15.dp
 private val CameraInsetBottom = 13.dp
 private val CameraIconSize = 25.dp
 private val ButtonShadow = 4.dp
+
+@Preview(showBackground = true)
+@Composable
+private fun PhotoSlotEmptyPreview() {
+    SmartfoodTheme { PhotoSlot(photo = PhotoUiState.None, onAddPhotoClick = {}, onRemoveClick = {}) }
+}

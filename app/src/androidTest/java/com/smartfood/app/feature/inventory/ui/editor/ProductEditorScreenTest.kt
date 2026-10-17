@@ -227,4 +227,13 @@ class ProductEditorScreenTest {
 
         assertEquals(listOf<ProductEditorEvent>(ProductEditorEvent.GalleryChosen), eventos)
     }
+
+    @Test
+    fun t050_caInv1004_laFotoPendienteSeVeYSePuedeQuitar() {
+        mostrar(ProductEditorUiState(mode = EditorMode.EDIT, photo = PhotoUiState.Pending("/files/pending/1/a.jpg")))
+
+        composeTestRule.onNodeWithContentDescription("Foto del producto").assertExists()
+        composeTestRule.onNodeWithContentDescription("Eliminar la foto").assertIsEnabled()
+    }
 }
+

@@ -49,9 +49,11 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.SpeechError
 import com.smartfood.app.feature.inventory.ui.messageRes
@@ -217,3 +219,23 @@ private val WaveStroke = 8.dp
 
 /** Alto relativo de cada barra del ecualizador, simétrico y más alto al centro, como el Figma. */
 private val BarProfile = listOf(0.25f, 0.45f, 0.6f, 0.8f, 1f, 0.8f, 0.6f, 0.45f, 0.25f)
+
+@Preview(showBackground = true)
+@Composable
+private fun VoiceSearchOverlayListeningPreview() {
+    SmartfoodTheme { VoiceSearchOverlay(state = VoiceUiState.Listening, onRetry = {}, onDismiss = {}) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun VoiceSearchOverlayRecognizedPreview() {
+    SmartfoodTheme {
+        VoiceSearchOverlay(state = VoiceUiState.Recognized("Carne Leche Tomate"), onRetry = {}, onDismiss = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun VoiceSearchOverlayFailedPreview() {
+    SmartfoodTheme { VoiceSearchOverlay(state = VoiceUiState.Failed(SpeechError.NO_MATCH), onRetry = {}, onDismiss = {}) }
+}

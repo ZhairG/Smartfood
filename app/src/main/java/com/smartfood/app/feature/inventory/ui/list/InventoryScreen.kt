@@ -42,16 +42,22 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
+import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
+import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.model.InventorySection
 import com.smartfood.app.feature.inventory.ui.components.ExpirySectionHeader
 import com.smartfood.app.feature.inventory.ui.components.InventoryItemRow
 import com.smartfood.app.feature.inventory.ui.messageRes
+import java.time.LocalDate
 
 /**
  * @param state Estado que pinta la pantalla.
@@ -249,3 +255,73 @@ private val SectionGap = 34.dp
 
 // Íconos del Figma (476:3100 lupa y 476:3125 "+"): 20 y 22 px.
 private val FigmaIconSize = 22.dp
+
+// Pantalla de carga
+@Preview(showBackground = true, heightDp = 800)
+@Composable
+private fun InventoryScreenLoadingPreview() {
+    SmartfoodTheme {
+        InventoryScreen(
+            state = InventoryUiState(
+                isLoading = true
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+// Pantalla con datos
+@Preview(showBackground = true, heightDp = 800)
+@Composable
+private fun InventoryScreenListPreview() {
+    SmartfoodTheme {
+        InventoryScreen(
+            state = InventoryUiState(
+                sections = listOf(
+                    InventorySection(
+                        status = ExpiryStatus.FRESH,
+                        items = listOf(
+                            InventoryItem(
+                                id = "1",
+                                name = "Tomate",
+                                category = FoodCategory.DAIRY,
+                                expiresOn = LocalDate.of(2026, 10, 20)
+                            )
+                        )
+                    )
+                ),
+                isLoading = false
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+// Pantalla vacia
+@Preview(showBackground = true, heightDp = 800)
+@Composable
+private fun InventoryScreenEmptyPreview() {
+    SmartfoodTheme {
+        InventoryScreen(
+            state = InventoryUiState(
+                isLoading = false
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+// Pantalla con error
+@Preview(showBackground = true, heightDp = 800)
+@Composable
+private fun InventoryScreenErrorPreview() {
+    SmartfoodTheme {
+        InventoryScreen(
+            state = InventoryUiState(
+                error = InventoryError.Network,
+                isLoading = false
+            ),
+            onEvent = {}
+        )
+    }
+}

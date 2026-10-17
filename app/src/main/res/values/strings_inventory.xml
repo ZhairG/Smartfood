@@ -138,6 +138,9 @@
     <!-- Diálogos del editor (CA-INV-02-06, 03-02, 04-01, 04-02, 05-04) -->
     <string name="editor_saved_title">Producto Guardado</string>
     <string name="editor_saved_body">Te avisaremos antes de que caduque para que no se desperdicie.</string>
+    <!-- Resultado sin conexión (CA-INV-10-02, T050) -->
+    <string name="editor_saved_on_phone_title">Guardado en tu teléfono</string>
+    <string name="editor_saved_on_phone_body">Se subirá cuando vuelva la conexión.</string>
     <string name="editor_updated_title">Guardado</string>
     <string name="editor_updated_body">«%1$s» se actualizó</string>
     <string name="editor_deleted_title">Producto eliminado</string>

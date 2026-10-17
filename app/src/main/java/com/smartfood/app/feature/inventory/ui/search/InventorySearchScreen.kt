@@ -43,17 +43,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.theme.GreyDivider
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.SurfaceLight
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
+import com.smartfood.app.feature.inventory.domain.model.FoodCategory
+import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.ui.components.CategoryChips
 import com.smartfood.app.feature.inventory.ui.components.PermissionRationale
 import com.smartfood.app.feature.inventory.ui.components.VoiceSearchCard
 import com.smartfood.app.feature.inventory.ui.components.VoiceSearchOverlay
+import java.time.LocalDate
 
 /**
  * Muestra la búsqueda del inventario.
@@ -230,3 +236,29 @@ private val BlockGap = 22.dp
 private val SidePadding = 20.dp
 private val SearchIconSize = 20.dp
 private val SearchBarBorder = 1.dp
+
+@Preview(showBackground = true, heightDp = 800)
+@Composable
+private fun InventorySearchScreenPreview() {
+    SmartfoodTheme {
+        InventorySearchScreen(
+            state = InventorySearchUiState(
+                query = "leche",
+                isVoiceAvailable = true,
+                results = listOf(
+                    SearchResultUi(
+                        InventoryItem("1", "Leche Entera", FoodCategory.DAIRY, LocalDate.of(2026, 10, 20)),
+                        ExpiryStatus.FRESH
+                    )
+                )
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, heightDp = 800)
+@Composable
+private fun InventorySearchScreenEmptyPreview() {
+    SmartfoodTheme { InventorySearchScreen(state = InventorySearchUiState(query = "pera"), onEvent = {}) }
+}

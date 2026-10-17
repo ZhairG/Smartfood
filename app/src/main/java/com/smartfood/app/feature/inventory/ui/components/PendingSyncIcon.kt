@@ -18,8 +18,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
 @Composable
 internal fun PendingSyncIcon(modifier: Modifier = Modifier) {
@@ -33,3 +35,9 @@ internal fun PendingSyncIcon(modifier: Modifier = Modifier) {
 
 // Del tamaño del lápiz de la fila (EditIconSize en InventoryItemRow).
 private val PendingSyncIconSize = 20.dp
+
+@Preview(showBackground = true)
+@Composable
+private fun PendingSyncIconPreview() {
+    SmartfoodTheme { PendingSyncIcon() }
+}

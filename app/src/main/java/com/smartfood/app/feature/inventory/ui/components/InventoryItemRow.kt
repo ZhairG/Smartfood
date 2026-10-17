@@ -39,6 +39,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +47,7 @@ import coil3.compose.AsyncImage
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreenMain20
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
@@ -54,6 +56,7 @@ import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
 import java.io.File
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -309,3 +312,27 @@ private val TrailingThumbnailShape = RoundedCornerShape(
     topEnd = ThumbnailRadius,
     bottomEnd = ThumbnailRadius
 )
+
+private val PreviewItem = InventoryItem(
+    id = "1",
+    name = "Leche Entera",
+    category = FoodCategory.DAIRY,
+    expiresOn = LocalDate.of(2026, 10, 20),
+    quantity = Quantity(1.0, QuantityUnit.LITERS),
+    price = 4500,
+)
+
+@Preview(showBackground = true)
+@Composable
+private fun InventoryItemRowPreview() {
+    SmartfoodTheme { InventoryItemRow(item = PreviewItem, status = ExpiryStatus.FRESH, onEditClicked = {}) }
+}
+
+// Con cambios sin subir: la nube junto al lápiz (CA-INV-10-02).
+@Preview(showBackground = true)
+@Composable
+private fun InventoryItemRowPendingPreview() {
+    SmartfoodTheme {
+        InventoryItemRow(item = PreviewItem.copy(isPendingSync = true), status = ExpiryStatus.EXPIRED, onEditClicked = {})
+    }
+}
