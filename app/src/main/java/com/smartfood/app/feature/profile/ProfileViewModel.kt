@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartfood.app.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.smartfood.app.feature.auth.domain.usecase.LogoutUseCase
+import com.smartfood.app.feature.inventory.domain.usecase.HasPendingChangesUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -35,6 +36,7 @@ class ProfileViewModel @Inject constructor(
     private val getCurrentUser: GetCurrentUserUseCase,
     private val logout: LogoutUseCase,
     private val observeInventory: ObserveInventoryUseCase,
+    private val hasPendingChanges: HasPendingChangesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -73,11 +75,26 @@ class ProfileViewModel @Inject constructor(
     /** Procesa un evento de la UI. */
     fun onEvent(event: ProfileEvent) {
         when (event) {
-            ProfileEvent.LogoutClicked -> {
-                logout()
-                viewModelScope.launch { _effects.send(ProfileEffect.NavigateToLogin) }
+            // Con cambios sin subir, primero se avisa que podrían perderse (CA-INV-10-07, T051).
+            ProfileEvent.LogoutClicked -> viewModelScope.launch {
+                if (hasPendingChanges()) {
+                    _uiState.update { it.copy(dialog = ProfileDialog.ConfirmLogoutWithPending) }
+                } else {
+                    logoutAndLeave()
+                }
             }
+            ProfileEvent.LogoutConfirmed -> {
+                _uiState.update { it.copy(dialog = null) }
+                viewModelScope.launch { logoutAndLeave() }
+            }
+            ProfileEvent.DialogDismissed -> _uiState.update { it.copy(dialog = null) }
         }
+    }
+
+    /** Cierra la sesión (descarta las fotos pendientes, CA-INV-10-07) y vuelve al inicio de sesión (CA-05-03). */
+    private suspend fun logoutAndLeave() {
+        logout()
+        _effects.send(ProfileEffect.NavigateToLogin)
     }
 
     internal companion object {
@@ -96,6 +113,7 @@ class ProfileViewModel @Inject constructor(
  * @property email Correo del encabezado.
  * @property initials Iniciales del avatar.
  * @property inventoryCount Productos del inventario, para la tarjeta "Ingredientes en inventario".
+ * @property dialog Aviso abierto sobre el Perfil, o `null`.
  */
 @Immutable
 data class ProfileUiState(
@@ -105,10 +123,19 @@ data class ProfileUiState(
     val email: String? = null,
     val initials: String? = null,
     val inventoryCount: Int = 0,
+    val dialog: ProfileDialog? = null,
 )
+
+/** Aviso abierto sobre el Perfil. */
+sealed interface ProfileDialog {
+    /** "Tienes cambios sin subir. Si cierras sesión ahora, podrían perderse" (CA-INV-10-07). */
+    data object ConfirmLogoutWithPending : ProfileDialog
+}
 
 sealed interface ProfileEvent {
     data object LogoutClicked : ProfileEvent
+    data object LogoutConfirmed : ProfileEvent
+    data object DialogDismissed : ProfileEvent
 }
 
 sealed interface ProfileEffect {

@@ -9,6 +9,7 @@ import com.smartfood.app.feature.inventory.domain.model.InventoryException
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
+import com.smartfood.app.feature.inventory.domain.usecase.HasPendingChangesUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
@@ -51,15 +52,17 @@ class ProfileViewModelTest {
     }
 
     private val inventoryRepository = FakeInventoryRepository()
+    private val photoSync = FakePhotoSync()
 
     private fun crearViewModel(repository: InventoryRepository = inventoryRepository) = ProfileViewModel(
         getCurrentUser = GetCurrentUserUseCase(authRepository, userRepository),
-        logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), FakePhotoSync()),
+        logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), photoSync),
         observeInventory = ObserveInventoryUseCase(
             repository,
             FakePhotoSync(),
             ClassifyExpiryUseCase(fixedClock(LocalDate.of(2026, 9, 10)))
-        )
+        ),
+        hasPendingChanges = HasPendingChangesUseCase(repository, photoSync)
     )
 
     @Test
@@ -129,4 +132,54 @@ class ProfileViewModelTest {
         assertEquals("AM", ProfileViewModel.initialsOf("ana maría lópez"))
         assertEquals("P", ProfileViewModel.initialsOf("Pepito"))
     }
+
+    // T051: aviso al cerrar sesión con cambios sin subir (CA-INV-10-07).
+
+    @Test
+    fun `CA-INV-10-07 con cambios pendientes cerrar sesion primero avisa y no sale`() {
+        inventoryRepository.pendingWrites = true
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.LogoutClicked)
+
+        assertEquals(ProfileDialog.ConfirmLogoutWithPending, viewModel.uiState.value.dialog)
+        assertEquals(DEFAULT_UID, authRepository.currentUserId())
+    }
+
+    @Test
+    fun `CA-INV-10-07 Cancelar cierra el aviso y deja la sesion como estaba`() {
+        photoSync.pending.value = mapOf("leche" to "/files/pending/leche/a.jpg")
+        val viewModel = crearViewModel()
+        viewModel.onEvent(ProfileEvent.LogoutClicked)
+
+        viewModel.onEvent(ProfileEvent.DialogDismissed)
+
+        assertEquals(null, viewModel.uiState.value.dialog)
+        assertEquals(DEFAULT_UID, authRepository.currentUserId())
+        assertEquals(0, photoSync.clearAllCalls)
+    }
+
+    @Test
+    fun `CA-INV-10-07 confirmar cierra la sesion y descarta las fotos pendientes`() = runTest {
+        photoSync.pending.value = mapOf("leche" to "/files/pending/leche/a.jpg")
+        val viewModel = crearViewModel()
+        viewModel.onEvent(ProfileEvent.LogoutClicked)
+
+        viewModel.onEvent(ProfileEvent.LogoutConfirmed)
+
+        assertEquals(ProfileEffect.NavigateToLogin, viewModel.effects.first())
+        assertEquals(1, photoSync.clearAllCalls)
+        assertEquals(null, authRepository.currentUserId())
+    }
+
+    @Test
+    fun `CA-INV-10-07 sin cambios pendientes cierra sesion como siempre`() = runTest {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.LogoutClicked)
+
+        assertEquals(ProfileEffect.NavigateToLogin, viewModel.effects.first())
+        assertEquals(null, viewModel.uiState.value.dialog)
+    }
 }
+
