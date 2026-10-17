@@ -103,6 +103,10 @@
     <string name="editor_save">Guardar</string>
     <string name="editor_add_button">Añadir al Inventario</string>
     <string name="editor_saving">Registrando</string>
+    <!-- Diálogo de carga mientras se guarda (CA-INV-02-12) -->
+    <string name="editor_saving_add">Guardando producto…</string>
+    <string name="editor_saving_update">Actualizando producto…</string>
+    <string name="editor_saving_delete">Eliminando producto…</string>
     <string name="editor_delete_button">Eliminar</string>
     <string name="editor_name_placeholder">Ej. Carne</string>
     <string name="editor_name_label">Nombre del producto</string>

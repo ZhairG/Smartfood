@@ -18,6 +18,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smartfood.app.core.designsystem.components.SmartFoodConfirmDialog
+import com.smartfood.app.core.designsystem.components.SmartFoodLoadingDialog
 import com.smartfood.app.core.designsystem.components.SmartFoodResultDialog
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
@@ -96,6 +97,24 @@ class SmartFoodDialogsTest {
 
         composeTestRule.onNodeWithText("Guardado").assertIsDisplayed()
         composeTestRule.onNodeWithText("Te avisaremos antes de que caduque.").assertDoesNotExist()
+
+        cerrarDialogo(visible)
+    }
+
+    // CA-INV-02-12 (T056): el diálogo de carga muestra la acción en curso y TalkBack la anuncia.
+    @Test
+    fun t056_caInv0212_cargaMuestraLaAccionYSeAnuncia() {
+        val visible = mutableStateOf(true)
+        composeTestRule.setContent {
+            SmartfoodTheme {
+                if (visible.value) SmartFoodLoadingDialog(text = "Guardando producto…")
+            }
+        }
+
+        composeTestRule.onNodeWithText("Guardando producto…").assertIsDisplayed()
+        composeTestRule.onNode(
+            SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite)
+        ).assertIsDisplayed()
 
         cerrarDialogo(visible)
     }

@@ -67,7 +67,8 @@ sealed interface EditorDialog {
  * @property priceText Precio tal como se escribió; vacío si no tiene (CA-INV-02-10).
  * @property photo Foto que muestra la zona de imagen.
  * @property isSaveEnabled `true` cuando están el nombre, la fecha y la categoría (CA-INV-02-02).
- * @property isSaving `true` mientras se guarda o se elimina.
+ * @property savingAction Acción en curso (guardar, actualizar o eliminar), o `null` si no hay; el editor muestra
+ *   el diálogo de carga mientras tanto (CA-INV-02-12).
  * @property showMissingFields `true` después de tocar el botón gris con campos vacíos (CA-INV-02-02).
  * @property error Último error, de validación o del guardado.
  * @property dialog Hoja, calendario o diálogo abierto.
@@ -84,11 +85,15 @@ data class ProductEditorUiState(
     val priceText: String = "",
     val photo: PhotoUiState = PhotoUiState.None,
     val isSaveEnabled: Boolean = false,
-    val isSaving: Boolean = false,
+    val savingAction: SavingAction? = null,
     val showMissingFields: Boolean = false,
     val error: InventoryError? = null,
     val dialog: EditorDialog? = null,
 ) {
+    /** `true` mientras se guarda o se elimina. */
+    val isSaving: Boolean
+        get() = savingAction != null
+
     /** Campo marcado en rojo, si el error es de validación. */
     val errorField: InventoryField?
         get() = (error as? InventoryError.Validation)?.field
@@ -104,6 +109,18 @@ data class ProductEditorUiState(
     /** Error que no es de un campo (red, permisos…), para mostrarlo bajo el formulario (CA-INV-02-07). */
     val generalError: InventoryError?
         get() = error.takeIf { it != null && it !is InventoryError.Validation }
+}
+
+/** Acción que se está guardando, para el texto del diálogo de carga (CA-INV-02-12). */
+enum class SavingAction {
+    /** "Guardando producto…": alta de un producto nuevo. */
+    ADD,
+
+    /** "Actualizando producto…": cambios de un producto existente. */
+    UPDATE,
+
+    /** "Eliminando producto…". */
+    DELETE,
 }
 
 /** Lo que el usuario hace en el editor. */
