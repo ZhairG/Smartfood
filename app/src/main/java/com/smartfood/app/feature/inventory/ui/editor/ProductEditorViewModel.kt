@@ -181,7 +181,8 @@ class ProductEditorViewModel @Inject constructor(
             }
             result
                 .onSuccess { item ->
-                    _uiState.update { it.copy(savingAction = null) }
+                    // El diálogo de carga sigue hasta que el editor se va, para no dejar ver el formulario un instante
+                    // antes de volver a la lista (CA-INV-02-12).
                     requestNotificationPermissionOnce()
                     // El resultado se ve encima de la lista, como el Figma (476:3851).
                     val saved = if (current == null) EditorResult.Saved else EditorResult.Updated(item.name)
@@ -201,7 +202,6 @@ class ProductEditorViewModel @Inject constructor(
                     (_uiState.value.photo as? PhotoUiState.Local)?.let {
                         sendEffect(ProductEditorEffect.DeleteLocalPhoto(it.path))
                     }
-                    _uiState.update { it.copy(savingAction = null) }
                     _effects.send(ProductEditorEffect.NavigateBackWithResult(EditorResult.Deleted))
                 }
                 .onFailure { cause -> _uiState.update { it.copy(savingAction = null, error = cause.toInventoryError()) } }

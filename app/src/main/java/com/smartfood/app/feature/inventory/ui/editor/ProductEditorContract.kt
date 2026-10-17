@@ -67,7 +67,8 @@ sealed interface EditorDialog {
  * @property priceText Precio tal como se escribió; vacío si no tiene (CA-INV-02-10).
  * @property photo Foto que muestra la zona de imagen.
  * @property isSaveEnabled `true` cuando están el nombre, la fecha y la categoría (CA-INV-02-02).
- * @property savingAction Acción en curso (guardar, actualizar o eliminar), o `null` si no hay; el editor muestra
+ * @property savingAction Acción en curso (guardar, actualizar o eliminar), o `null` si no hay. Con éxito sigue hasta que
+ *   el editor se va; si falla vuelve a `null`. El editor muestra
  *   el diálogo de carga mientras tanto (CA-INV-02-12).
  * @property showMissingFields `true` después de tocar el botón gris con campos vacíos (CA-INV-02-02).
  * @property error Último error, de validación o del guardado.

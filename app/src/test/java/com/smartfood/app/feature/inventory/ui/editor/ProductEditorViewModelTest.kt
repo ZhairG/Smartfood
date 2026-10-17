@@ -134,7 +134,7 @@ class ProductEditorViewModelTest {
     }
 
     @Test
-    fun `CA-INV-02-12 mientras se guarda un alta se ve Guardando y al terminar desaparece`() {
+    fun `CA-INV-02-12 mientras se guarda un alta se ve Guardando hasta volver a la lista`() = runTest {
         val gate = CompletableDeferred<Unit>().also { repository.gate = it }
         val viewModel = createViewModel()
         viewModel.fillValidForm()
@@ -144,8 +144,13 @@ class ProductEditorViewModelTest {
         assertTrue(viewModel.uiState.value.isSaving)
 
         gate.complete(Unit)
-        assertNull(viewModel.uiState.value.savingAction)
+        // Con éxito el diálogo no se cierra: el editor se va con el resultado y no se ve el formulario un instante.
+        assertEquals(SavingAction.ADD, viewModel.uiState.value.savingAction)
         assertEquals("Carne", repository.savedItems.single().name)
+        assertEquals(
+            ProductEditorEffect.NavigateBackWithResult(EditorResult.Saved),
+            viewModel.effects.take(2).toList().last()
+        )
     }
 
     @Test
@@ -158,7 +163,7 @@ class ProductEditorViewModelTest {
         assertEquals(SavingAction.UPDATE, viewModel.uiState.value.savingAction)
 
         gate.complete(Unit)
-        assertNull(viewModel.uiState.value.savingAction)
+        assertEquals(SavingAction.UPDATE, viewModel.uiState.value.savingAction)
     }
 
     @Test
@@ -172,7 +177,7 @@ class ProductEditorViewModelTest {
         assertEquals(SavingAction.DELETE, viewModel.uiState.value.savingAction)
 
         gate.complete(Unit)
-        assertNull(viewModel.uiState.value.savingAction)
+        assertEquals(SavingAction.DELETE, viewModel.uiState.value.savingAction)
         assertEquals(listOf("carne"), repository.deletedIds)
     }
 
