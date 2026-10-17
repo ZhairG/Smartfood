@@ -67,6 +67,7 @@
 - [x] T054 Editor adaptable: botón fijo abajo con el aviso "⚠ Los campos no pueden estar vacíos" (CA-INV-02-02), medidas sin el inset del teclado y pruebas reales con adb en 360×640, 360×804, 412×917 dp y fuente al 130 % (RNF-INV-06). Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `AdaptiveLayoutTest.t036_*`, M (capturas de adb). → #40
 
 - [x] T055 Fidelidad al Figma antes de la entrega: barra de 4 pestañas (Recetas y Guardadas deshabilitadas) también en la búsqueda y el editor, campos del editor con línea inferior y botón dentro del formulario, diálogos y voz con fondo desenfocado, "Imagen Eliminada" y "Producto eliminado" del Figma, texto reconocido en el aviso de voz, resultado del editor sobre la lista y foto desde la galería o la cámara con la hoja "Agregar foto", y etiqueta de la lista del tamaño del Figma con la cantidad junto al nombre (CA-INV-01-08, 02-06, 03-02, 04-02, 05-04, 05-07, 07-03, 09-02, 09-04). Pruebas: I `MainNavigationTest`, I `SmartFoodNavigationTest`, I `AdaptiveLayoutTest`, I `InventoryScreenTest`, U `InventorySearchViewModelTest`, U `ProductEditorViewModelTest`, M (capturas frente al Figma). → PR `fix/ui-figma`
+- [ ] T056 Indicador de carga al guardar, actualizar y eliminar: `SmartFoodLoadingDialog` (fondo desenfocado, indicador circular y texto) y `savingAction` (`ADD`, `UPDATE`, `DELETE`) en el editor con "Guardando producto…", "Actualizando producto…" o "Eliminando producto…" (CA-INV-02-12). Salió de la sustentación del 16/10. Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `SmartFoodDialogsTest`. → #96
 
 ## Fase 6: Avisos
 - [x] T037 `ExpiryNotifier` (canal, plurales y `PendingIntent`) y `ExpiryReminderWorker` (`@HiltWorker`) (CA-INV-08-01 a 08-04). → #44
@@ -119,6 +120,7 @@ verificación manual (checklist).
 | CA-INV-02-09 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
 | CA-INV-02-10 | U `ValidateItemUseCaseTest`, U `InventoryDocumentTest`, U `ProductEditorViewModelTest`, R `firestore.test.js` |
 | CA-INV-02-11 | U `ValidateItemUseCaseTest`, I `ProductEditorScreenTest` |
+| CA-INV-02-12 | U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `SmartFoodDialogsTest` |
 | CA-INV-03-01 | U `ProductEditorViewModelTest` |
 | CA-INV-03-02 | U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `SmartFoodDialogsTest` |
 | CA-INV-03-03 | U `ValidateItemUseCaseTest` |
