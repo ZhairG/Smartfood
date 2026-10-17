@@ -32,8 +32,9 @@ class ParseSpokenIngredientsUseCaseTest {
     }
 
     @Test
-    fun `CA-INV-07-03 sin pausa ni conector no se separa`() {
-        assertEquals(listOf("carne pollo", "leche"), parse("carne pollo y leche"))
+    fun `CA-INV-07-03 sin pausa tambien se separa por palabras`() {
+        // El reconocedor no siempre pone la coma en la pausa (checklist del #45).
+        assertEquals(listOf("leche", "tomate", "pasta"), parse("leche tomate y pasta"))
     }
 
     @Test
@@ -50,13 +51,13 @@ class ParseSpokenIngredientsUseCaseTest {
     }
 
     @Test
-    fun `CA-INV-07-03 un articulo dentro del nombre se conserva`() {
-        assertEquals(listOf("salsa de la casa"), parse("salsa de la casa"))
+    fun `CA-INV-07-03 los articulos y conectores dentro del dictado se quitan`() {
+        assertEquals(listOf("salsa", "casa", "arroz", "pollo"), parse("salsa de la casa, arroz con pollo"))
     }
 
     @Test
     fun `CA-INV-07-03 las palabras que contienen y o e no se dividen`() {
-        assertEquals(listOf("yogur", "leche entera"), parse("yogur y leche entera"))
+        assertEquals(listOf("yogur", "leche", "entera"), parse("yogur y leche entera"))
     }
 
     @Test

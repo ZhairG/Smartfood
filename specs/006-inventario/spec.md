@@ -135,7 +135,7 @@ tengo.
 |---|---|
 | CA-INV-07-01 | **Dado** la búsqueda, **cuando** toco el micrófono de "Usa tu voz — Dicta muchos ingredientes al mismo tiempo", **entonces** aparece sobre la pantalla el aviso "Habla ahora" con la animación de ondas. |
 | CA-INV-07-02 | **Dado** que dicté, **mientras** se procesa, **entonces** el aviso muestra "…". |
-| CA-INV-07-03 | **Dado** que dije "carne, pollo y leche", **entonces** el aviso muestra un momento lo que entendió ("Carne Pollo Leche", con las ondas), se cierra, la barra muestra "carne, pollo, leche" y veo los productos que coinciden con cualquiera de los tres (CA-INV-06-05). Los separadores reconocidos son las pausas, las comas, "y" y "e". |
+| CA-INV-07-03 | **Dado** que dije "carne, pollo y leche", **entonces** el aviso muestra un momento lo que entendió ("Carne Pollo Leche", con las ondas), se cierra, la barra muestra "carne, pollo, leche" y veo los productos que coinciden con cualquiera de los tres (CA-INV-06-05). Cada palabra dictada es un ingrediente (sin artículos ni conectores como "y", "e", "de" o "con"): si el reconocedor no pone la coma, "leche tomate y pasta" también da "leche, tomate, pasta" (#45). |
 | CA-INV-07-04 | **Dado** un término en plural simple ("tomates", "limones"), **entonces** también coincide con el singular (Tomate, Limón). |
 | CA-INV-07-05 | **Dado** que no se entendió nada, **entonces** el aviso muestra "No se entendió. Reinténtalo" con el botón "Reintentar", que vuelve a escuchar. |
 | CA-INV-07-06 | **Dado** que es la primera vez, **entonces** se me pide permiso de micrófono; **si** lo niego, **entonces** veo un mensaje que explica para qué se usa, con un acceso a los ajustes, y la búsqueda por texto sigue funcionando. |

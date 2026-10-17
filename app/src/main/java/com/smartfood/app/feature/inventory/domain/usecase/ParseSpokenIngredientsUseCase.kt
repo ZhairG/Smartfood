@@ -15,23 +15,27 @@ class ParseSpokenIngredientsUseCase @Inject constructor() {
 
     /**
      * @param alternatives Transcripciones del reconocedor, de la más probable a la menos probable.
-     * @return Los ingredientes en minúsculas, sin artículos iniciales ni repetidos; vacía si no se entendió nada.
+     * @return Una palabra por ingrediente, en minúsculas, sin artículos ni conectores y sin repetidos; vacía si no se
+     *   entendió nada. El reconocedor no siempre pone la coma en las pausas ("leche tomate y pasta"), así que cada
+     *   palabra es un término: la búsqueda por "contiene" con O sigue encontrando los productos de varias palabras
+     *   (CA-INV-07-03, #45).
      */
     operator fun invoke(alternatives: List<String>): List<String> {
         val text = alternatives.firstOrNull { it.isNotBlank() } ?: return emptyList()
         return text.lowercase(SPANISH)
             .split(SEPARATORS)
-            .map { it.replace(PUNCTUATION, " ").trim().replace(LEADING_ARTICLE, "").replace(SPACES, " ") }
-            .filter { it.isNotEmpty() }
+            .filter { it.isNotEmpty() && it !in STOP_WORDS }
             .distinctBy(SearchInventoryUseCase::normalize)
     }
 
     private companion object {
         val SPANISH: Locale = Locale.forLanguageTag("es-CO")
-        /** Comas, punto y coma, y las palabras sueltas "y" o "e" (no la letra dentro de "yogur" o "leche"). */
-        val SEPARATORS = Regex("""\s*(?:[,;]|(?<!\p{L})[ye](?!\p{L}))\s*""")
-        val PUNCTUATION = Regex("""[.!?¿¡]""")
-        val LEADING_ARTICLE = Regex("""^(el|la|los|las|un|una|unos|unas)\s+""")
-        val SPACES = Regex("""\s+""")
+        /** Espacios, comas, punto y coma y la puntuación del dictado. */
+        val SEPARATORS = Regex("""[\s,;.!?¿¡]+""")
+        /** Artículos y conectores que no son ingredientes ("y", "e", "de", "con"…). */
+        val STOP_WORDS = setOf(
+            "el", "la", "los", "las", "un", "una", "unos", "unas",
+            "y", "e", "de", "del", "con", "sin", "a", "al", "para", "por",
+        )
     }
 }
