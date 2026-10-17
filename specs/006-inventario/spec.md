@@ -268,7 +268,8 @@ Desviaciones aprobadas por el equipo:
 - **Fondo desenfocado** de los diálogos y del aviso de voz (Figma `476:3851`, `476:4021` y `476:4507`): con API 31+
   se desenfoca lo de atrás; en API 24 a 30 se usa un velo claro.
 - **Uso sin conexión** (HU-INV-10, #71): el Figma no tiene el ícono de pendiente ni el aviso de guardado en el
-  teléfono. La fila usa el ícono `CloudUpload` de Material en gris, y el aviso usa `SmartFoodResultDialog`, el mismo
+  teléfono. La fila usa el ícono `CloudUpload` de Material en gris, a la izquierda del lápiz (en la búsqueda, antes
+  de la etiqueta), y el aviso usa `SmartFoodResultDialog`, el mismo
   de "Producto Guardado". Se ajustan cuando exista un frame.
 - **Íconos del Figma** (#37, actualizado el 16/10 en el #40): se usan los PNG exportados del Figma, teñidos con el
   color del tema para que funcionen en modo oscuro (T053). Donde el Figma no tiene un ícono (el micrófono de la voz,

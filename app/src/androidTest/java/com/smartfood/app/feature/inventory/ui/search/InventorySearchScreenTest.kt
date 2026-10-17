@@ -2,6 +2,8 @@ package com.smartfood.app.feature.inventory.ui.search
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.click
@@ -244,4 +246,14 @@ class InventorySearchScreenTest {
 
         assertEquals(listOf<InventorySearchEvent>(InventorySearchEvent.BackClicked), eventos)
     }
+
+    @Test
+    fun caInv1002_unResultadoPendienteMuestraElIcono() {
+        val pendiente = resultado().let { it.copy(item = it.item.copy(isPendingSync = true)) }
+        mostrar(InventorySearchUiState(results = listOf(pendiente, resultado(id = "item-2", name = "Manzana"))))
+
+        // Solo el pendiente lleva el ícono.
+        composeTestRule.onAllNodesWithContentDescription("Pendiente de sincronizar").assertCountEquals(1)
+    }
 }
+

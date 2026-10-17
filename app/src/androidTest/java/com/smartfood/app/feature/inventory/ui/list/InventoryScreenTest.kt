@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.ThemeMode
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
@@ -303,4 +304,57 @@ class InventoryScreenTest {
 
         composeTestRule.onNodeWithText("20/09/2026 · $ 12.500").assertIsDisplayed()
     }
+
+    // T049: el ícono de pendiente y la foto del teléfono (CA-INV-10-02, 10-04 y 10-06).
+    private fun pendiente(id: String = "1", localPhotoPath: String? = null) = InventoryItem(
+        id = id,
+        name = "Leche Entera",
+        category = FoodCategory.DAIRY,
+        expiresOn = today.plusDays(10),
+        localPhotoPath = localPhotoPath,
+        isPendingSync = true
+    )
+
+    private fun mostrarCon(items: List<InventoryItem>, themeMode: ThemeMode = ThemeMode.LIGHT) {
+        composeTestRule.setContent {
+            SmartfoodTheme(themeMode = themeMode) {
+                InventoryScreen(
+                    state = InventoryUiState(
+                        isLoading = false,
+                        sections = listOf(InventorySection(ExpiryStatus.FRESH, items))
+                    ),
+                    onEvent = {}
+                )
+            }
+        }
+    }
+
+    @Test
+    fun caInv1006_elPendienteSeAnunciaEnModoClaro() {
+        mostrarCon(listOf(pendiente()), ThemeMode.LIGHT)
+
+        composeTestRule.onNodeWithContentDescription("Pendiente de sincronizar").assertIsDisplayed()
+    }
+
+    @Test
+    fun caInv1006_elPendienteSeAnunciaEnModoOscuro() {
+        mostrarCon(listOf(pendiente()), ThemeMode.DARK)
+
+        composeTestRule.onNodeWithContentDescription("Pendiente de sincronizar").assertIsDisplayed()
+    }
+
+    @Test
+    fun caInv1002_unProductoSincronizadoNoMuestraElIcono() {
+        mostrarCon(listOf(pendiente().copy(isPendingSync = false)))
+
+        composeTestRule.onNodeWithContentDescription("Pendiente de sincronizar").assertDoesNotExist()
+    }
+
+    @Test
+    fun caInv1004_laMiniaturaUsaLaFotoDelTelefonoAunqueNoHayaFotoEnLaNube() {
+        mostrarCon(listOf(pendiente(localPhotoPath = "/data/files/pending/1/a.jpg")))
+
+        composeTestRule.onNodeWithContentDescription("Foto de Leche Entera").assertExists()
+    }
 }
+

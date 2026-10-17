@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenMain20
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.feature.inventory.ui.components.PendingSyncIcon
 import com.smartfood.app.feature.inventory.ui.components.color
 import com.smartfood.app.feature.inventory.ui.components.titleRes
 import java.time.format.DateTimeFormatter
@@ -86,6 +87,8 @@ internal fun SearchResultRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            // Cambios o foto sin subir, como en la lista (CA-INV-10-02, T049).
+            if (item.isPendingSync) PendingSyncIcon()
             // Etiqueta propia de la búsqueda (Figma 476:3235): verde muy claro con borde, Bold de 11 px.
             Text(
                 text = stringResource(id = item.category.titleRes),

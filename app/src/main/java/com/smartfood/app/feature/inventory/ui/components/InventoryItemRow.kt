@@ -52,6 +52,7 @@ import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
+import java.io.File
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -156,6 +157,8 @@ fun InventoryItemRow(
                         )
                         QuantityText(item = item)
                     }
+                    // Cambios o foto sin subir: a la izquierda del lápiz, donde no recorta el texto (CA-INV-10-02, T049).
+                    if (item.isPendingSync) PendingSyncIcon()
                     IconButton(
                         onClick = { onEditClicked(item.id) },
                         modifier = Modifier.size(EditButtonSize)
@@ -201,8 +204,9 @@ private fun ItemThumbnail(
                 .fillMaxHeight()
                 .background(color = status.color, shape = LeadingThumbnailShape)
         )
-        val photo = item.photo
-        if (photo == null) {
+        // La foto que todavía no se sube se ve desde el teléfono antes que la de la nube (CA-INV-10-04).
+        val photoModel: Any? = item.localPhotoPath?.let { File(it) } ?: item.photo?.url
+        if (photoModel == null) {
             Box(
                 modifier = Modifier
                     .size(ThumbnailHeight)
@@ -210,7 +214,7 @@ private fun ItemThumbnail(
             )
         } else {
             AsyncImage(
-                model = photo.url,
+                model = photoModel,
                 contentDescription = stringResource(id = R.string.cd_item_photo, item.name),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

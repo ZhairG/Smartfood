@@ -541,8 +541,9 @@ Firestore (§3) y las fotos por WorkManager. Ninguna escritura muestra un error 
   vuelve a iniciar sesión, y por eso el aviso dice "podrían perderse".
 
 **Diseño.** Ninguno de estos elementos está en el Figma (spec §8):
-- el ícono `Icons.Outlined.CloudUpload` en `onSurfaceVariant`, del tamaño de los íconos de la fila, junto a la fecha,
-  con la descripción "Pendiente de sincronizar";
+- el ícono `Icons.Outlined.CloudUpload` en `onSurfaceVariant`, del tamaño del lápiz (20 dp), con la descripción
+  "Pendiente de sincronizar" (`PendingSyncIcon`). En la lista va en la segunda línea, a la izquierda del lápiz: junto a
+  la fecha no cabe con el precio sin recortar la etiqueta (T049, #85). En la búsqueda va antes de la etiqueta;
 - el diálogo de guardado en el teléfono, con el ícono de nube y "Guardado en tu teléfono: se subirá cuando vuelva la
   conexión";
 - los textos van en `strings_inventory.xml`.
