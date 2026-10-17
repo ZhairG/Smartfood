@@ -26,6 +26,12 @@ sealed interface PhotoUiState {
 
     /** Foto ya guardada en la nube. */
     data class Remote(val url: String) : PhotoUiState
+
+    /**
+     * Foto que ya se guardó con el producto pero todavía espera subirse (CA-INV-10-04, T050). Se ve desde el teléfono,
+     * al guardar se conserva y nunca se borra al salir: la subida pendiente es la dueña del archivo.
+     */
+    data class Pending(val path: String) : PhotoUiState
 }
 
 /** Hoja, calendario o diálogo abierto sobre el editor. */
@@ -182,4 +188,7 @@ sealed interface EditorResult {
 
     /** "Producto eliminado" (CA-INV-04-02). */
     data object Deleted : EditorResult
+
+    /** "Guardado en tu teléfono": se guardó sin conexión y se subirá sola (CA-INV-10-02, T050). */
+    data object SavedOnPhone : EditorResult
 }

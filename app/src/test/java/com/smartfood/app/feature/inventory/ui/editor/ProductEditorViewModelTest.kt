@@ -15,8 +15,10 @@ import com.smartfood.app.feature.inventory.domain.model.InventoryField
 import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.inventory.domain.usecase.AddItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.DeleteItemUseCase
+import com.smartfood.app.feature.inventory.domain.usecase.GetItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.PhotoEdit
 import com.smartfood.app.feature.inventory.domain.usecase.UpdateItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ValidateItemUseCase
@@ -54,7 +56,7 @@ class ProductEditorViewModelTest {
 
     private fun createViewModel(itemId: String? = null) = ProductEditorViewModel(
         savedStateHandle = SavedStateHandle(mapOf(ProductEditorViewModel.ITEM_ID_KEY to itemId)),
-        repository = repository,
+        getItem = GetItemUseCase(repository, photoSync),
         validate = validate,
         addItem = AddItemUseCase(repository, photoSync, validate, scheduler),
         updateItem = UpdateItemUseCase(repository, photoSync, validate),
@@ -484,4 +486,90 @@ class ProductEditorViewModelTest {
         assertNull(viewModel.uiState.value.dialog)
         assertEquals(ProductEditorEffect.NavigateToCamera, viewModel.effects.first())
     }
+
+    // T050: sin conexión y fotos que esperan subirse (CA-INV-10-02 y 10-04).
+
+    @Test
+    fun `CA-INV-10-02 sin conexion el alta vuelve a la lista con Guardado en tu telefono`() = runTest {
+        repository.outcome = WriteOutcome.PENDING
+        val viewModel = createViewModel()
+        viewModel.fillValidForm()
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        assertEquals(
+            ProductEditorEffect.NavigateBackWithResult(EditorResult.SavedOnPhone),
+            viewModel.effects.take(2).toList().last()
+        )
+    }
+
+    @Test
+    fun `CA-INV-10-02 sin conexion la edicion vuelve a la lista con Guardado en tu telefono`() = runTest {
+        repository.items.value = listOf(inventoryItem(id = "carne", name = "Carne", expiresOn = today.plusDays(3)))
+        repository.outcome = WriteOutcome.PENDING
+        val viewModel = createViewModel(itemId = "carne")
+
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        assertEquals(
+            ProductEditorEffect.NavigateBackWithResult(EditorResult.SavedOnPhone),
+            viewModel.effects.take(2).toList().last()
+        )
+    }
+
+    @Test
+    fun `CA-INV-10-04 un producto con foto pendiente la muestra desde el telefono`() {
+        repository.items.value = listOf(inventoryItem(id = "carne", expiresOn = today.plusDays(3)))
+        photoSync.pending.value = mapOf("carne" to "/files/pending/carne/a.jpg")
+
+        val state = createViewModel(itemId = "carne").uiState.value
+
+        assertEquals(PhotoUiState.Pending("/files/pending/carne/a.jpg"), state.photo)
+    }
+
+    @Test
+    fun `CA-INV-10-04 guardar con la foto pendiente la conserva sin volver a encolarla`() {
+        repository.items.value = listOf(inventoryItem(id = "carne", expiresOn = today.plusDays(3)))
+        photoSync.pending.value = mapOf("carne" to "/files/pending/carne/a.jpg")
+        val viewModel = createViewModel(itemId = "carne")
+
+        viewModel.onEvent(ProductEditorEvent.NameChanged("Carne molida"))
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        assertTrue(photoSync.uploads.isEmpty())
+        assertTrue(photoSync.cancelled.isEmpty())
+        assertEquals(listOf(false), repository.photoChangedFlags)
+    }
+
+    @Test
+    fun `CA-INV-10-04 quitar la foto pendiente cancela su subida al guardar`() {
+        repository.items.value = listOf(inventoryItem(id = "carne", expiresOn = today.plusDays(3)))
+        photoSync.pending.value = mapOf("carne" to "/files/pending/carne/a.jpg")
+        val viewModel = createViewModel(itemId = "carne")
+
+        viewModel.onEvent(ProductEditorEvent.RemovePhotoClicked)
+        viewModel.onEvent(ProductEditorEvent.RemovePhotoConfirmed)
+        advanceResultDialog()
+        viewModel.onEvent(ProductEditorEvent.SaveClicked)
+
+        assertEquals(listOf("carne"), photoSync.cancelled)
+    }
+
+    @Test
+    fun `CA-INV-10-04 volver atras no borra la foto pendiente del telefono`() = runTest {
+        repository.items.value = listOf(inventoryItem(id = "carne", expiresOn = today.plusDays(3)))
+        photoSync.pending.value = mapOf("carne" to "/files/pending/carne/a.jpg")
+        val viewModel = createViewModel(itemId = "carne")
+
+        viewModel.onEvent(ProductEditorEvent.BackClicked)
+
+        // Solo navega: la subida pendiente es la dueña del archivo.
+        assertEquals(ProductEditorEffect.NavigateBack, viewModel.effects.first())
+    }
+
+    @Test
+    fun `CA-INV-10-02 el resultado Guardado en tu telefono se guarda y se lee como texto`() {
+        assertEquals(EditorResult.SavedOnPhone, decodeEditorResult(EditorResult.SavedOnPhone.encode()))
+    }
 }
+

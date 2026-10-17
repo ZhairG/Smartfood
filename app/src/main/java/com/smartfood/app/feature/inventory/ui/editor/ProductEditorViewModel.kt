@@ -16,11 +16,12 @@ import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.model.ItemDraft
 import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.inventory.domain.model.toInventoryError
 import com.smartfood.app.feature.inventory.domain.repository.InventoryPreferences
-import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.usecase.AddItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.DeleteItemUseCase
+import com.smartfood.app.feature.inventory.domain.usecase.GetItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.PhotoEdit
 import com.smartfood.app.feature.inventory.domain.usecase.UpdateItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ValidateItemUseCase
@@ -48,7 +49,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductEditorViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: InventoryRepository,
+    private val getItem: GetItemUseCase,
     private val validate: ValidateItemUseCase,
     private val addItem: AddItemUseCase,
     private val updateItem: UpdateItemUseCase,
@@ -113,7 +114,7 @@ class ProductEditorViewModel @Inject constructor(
     private fun loadItem(id: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            repository.getItem(id)
+            getItem(id)
                 .onSuccess { item ->
                     original = item
                     _uiState.update {
@@ -126,7 +127,7 @@ class ProductEditorViewModel @Inject constructor(
                             quantityText = item.quantity?.let { quantity -> formatAmount(quantity.amount) }.orEmpty(),
                             unit = item.quantity?.unit,
                             priceText = item.price?.toString().orEmpty(),
-                            photo = item.photo?.let { photo -> PhotoUiState.Remote(photo.url) } ?: PhotoUiState.None,
+                            photo = item.toPhotoUiState(),
                         ).withSaveEnabled()
                     }
                 }
@@ -184,9 +185,13 @@ class ProductEditorViewModel @Inject constructor(
                     // El diálogo de carga sigue hasta que el editor se va, para no dejar ver el formulario un instante
                     // antes de volver a la lista (CA-INV-02-12).
                     requestNotificationPermissionOnce()
-                    // El resultado se ve encima de la lista, como el Figma (476:3851). "Guardado en tu teléfono" con
-                    // WriteOutcome.PENDING llega con la T050.
-                    val saved = if (current == null) EditorResult.Saved else EditorResult.Updated(savedItem.item.name)
+                    // El resultado se ve encima de la lista, como el Figma (476:3851). Sin conexión, el cambio quedó
+                    // en el teléfono y se subirá solo (CA-INV-10-02, T050).
+                    val saved = when {
+                        savedItem.outcome == WriteOutcome.PENDING -> EditorResult.SavedOnPhone
+                        current == null -> EditorResult.Saved
+                        else -> EditorResult.Updated(savedItem.item.name)
+                    }
                     _effects.send(ProductEditorEffect.NavigateBackWithResult(saved))
                 }
                 .onFailure { cause -> _uiState.update { it.copy(savingAction = null, error = cause.toInventoryError()) } }
@@ -256,9 +261,18 @@ class ProductEditorViewModel @Inject constructor(
         /** Qué pasa con la foto al guardar una edición (CA-INV-05-04, CA-INV-05-05). */
         internal fun photoEditFor(original: InventoryItem, photo: PhotoUiState): PhotoEdit = when (photo) {
             is PhotoUiState.Local -> PhotoEdit.Replace(LocalPhoto(photo.path))
-            PhotoUiState.None -> if (original.photo != null) PhotoEdit.Remove else PhotoEdit.Keep
-            is PhotoUiState.Remote -> PhotoEdit.Keep
+            // Quitar una foto que espera subirse también es quitarla: así se cancela su subida.
+            PhotoUiState.None ->
+                if (original.photo != null || original.localPhotoPath != null) PhotoEdit.Remove else PhotoEdit.Keep
+            // La foto pendiente ya está en cola: se conserva (T050).
+            is PhotoUiState.Remote, is PhotoUiState.Pending -> PhotoEdit.Keep
         }
+
+        /** Foto que muestra el editor: la del teléfono que espera subirse, la de la nube o ninguna (CA-INV-10-04). */
+        internal fun InventoryItem.toPhotoUiState(): PhotoUiState =
+            localPhotoPath?.let { PhotoUiState.Pending(it) }
+                ?: photo?.let { PhotoUiState.Remote(it.url) }
+                ?: PhotoUiState.None
 
         /** Cantidad guardada como texto, sin ceros decimales sobrantes ("1.5", "2"). */
         internal fun formatAmount(amount: Double): String =

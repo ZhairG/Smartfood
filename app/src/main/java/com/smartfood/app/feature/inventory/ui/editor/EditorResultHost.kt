@@ -4,7 +4,7 @@
  * Fecha: Octubre 2026
  * Descripción: Muestra encima de la lista (o de la búsqueda) el resultado que deja el editor al volver: "Producto
  * Guardado", "Guardado: «nombre» se actualizó" o "Producto eliminado", como el Figma `476:3851` (spec 006, T055,
- * CA-INV-02-06, 03-02 y 04-02). El editor deja el resultado en el `savedStateHandle` de la pantalla anterior; aquí se
+ * CA-INV-02-06, 03-02 y 04-02), o "Guardado en tu teléfono" si no había conexión (CA-INV-10-02). El editor deja el resultado en el `savedStateHandle` de la pantalla anterior; aquí se
  * muestra unos segundos y se limpia para no repetirlo.
  */
 package com.smartfood.app.feature.inventory.ui.editor
@@ -12,6 +12,7 @@ package com.smartfood.app.feature.inventory.ui.editor
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,10 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodResultDialog
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
 import kotlinx.coroutines.delay
 
@@ -37,6 +40,7 @@ fun EditorResult.encode(): String = when (this) {
     EditorResult.Saved -> SAVED
     is EditorResult.Updated -> UPDATED_PREFIX + name
     EditorResult.Deleted -> DELETED
+    EditorResult.SavedOnPhone -> SAVED_ON_PHONE
 }
 
 /** Lee el resultado guardado con [encode], o `null` si no hay. */
@@ -44,6 +48,7 @@ internal fun decodeEditorResult(raw: String?): EditorResult? = when {
     raw == null -> null
     raw == SAVED -> EditorResult.Saved
     raw == DELETED -> EditorResult.Deleted
+    raw == SAVED_ON_PHONE -> EditorResult.SavedOnPhone
     raw.startsWith(UPDATED_PREFIX) -> EditorResult.Updated(raw.removePrefix(UPDATED_PREFIX))
     else -> null
 }
@@ -80,6 +85,12 @@ fun EditorResultHost(savedStateHandle: SavedStateHandle) {
             body = stringResource(id = R.string.editor_deleted_body),
             destructive = true
         )
+        // Sin conexión: el cambio quedó en el teléfono y se subirá solo (CA-INV-10-02, T050).
+        EditorResult.SavedOnPhone -> SmartFoodResultDialog(
+            icon = { ResultIcon(Icons.Outlined.CloudUpload, MaterialTheme.colorScheme.primary) },
+            title = stringResource(id = R.string.editor_saved_on_phone_title),
+            body = stringResource(id = R.string.editor_saved_on_phone_body)
+        )
     }
 }
 
@@ -96,5 +107,14 @@ private fun ResultIcon(icon: ImageVector, tint: Color) {
 
 private const val SAVED = "saved"
 private const val DELETED = "deleted"
+private const val SAVED_ON_PHONE = "saved_on_phone"
 private const val UPDATED_PREFIX = "updated:"
 private const val GlyphFraction = 0.4f
+
+@Preview(showBackground = true)
+@Composable
+private fun EditorResultHostSavedOnPhonePreview() {
+    SmartfoodTheme {
+        EditorResultHost(savedStateHandle = SavedStateHandle(mapOf(EDITOR_RESULT_KEY to EditorResult.SavedOnPhone.encode())))
+    }
+}

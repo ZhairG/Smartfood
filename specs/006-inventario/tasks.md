@@ -90,7 +90,7 @@
 - [x] T047 [P] `FirestoreInventoryRepository` sin transacciones: `set`/`update`/`delete` con espera de 3 s → `WriteOutcome`, `MetadataChanges.INCLUDE` → `isPendingSync`, `setPhoto` y `hasPendingWrites` (plan §3). Las reglas no cambian. Pruebas: U `InventoryDocumentTest`, I `FirestoreInventoryRepositoryEmulatorTest` con `disableNetwork()` (CA-INV-10-02, 10-05).
 - [x] T048 [P] `PendingPhotoStore`, `PhotoUploadWorker`, `PhotoDeleteWorker` y `WorkManagerPhotoSync` (`@HiltWorker`), con su `@Binds` en `InventoryDataModule`. `SmartfoodApp` como `Configuration.Provider` y sin el inicializador del manifiesto (sale de la T038, #44). `work-testing` ya está declarado desde la T038. Pruebas I de los workers (CA-INV-05-05, 05-06, 10-03, 10-04).
 - [x] T049 Lista y búsqueda: ícono de pendiente (`PendingSyncIcon`, a la izquierda del lápiz; en la búsqueda, antes de la etiqueta) y foto local en `InventoryItemRow`, con la descripción "Pendiente de sincronizar" (CA-INV-10-02, 10-04, 10-06). Pruebas: I `InventoryScreenTest` (claro y oscuro), I `InventorySearchScreenTest`. → #85
-- [ ] T050 Editor: diálogo "Guardado en tu teléfono" con `WriteOutcome.PENDING` y la foto local en `PhotoSlot` (CA-INV-10-02, 10-04). Salió del #40 el 16/10 y tiene su propio Issue. Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`. → #99
+- [ ] T050 Editor: resultado "Guardado en tu teléfono" con `WriteOutcome.PENDING` (`EditorResult.SavedOnPhone`) y la foto pendiente en `PhotoSlot` con `PhotoUiState.Pending`, cargada con `GetItemUseCase` (CA-INV-10-02, 10-04). Incluye las vistas previas que faltaban en la UI del inventario. Salió del #40 el 16/10 y tiene su propio Issue. Pruebas: U `GetItemUseCaseTest`, U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`, I `EditorResultHostTest`. → #99
 - [ ] T051 Perfil: aviso al cerrar sesión con cambios pendientes, con `SmartFoodConfirmDialog` (CA-INV-10-07). Pruebas: U `ProfileViewModelTest`, I `ProfileScreenTest`.
 
 ## Matriz de trazabilidad
@@ -164,9 +164,9 @@ verificación manual (checklist).
 | CA-INV-09-04 | I `MainNavigationTest` |
 | CA-INV-09-05 | I `MainNavigationTest` |
 | CA-INV-10-01 | M 7 |
-| CA-INV-10-02 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest`, I `FirestoreInventoryRepositoryEmulatorTest` (sin red → `PENDING`), I `InventoryScreenTest`, M 7 |
+| CA-INV-10-02 | U `AddItemUseCaseTest`, U `UpdateItemUseCaseTest`, U `ProductEditorViewModelTest` (`SavedOnPhone`), I `FirestoreInventoryRepositoryEmulatorTest` (sin red → `PENDING`), I `InventoryScreenTest`, I `EditorResultHostTest`, M 7 |
 | CA-INV-10-03 | U `DeleteItemUseCaseTest`, I `PhotoSyncWorkersTest`, M 7 |
-| CA-INV-10-04 | U `ObserveInventoryUseCaseTest`, I `PhotoSyncWorkersTest`, I `InventoryScreenTest`, I `ProductEditorScreenTest` |
+| CA-INV-10-04 | U `ObserveInventoryUseCaseTest`, U `GetItemUseCaseTest`, U `ProductEditorViewModelTest` (`Pending`), I `PhotoSyncWorkersTest`, I `InventoryScreenTest`, I `ProductEditorScreenTest` |
 | CA-INV-10-05 | I `FirestoreInventoryRepositoryEmulatorTest` (al encender la red, `isPendingSync` pasa a falso), M 7 |
 | CA-INV-10-06 | I `InventoryScreenTest` (claro y oscuro), I `InventorySearchScreenTest` |
 | CA-INV-10-07 | U `HasPendingChangesUseCaseTest`, U `SessionUseCasesTest`, U `ProfileViewModelTest`, I `ProfileScreenTest` |
