@@ -85,16 +85,27 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun t051_caInv1007_elAvisoDeCambiosSinSubirOfreceCerrarOCancelar() {
-        mostrar(dialog = ProfileDialog.ConfirmLogoutWithPending)
+    fun ca0503_elAvisoDeCerrarSesionDelFigmaOfreceCerrarOCancelar() {
+        mostrar(dialog = ProfileDialog.ConfirmLogout(hasPendingChanges = false))
 
+        composeTestRule.onNodeWithText("¿Cerrar sesión?").assertIsDisplayed()
         composeTestRule
-            .onNodeWithText("Tienes cambios sin subir. Si cierras sesión ahora, podrían perderse")
+            .onNodeWithText("Tendrás que iniciar sesión nuevamente para acceder a tu inventario y tus recetas guardadas.")
             .assertIsDisplayed()
         composeTestRule.onNodeWithText("Cancelar").performClick()
         composeTestRule.onNodeWithText("Cerrar sesión").performClick()
 
         assertEquals(listOf(ProfileEvent.DialogDismissed, ProfileEvent.LogoutConfirmed), eventos)
+    }
+
+    @Test
+    fun t051_caInv1007_conCambiosSinSubirElAvisoDiceQuePodrianPerderse() {
+        mostrar(dialog = ProfileDialog.ConfirmLogout(hasPendingChanges = true))
+
+        composeTestRule.onNodeWithText("¿Cerrar sesión?").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText("Tienes cambios sin subir. Si cierras sesión ahora, podrían perderse.")
+            .assertIsDisplayed()
     }
 }
 

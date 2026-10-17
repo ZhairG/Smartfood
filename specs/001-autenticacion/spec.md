@@ -102,7 +102,7 @@ celular compartido.
 |---|---|
 | CA-05-01 | **Dado** que inicié sesión, **entonces** Home me saluda con mi nombre ("Hola, Pepito"), leído de mi perfil. |
 | CA-05-02 | **Dado** que mi perfil no se puede leer, **entonces** Home muestra un saludo genérico ("Hola") sin fallar. |
-| CA-05-03 | **Dado** que estoy en Home, **cuando** presiono "Cerrar Sesión", **entonces** la sesión se cierra, llego al inicio de sesión y "atrás" no me devuelve a Home. |
+| CA-05-03 | **Dado** que estoy en Home (hoy, la pestaña Perfil), **cuando** presiono "Cerrar Sesión", **entonces** veo "¿Cerrar sesión?" con "Tendrás que iniciar sesión nuevamente para acceder a tu inventario y tus recetas guardadas.", "Cerrar sesión" y "Cancelar" (Figma `604:2668`); al confirmar, la sesión se cierra, llego al inicio de sesión y "atrás" no me devuelve a Home. "Cancelar" me deja como estaba. |
 
 ### HU-06: Falta de conexión
 | Código | Criterio |

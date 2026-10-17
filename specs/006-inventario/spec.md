@@ -178,7 +178,7 @@ en la tienda o en la cocina.
 | CA-INV-10-04 | **Dado** un producto cuya foto todavía no se sube, **entonces** su fila y "Editar Producto" muestran la foto guardada en el teléfono. |
 | CA-INV-10-05 | **Dado** cambios pendientes, **cuando** vuelve la conexión, **entonces** los cambios y las fotos se suben solos y el ícono de pendiente desaparece sin recargar. |
 | CA-INV-10-06 | **Dado** el ícono de pendiente, **entonces** tiene la descripción "Pendiente de sincronizar" para TalkBack (RNF-INV-04) y se ve en modo claro y oscuro. |
-| CA-INV-10-07 | **Dado** que tengo cambios pendientes, **cuando** toco "Cerrar sesión", **entonces** veo "Tienes cambios sin subir. Si cierras sesión ahora, podrían perderse" con "Cerrar sesión" y "Cancelar"; "Cancelar" me deja como estaba y "Cerrar sesión" cierra la sesión y descarta las fotos pendientes. Sin cambios pendientes, se cierra sesión como siempre. |
+| CA-INV-10-07 | **Dado** que tengo cambios pendientes, **cuando** toco "Cerrar sesión", **entonces** el aviso "¿Cerrar sesión?" (Figma `604:2668`, CA-05-03) dice "Tienes cambios sin subir. Si cierras sesión ahora, podrían perderse." con "Cerrar sesión" y "Cancelar"; "Cancelar" me deja como estaba y "Cerrar sesión" cierra la sesión y descarta las fotos pendientes. Sin cambios pendientes, el aviso muestra el texto del Figma. |
 
 ## 5. Requisitos funcionales
 
@@ -271,6 +271,9 @@ Desviaciones aprobadas por el equipo:
   teléfono. La fila usa el ícono `CloudUpload` de Material en gris, a la izquierda del lápiz (en la búsqueda, antes
   de la etiqueta), y el aviso usa `SmartFoodResultDialog` con la nube en el círculo verde claro (T050), el mismo
   de "Producto Guardado". Se ajustan cuando exista un frame.
+- **Aviso al cerrar sesión** (17/10, #45): sigue el Figma `604:2668` ("¿Cerrar sesión?", advertencia naranja, botones
+  naranja y gris lado a lado) con `SmartFoodWarningDialog`. Se muestra siempre; con cambios sin subir, solo cambia el
+  texto (CA-INV-10-07).
 - **Íconos del Figma** (#37, actualizado el 16/10 en el #40): se usan los PNG exportados del Figma, teñidos con el
   color del tema para que funcionen en modo oscuro (T053). Donde el Figma no tiene un ícono (el micrófono de la voz,
   la "x" de la búsqueda, el check de los diálogos) se usa `material-icons-extended`. El amarillo de "Próximo a vencer" es el token

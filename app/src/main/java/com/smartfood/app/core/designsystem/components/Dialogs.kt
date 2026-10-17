@@ -6,9 +6,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -17,6 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +46,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.ShadowColorModal
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
@@ -327,6 +333,152 @@ private fun LoadingIndicator() {
     )
 }
 
+/**
+ * Pide confirmar una acción que no es un borrado, como cerrar sesión: ícono de advertencia, título, explicación y los
+ * botones "confirmar" (naranja) y "cancelar" (gris) lado a lado.
+ *
+ * Figma: "Cerrar sesión" `604:2668` (spec 001 CA-05-03, spec 006 CA-INV-10-07). No se cierra tocando fuera; atrás
+ * equivale a cancelar.
+ *
+ * @param title Pregunta, como "¿Cerrar sesión?".
+ * @param body Explicación de lo que pasa al confirmar.
+ * @param confirmText Texto del botón naranja.
+ * @param dismissText Texto del botón gris.
+ * @param onConfirm Acción al confirmar.
+ * @param onDismiss Acción al cancelar o al usar atrás.
+ * @param modifier Modificador opcional para el contenido del diálogo.
+ */
+@Composable
+fun SmartFoodWarningDialog(
+    title: String,
+    body: String,
+    confirmText: String,
+    dismissText: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(dismissOnClickOutside = false)) {
+        BlurBehindDialog()
+        SmartFoodWarningDialogContent(title, body, confirmText, dismissText, onConfirm, onDismiss, modifier)
+    }
+}
+
+/** Muestra el contenido de [SmartFoodWarningDialog] para reutilizarlo en vistas previas. */
+@Composable
+private fun SmartFoodWarningDialogContent(
+    title: String,
+    body: String,
+    confirmText: String,
+    dismissText: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = MaterialTheme.spacing
+    val metrics = LocalFormMetrics.current
+    val dialogShape = RoundedCornerShape(spacing.panelRadius)
+
+    Column(
+        modifier = modifier
+            .widthIn(max = 480.dp)
+            .fillMaxWidth()
+            .padding(horizontal = spacing.extraSmall, vertical = spacing.small)
+            .figmaShadow(
+                color = ShadowColorModal,
+                borderRadius = spacing.panelRadius,
+                blurRadius = spacing.extraSmall,
+                offsetY = spacing.extraSmall
+            )
+            .background(MaterialTheme.colorScheme.surfaceVariant, dialogShape)
+            .padding(horizontal = metrics.formHorizontalPadding, vertical = metrics.sectionSpacing)
+            .semantics { liveRegion = LiveRegionMode.Polite },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(spacing.medium)
+    ) {
+        // Figma 604:2741: círculo naranja claro con la advertencia naranja (la mitad del círculo).
+        Box(
+            modifier = Modifier
+                .size(spacing.iconDialogSize)
+                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_figma_warning),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(spacing.iconDialogSize * 0.5f)
+            )
+        }
+
+        Text(
+            text = title,
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+            textAlign = TextAlign.Center
+        )
+
+        // Figma 604:2752: Poppins Regular de 13 px en gris.
+        Text(
+            text = body,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            // bodyLarge es el estilo del tema con Poppins; bodyMedium usa la fuente del sistema.
+            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.Normal),
+            textAlign = TextAlign.Center
+        )
+
+        // Figma 604:2745 y 604:2748: confirmar en naranja y cancelar en gris, lado a lado.
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(spacing.small),
+            modifier = Modifier.fillMaxWidth().padding(top = spacing.small)
+        ) {
+            WarningDialogButton(
+                text = confirmText,
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary,
+                onClick = onConfirm,
+                modifier = Modifier.weight(1f)
+            )
+            WarningDialogButton(
+                text = dismissText,
+                containerColor = GreyDivider,
+                contentColor = Color.Black,
+                onClick = onDismiss,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+/** Botón del aviso: radio 10, sombra del Figma y texto SemiBold de 13 sp. */
+@Composable
+private fun WarningDialogButton(
+    text: String,
+    containerColor: Color,
+    contentColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(MaterialTheme.spacing.buttonRadius),
+        colors = ButtonDefaults.buttonColors(containerColor = containerColor, contentColor = contentColor),
+        contentPadding = PaddingValues(horizontal = MaterialTheme.spacing.small),
+        modifier = modifier
+            .figmaShadow(color = Color(0x4D000000), borderRadius = 10.dp, blurRadius = 4.dp, offsetY = 4.dp)
+            .heightIn(min = WarningButtonHeight)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+/** Alto mínimo de los botones del aviso: 37 px en el Figma, redondeado al mínimo táctil de 48 dp. */
+private val WarningButtonHeight = 48.dp
+
 /** Muestra el contenido de [SmartFoodResultDialog] para reutilizarlo en vistas previas. */
 @Composable
 private fun SmartFoodResultDialogContent(
@@ -463,6 +615,21 @@ private fun SmartFoodResultDialogPreview() {
 private fun SmartFoodLoadingDialogPreview() {
     SmartfoodTheme {
         SmartFoodResultDialogContent(icon = { LoadingIndicator() }, title = "Guardando producto…", body = null)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SmartFoodWarningDialogPreview() {
+    SmartfoodTheme {
+        SmartFoodWarningDialogContent(
+            title = "¿Cerrar sesión?",
+            body = "Tendrás que iniciar sesión nuevamente para acceder a tu inventario y tus recetas guardadas.",
+            confirmText = "Cerrar sesión",
+            dismissText = "Cancelar",
+            onConfirm = {},
+            onDismiss = {}
+        )
     }
 }
 

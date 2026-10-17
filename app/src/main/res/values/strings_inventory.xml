@@ -29,7 +29,9 @@
     <!-- Ícono de cambios o foto sin subir (CA-INV-10-06, T049) -->
     <string name="cd_pending_sync">Pendiente de sincronizar</string>
     <!-- Aviso al cerrar sesión con cambios sin subir (CA-INV-10-07, T051) -->
-    <string name="profile_logout_pending_question">Tienes cambios sin subir. Si cierras sesión ahora, podrían perderse</string>
+    <string name="profile_logout_title">¿Cerrar sesión?</string>
+    <string name="profile_logout_body">Tendrás que iniciar sesión nuevamente para acceder a tu inventario y tus recetas guardadas.</string>
+    <string name="profile_logout_pending_question">Tienes cambios sin subir. Si cierras sesión ahora, podrían perderse.</string>
     <string name="profile_logout_pending_confirm">Cerrar sesión</string>
     <string name="profile_logout_pending_cancel">Cancelar</string>
     <!-- "unidades" concuerda con la cantidad en la fila de la lista (CA-INV-01-08). -->

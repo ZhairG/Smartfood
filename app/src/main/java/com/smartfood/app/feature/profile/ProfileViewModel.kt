@@ -75,13 +75,10 @@ class ProfileViewModel @Inject constructor(
     /** Procesa un evento de la UI. */
     fun onEvent(event: ProfileEvent) {
         when (event) {
-            // Con cambios sin subir, primero se avisa que podrían perderse (CA-INV-10-07, T051).
+            // Siempre se pide confirmar (Figma 604:2668, CA-05-03); con cambios sin subir, el aviso dice que podrían
+            // perderse (CA-INV-10-07).
             ProfileEvent.LogoutClicked -> viewModelScope.launch {
-                if (hasPendingChanges()) {
-                    _uiState.update { it.copy(dialog = ProfileDialog.ConfirmLogoutWithPending) }
-                } else {
-                    logoutAndLeave()
-                }
+                _uiState.update { it.copy(dialog = ProfileDialog.ConfirmLogout(hasPendingChanges = hasPendingChanges())) }
             }
             ProfileEvent.LogoutConfirmed -> {
                 _uiState.update { it.copy(dialog = null) }
@@ -128,8 +125,12 @@ data class ProfileUiState(
 
 /** Aviso abierto sobre el Perfil. */
 sealed interface ProfileDialog {
-    /** "Tienes cambios sin subir. Si cierras sesión ahora, podrían perderse" (CA-INV-10-07). */
-    data object ConfirmLogoutWithPending : ProfileDialog
+    /**
+     * "¿Cerrar sesión?" (Figma 604:2668, CA-05-03).
+     *
+     * @property hasPendingChanges `true` si hay cambios sin subir: el aviso dice que podrían perderse (CA-INV-10-07).
+     */
+    data class ConfirmLogout(val hasPendingChanges: Boolean) : ProfileDialog
 }
 
 sealed interface ProfileEvent {

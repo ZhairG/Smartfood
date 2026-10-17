@@ -86,10 +86,11 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `CA-05-03 cerrar sesion termina la sesion y emite NavigateToLogin`() = runTest {
+    fun `CA-05-03 confirmar el cierre termina la sesion y emite NavigateToLogin`() = runTest {
         val viewModel = crearViewModel()
 
         viewModel.onEvent(ProfileEvent.LogoutClicked)
+        viewModel.onEvent(ProfileEvent.LogoutConfirmed)
 
         assertNull(authRepository.currentUserId())
         assertEquals(ProfileEffect.NavigateToLogin, viewModel.effects.first())
@@ -142,7 +143,7 @@ class ProfileViewModelTest {
 
         viewModel.onEvent(ProfileEvent.LogoutClicked)
 
-        assertEquals(ProfileDialog.ConfirmLogoutWithPending, viewModel.uiState.value.dialog)
+        assertEquals(ProfileDialog.ConfirmLogout(hasPendingChanges = true), viewModel.uiState.value.dialog)
         assertEquals(DEFAULT_UID, authRepository.currentUserId())
     }
 
@@ -173,13 +174,13 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `CA-INV-10-07 sin cambios pendientes cierra sesion como siempre`() = runTest {
+    fun `CA-05-03 sin cambios pendientes tambien se pide confirmar sin la advertencia`() {
         val viewModel = crearViewModel()
 
         viewModel.onEvent(ProfileEvent.LogoutClicked)
 
-        assertEquals(ProfileEffect.NavigateToLogin, viewModel.effects.first())
-        assertEquals(null, viewModel.uiState.value.dialog)
+        assertEquals(ProfileDialog.ConfirmLogout(hasPendingChanges = false), viewModel.uiState.value.dialog)
+        assertEquals(DEFAULT_UID, authRepository.currentUserId())
     }
 }
 
