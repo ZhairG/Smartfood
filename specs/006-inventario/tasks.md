@@ -79,7 +79,7 @@
 - [x] T041 Plantilla de la Política de privacidad (spec 005): fotos, micrófono y avisos (spec §9). → #45
 - [x] T042 `README.md` y `AGENTS.md` (arquitectura de `feature/inventory`, emulador de Storage y comandos). → #45
 - [x] T043 Verificación local: `testDebugUnitTest`, `assembleDebug`, pruebas instrumentadas con `firebase emulators:start --only auth,firestore,storage` y el checklist manual (puntos 1 a 9). → #45
-- [ ] T044 Despliegue: activar Cloud Storage en `smartfood-f62a1` (`southamerica-east1`) y `firebase deploy --only firestore:rules,storage`. Checklist en producción (punto 10). → #45
+- [x] T044 Despliegue: activar Cloud Storage en `smartfood-f62a1` (`southamerica-east1`) y `firebase deploy --only firestore:rules,storage`. Checklist en producción (punto 10). → #45
 
 ## Fase 8: Sin conexión (HU-INV-10)
 > Spec, plan §13 y ADR-INV-09 aprobados en el #71. Las tareas T046 a T051 se dividen en Issues después de fusionar
