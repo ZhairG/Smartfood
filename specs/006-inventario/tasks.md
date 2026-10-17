@@ -89,8 +89,8 @@
 - [x] T046 Dominio: `WriteOutcome`, `SavedItem`, `isPendingSync` y `localPhotoPath` en `InventoryItem`; `InventoryRepository` con `createItem`, `updateItem`, `setPhoto` y `hasPendingWrites`; la interfaz `PhotoSync`; los casos de uso de agregar, editar, eliminar y observar sin subir fotos, `HasPendingChangesUseCase` y `LogoutUseCase` con `clearAll()`. Fakes: `FakeInventoryRepository` actualizado y `FakePhotoSync`. Pruebas U que citan CA-INV-10-xx (plan §2 y §13).
 - [x] T047 [P] `FirestoreInventoryRepository` sin transacciones: `set`/`update`/`delete` con espera de 3 s → `WriteOutcome`, `MetadataChanges.INCLUDE` → `isPendingSync`, `setPhoto` y `hasPendingWrites` (plan §3). Las reglas no cambian. Pruebas: U `InventoryDocumentTest`, I `FirestoreInventoryRepositoryEmulatorTest` con `disableNetwork()` (CA-INV-10-02, 10-05).
 - [x] T048 [P] `PendingPhotoStore`, `PhotoUploadWorker`, `PhotoDeleteWorker` y `WorkManagerPhotoSync` (`@HiltWorker`), con su `@Binds` en `InventoryDataModule`. `SmartfoodApp` como `Configuration.Provider` y sin el inicializador del manifiesto (sale de la T038, #44). `work-testing` ya está declarado desde la T038. Pruebas I de los workers (CA-INV-05-05, 05-06, 10-03, 10-04).
-- [ ] T049 Lista: ícono de pendiente y foto local en `InventoryItemRow`, con la descripción "Pendiente de sincronizar" (CA-INV-10-02, 10-04, 10-06). Va después del #39. Pruebas: I `InventoryScreenTest`.
-- [ ] T050 Editor: diálogo "Guardado en tu teléfono" con `WriteOutcome.PENDING` y la foto local en `PhotoSlot` (CA-INV-10-02, 10-04). Salió del #40 el 16/10: se hace después de la entrega, con el resto de la fase 8. Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`.
+- [x] T049 Lista y búsqueda: ícono de pendiente (`PendingSyncIcon`, a la izquierda del lápiz; en la búsqueda, antes de la etiqueta) y foto local en `InventoryItemRow`, con la descripción "Pendiente de sincronizar" (CA-INV-10-02, 10-04, 10-06). Pruebas: I `InventoryScreenTest` (claro y oscuro), I `InventorySearchScreenTest`. → #85
+- [ ] T050 Editor: diálogo "Guardado en tu teléfono" con `WriteOutcome.PENDING` y la foto local en `PhotoSlot` (CA-INV-10-02, 10-04). Salió del #40 el 16/10 y tiene su propio Issue. Pruebas: U `ProductEditorViewModelTest`, I `ProductEditorScreenTest`. → #99
 - [ ] T051 Perfil: aviso al cerrar sesión con cambios pendientes, con `SmartFoodConfirmDialog` (CA-INV-10-07). Pruebas: U `ProfileViewModelTest`, I `ProfileScreenTest`.
 
 ## Matriz de trazabilidad
@@ -168,7 +168,7 @@ verificación manual (checklist).
 | CA-INV-10-03 | U `DeleteItemUseCaseTest`, I `PhotoSyncWorkersTest`, M 7 |
 | CA-INV-10-04 | U `ObserveInventoryUseCaseTest`, I `PhotoSyncWorkersTest`, I `InventoryScreenTest`, I `ProductEditorScreenTest` |
 | CA-INV-10-05 | I `FirestoreInventoryRepositoryEmulatorTest` (al encender la red, `isPendingSync` pasa a falso), M 7 |
-| CA-INV-10-06 | I `InventoryScreenTest` |
+| CA-INV-10-06 | I `InventoryScreenTest` (claro y oscuro), I `InventorySearchScreenTest` |
 | CA-INV-10-07 | U `HasPendingChangesUseCaseTest`, U `SessionUseCasesTest`, U `ProfileViewModelTest`, I `ProfileScreenTest` |
 | RNF-INV-01 | R `firestore.test.js`, R `storage.test.js`, I `FirestoreInventoryRepositoryEmulatorTest`, M 9 |
 | RNF-INV-02 | U `PhotoScalingTest`, I `PhotoCompressorTest`, I `FirebaseStoragePhotoRepositoryEmulatorTest`, R `storage.test.js`, M 9 (foto > 2 MB denegada), M 2 (tamaño subido) |

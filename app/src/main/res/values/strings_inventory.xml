@@ -26,6 +26,8 @@
 
     <!-- Categoría y cantidad de la fila (CA-INV-01-02 y CA-INV-01-08) -->
     <string name="inventory_quantity_format">%1$s %2$s</string>
+    <!-- Ícono de cambios o foto sin subir (CA-INV-10-06, T049) -->
+    <string name="cd_pending_sync">Pendiente de sincronizar</string>
     <!-- "unidades" concuerda con la cantidad en la fila de la lista (CA-INV-01-08). -->
     <plurals name="inventory_quantity_units">
         <item quantity="one">%1$s unidad</item>
