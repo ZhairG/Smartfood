@@ -42,15 +42,17 @@
 Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada (`app/src/androidTest`),
 **M** = verificación manual (checklist).
 
+> Desde el #105 varias pruebas recorren un flujo o una tabla de casos y citan **todos** sus CA en el nombre. La matriz nombra la clase; `python tools/ca_coverage.py --check tools/ca_coverage_baseline.txt` comprueba que ningún CA se quede sin prueba.
+
 | Criterio | Pruebas |
 |---|---|
-| CA-LEG-01-01 | I `RegisterScreenTest.caLeg0101_*`, M ✅ |
-| CA-LEG-01-02 | I `RegisterScreenTest.caLeg0102_*`, M ✅ |
-| CA-LEG-01-03 | I `AppNavigationTest.caLeg0103_*` (2), I `LegalDocumentScreenTest.caLeg0103_*` |
-| CA-LEG-01-04 | I `RegisterScreenTest.caLeg0104_*` |
-| CA-LEG-01-05 | I `LegalDocumentScreenTest.caLeg0105_*` (2) |
-| CA-LEG-01-06 | I `LegalDocumentScreenTest.caLeg0106_*` (4), M (360 dp) |
-| CA-LEG-01-07 | I `RegisterScreenTest.caLeg0107_*`, M (TalkBack) ✅ |
+| CA-LEG-01-01 | I `RegisterScreenTest`, M ✅ |
+| CA-LEG-01-02 | I `RegisterScreenTest`, M ✅ |
+| CA-LEG-01-03 | I `AppNavigationTest.caLeg0103_*` (2), I `LegalDocumentScreenTest` |
+| CA-LEG-01-04 | I `RegisterScreenTest` |
+| CA-LEG-01-05 | I `LegalDocumentScreenTest` |
+| CA-LEG-01-06 | I `LegalDocumentScreenTest`, M (360 dp) |
+| CA-LEG-01-07 | I `RegisterScreenTest`, M (TalkBack) ✅ |
 | CA-LEG-02-01 | U `RegisterUseCaseTest`, M (producción: `termsVersion` y `termsAcceptedAt` = `createdAt`) ✅ |
 | CA-LEG-02-02 | M (verificado el 2026-10-06 con los emuladores por REST: sin versión, con fecha del cliente y en el perfil de otro usuario → 403; con constancia → 200) |
 

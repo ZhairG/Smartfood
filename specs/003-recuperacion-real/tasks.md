@@ -51,27 +51,29 @@
 Leyenda: **S** = prueba del servidor (`functions/src/test/recoveryService.test.ts`), **U** = prueba unitaria de la app
 (`app/src/test`), **I** = prueba instrumentada (`app/src/androidTest`), **M** = verificación manual (checklist).
 
+> Desde el #105 varias pruebas recorren un flujo o una tabla de casos y citan **todos** sus CA en el nombre. La matriz nombra la clase; `python tools/ca_coverage.py --check tools/ca_coverage_baseline.txt` comprueba que ningún CA se quede sin prueba.
+
 | Criterio | Pruebas |
 |---|---|
 | CA-REC-01-01 | S (2), M |
 | CA-REC-01-02 | S (2), U `DemoPasswordRecoveryRepositoryTest`, M |
-| CA-REC-01-03 | I `PasswordRecoveryScreenTest.ca0404_caRec0103_*` |
+| CA-REC-01-03 | I `PasswordRecoveryScreenTest` |
 | CA-REC-01-04 | S (2), U `FirebaseErrorMapperTest`, U `DemoPasswordRecoveryRepositoryTest`, M |
 | CA-REC-01-05 | S |
 | CA-REC-02-01 | S, M |
 | CA-REC-02-02 | S, M |
 | CA-REC-02-03 | S (2), U `PasswordRecoveryViewModelTest` |
 | CA-REC-02-04 | S (2), U `FirebaseErrorMapperTest`, U `PasswordRecoveryViewModelTest`, M |
-| CA-REC-03-01 | S, U `FirebaseErrorMapperTest`, I `PasswordRecoveryScreenTest.caRec0301_*` |
-| CA-REC-03-02 | S (2), U `FirebaseErrorMapperTest`, I `PasswordRecoveryScreenTest.caRec0302_*` |
-| CA-REC-03-03 | S, U `FirebaseErrorMapperTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest.caRec0303_*`, M |
+| CA-REC-03-01 | S, U `FirebaseErrorMapperTest`, I `PasswordRecoveryScreenTest` |
+| CA-REC-03-02 | S (2), U `FirebaseErrorMapperTest`, I `PasswordRecoveryScreenTest` |
+| CA-REC-03-03 | S, U `FirebaseErrorMapperTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest`, M |
 | CA-REC-03-04 | S, U `PasswordRecoveryViewModelTest` |
 | CA-REC-03-05 | S |
 | CA-REC-03-06 | U `PasswordRecoveryViewModelTest` |
 | CA-REC-03-07 | S (2) |
-| CA-REC-04-01 | U `PasswordRecoveryViewModelTest` (2), I `PasswordRecoveryScreenTest.caRec0401_*` |
+| CA-REC-04-01 | U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest` |
 | CA-REC-04-02 | S (2), U `FirebaseErrorMapperTest`, U `PasswordRecoveryViewModelTest`, U `CountdownFormatTest` |
-| CA-REC-04-03 | U `PasswordRecoveryViewModelTest` (2), I `PasswordRecoveryScreenTest.caRec0403_*` |
+| CA-REC-04-03 | U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest` |
 | CA-REC-04-04 | I `AdaptiveLayoutTest` (paso 2 con cuenta regresiva), M |
 | RNF-REC-02 | M |
 
