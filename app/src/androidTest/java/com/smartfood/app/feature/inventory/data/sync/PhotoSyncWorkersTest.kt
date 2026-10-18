@@ -62,7 +62,7 @@ class PhotoSyncWorkersTest {
     fun limpiarDespues() = store.clear()
 
     @Test
-    fun caInv0505_subeLaFotoLaPoneEnElProductoYBorraLaAnterior() = runBlocking {
+    fun caInv0505_subeLaFotoLaPoneEnElProductoYBorraOEncolaElBorradoDeLaAnterior() = runBlocking {
         val file = store.put("leche", jpeg())
 
         val result = upload(file, replacedPath = "users/uid/inventory/leche/vieja.jpg").doWork()
@@ -72,96 +72,71 @@ class PhotoSyncWorkersTest {
         assertFalse("La foto del teléfono se borra al quedar en el producto", file.exists())
         assertTrue(store.pending.value.isEmpty())
         assertEquals(listOf("users/uid/inventory/leche/vieja.jpg"), photos.deleted)
-    }
 
-    @Test
-    fun caInv0506_sinRedReintentaYConservaLaFoto() = runBlocking {
-        val file = store.put("leche", jpeg())
-        photos.uploadError = InventoryError.Network
-
-        assertEquals(ListenableWorker.Result.retry(), upload(file).doWork())
-        assertTrue(file.exists())
-        assertEquals(file.path, store.pending.value["leche"])
-    }
-
-    @Test
-    fun caInv0506_unaFotoIlegibleDejaElProductoSinFoto() = runBlocking {
-        val roto = File(context.cacheDir, "rota.jpg").apply { writeText("no es una imagen") }
-        val file = store.put("leche", roto)
-
-        assertEquals(ListenableWorker.Result.success(), upload(file).doWork())
-        assertEquals(0, photos.uploads)
-        assertFalse(file.exists())
-        assertTrue(store.pending.value.isEmpty())
-    }
-
-    @Test
-    fun t048_siElProductoSeBorroLaFotoSubidaSeBorraDeLaNube() = runBlocking {
-        val file = store.put("leche", jpeg())
-        inventory.setPhotoError = InventoryError.NotFound
-
-        assertEquals(ListenableWorker.Result.success(), upload(file).doWork())
-        assertEquals(listOf(photos.lastUploaded!!.path), photos.deleted)
-        assertFalse(file.exists())
-    }
-
-    @Test
-    fun t048_siLasReglasNoDejanPonerLaFotoNoSeReintentaParaSiempre() = runBlocking {
-        val file = store.put("leche", jpeg())
-        inventory.setPhotoError = InventoryError.PermissionDenied
-
-        assertEquals(ListenableWorker.Result.success(), upload(file).doWork())
-        assertEquals(listOf(photos.lastUploaded!!.path), photos.deleted)
-        assertFalse(file.exists())
-    }
-
-    @Test
-    fun t048_siPonerLaFotoFallaPorRedSeReintentaSinDejarLaFotoHuerfana() = runBlocking {
-        val file = store.put("leche", jpeg())
-        inventory.setPhotoError = InventoryError.Network
-
-        assertEquals(ListenableWorker.Result.retry(), upload(file).doWork())
-        assertEquals(listOf(photos.lastUploaded!!.path), photos.deleted)
-        assertTrue(file.exists())
-    }
-
-    @Test
-    fun caInv0505_siLaAnteriorNoSeBorraSeEncolaSuBorrado() = runBlocking {
-        val file = store.put("leche", jpeg())
+        // Si la anterior no se puede borrar, su borrado queda encolado.
         photos.deleteError = InventoryError.Network
-
-        upload(file, replacedPath = "vieja.jpg").doWork()
-
+        upload(store.put("leche", jpeg()), replacedPath = "vieja.jpg").doWork()
         assertEquals(listOf("vieja.jpg"), photoSync.deletes)
     }
 
     @Test
-    fun caInv1007_sinSesionNoSubeNada() = runBlocking {
+    fun caInv0506_sinRedReintentaConservandoLaFotoYUnaIlegibleDejaElProductoSinFoto() = runBlocking {
         val file = store.put("leche", jpeg())
-        auth.userId = null
+        photos.uploadError = InventoryError.Network
+        assertEquals("sin red", ListenableWorker.Result.retry(), upload(file).doWork())
+        assertTrue(file.exists())
+        assertEquals(file.path, store.pending.value["leche"])
 
-        assertEquals(ListenableWorker.Result.success(), upload(file).doWork())
+        photos.uploadError = null
+        val roto = File(context.cacheDir, "rota.jpg").apply { writeText("no es una imagen") }
+        val ilegible = store.put("leche", roto)
+        assertEquals("foto ilegible", ListenableWorker.Result.success(), upload(ilegible).doWork())
         assertEquals(0, photos.uploads)
+        assertFalse(ilegible.exists())
+        assertTrue(store.pending.value.isEmpty())
+    }
+
+    /**
+     * T048: si la foto se sube pero no se puede poner en el producto, la subida se borra de la nube. Solo la falta de
+     * red se reintenta (con la foto del teléfono); un producto borrado o las reglas terminan el trabajo.
+     */
+    @Test
+    fun t048_siPonerLaFotoFallaLaSubidaNoQuedaHuerfanaYSoloSeReintentaSinRed() = runBlocking {
+        listOf(
+            Triple(InventoryError.NotFound, ListenableWorker.Result.success(), false),
+            Triple(InventoryError.PermissionDenied, ListenableWorker.Result.success(), false),
+            Triple(InventoryError.Network, ListenableWorker.Result.retry(), true)
+        ).forEach { (error, esperado, conservaLaFoto) ->
+            photos.deleted.clear()
+            inventory.setPhotoError = error
+            val file = store.put("leche", jpeg())
+
+            assertEquals("$error", esperado, upload(file).doWork())
+            assertEquals("$error", listOf(photos.lastUploaded!!.path), photos.deleted)
+            assertEquals("$error", conservaLaFoto, file.exists())
+        }
     }
 
     @Test
-    fun caInv1003_borrarLaFotoEnLaNubeReintentaSinRedYTerminaAlBorrarla() = runBlocking {
-        photos.deleteError = InventoryError.Network
-        assertEquals(ListenableWorker.Result.retry(), delete("users/uid/inventory/leche/a.jpg").doWork())
-
-        photos.deleteError = null
-        assertEquals(ListenableWorker.Result.success(), delete("users/uid/inventory/leche/a.jpg").doWork())
-    }
-
-    @Test
-    fun t048_unaFotoNuevaReemplazaALaQueEsperabaDelMismoProducto() {
+    fun t048_caInv1003_caInv1007_reemplazoBorradoEnLaNubeYSinSesion() = runBlocking {
+        // Una foto nueva reemplaza a la que esperaba del mismo producto.
         val primera = store.put("leche", jpeg())
         val segunda = store.put("leche", jpeg())
-
         assertFalse(primera.exists())
         assertEquals(mapOf("leche" to segunda.path), store.pending.value)
         store.removeAll("leche")
         assertTrue(store.pending.value.isEmpty())
+
+        // CA-INV-10-03: borrar la foto en la nube reintenta sin red y termina al borrarla.
+        photos.deleteError = InventoryError.Network
+        assertEquals(ListenableWorker.Result.retry(), delete("users/uid/inventory/leche/a.jpg").doWork())
+        photos.deleteError = null
+        assertEquals(ListenableWorker.Result.success(), delete("users/uid/inventory/leche/a.jpg").doWork())
+
+        // CA-INV-10-07: sin sesión no se sube nada.
+        auth.userId = null
+        assertEquals(ListenableWorker.Result.success(), upload(store.put("leche", jpeg())).doWork())
+        assertEquals(0, photos.uploads)
     }
 
     private fun upload(file: File, replacedPath: String? = null): PhotoUploadWorker =
