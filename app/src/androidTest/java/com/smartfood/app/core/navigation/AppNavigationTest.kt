@@ -84,7 +84,7 @@ class AppNavigationTest {
     }
 
     @Test
-    fun transicionSplashALogin_respetaTiempoDeSplashYAnimacionDeEmpuje600ms() {
+    fun ca0304_transicionSplashALogin_respetaTiempoDeSplashYAnimacionDeEmpuje600ms() {
         // En esta prueba desactivamos el autoAdvance para inspeccionar el reloj frame a frame
         composeTestRule.mainClock.autoAdvance = false
 
@@ -115,39 +115,7 @@ class AppNavigationTest {
     }
 
     @Test
-    fun transicionLoginARegister_ejecutaAnimacionDeEmpujeDe600ms() {
-        launchAppNavHost()
-        advanceToLogin()
-
-        // Disparamos la acción de navegación hacia Registro automáticamente
-        composeTestRule.onNodeWithText("Regístrate").performScrollTo().performClick()
-
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
-            composeTestRule.onAllNodesWithText("Crea tu cuenta").fetchSemanticsNodes().isNotEmpty()
-        }
-
-        // Verificación: RegisterScreen se encuentra completamente visible
-        composeTestRule.onNodeWithText("Crea tu cuenta").assertIsDisplayed()
-    }
-
-    @Test
-    fun transicionLoginARecuperacion_ejecutaAnimacionDeEmpujeDe600ms() {
-        launchAppNavHost()
-        advanceToLogin()
-
-        // Disparamos la navegación a Recuperación de Contraseña automáticamente
-        composeTestRule.onNodeWithText("¿Olvidaste tu contraseña?").performScrollTo().performClick()
-
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
-            composeTestRule.onAllNodesWithText("Recupera tu acceso y vuelve a disfrutar de tus recetas favoritas.").fetchSemanticsNodes().isNotEmpty()
-        }
-
-        // Verificación: PasswordRecoveryScreen está visible con el subtítulo del Paso 1
-        composeTestRule.onNodeWithText("Recupera tu acceso y vuelve a disfrutar de tus recetas favoritas.").assertIsDisplayed()
-    }
-
-    @Test
-    fun transicionRegisterALogin_conPopBackStack_ejecutaAnimacion() {
+    fun transicionLoginARegisterYDeVuelta_conPopBackStack_ejecutaAnimacion() {
         launchAppNavHost()
         advanceToRegister()
 
@@ -163,7 +131,7 @@ class AppNavigationTest {
     }
 
     @Test
-    fun transicionRecuperacionALogin_conPopBackStack_ejecutaAnimacion() {
+    fun ca0412_transicionLoginARecuperacionYDeVuelta_conPopBackStack_ejecutaAnimacion() {
         launchAppNavHost()
         advanceToLogin()
 

@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -84,34 +83,16 @@ class InventoryViewModelTest {
     }
 
     @Test
-    fun `AddClicked emite efecto NavigateToEditor con null`() = runTest {
+    fun `CA-INV-01-05 anadir, buscar y editar emiten su navegacion`() = runTest {
         val viewModel = createViewModel()
 
-        viewModel.onEvent(InventoryEvent.AddClicked)
-
-        val effect = viewModel.effects.first()
-        assertTrue(effect is InventoryEffect.NavigateToEditor)
-        assertNull((effect as InventoryEffect.NavigateToEditor).itemId)
-    }
-
-    @Test
-    fun `SearchClicked emite efecto NavigateToSearch`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onEvent(InventoryEvent.SearchClicked)
-
-        val effect = viewModel.effects.first()
-        assertEquals(InventoryEffect.NavigateToSearch, effect)
-    }
-
-    @Test
-    fun `EditClicked emite efecto NavigateToEditor con el id del producto`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onEvent(InventoryEvent.EditClicked("item-123"))
-
-        val effect = viewModel.effects.first()
-        assertTrue(effect is InventoryEffect.NavigateToEditor)
-        assertEquals("item-123", (effect as InventoryEffect.NavigateToEditor).itemId)
+        listOf(
+            InventoryEvent.AddClicked to InventoryEffect.NavigateToEditor(null),
+            InventoryEvent.SearchClicked to InventoryEffect.NavigateToSearch,
+            InventoryEvent.EditClicked("item-123") to InventoryEffect.NavigateToEditor("item-123")
+        ).forEach { (evento, efecto) ->
+            viewModel.onEvent(evento)
+            assertEquals("$evento", efecto, viewModel.effects.first())
+        }
     }
 }

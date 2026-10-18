@@ -8,9 +8,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.core.view.WindowCompat
 import com.smartfood.app.HiltTestActivity
 import com.smartfood.app.core.navigation.AppNavHost
-import com.smartfood.app.feature.auth.ui.login.LoginUiState
-import com.smartfood.app.feature.auth.ui.login.LoginScreen
-import com.smartfood.app.feature.splash.SplashScreen
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -25,7 +22,8 @@ import org.junit.Test
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas instrumentadas para verificar la adaptabilidad dinámica del Status Bar
- * e íconos de la barra de estado según el fondo de pantalla activo.
+ * e íconos de la barra de estado según el fondo de pantalla activo. La transición de la Splash al Login comprueba
+ * las dos pantallas; las pruebas sueltas de cada una se quitaron por repetidas (#105).
  */
 @HiltAndroidTest
 class StatusBarAdaptabilityTest {
@@ -39,41 +37,6 @@ class StatusBarAdaptabilityTest {
     @Before
     fun inicializarHilt() {
         hiltRule.inject()
-    }
-
-    @Test
-    fun test_statusBar_enSplashScreen_configuraIconosOscurosParaFondoClaro() {
-        composeTestRule.setContent {
-            SmartfoodTheme {
-                SplashScreen(destination = null, onNavigate = {})
-            }
-        }
-
-        composeTestRule.onNodeWithContentDescription("Logo de SmartFood").assertIsDisplayed()
-
-        val activity = composeTestRule.activity
-        val insetsController = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
-        assertTrue(insetsController.isAppearanceLightStatusBars)
-    }
-
-    @Test
-    fun test_statusBar_enLoginScreen_configuraIconosBlancosParaFondoOscuro() {
-        composeTestRule.setContent {
-            SmartfoodTheme {
-                LoginScreen(
-                    state = LoginUiState(),
-                    onEvent = {},
-                    onNavigateToRegister = {},
-                    onNavigateToForgotPassword = {}
-                )
-            }
-        }
-
-        composeTestRule.onNodeWithText("Bienvenido").assertIsDisplayed()
-
-        val activity = composeTestRule.activity
-        val insetsController = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
-        assertFalse(insetsController.isAppearanceLightStatusBars)
     }
 
     @Test
