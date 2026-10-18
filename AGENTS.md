@@ -17,6 +17,9 @@ Antes de escribir código, leer **`specs/constitution.md`** (principios no negoc
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
 - Códigos de trazabilidad: `HU-NN`, `CA-NN-MM`, `RF-XXX-NN`, `RNF-NN`. Los nombres de los tests citan el CA que cubren.
 - Al revisar comentarios `TODO`, implementarlos aplicando MVVM según la constitución.
+- **Plantilla de las specs nuevas:** además de historias, criterios, requisitos, fuera de alcance y supuestos, cada `spec.md` incluye:
+  - **Fidelidad con Figma:** frames de referencia, interacciones del prototipo (transiciones con duración y curva) y **Desviaciones** aprobadas.
+  - **Plan de entrega:** las features verticales (domain + data + estructura + ui), los commits y los PR previstos (ver "Recomendaciones de Zhair").
 
 ## Modo plan con preguntas (obligatorio en toda modificación)
 
@@ -39,6 +42,15 @@ El diseño de referencia es el archivo **[SmartFood en Figma](https://www.figma.
 - Al implementar, pedir al usuario el enlace del frame (`...?node-id=123-456`; en las llamadas el nodo se escribe `123:456`) y obtener el contexto de diseño y una captura del nodo con el MCP.
 - El código que entrega Figma es **referencia**, no código final: se adapta a los tokens de `core/designsystem/theme`, a los componentes `SmartFood*`, a `LocalFormMetrics` y al resto de reglas de este archivo. No se copian colores ni medidas fijas.
 - Si el diseño pide un color o una medida que no existe, se pregunta en el modo plan (categoría *Diseño*) antes de crear nada.
+
+### Fidelidad total con Figma (exigencia del curso)
+
+El profesor evalúa que la app funcione **exactamente como el prototipo**, como lo exigiría un cliente real que lo aprobó. Es un principio de la [constitución](specs/constitution.md#1-propósito-del-producto).
+
+- **Todo cuenta:** íconos (los del Figma, no sustitutos de Material), colores, tipografía, espaciados, componentes, estados (vacío, carga, error) y **animaciones y transiciones**.
+- **Interacciones del prototipo:** además del frame, se leen sus reacciones (transición, dirección, duración y curva) con el MCP. Con `use_figma` en modo solo lectura, `node.reactions` de los nodos del flujo; el resultado se agrupa porque el archivo tiene cientos de interacciones.
+- **Desviaciones:** toda diferencia con el Figma (por limitación técnica o porque el Figma no define el caso) va en la sección "Desviaciones" de la spec y la aprueba Zhair antes de programarla.
+- **Verificación:** el PR de una pantalla incluye la captura del Figma junto a la de la app en el mismo estado.
 
 ### Si el MCP de Figma no está configurado
 
@@ -84,7 +96,7 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 
 ### 0. Issues, asignación y plan
 
-- Zhair es el planeador: escribe o aprueba la spec, divide su `tasks.md` en **Issues** (etiquetas `spec-NNN`, capa y dificultad `inicial`/`intermedia`/`avanzada`, dentro del milestone de la spec) y los asigna. Nadie empieza un Issue que no tenga asignado.
+- Zhair es el planeador: escribe o aprueba la spec, divide su `tasks.md` en **Issues por feature completa** (domain, data, estructura y ui juntos, no un Issue por capa) (etiquetas `spec-NNN`, capa y dificultad `inicial`/`intermedia`/`avanzada`, dentro del milestone de la spec) y los asigna. Nadie empieza un Issue que no tenga asignado.
 - El tablero de GitHub Projects sigue el orden *Por hacer → Plan en revisión → En progreso → PR en revisión → Hecho*. Cada persona tiene **un solo Issue en progreso** a la vez.
 - Antes de programar, el plan del modo plan (preguntas respondidas incluidas) se publica **como comentario en el Issue** y el Issue pasa a *Plan en revisión*. Natalia puede revisar primero los planes de dificultad `inicial` o `intermedia`; **la aprobación final es de Zhair**, en el mismo Issue. Sin esa aprobación no se escribe código.
 - Los archivos compartidos (`libs.versions.toml`, `app/build.gradle.kts`, `CoreDataModule`, `AppNavHost`, `strings.xml`, `firestore.rules`) solo los modifica el Issue que los menciona. Si un plan necesita tocarlos y su Issue no los menciona, se pregunta en el Issue.
@@ -98,7 +110,7 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 ### 2. Commits
 
 - Convencionales y en español: `feat`, `fix`, `test`, `docs`, `refactor` o `chore`, con ámbito y la spec o el CA que cubren. Ejemplos: `feat(inventario): agregar producto con fecha de vencimiento (spec 006, CA-INV-01-01)` y `fix(ui): … (spec 002, CA-UI-07-08)`.
-- Commits pequeños y con un solo propósito. Antes de confirmar, revisar `git status` y `git diff --cached`. Nunca se suben `app/google-services.json`, keystores ni otros secretos (RNF-01).
+- **Un commit por feature completa:** su `domain`, `data`, estructura (DI, navegación, recursos) y `ui`, con sus pruebas, van juntos, no un commit por capa ni por archivo. Un Issue suele ser una feature y un commit (más uno de spec o documentación si hace falta). Las correcciones de la feature se integran en ese commit mientras no se haya hecho push; después, van en commits nuevos. Antes de confirmar, revisar `git status` y `git diff --cached`. Nunca se suben `app/google-services.json`, keystores ni otros secretos (RNF-01).
 
 ### 3. Antes de abrir el PR (todo obligatorio)
 
@@ -110,7 +122,7 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 
 ### 4. El pull request
 
-- Base `master`. El título sigue el formato de los commits. Un PR por Issue, y la descripción empieza con `Closes #<issue>` para que el Issue se cierre al fusionar.
+- Base `master`. El título sigue el formato de los commits. **Pocos PR:** se agrupan en uno los Issues relacionados cuando Zhair lo acepta. La descripción empieza con un `Closes #<issue>` por cada Issue, para que se cierren al fusionar.
 - La descripción incluye:
   - **Resumen:** qué cambia y por qué.
   - **Trazabilidad:** spec, HU y CA cubiertos.
@@ -157,6 +169,19 @@ Cada agente mantiene al día el checklist del Issue en el que trabaja, sin que n
 
 - **Nunca** se marca una casilla cuyo paso no se cumplió. Si un paso falla, la casilla queda vacía y el agente lo informa con la salida.
 - Al terminar, el agente dice qué casillas marcó, cuáles quedan pendientes y por qué.
+
+## Recomendaciones de Zhair
+
+Zhair (planeador) da recomendaciones durante el trabajo. **Toda recomendación nueva se agrega a esta lista**, sin que nadie lo pida, y las specs nuevas las aplican.
+
+| Fecha | Recomendación | Cómo se aplica |
+|---|---|---|
+| 2026-10-17 | Terminar cada Issue más rápido sin saltarse pasos. | Una compilación por ronda (unitarias, assemble, androidTest y lint juntos) y las preguntas del modo plan en una sola ronda. |
+| 2026-10-17 | Pruebas instrumentadas específicas. | En cada Issue solo las clases de las pantallas y componentes que toca, más las de navegación si cambia; la suite completa, en el cierre de la spec. |
+| 2026-10-18 | Commits por feature grande y pocos PR, porque el profesor ve demasiados cambios en GitHub. | Ver §2 Commits y §4 PR: un commit por feature completa y varios Issues por PR. |
+| 2026-10-18 | Asociar en un solo Issue el domain, data, estructura y ui de cada feature. | Issues por feature vertical (§0); así un Issue es un commit. |
+| 2026-10-18 | La app debe ser 100 % fiel al Figma: íconos, animaciones, colores y componentes. | Ver "Fidelidad total con Figma" y la constitución §1. |
+| 2026-10-18 | Medir la fluidez de las animaciones en el build release. | En debug, Compose pierde ~300 ms al iniciar cada pantalla; las animaciones se juzgan con el APK release en el teléfono (medición del 18/10/2026). |
 
 ## Comandos
 
