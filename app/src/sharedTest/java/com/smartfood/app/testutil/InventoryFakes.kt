@@ -28,7 +28,8 @@ import java.time.LocalDate
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Implementaciones fake de los contratos del dominio del inventario (spec 006, T006), compartidas
- * por las pruebas unitarias. Registran las llamadas recibidas y devuelven resultados configurables.
+ * por las pruebas unitarias y las instrumentadas (source set `sharedTest`, #105). Registran las llamadas recibidas y
+ * devuelven resultados configurables.
  */
 
 /**
@@ -51,7 +52,8 @@ fun inventoryItem(
     expiresOn: LocalDate = LocalDate.of(2026, 9, 10),
     quantity: Quantity? = null,
     photo: ItemPhoto? = null,
-) = InventoryItem(id, name, category, expiresOn, quantity, photo)
+    price: Long? = null,
+) = InventoryItem(id, name, category, expiresOn, quantity, photo, price = price)
 
 /**
  * Fake de [InventoryRepository] que guarda los productos en un `MutableStateFlow`, así cada cambio se emite como
@@ -182,6 +184,9 @@ class FakePhotoRepository(private val log: CallLog = CallLog()) : PhotoRepositor
     var deleteResult: Result<Unit>? = null
 
     val uploads = mutableListOf<Pair<String, LocalPhoto>>()
+    /** La última foto que se subió con éxito. */
+    var lastUploaded: ItemPhoto? = null
+        private set
     val deletedPaths = mutableListOf<String>()
     private var uploadCount = 0
 
@@ -191,7 +196,7 @@ class FakePhotoRepository(private val log: CallLog = CallLog()) : PhotoRepositor
         uploadCount++
         uploads += itemId to photo
         val path = "users/$DEFAULT_UID/inventory/$itemId/foto-$uploadCount.jpg"
-        return Result.success(ItemPhoto(path, "https://fotos.test/$path"))
+        return Result.success(ItemPhoto(path, "https://fotos.test/$path").also { lastUploaded = it })
     }
 
     override suspend fun delete(path: String): Result<Unit> {

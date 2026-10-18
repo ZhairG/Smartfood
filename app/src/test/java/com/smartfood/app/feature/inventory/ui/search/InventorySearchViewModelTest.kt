@@ -71,8 +71,8 @@ class InventorySearchViewModelTest {
         )
     }
 
-    private fun crearViewModel() = InventorySearchViewModel(
-        observeInventoryUseCase = ObserveInventoryUseCase(repository, FakePhotoSync(), ClassifyExpiryUseCase(fixedClock(today))),
+    private fun crearViewModel(inventario: InventoryRepository = repository) = InventorySearchViewModel(
+        observeInventoryUseCase = ObserveInventoryUseCase(inventario, FakePhotoSync(), ClassifyExpiryUseCase(fixedClock(today))),
         searchInventoryUseCase = SearchInventoryUseCase(),
         speechToText = speech,
         parseSpokenIngredientsUseCase = ParseSpokenIngredientsUseCase()
@@ -231,12 +231,7 @@ class InventorySearchViewModelTest {
             override fun observeItems(): Flow<List<InventoryItem>> =
                 flow { throw InventoryException(InventoryError.NotAuthenticated) }
         }
-        val viewModel = InventorySearchViewModel(
-            observeInventoryUseCase = ObserveInventoryUseCase(sinSesion, FakePhotoSync(), ClassifyExpiryUseCase(fixedClock(today))),
-            searchInventoryUseCase = SearchInventoryUseCase(),
-            speechToText = speech,
-            parseSpokenIngredientsUseCase = ParseSpokenIngredientsUseCase()
-        )
+        val viewModel = crearViewModel(sinSesion)
 
         val state = viewModel.uiState.first { !it.isLoading }
 

@@ -15,8 +15,8 @@ import kotlin.time.Duration.Companion.seconds
  * Nombre: Fakes.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Implementaciones fake de los contratos del dominio, compartidas por todas las pruebas
- * unitarias. Registran las llamadas recibidas y devuelven resultados configurables.
+ * Descripción: Implementaciones fake de los contratos del dominio, compartidas por las pruebas unitarias y las
+ * instrumentadas (source set `sharedTest`, #105). Registran las llamadas recibidas y devuelven resultados configurables.
  */
 
 /** Fake de [AuthRepository]. Por defecto todas las operaciones tienen éxito. */
