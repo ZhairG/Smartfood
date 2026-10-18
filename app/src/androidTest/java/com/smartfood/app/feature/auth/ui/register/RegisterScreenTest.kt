@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.auth.ui.register
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
@@ -32,30 +33,38 @@ import org.junit.Test
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas de UI de la pantalla stateless [RegisterScreen] (HU-01) y de los enlaces a los documentos
- * legales de la casilla (spec 005, HU-LEG-01).
+ * legales de la casilla (spec 005, HU-LEG-01). Una prueba recorre el formulario cambiando el `UiState` y otra la
+ * casilla con sus enlaces (#105).
  */
 class RegisterScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private fun mostrar(
-        state: RegisterUiState = RegisterUiState(),
-        onEvent: (RegisterEvent) -> Unit = {},
-        onOpenTerms: () -> Unit = {},
-        onOpenPrivacy: () -> Unit = {}
-    ) {
+    private val eventos = mutableListOf<RegisterEvent>()
+    private val estado = mutableStateOf(RegisterUiState())
+    private var terminos = 0
+    private var privacidad = 0
+
+    /** Monta la pantalla una sola vez; cada paso del flujo cambia [estado]. */
+    private fun mostrar() {
         composeTestRule.setContent {
             SmartfoodTheme {
                 RegisterScreen(
-                    state = state,
-                    onEvent = onEvent,
+                    state = estado.value,
+                    onEvent = { eventos += it },
                     onNavigateToLogin = {},
-                    onOpenTerms = onOpenTerms,
-                    onOpenPrivacy = onOpenPrivacy
+                    onOpenTerms = { terminos++ },
+                    onOpenPrivacy = { privacidad++ }
                 )
             }
         }
+    }
+
+    private fun paso(nuevo: RegisterUiState) {
+        eventos.clear()
+        estado.value = nuevo
+        composeTestRule.waitForIdle()
     }
 
     /** Texto de la casilla, fuera del árbol fusionado para poder medir dónde quedó cada enlace. */
@@ -85,117 +94,56 @@ class RegisterScreenTest {
     private fun campoContrasena() =
         composeTestRule.onNode(hasSetTextAction() and SemanticsMatcher.keyIsDefined(SemanticsProperties.Password))
 
-    @Test
-    fun pantallaRegistro_muestraEncabezadoYCampos() {
-        mostrar()
-
-        composeTestRule.onNodeWithText("Crea tu cuenta").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Empieza a aprovechar cada ingrediente de tu cocina.").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Nombre completo").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Correo electrónico").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Contraseña").assertIsDisplayed()
-    }
-
-    @Test
-    fun ca0103_cuandoCampoContrasenaEnfocado_muestraChecklistDeRequisitos() {
-        mostrar()
-
-        campoContrasena().performClick()
-
-        composeTestRule.onNodeWithText("Mínimo 8 caracteres").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Una letra mayúscula").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Un número y carácter especial").assertIsDisplayed()
-    }
-
-    @Test
-    fun pantallaRegistro_cuandoUsuarioEscribeNombre_emiteEventoFullNameChanged() {
-        var lastEvent: RegisterEvent? = null
-        mostrar(onEvent = { lastEvent = it })
-
-        composeTestRule.onNodeWithText("Ej. Pepito Perez").performTextInput("Pepito Perez")
-
-        assertEquals(RegisterEvent.FullNameChanged("Pepito Perez"), lastEvent)
-    }
-
-    @Test
-    fun ca0105_sinAceptarTerminos_botonDeshabilitado() {
-        mostrar(RegisterUiState(acceptedTerms = false))
-
-        botonCrearCuenta().assertIsNotEnabled()
-    }
-
-    @Test
-    fun ca0105_conTerminosAceptados_botonHabilitado() {
-        mostrar(RegisterUiState(acceptedTerms = true))
-
-        botonCrearCuenta().assertIsEnabled()
-    }
-
-    @Test
-    fun ca0106_cuentaExistente_muestraMensaje() {
-        mostrar(RegisterUiState(error = AuthError.EmailAlreadyInUse))
-
-        composeTestRule.onNodeWithText("Ya existe una cuenta registrada con este correo electrónico").assertIsDisplayed()
-    }
-
-    @Test
-    fun caLeg0101_tocarTerminos_abreElDocumentoSinAlternarLaCasilla() {
-        var aperturas = 0
-        val eventos = mutableListOf<RegisterEvent>()
-        mostrar(onEvent = { eventos += it }, onOpenTerms = { aperturas++ })
-
-        tocarEnTextoCasilla("Términos y condiciones")
-
-        assertEquals(1, aperturas)
-        assertEquals(emptyList<RegisterEvent>(), eventos)
-    }
-
-    @Test
-    fun caLeg0102_tocarPolitica_abreElDocumentoSinAlternarLaCasilla() {
-        var aperturas = 0
-        val eventos = mutableListOf<RegisterEvent>()
-        mostrar(onEvent = { eventos += it }, onOpenPrivacy = { aperturas++ })
-
-        tocarEnTextoCasilla("Política de privacidad")
-
-        assertEquals(1, aperturas)
-        assertEquals(emptyList<RegisterEvent>(), eventos)
-    }
-
-    @Test
-    fun caLeg0104_tocarAceptoLos_alternaLaCasilla() {
-        var aperturas = 0
-        val eventos = mutableListOf<RegisterEvent>()
-        mostrar(onEvent = { eventos += it }, onOpenTerms = { aperturas++ }, onOpenPrivacy = { aperturas++ })
-
-        tocarEnTextoCasilla("Acepto")
-
-        assertEquals(listOf<RegisterEvent>(RegisterEvent.AcceptedTermsChanged(true)), eventos)
-        assertEquals(0, aperturas)
-    }
-
-    @Test
-    fun caLeg0107_lectorDePantalla_ofreceAbrirAmbosDocumentos() {
-        var terminos = 0
-        var privacidad = 0
-        mostrar(onOpenTerms = { terminos++ }, onOpenPrivacy = { privacidad++ })
-
-        accionLectorDePantalla("Abrir Términos y condiciones")
-        accionLectorDePantalla("Abrir Política de privacidad")
-
-        assertEquals(1, terminos)
-        assertEquals(1, privacidad)
-    }
-
     /** El nodo editable declara [type] para el autocompletado del teléfono (spec 001, HU-07). */
     private fun conTipo(type: ContentType) = SemanticsMatcher.expectValue(SemanticsProperties.ContentType, type)
 
     @Test
-    fun ca0703_registroOfreceUsuarioYPideContrasenaNueva() {
+    fun ca0103_0105_0106_0703_elFormularioPideLosDatosYHabilitaCrearCuentaConLosTerminos() {
         mostrar()
-
+        listOf(
+            "Crea tu cuenta", "Empieza a aprovechar cada ingrediente de tu cocina.", "Nombre completo",
+            "Correo electrónico", "Contraseña"
+        ).forEach { composeTestRule.onNodeWithText(it).assertIsDisplayed() }
+        // CA-07-03: el registro ofrece el nombre y el usuario, y pide una contraseña nueva.
         composeTestRule.onNodeWithText("Nombre completo").assert(conTipo(ContentType.PersonFullName))
         composeTestRule.onNodeWithText("Correo electrónico").assert(conTipo(EmailAccountContentType))
         campoContrasena().assert(conTipo(ContentType.NewPassword))
+        composeTestRule.onNodeWithText("Ej. Pepito Perez").performTextInput("Pepito Perez")
+        assertEquals("escribir el nombre", listOf<RegisterEvent>(RegisterEvent.FullNameChanged("Pepito Perez")), eventos)
+
+        // CA-01-05: el botón solo se habilita con los términos aceptados.
+        botonCrearCuenta().assertIsNotEnabled()
+        paso(RegisterUiState(acceptedTerms = true))
+        botonCrearCuenta().assertIsEnabled()
+
+        // CA-01-06: cuenta existente.
+        paso(RegisterUiState(acceptedTerms = true, error = AuthError.EmailAlreadyInUse))
+        composeTestRule.onNodeWithText("Ya existe una cuenta registrada con este correo electrónico").assertIsDisplayed()
+
+        // CA-01-03: al enfocar la contraseña aparece el checklist de requisitos.
+        campoContrasena().performClick()
+        listOf("Mínimo 8 caracteres", "Una letra mayúscula", "Un número y carácter especial")
+            .forEach { composeTestRule.onNodeWithText(it).assertIsDisplayed() }
+    }
+
+    @Test
+    fun caLeg0101_0102_0104_0107_losEnlacesAbrenSuDocumentoYElRestoAlternaLaCasilla() {
+        mostrar()
+
+        // CA-LEG-01-01 y 01-02: cada enlace abre su documento sin alternar la casilla.
+        tocarEnTextoCasilla("Términos y condiciones")
+        tocarEnTextoCasilla("Política de privacidad")
+        assertEquals("términos y privacidad", 1 to 1, terminos to privacidad)
+        assertEquals("los enlaces no alternan la casilla", emptyList<RegisterEvent>(), eventos)
+
+        // CA-LEG-01-04: el resto del texto alterna la casilla.
+        tocarEnTextoCasilla("Acepto")
+        assertEquals("tocar «Acepto»", listOf<RegisterEvent>(RegisterEvent.AcceptedTermsChanged(true)), eventos)
+        assertEquals("«Acepto» no abre documentos", 1 to 1, terminos to privacidad)
+
+        // CA-LEG-01-07: el lector de pantalla ofrece abrir ambos documentos.
+        accionLectorDePantalla("Abrir Términos y condiciones")
+        accionLectorDePantalla("Abrir Política de privacidad")
+        assertEquals("acciones del lector de pantalla", 2 to 2, terminos to privacidad)
     }
 }

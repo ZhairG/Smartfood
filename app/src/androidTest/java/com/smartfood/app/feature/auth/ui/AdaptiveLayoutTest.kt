@@ -1,6 +1,7 @@
 package com.smartfood.app.feature.auth.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.DeviceConfigurationOverride
 import androidx.compose.ui.test.ForcedSize
@@ -47,7 +48,7 @@ import kotlin.math.ceil
  * Descripción: Verifica que cada pantalla de formulario cabe sin scroll (spec 002, HU-UI-01): con el teclado
  * cerrado, ningún contenedor desplazable tiene rango de scroll y el botón principal es visible.
  * Se ejecuta en 360×720 dp (perfil compacto), 384×857 dp (perfil medio, teléfono V2436) y 412×917 dp (tamaño de los
- * frames de Figma).
+ * frames de Figma). En cada tamaño se monta un solo contenedor y se cambia la pantalla que dibuja (#105).
  */
 @RunWith(Parameterized::class)
 class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
@@ -68,12 +69,21 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private fun mostrar(content: @Composable () -> Unit) {
+    private val pantalla = mutableStateOf<@Composable () -> Unit>({})
+
+    /** Monta un contenedor una sola vez; cada paso cambia la [pantalla] que dibuja. */
+    private fun montar() {
         composeTestRule.setContent {
             DeviceConfigurationOverride(DeviceConfigurationOverride.ForcedSize(screenSize)) {
-                SmartfoodTheme { content() }
+                SmartfoodTheme { pantalla.value() }
             }
         }
+    }
+
+    private fun mostrar(content: @Composable () -> Unit) {
+        pantalla.value = content
+        // Primero se compone la pantalla nueva, como hacía setContent; si no, el adelanto del reloj empieza antes.
+        composeTestRule.waitForIdle()
         // El scaffold baja de perfil solo si el desborde se mantiene; el reloj de la prueba es virtual y waitForIdle
         // no avanza esos delay, así que se deja pasar el tiempo para que cada pantalla use su perfil definitivo.
         composeTestRule.mainClock.advanceTimeBy(3_000)
@@ -81,73 +91,47 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
     }
 
     /** Ningún contenedor desplazable puede tener rango de scroll y [buttonText] debe verse completo. */
-    private fun assertCabeSinScroll(buttonText: String) {
+    private fun assertCabeSinScroll(pantalla: String, buttonText: String) {
         val scrollables = composeTestRule
             .onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange))
             .fetchSemanticsNodes()
-        assertTrue("Debe existir el contenedor del formulario", scrollables.isNotEmpty())
+        assertTrue("$pantalla: debe existir el contenedor del formulario", scrollables.isNotEmpty())
         scrollables.forEach { node ->
             val range = node.config[SemanticsProperties.VerticalScrollAxisRange]
-            assertEquals("No debe haber scroll en $screenSize", 0f, range.maxValue(), 0.5f)
+            assertEquals("$pantalla: no debe haber scroll en $screenSize", 0f, range.maxValue(), 0.5f)
         }
         composeTestRule.onNode(hasText(buttonText) and hasClickAction()).assertIsDisplayed()
     }
 
-    @Test
-    fun ca_ui_01_01_login_cabeSinScroll() {
-        mostrar { LoginScreen(LoginUiState(), {}, {}, {}) }
-        assertCabeSinScroll("Iniciar Sesión")
-    }
-
-    @Test
-    fun ca_ui_01_01_registro_cabeSinScroll() {
-        mostrar { RegisterScreen(RegisterUiState(acceptedTerms = true), {}, {}, {}, {}) }
-        assertCabeSinScroll("Crear Cuenta")
-    }
-
-    @Test
-    fun ca_ui_01_01_registroConMensajeDeError_cabeSinScroll() {
-        mostrar { RegisterScreen(RegisterUiState(acceptedTerms = true, error = AuthError.EmailAlreadyInUse), {}, {}, {}, {}) }
-        assertCabeSinScroll("Crear Cuenta")
-    }
-
-    @Test
-    fun ca_ui_01_01_recuperacionPaso1_cabeSinScroll() {
-        mostrar { PasswordRecoveryScreen(PasswordRecoveryUiState(step = RecoveryStep.EMAIL_REQUEST), {}, {}) }
-        assertCabeSinScroll("Enviar Código")
-    }
-
-    @Test
-    fun ca_ui_01_01_recuperacionPaso2_cabeSinScroll() {
-        mostrar {
-            PasswordRecoveryScreen(
-                PasswordRecoveryUiState(step = RecoveryStep.OTP_VERIFICATION, email = "demo@smartfood.com"),
-                {},
-                {}
-            )
-        }
-        assertCabeSinScroll("Verificar Código")
-    }
-
     /**
-     * CA-REC-04-04: con la cuenta regresiva más larga ("37:12", límite de 5 por hora) el paso 2 sigue cabiendo y la
-     * fila cabe en una línea y la píldora no se recorta.
+     * CA-UI-01-01: login, registro (con y sin error) y los tres pasos de la recuperación caben sin scroll. CA-REC-04-04:
+     * con la cuenta regresiva más larga ("37:12", límite de 5 por hora) el paso 2 sigue cabiendo, la fila cabe en una
+     * línea y la píldora no se recorta. CA-UI-01-02: la pantalla de éxito muestra el botón completo.
      */
     @Test
-    fun ca_rec_04_04_recuperacionPaso2ConCuentaRegresiva_cabeSinScroll() {
-        mostrar {
-            PasswordRecoveryScreen(
-                PasswordRecoveryUiState(
-                    step = RecoveryStep.OTP_VERIFICATION,
-                    email = "demo@smartfood.com",
-                    resendCooldownSeconds = 2_232,
-                    cooldownEmail = "demo@smartfood.com"
-                ),
-                {},
-                {}
-            )
+    fun ca_ui_01_01_ca_ui_01_02_ca_rec_04_04_lasPantallasDeAutenticacionCabenSinScroll() {
+        montar()
+        val paso2 = PasswordRecoveryUiState(step = RecoveryStep.OTP_VERIFICATION, email = "demo@smartfood.com")
+        listOf<Triple<String, String, @Composable () -> Unit>>(
+            Triple("login", "Iniciar Sesión") { LoginScreen(LoginUiState(), {}, {}, {}) },
+            Triple("registro", "Crear Cuenta") { RegisterScreen(RegisterUiState(acceptedTerms = true), {}, {}, {}, {}) },
+            Triple("registro con error", "Crear Cuenta") {
+                RegisterScreen(RegisterUiState(acceptedTerms = true, error = AuthError.EmailAlreadyInUse), {}, {}, {}, {})
+            },
+            Triple("recuperación paso 1", "Enviar Código") {
+                PasswordRecoveryScreen(PasswordRecoveryUiState(step = RecoveryStep.EMAIL_REQUEST), {}, {})
+            },
+            Triple("recuperación paso 2", "Verificar Código") { PasswordRecoveryScreen(paso2, {}, {}) },
+            Triple("recuperación paso 3", "Reestablecer Contraseña") {
+                PasswordRecoveryScreen(PasswordRecoveryUiState(step = RecoveryStep.NEW_PASSWORD), {}, {})
+            },
+            Triple("paso 2 con cuenta regresiva", "Verificar Código") {
+                PasswordRecoveryScreen(paso2.copy(resendCooldownSeconds = 2_232, cooldownEmail = "demo@smartfood.com"), {}, {})
+            }
+        ).forEach { (nombre, boton, contenido) ->
+            mostrar(contenido)
+            assertCabeSinScroll(nombre, boton)
         }
-        assertCabeSinScroll("Verificar Código")
 
         val texto = textLayout("Reenviar código en")
         assertEquals("El texto debe quedar en una línea en $screenSize", 1, texto.lineCount)
@@ -159,25 +143,7 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
             "La píldora no debe recortarse en $screenSize",
             ceil(pildora.multiParagraph.maxIntrinsicWidth) <= pildora.size.width
         )
-    }
 
-    /** Resultado del layout del texto visible [text], para comprobar líneas y recortes. */
-    private fun textLayout(text: String): TextLayoutResult {
-        val node = composeTestRule.onNodeWithText(text, useUnmergedTree = true)
-        node.assertIsDisplayed()
-        val layouts = mutableListOf<TextLayoutResult>()
-        node.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
-        return layouts.first()
-    }
-
-    @Test
-    fun ca_ui_01_01_recuperacionPaso3_cabeSinScroll() {
-        mostrar { PasswordRecoveryScreen(PasswordRecoveryUiState(step = RecoveryStep.NEW_PASSWORD), {}, {}) }
-        assertCabeSinScroll("Reestablecer Contraseña")
-    }
-
-    @Test
-    fun ca_ui_01_02_pantallaDeExito_muestraElBotonCompleto() {
         mostrar {
             ActionSuccessScreen(
                 title = "¡Cuenta creada con éxito!",
@@ -189,37 +155,36 @@ class AdaptiveLayoutTest(widthDp: Int, heightDp: Int) {
         composeTestRule.onNode(hasText("Continuar") and hasClickAction()).assertIsDisplayed()
     }
 
-    // T036 (spec 006, RNF-INV-06): el editor de producto cabe con el teclado cerrado, en alta y en edición.
-    @Test
-    fun t036_rnfInv06_editorAlta_botonFijoYPrecioAlcanzable() {
-        mostrar { ProductEditorScreen(ProductEditorUiState(), {}) }
-        assertEditorAdaptable("Añadir al Inventario")
-    }
-
-    @Test
-    fun t036_rnfInv06_editorEdicion_botonFijoYPrecioAlcanzable() {
-        mostrar {
-            ProductEditorScreen(
-                ProductEditorUiState(
-                    mode = EditorMode.EDIT,
-                    name = "Carne",
-                    expiresOn = LocalDate.of(2026, 9, 20),
-                    category = FoodCategory.PROTEINS,
-                    isSaveEnabled = true
-                ),
-                {}
-            )
-        }
-        assertEditorAdaptable("Eliminar")
+    /** Resultado del layout del texto visible [text], para comprobar líneas y recortes. */
+    private fun textLayout(text: String): TextLayoutResult {
+        val node = composeTestRule.onNodeWithText(text, useUnmergedTree = true)
+        node.assertIsDisplayed()
+        val layouts = mutableListOf<TextLayoutResult>()
+        node.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        return layouts.first()
     }
 
     /**
-     * T054 y T055 (RNF-INV-06): con el precio, el editor puede necesitar desplazarse en pantallas bajas. El último
-     * campo (el precio) y el botón, que va dentro del formulario como el Figma, se alcanzan desplazando.
+     * T036, T054 y T055 (spec 006, RNF-INV-06): con el precio, el editor puede necesitar desplazarse en pantallas
+     * bajas. En alta y en edición, el último campo (el precio) y el botón, que va dentro del formulario como el Figma,
+     * se alcanzan desplazando.
      */
-    private fun assertEditorAdaptable(buttonText: String) {
-        // Como el Figma (T055), el botón va dentro del formulario: el último campo y el botón se alcanzan desplazando.
-        composeTestRule.onNodeWithContentDescription("Precio (opcional)").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNode(hasText(buttonText) and hasClickAction()).performScrollTo().assertIsDisplayed()
+    @Test
+    fun t036_rnfInv06_elEditorDeAltaYEdicionAlcanzaElPrecioYElBoton() {
+        montar()
+        listOf(
+            "Añadir al Inventario" to ProductEditorUiState(),
+            "Eliminar" to ProductEditorUiState(
+                mode = EditorMode.EDIT,
+                name = "Carne",
+                expiresOn = LocalDate.of(2026, 9, 20),
+                category = FoodCategory.PROTEINS,
+                isSaveEnabled = true
+            )
+        ).forEach { (boton, estado) ->
+            mostrar { ProductEditorScreen(estado, {}) }
+            composeTestRule.onNodeWithContentDescription("Precio (opcional)").performScrollTo().assertIsDisplayed()
+            composeTestRule.onNode(hasText(boton) and hasClickAction()).performScrollTo().assertIsDisplayed()
+        }
     }
 }
