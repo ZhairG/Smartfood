@@ -16,6 +16,11 @@ apps existentes tratan por separado: **inventario** (qué hay), **vencimiento** 
 **presupuesto** (cuánto se puede gastar). Sobre esos datos actúa un **agente de recomendación basado en
 utilidad** que ordena recetas de un catálogo curado (ver Avance 2 de IA).
 
+**Fidelidad total con el prototipo.** La app cumple el prototipo de Figma al 100 %: íconos, colores, tipografía,
+componentes, estados, animaciones y transiciones, como lo esperaría un cliente real que aprobó ese prototipo. Toda
+diferencia con el Figma se documenta en la sección "Desviaciones" de la spec y la aprueba el planeador antes de
+programarla.
+
 ## 2. Flujo de trabajo: Spec Driven Development
 
 Ninguna funcionalidad se programa sin especificación. El orden es obligatorio:
@@ -105,6 +110,7 @@ Una tarea está terminada cuando se cumple todo esto:
 - [ ] `./gradlew :app:assembleDebug` compila sin errores.
 - [ ] No introduce secretos (`git grep` limpio).
 - [ ] La spec, el plan o las tareas se actualizaron si la implementación cambió algo.
+- [ ] Si la tarea toca la interfaz, coincide con el frame y con las interacciones del prototipo de Figma, o la diferencia está aprobada en la spec.
 
 ## Enmiendas
 
@@ -112,3 +118,4 @@ Una tarea está terminada cuando se cumple todo esto:
 |---|---|---|
 | 2026-10-04 | Versión 1.0 | Adopción de SDD para el módulo 1 |
 | 2026-10-04 | Códigos con prefijo por spec | Evitar choques de códigos entre la spec 001 y la 002 |
+| 2026-10-18 | Fidelidad total con el prototipo de Figma (§1 y Definition of Done) | El profesor evalúa que el producto cumpla el prototipo como lo exigiría un cliente real |
