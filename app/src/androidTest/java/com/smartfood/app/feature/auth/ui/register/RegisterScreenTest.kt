@@ -1,6 +1,5 @@
 package com.smartfood.app.feature.auth.ui.register
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
@@ -24,6 +23,9 @@ import androidx.compose.ui.text.TextLayoutResult
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.ui.components.EmailAccountContentType
+import com.smartfood.app.testutil.PantallaEnFlujo
+import com.smartfood.app.testutil.conTipo
+import com.smartfood.app.testutil.mostrado
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -41,30 +43,22 @@ class RegisterScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val eventos = mutableListOf<RegisterEvent>()
-    private val estado = mutableStateOf(RegisterUiState())
     private var terminos = 0
     private var privacidad = 0
 
-    /** Monta la pantalla una sola vez; cada paso del flujo cambia [estado]. */
-    private fun mostrar() {
-        composeTestRule.setContent {
-            SmartfoodTheme {
-                RegisterScreen(
-                    state = estado.value,
-                    onEvent = { eventos += it },
-                    onNavigateToLogin = {},
-                    onOpenTerms = { terminos++ },
-                    onOpenPrivacy = { privacidad++ }
-                )
-            }
+    private val flujo = PantallaEnFlujo<RegisterUiState, RegisterEvent>(
+        composeTestRule,
+        RegisterUiState()
+    ) { state, onEvent ->
+        SmartfoodTheme {
+            RegisterScreen(
+                state = state,
+                onEvent = onEvent,
+                onNavigateToLogin = {},
+                onOpenTerms = { terminos++ },
+                onOpenPrivacy = { privacidad++ }
+            )
         }
-    }
-
-    private fun paso(nuevo: RegisterUiState) {
-        eventos.clear()
-        estado.value = nuevo
-        composeTestRule.waitForIdle()
     }
 
     /** Texto de la casilla, fuera del árbol fusionado para poder medir dónde quedó cada enlace. */
@@ -94,51 +88,47 @@ class RegisterScreenTest {
     private fun campoContrasena() =
         composeTestRule.onNode(hasSetTextAction() and SemanticsMatcher.keyIsDefined(SemanticsProperties.Password))
 
-    /** El nodo editable declara [type] para el autocompletado del teléfono (spec 001, HU-07). */
-    private fun conTipo(type: ContentType) = SemanticsMatcher.expectValue(SemanticsProperties.ContentType, type)
-
     @Test
     fun ca0103_0105_0106_0703_elFormularioPideLosDatosYHabilitaCrearCuentaConLosTerminos() {
-        mostrar()
-        listOf(
+        flujo.mostrar()
+        composeTestRule.mostrado(
             "Crea tu cuenta", "Empieza a aprovechar cada ingrediente de tu cocina.", "Nombre completo",
             "Correo electrónico", "Contraseña"
-        ).forEach { composeTestRule.onNodeWithText(it).assertIsDisplayed() }
+        )
         // CA-07-03: el registro ofrece el nombre y el usuario, y pide una contraseña nueva.
         composeTestRule.onNodeWithText("Nombre completo").assert(conTipo(ContentType.PersonFullName))
         composeTestRule.onNodeWithText("Correo electrónico").assert(conTipo(EmailAccountContentType))
         campoContrasena().assert(conTipo(ContentType.NewPassword))
         composeTestRule.onNodeWithText("Ej. Pepito Perez").performTextInput("Pepito Perez")
-        assertEquals("escribir el nombre", listOf<RegisterEvent>(RegisterEvent.FullNameChanged("Pepito Perez")), eventos)
+        assertEquals("escribir el nombre", listOf<RegisterEvent>(RegisterEvent.FullNameChanged("Pepito Perez")), flujo.eventos)
 
         // CA-01-05: el botón solo se habilita con los términos aceptados.
         botonCrearCuenta().assertIsNotEnabled()
-        paso(RegisterUiState(acceptedTerms = true))
+        flujo.paso(RegisterUiState(acceptedTerms = true))
         botonCrearCuenta().assertIsEnabled()
 
         // CA-01-06: cuenta existente.
-        paso(RegisterUiState(acceptedTerms = true, error = AuthError.EmailAlreadyInUse))
+        flujo.paso(RegisterUiState(acceptedTerms = true, error = AuthError.EmailAlreadyInUse))
         composeTestRule.onNodeWithText("Ya existe una cuenta registrada con este correo electrónico").assertIsDisplayed()
 
         // CA-01-03: al enfocar la contraseña aparece el checklist de requisitos.
         campoContrasena().performClick()
-        listOf("Mínimo 8 caracteres", "Una letra mayúscula", "Un número y carácter especial")
-            .forEach { composeTestRule.onNodeWithText(it).assertIsDisplayed() }
+        composeTestRule.mostrado("Mínimo 8 caracteres", "Una letra mayúscula", "Un número y carácter especial")
     }
 
     @Test
     fun caLeg0101_0102_0104_0107_losEnlacesAbrenSuDocumentoYElRestoAlternaLaCasilla() {
-        mostrar()
+        flujo.mostrar()
 
         // CA-LEG-01-01 y 01-02: cada enlace abre su documento sin alternar la casilla.
         tocarEnTextoCasilla("Términos y condiciones")
         tocarEnTextoCasilla("Política de privacidad")
         assertEquals("términos y privacidad", 1 to 1, terminos to privacidad)
-        assertEquals("los enlaces no alternan la casilla", emptyList<RegisterEvent>(), eventos)
+        assertEquals("los enlaces no alternan la casilla", emptyList<RegisterEvent>(), flujo.eventos)
 
         // CA-LEG-01-04: el resto del texto alterna la casilla.
         tocarEnTextoCasilla("Acepto")
-        assertEquals("tocar «Acepto»", listOf<RegisterEvent>(RegisterEvent.AcceptedTermsChanged(true)), eventos)
+        assertEquals("tocar «Acepto»", listOf<RegisterEvent>(RegisterEvent.AcceptedTermsChanged(true)), flujo.eventos)
         assertEquals("«Acepto» no abre documentos", 1 to 1, terminos to privacidad)
 
         // CA-LEG-01-07: el lector de pantalla ofrece abrir ambos documentos.

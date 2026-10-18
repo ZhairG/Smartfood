@@ -22,6 +22,8 @@ import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.model.SpeechError
+import com.smartfood.app.testutil.PantallaEnFlujo
+import com.smartfood.app.testutil.mostrado
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -45,31 +47,21 @@ class InventorySearchScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val eventos = mutableListOf<InventorySearchEvent>()
-    private val estado = mutableStateOf(InventorySearchUiState())
     private val pideAjustes = mutableStateOf(false)
     private var abrioAjustes = false
 
-    /** Monta la pantalla una sola vez; cada paso del flujo cambia [estado]. */
-    private fun mostrar(inicial: InventorySearchUiState) {
-        estado.value = inicial
-        composeTestRule.setContent {
-            SmartfoodTheme {
-                InventorySearchScreen(
-                    state = estado.value,
-                    onEvent = { eventos += it },
-                    showPermissionRationale = pideAjustes.value,
-                    onOpenSettings = { abrioAjustes = true }
-                )
-            }
+    private val flujo = PantallaEnFlujo<InventorySearchUiState, InventorySearchEvent>(
+        composeTestRule,
+        InventorySearchUiState()
+    ) { state, onEvent ->
+        SmartfoodTheme {
+            InventorySearchScreen(
+                state = state,
+                onEvent = onEvent,
+                showPermissionRationale = pideAjustes.value,
+                onOpenSettings = { abrioAjustes = true }
+            )
         }
-    }
-
-    private fun paso(nuevo: InventorySearchUiState) {
-        eventos.clear()
-        estado.value = nuevo
-        if (composeTestRule.mainClock.autoAdvance) composeTestRule.waitForIdle()
-        else composeTestRule.mainClock.advanceTimeByFrame()
     }
 
     /** Resultado de prueba: por defecto, leche fresca que vence el 15/09/2026. */
@@ -86,7 +78,7 @@ class InventorySearchScreenTest {
     fun caInv0601_0603_0606_0607_0608_0708_1002_rnfInv04_buscarFiltrarYAbrirUnResultado() {
         // CA-INV-06-01 y 07-08: la barra, la tarjeta de voz, los filtros y los resultados; CA-INV-10-02: solo el
         // pendiente lleva el ícono.
-        mostrar(
+        flujo.mostrar(
             InventorySearchUiState(
                 isVoiceAvailable = true,
                 results = listOf(
@@ -97,8 +89,8 @@ class InventorySearchScreenTest {
         )
         composeTestRule.onNodeWithContentDescription("Buscar producto…").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Buscar por voz").assertIsDisplayed()
-        listOf("Usa tu voz", "Dicta muchos ingredientes al mismo tiempo", "Todos", "Leche Entera", "Vence: 01/09/2026",
-            "Manzana", "Vence: 20/09/2026").forEach { composeTestRule.onNodeWithText(it).assertIsDisplayed() }
+        composeTestRule.mostrado("Usa tu voz", "Dicta muchos ingredientes al mismo tiempo", "Todos", "Leche Entera", "Vence: 01/09/2026",
+            "Manzana", "Vence: 20/09/2026")
         // "Frutas" aparece en el filtro y, además, como etiqueta de la categoría del resultado.
         composeTestRule.onAllNodesWithText("Frutas").onFirst().assertIsDisplayed()
         composeTestRule.onAllNodesWithContentDescription("Pendiente de sincronizar").assertCountEquals(1)
@@ -108,27 +100,27 @@ class InventorySearchScreenTest {
         assertEquals(
             "abrir el resultado y volver",
             listOf(InventorySearchEvent.ResultClicked("item-2"), InventorySearchEvent.BackClicked),
-            eventos
+            flujo.eventos
         )
 
         // CA-INV-06-03: tocar un filtro emite su categoría; sin texto no hay equis.
-        paso(InventorySearchUiState(isVoiceAvailable = false))
+        flujo.paso(InventorySearchUiState(isVoiceAvailable = false))
         composeTestRule.onNodeWithContentDescription("Limpiar búsqueda").assertDoesNotExist()
         composeTestRule.onNodeWithText("Usa tu voz").assertDoesNotExist()
         composeTestRule.onNodeWithText("Frutas").performClick()
-        assertEquals("elegir Frutas", listOf<InventorySearchEvent>(InventorySearchEvent.CategorySelected(FoodCategory.FRUITS)), eventos)
+        assertEquals("elegir Frutas", listOf<InventorySearchEvent>(InventorySearchEvent.CategorySelected(FoodCategory.FRUITS)), flujo.eventos)
 
         // CA-INV-06-03, 06-06 y 06-07: el filtro elegido se ve seleccionado, sin coincidencias se avisa y la equis limpia.
-        paso(InventorySearchUiState(query = "zzz", selectedCategory = FoodCategory.FRUITS))
+        flujo.paso(InventorySearchUiState(query = "zzz", selectedCategory = FoodCategory.FRUITS))
         composeTestRule.onNodeWithText("Frutas").assertIsSelected()
         composeTestRule.onNodeWithText("Todos").assertIsNotSelected()
         composeTestRule.onNodeWithText("No hay productos que coincidan").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Limpiar búsqueda").performClick()
-        assertEquals("limpiar", listOf<InventorySearchEvent>(InventorySearchEvent.ClearQuery), eventos)
+        assertEquals("limpiar", listOf<InventorySearchEvent>(InventorySearchEvent.ClearQuery), flujo.eventos)
 
         // RNF-INV-04: el punto de estado anuncia el estado, además del color. La fila del Figma no tiene lápiz:
         // toda la fila es un botón que abre el editor (CA-INV-06-08).
-        paso(
+        flujo.paso(
             InventorySearchUiState(
                 results = listOf(resultado(name = "Yogur", expiresOn = LocalDate.of(2026, 9, 12), status = ExpiryStatus.EXPIRING_SOON))
             )
@@ -140,24 +132,24 @@ class InventorySearchScreenTest {
     @Test
     fun caInv0701_0702_0707_elAvisoDeVozEscuchaProcesaYSeCierraAlTocarFuera() {
         composeTestRule.mainClock.autoAdvance = false
-        mostrar(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Listening))
+        flujo.mostrar(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Listening))
         composeTestRule.onNodeWithText("Habla ahora").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Cerrar el aviso de voz").performTouchInput { click(Offset(5f, 5f)) }
-        assertEquals("tocar fuera del aviso", listOf<InventorySearchEvent>(InventorySearchEvent.VoiceDismissed), eventos)
+        assertEquals("tocar fuera del aviso", listOf<InventorySearchEvent>(InventorySearchEvent.VoiceDismissed), flujo.eventos)
 
-        paso(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Processing))
+        flujo.paso(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Processing))
         composeTestRule.onNodeWithText("…").assertIsDisplayed()
     }
 
     @Test
     fun caInv0705_0706_elErrorDeVozReintentaYElPermisoAbreAjustes() {
-        mostrar(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Failed(SpeechError.NO_MATCH)))
+        flujo.mostrar(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Failed(SpeechError.NO_MATCH)))
         composeTestRule.onNodeWithText("No se entendió. Reinténtalo").assertIsDisplayed()
         composeTestRule.onNodeWithText("Reintentar").performClick()
-        assertEquals("reintentar", listOf<InventorySearchEvent>(InventorySearchEvent.VoiceRetry), eventos)
+        assertEquals("reintentar", listOf<InventorySearchEvent>(InventorySearchEvent.VoiceRetry), flujo.eventos)
 
         pideAjustes.value = true
-        paso(InventorySearchUiState(isVoiceAvailable = true))
+        flujo.paso(InventorySearchUiState(isVoiceAvailable = true))
         composeTestRule.onNodeWithText("Necesitamos tu micrófono").assertIsDisplayed()
         composeTestRule.onNodeWithText("Abrir ajustes").performClick()
         assertTrue("abrir los ajustes", abrioAjustes)

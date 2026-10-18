@@ -26,6 +26,9 @@ import com.smartfood.app.feature.inventory.domain.model.InventorySection
 import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
+import com.smartfood.app.testutil.PantallaEnFlujo
+import com.smartfood.app.testutil.inventoryItem
+import com.smartfood.app.testutil.mostrado
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -37,100 +40,68 @@ class InventoryScreenTest {
     val composeTestRule = createComposeRule()
 
     private val today = LocalDate.of(2026, 9, 10)
-    private val eventos = mutableListOf<InventoryEvent>()
-    private val estado = mutableStateOf(InventoryUiState(isLoading = false))
     private val tema = mutableStateOf(ThemeMode.LIGHT)
 
-    private fun item(
-        id: String,
-        name: String,
-        category: FoodCategory = FoodCategory.OTHER,
-        expiresOn: LocalDate = today,
-        quantity: Quantity? = null,
-        photo: ItemPhoto? = null,
-        price: Long? = null,
-    ) = InventoryItem(
-        id = id,
-        name = name,
-        category = category,
-        expiresOn = expiresOn,
-        quantity = quantity,
-        photo = photo,
-        price = price
-    )
+    private val flujo = PantallaEnFlujo<InventoryUiState, InventoryEvent>(
+        composeTestRule,
+        InventoryUiState(isLoading = false)
+    ) { state, onEvent ->
+        SmartfoodTheme(themeMode = tema.value) { InventoryScreen(state = state, onEvent = onEvent) }
+    }
 
     private fun conProductos(vararg sections: InventorySection) =
         InventoryUiState(isLoading = false, sections = sections.toList())
 
-    /** Monta la pantalla una sola vez; cada paso del flujo cambia [estado] o [tema]. */
-    private fun mostrar(inicial: InventoryUiState) {
-        estado.value = inicial
-        composeTestRule.setContent {
-            SmartfoodTheme(themeMode = tema.value) {
-                InventoryScreen(state = estado.value, onEvent = { eventos += it })
-            }
-        }
-    }
-
-    private fun paso(nuevo: InventoryUiState) {
-        eventos.clear()
-        estado.value = nuevo
-        composeTestRule.waitForIdle()
-    }
-
-    private fun mostrado(texto: String) = composeTestRule.onNodeWithText(texto).assertIsDisplayed()
-
     @Test
     fun caInv0101_0102_0103_0108_0109_laListaMuestraSusSeccionesYLosDatosDeCadaFila() {
         // CA-INV-01-01, 01-02 y 01-03: las tres secciones y la fila con fecha, nombre, categoría, lápiz y bloque de color.
-        mostrar(
+        flujo.mostrar(
             conProductos(
                 InventorySection(
                     ExpiryStatus.EXPIRED,
-                    listOf(item("1", "Banano", FoodCategory.FRUITS, expiresOn = LocalDate.of(2026, 9, 9)))
+                    listOf(inventoryItem("1", "Banano", FoodCategory.FRUITS, expiresOn = LocalDate.of(2026, 9, 9)))
                 ),
-                InventorySection(ExpiryStatus.EXPIRING_SOON, listOf(item("item-99", "Tomate", FoodCategory.VEGETABLES))),
-                InventorySection(ExpiryStatus.FRESH, listOf(item("3", "Pasta", FoodCategory.GRAINS)))
+                InventorySection(ExpiryStatus.EXPIRING_SOON, listOf(inventoryItem("item-99", "Tomate", FoodCategory.VEGETABLES))),
+                InventorySection(ExpiryStatus.FRESH, listOf(inventoryItem("3", "Pasta", FoodCategory.GRAINS)))
             )
         )
-        listOf("Vencido", "Próximo a vencer", "Fresco", "Banano", "Tomate", "Pasta", "09/09/2026", "Frutas")
-            .forEach(::mostrado)
+        composeTestRule.mostrado("Vencido", "Próximo a vencer", "Fresco", "Banano", "Tomate", "Pasta", "09/09/2026", "Frutas")
         composeTestRule.onNodeWithContentDescription("Editar Banano").assertIsDisplayed()
         // El bloque del estado se describe con su nombre, no solo con el color (RNF-INV-04).
         composeTestRule.onNodeWithContentDescription("Fresco").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Editar Tomate").performClick()
-        assertEquals("tocar el lápiz", listOf<InventoryEvent>(InventoryEvent.EditClicked("item-99")), eventos)
+        assertEquals("tocar el lápiz", listOf<InventoryEvent>(InventoryEvent.EditClicked("item-99")), flujo.eventos)
 
         // CA-INV-01-03 y 01-08: la foto del producto y la cantidad aparte de la categoría.
-        paso(
+        flujo.paso(
             conProductos(
                 InventorySection(
                     ExpiryStatus.EXPIRING_SOON,
                     listOf(
-                        item("1", "Leche Entera", photo = ItemPhoto(path = "photos/1.jpg", url = "https://example.com/1.jpg")),
-                        item("2", "Yogur", FoodCategory.DAIRY, quantity = Quantity(1.5, QuantityUnit.LITERS)),
-                        item("3", "Arroz", FoodCategory.GRAINS)
+                        inventoryItem("1", "Leche Entera", FoodCategory.OTHER, photo = ItemPhoto(path = "photos/1.jpg", url = "https://example.com/1.jpg")),
+                        inventoryItem("2", "Yogur", FoodCategory.DAIRY, quantity = Quantity(1.5, QuantityUnit.LITERS)),
+                        inventoryItem("3", "Arroz", FoodCategory.GRAINS)
                     )
                 )
             )
         )
         composeTestRule.onNodeWithContentDescription("Foto de Leche Entera").assertIsDisplayed()
-        listOf("Lácteos", "1,5 L", "Yogur", "Cereales").forEach(::mostrado)
+        composeTestRule.mostrado("Lácteos", "1,5 L", "Yogur", "Cereales")
 
         // CA-INV-01-08 y 01-09: singular y plural de las unidades, y el precio junto a la fecha.
-        paso(
+        flujo.paso(
             conProductos(
                 InventorySection(
                     ExpiryStatus.FRESH,
                     listOf(
-                        item("1", "Pollo", quantity = Quantity(1.0, QuantityUnit.UNITS)),
-                        item("2", "Huevos", quantity = Quantity(12.0, QuantityUnit.UNITS)),
-                        item("3", "Carne", expiresOn = LocalDate.of(2026, 9, 20), price = 12_500L)
+                        inventoryItem("1", "Pollo", quantity = Quantity(1.0, QuantityUnit.UNITS)),
+                        inventoryItem("2", "Huevos", quantity = Quantity(12.0, QuantityUnit.UNITS)),
+                        inventoryItem("3", "Carne", expiresOn = LocalDate.of(2026, 9, 20), price = 12_500L)
                     )
                 )
             )
         )
-        listOf("1 unidad", "12 unidades", "20/09/2026 · $ 12.500").forEach(::mostrado)
+        composeTestRule.mostrado("1 unidad", "12 unidades", "20/09/2026 · $ 12.500")
     }
 
     @Test
@@ -143,7 +114,7 @@ class InventoryScreenTest {
             localPhotoPath = "/data/files/pending/1/a.jpg",
             isPendingSync = true
         )
-        mostrar(conProductos(InventorySection(ExpiryStatus.FRESH, listOf(pendiente, item("2", "Arroz")))))
+        flujo.mostrar(conProductos(InventorySection(ExpiryStatus.FRESH, listOf(pendiente, inventoryItem("2", "Arroz")))))
 
         // CA-INV-10-02 y 10-06: solo el producto pendiente lleva el ícono, que se anuncia.
         composeTestRule.onAllNodesWithContentDescription("Pendiente de sincronizar").assertCountEquals(1)
@@ -159,27 +130,27 @@ class InventoryScreenTest {
     @Test
     fun caInv0101_0105_laCargaElVacioYElErrorOfrecenSusAcciones() {
         // #45: mientras carga se ve el esqueleto, que TalkBack anuncia como "Cargando inventario".
-        mostrar(InventoryUiState(isLoading = true))
+        flujo.mostrar(InventoryUiState(isLoading = true))
         composeTestRule.onNodeWithContentDescription("Cargando inventario").assertIsDisplayed()
         composeTestRule.onNodeWithText("Tu inventario está vacío").assertDoesNotExist()
 
         // CA-INV-01-05: sin productos se invita a añadir el primero.
-        paso(InventoryUiState(isLoading = false, sections = emptyList()))
-        mostrado("Tu inventario está vacío")
-        mostrado("Añade tus alimentos para hacer seguimiento de sus fechas de vencimiento y evitar el desperdicio.")
+        flujo.paso(InventoryUiState(isLoading = false, sections = emptyList()))
+        composeTestRule.mostrado("Tu inventario está vacío")
+        composeTestRule.mostrado("Añade tus alimentos para hacer seguimiento de sus fechas de vencimiento y evitar el desperdicio.")
         composeTestRule.onNodeWithText("Añadir Producto").performClick()
         composeTestRule.onNodeWithContentDescription("Añadir producto").performClick()
         composeTestRule.onNodeWithContentDescription("Buscar productos").performClick()
         assertEquals(
             "botón del vacío, botón flotante y lupa",
             listOf(InventoryEvent.AddClicked, InventoryEvent.AddClicked, InventoryEvent.SearchClicked),
-            eventos
+            flujo.eventos
         )
 
         // Un error de carga muestra su mensaje y ofrece reintentar.
-        paso(InventoryUiState(isLoading = false, error = InventoryError.Network))
-        mostrado("Sin conexión a Internet. Verifica tu red e inténtalo de nuevo.")
+        flujo.paso(InventoryUiState(isLoading = false, error = InventoryError.Network))
+        composeTestRule.mostrado("Sin conexión a Internet. Verifica tu red e inténtalo de nuevo.")
         composeTestRule.onNodeWithText("Reintentar").performClick()
-        assertEquals("reintentar", listOf<InventoryEvent>(InventoryEvent.RetryClicked), eventos)
+        assertEquals("reintentar", listOf<InventoryEvent>(InventoryEvent.RetryClicked), flujo.eventos)
     }
 }
