@@ -61,14 +61,16 @@
 Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada (`app/src/androidTest`),
 **M** = verificación manual (checklist al final).
 
+> Desde el #105 varias pruebas recorren un flujo o una tabla de casos y citan **todos** sus CA en el nombre. La matriz nombra la clase; `python tools/ca_coverage.py --check tools/ca_coverage_baseline.txt` comprueba que ningún CA se quede sin prueba.
+
 | Criterio | Pruebas |
 |---|---|
 | CA-01-01 | U `RegisterUseCaseTest`, U `RegisterViewModelTest` |
 | CA-01-02 | U `RegisterUseCaseTest` |
-| CA-01-03 | U `RegisterViewModelTest`, I `RegisterScreenTest.ca0103_*` |
+| CA-01-03 | U `RegisterViewModelTest`, I `RegisterScreenTest` |
 | CA-01-04 | U `RegisterUseCaseTest`, U `RegisterViewModelTest` |
-| CA-01-05 | U `RegisterUseCaseTest`, U `RegisterViewModelTest`, I `RegisterScreenTest.ca0105_*` |
-| CA-01-06 | U `RegisterUseCaseTest`, U `RegisterViewModelTest`, U `FirebaseErrorMapperTest`, I `RegisterScreenTest.ca0106_*` |
+| CA-01-05 | U `RegisterUseCaseTest`, U `RegisterViewModelTest`, I `RegisterScreenTest` |
+| CA-01-06 | U `RegisterUseCaseTest`, U `RegisterViewModelTest`, U `FirebaseErrorMapperTest`, I `RegisterScreenTest` |
 | CA-01-07 | U `RegisterUseCaseTest` (2), U `RegisterViewModelTest`, M |
 | CA-01-08 | M |
 | CA-01-09 | U `RegisterUseCaseTest` |
@@ -82,29 +84,29 @@ Leyenda: **U** = prueba unitaria (`app/src/test`), **I** = prueba instrumentada 
 | CA-03-01 | U `SessionUseCasesTest`, U `SplashViewModelTest`, M |
 | CA-03-02 | U `SessionUseCasesTest`, U `SplashViewModelTest`, U `LoginUseCaseTest`, M |
 | CA-03-03 | U `SessionUseCasesTest`, U `SplashViewModelTest`, I `AppNavigationTest` |
-| CA-03-04 | I `AppNavigationTest.transicionSplashALogin_*` |
-| CA-04-01 | U `PasswordRecoveryUseCasesTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest.ca0401_*` |
+| CA-03-04 | I `AppNavigationTest.ca0304_*` |
+| CA-04-01 | U `PasswordRecoveryUseCasesTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest` |
 | CA-04-02 | U `PasswordRecoveryUseCasesTest` |
 | ~~CA-04-03~~ | Reemplazado por CA-REC-01-02 ([tasks 003](../003-recuperacion-real/tasks.md#matriz-de-trazabilidad)) |
-| CA-04-04 | U `PasswordRecoveryUseCasesTest`, U `DemoPasswordRecoveryRepositoryTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest.ca0404_*` |
+| CA-04-04 | U `PasswordRecoveryUseCasesTest`, U `DemoPasswordRecoveryRepositoryTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest` |
 | CA-04-05 | U `PasswordRecoveryUseCasesTest` |
-| CA-04-06 | U `PasswordRecoveryUseCasesTest`, U `DemoPasswordRecoveryRepositoryTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest.ca0406_*` |
+| CA-04-06 | U `PasswordRecoveryUseCasesTest`, U `DemoPasswordRecoveryRepositoryTest`, U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest` |
 | CA-04-07 | U `PasswordRecoveryUseCasesTest`, U `DemoPasswordRecoveryRepositoryTest`, U `PasswordRecoveryViewModelTest` |
 | CA-04-08 | U `PasswordRecoveryViewModelTest` |
 | CA-04-09 | U `PasswordRecoveryViewModelTest` |
-| CA-04-10 | U `PasswordRecoveryUseCasesTest` (2), U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest.ca0410_*` (2) |
+| CA-04-10 | U `PasswordRecoveryUseCasesTest` (2), U `PasswordRecoveryViewModelTest`, I `PasswordRecoveryScreenTest` |
 | CA-04-11 | U `PasswordRecoveryUseCasesTest`, U `DemoPasswordRecoveryRepositoryTest`, U `PasswordRecoveryViewModelTest`, M |
-| CA-04-12 | I `AppNavigationTest.transicionRecuperacionALogin_*`, M |
-| CA-05-01 | U `SessionUseCasesTest`, U `HomeViewModelTest`, M |
-| CA-05-02 | U `HomeViewModelTest` |
-| CA-05-03 | U `SessionUseCasesTest`, U `HomeViewModelTest`, M |
+| CA-04-12 | I `AppNavigationTest.ca0412_*`, M |
+| CA-05-01 | U `SessionUseCasesTest`, U `ProfileViewModelTest`, M |
+| CA-05-02 | U `ProfileViewModelTest` |
+| CA-05-03 | U `SessionUseCasesTest`, U `ProfileViewModelTest`, M |
 | CA-06-01 | U `FirebaseErrorMapperTest`, U `LoginViewModelTest`, U `RegisterViewModelTest`, I `LoginScreenTest.ca0601_*` |
 | CA-06-02 | U `LoginViewModelTest`, U `RegisterViewModelTest` |
 | RF-AUTH-04 | U `ValidateEmailUseCaseTest`, U `ValidatePasswordUseCaseTest` |
 | CA-07-01 | I `LoginScreenTest.ca0701_*`, M 7 |
 | CA-07-02 | M 7 |
-| CA-07-03 | I `RegisterScreenTest.ca0703_*`, I `PasswordRecoveryScreenTest.ca0703_*`, M 7 |
-| CA-07-04 | I `SmartFoodFieldsTest.ca_07_04_*` |
+| CA-07-03 | I `RegisterScreenTest`, I `PasswordRecoveryScreenTest`, M 7 |
+| CA-07-04 | I `SmartFoodFieldsTest` |
 
 ### Checklist de verificación manual (emulador con Firebase real)
 

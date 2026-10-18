@@ -52,22 +52,24 @@
 
 Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un V2436 con Android 16), **M** = revisión manual.
 
+> Desde el #105 varias pruebas recorren un flujo o una tabla de casos y citan **todos** sus CA en el nombre. La matriz nombra la clase; `python tools/ca_coverage.py --check tools/ca_coverage_baseline.txt` comprueba que ningún CA se quede sin prueba.
+
 | Criterio | Pruebas |
 |---|---|
 | CA-UI-01-01 | I `AdaptiveLayoutTest` (Login, Registro, Registro con error y recuperación pasos 1, 2 y 3, en 360×720, 384×857 y 412×917) |
-| CA-UI-01-02 | I `AdaptiveLayoutTest.ca_ui_01_02_*` (360×720, 384×857 y 412×917) |
+| CA-UI-01-02 | I `AdaptiveLayoutTest` (360×720, 384×857 y 412×917) |
 | CA-UI-01-03 | U `FormMetricsTest` |
 | CA-UI-01-04 | U `FormMetricsTest`, I `AdaptiveLayoutTest` (384×857) |
 | CA-UI-01-05 | U `FormMetricsTest`, I `AdaptiveLayoutTest` (360×720) |
 | CA-UI-01-06 | Diseño: el `verticalScroll` del panel sigue activo como respaldo |
-| CA-UI-02-01 | I `FormFocusTest.ca_ui_02_01_*`, I `SmartFoodFieldsTest.ca_ui_02_01_*` (selector) |
+| CA-UI-02-01 | I `FormFocusTest.ca_ui_02_01_*`, I `SmartFoodFieldsTest` (selector) |
 | CA-UI-02-02 | I `FormFocusTest.ca_ui_02_02_*` |
 | CA-UI-02-03 | M (acciones "Listo" en Login, Registro y pasos 1, 2 y 3) |
 | CA-UI-02-04 | M (capturas en el dispositivo: el campo enfocado queda visible con el teclado abierto) |
 | CA-UI-02-05 | M (capturas en el dispositivo: el encabezado se colapsa con el teclado) |
 | CA-UI-02-06 | M |
 | CA-UI-02-07 | M |
-| CA-UI-02-08 | I `FormFocusTest.ca_ui_02_01_*` (la etiqueta forma parte del nodo editable), I `SmartFoodFieldsTest.ca_ui_02_08_*` |
+| CA-UI-02-08 | I `FormFocusTest.ca_ui_02_01_*` (la etiqueta forma parte del nodo editable), I `SmartFoodFieldsTest` |
 | CA-UI-03-01 | U `AbovePopupPositionProviderTest`, I `FormFocusTest.ca_ui_03_01_*` |
 | CA-UI-03-02 | I `FormFocusTest.ca_ui_03_02_*` |
 | CA-UI-03-03 | Diseño: `PopupProperties(focusable = false)`; I `FormFocusTest.ca_ui_03_05_*` (el foco sigue en los campos) |

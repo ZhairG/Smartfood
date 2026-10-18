@@ -30,7 +30,7 @@ import javax.inject.Inject
  * Fecha: Octubre 2026
  * Descripción: Comprueba que el grafo de Hilt de la app provee los repositorios del inventario con sus
  * implementaciones reales (spec 006, T015 y T021, Issue #69), el reloj del dominio (T031, Issue #39) y el aviso de
- * vencimiento (T038, Issue #44). No usa la red: solo construye el grafo.
+ * vencimiento (T038, Issue #44). No usa la red: solo construye el grafo, una vez (#105).
  */
 @HiltAndroidTest
 class InventoryDataModuleTest {
@@ -77,41 +77,22 @@ class InventoryDataModuleTest {
     }
 
     @Test
-    fun t021_inventarioYFotosSeInyectanConSusImplementacionesDeFirebase() {
-        assertTrue(inventoryRepository is FirestoreInventoryRepository)
-        assertTrue(photoRepository is FirebaseStoragePhotoRepository)
-    }
-
-    @Test
-    fun t021_losRepositoriosSonUnicosEnLaApp() {
-        assertSame(inventoryRepository, otroInventoryRepository)
-    }
-
-    @Test
-    fun t048_lasFotosSeSincronizanConWorkManagerYEsUnico() {
-        assertTrue(photoSync is WorkManagerPhotoSync)
-        assertSame(photoSync, otroPhotoSync)
-    }
-
-    @Test
-    fun t019_reconocimientoDeVozSeInyectaConLaImplementacionDeAndroid() {
-        assertTrue(speechToText is AndroidSpeechToText)
-    }
-
-    @Test
-    fun t020_lasPreferenciasDeInventarioSeInyectanSobreElDataStore() {
-        assertTrue(inventoryPreferences is DataStoreInventoryPreferences)
-    }
-
-    @Test
-    fun t031_elRelojDelDominioSeInyectaConLaZonaDelTelefonoYEsUnico() {
-        assertEquals(ZoneId.systemDefault(), clock.zone)
-        assertSame(clock, otroClock)
-    }
-
-    @Test
-    fun t038_elAvisoDeVencimientoSeInyectaConWorkManagerYEsUnico() {
-        assertTrue(expiryReminderScheduler is WorkManagerExpiryReminderScheduler)
-        assertSame(expiryReminderScheduler, otroExpiryReminderScheduler)
+    fun t019_t020_t021_t031_t038_t048_elGrafoProveeLasImplementacionesRealesYLasUnicas() {
+        // T021: inventario y fotos con Firebase, y un solo repositorio en la app.
+        assertTrue("inventario", inventoryRepository is FirestoreInventoryRepository)
+        assertTrue("fotos", photoRepository is FirebaseStoragePhotoRepository)
+        assertSame("inventario único", inventoryRepository, otroInventoryRepository)
+        // T048: las fotos se sincronizan con WorkManager.
+        assertTrue("sincronización de fotos", photoSync is WorkManagerPhotoSync)
+        assertSame("sincronización única", photoSync, otroPhotoSync)
+        // T019 y T020: voz de Android y preferencias sobre el DataStore.
+        assertTrue("voz", speechToText is AndroidSpeechToText)
+        assertTrue("preferencias", inventoryPreferences is DataStoreInventoryPreferences)
+        // T031: el reloj del dominio usa la zona del teléfono.
+        assertEquals("zona del reloj", ZoneId.systemDefault(), clock.zone)
+        assertSame("reloj único", clock, otroClock)
+        // T038: el aviso de vencimiento con WorkManager.
+        assertTrue("aviso de vencimiento", expiryReminderScheduler is WorkManagerExpiryReminderScheduler)
+        assertSame("aviso único", expiryReminderScheduler, otroExpiryReminderScheduler)
     }
 }

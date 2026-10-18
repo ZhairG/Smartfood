@@ -94,7 +94,7 @@ A partir de la spec 002, los códigos llevan un prefijo corto de la spec para no
 - **Instrumentadas (Compose)** para pantallas y navegación.
 - El nombre del test cita el criterio de aceptación:
   `` `CA-02-03 credenciales incorrectas muestran error de credenciales` ``.
-- Fakes escritos a mano y compartidos en `app/src/test/.../testutil/`. No se usa una librería de mocks.
+- Fakes escritos a mano y compartidos en `app/src/sharedTest/.../testutil/` (los usan las pruebas unitarias y las instrumentadas). No se usa una librería de mocks.
 
 ## 7. Definition of Done
 

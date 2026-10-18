@@ -233,8 +233,10 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 
 ## Pruebas
 
-- **Unitarias:** JUnit4 + `kotlinx-coroutines-test`, sin librería de mocks. Los fakes compartidos están en `app/src/test/.../testutil/` (`FakeAuthRepository`, `FakeUserRepository`, `FakeSessionPreferences`, `FakePasswordRecoveryRepository`, `MainDispatcherRule`, `Result.authError`). Para probar efectos: `viewModel.effects.first()` dentro de `runTest`.
+- **Unitarias:** JUnit4 + `kotlinx-coroutines-test`, sin librería de mocks. Los fakes compartidos están en `app/src/sharedTest/.../testutil/`, que Gradle agrega a las unitarias y a las instrumentadas (`FakeAuthRepository`, `FakeUserRepository`, `FakeSessionPreferences`, `FakePasswordRecoveryRepository`, `Result.authError`). `MainDispatcherRule` sigue en `app/src/test/.../testutil/`. Para probar efectos: `viewModel.effects.first()` dentro de `runTest`.
 - Los fakes del inventario están en `testutil/InventoryFakes.kt` (`FakeInventoryRepository` con `outcome`, `gate` y `pendingWrites`, `FakePhotoSync`, `FakePhotoRepository`, `FakeSpeechToText`…).
+- En las instrumentadas, `androidTest/.../testutil/PantallaEnFlujo` monta una pantalla sin estado una vez y cambia su `UiState` con `paso()`; `ComposeMatchers.kt` tiene `conTipo` y `mostrado`.
+- `tools/ca_coverage.py --check tools/ca_coverage_baseline.txt` comprueba que ningún CA se quede sin prueba al reorganizarlas.
 - `CustomTestRunner` inicializa un WorkManager de prueba (`SynchronousExecutor`): ninguna prueba instrumentada encola trabajos en el WorkManager real del dispositivo.
 - `unitTests.isReturnDefaultValues = true` está activo porque los constructores de las excepciones de Firebase usan `TextUtils`.
 - **Instrumentadas:** usan `@HiltAndroidTest`, `CustomTestRunner` (`HiltTestApplication`) y `createAndroidComposeRule<HiltTestActivity>()` (`HiltTestActivity` vive en `app/src/debug`). Las pruebas de pantalla usan la `XScreen` stateless con un `XUiState` construido a mano.

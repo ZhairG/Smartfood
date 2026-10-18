@@ -18,16 +18,12 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.smartfood.app.feature.auth.domain.repository.AuthRepository
-import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
-import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
-import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
-import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.GetExpiringItemsUseCase
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import com.smartfood.app.testutil.FakeAuthRepository
+import com.smartfood.app.testutil.FakeInventoryRepository
+import com.smartfood.app.testutil.inventoryItem
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -39,14 +35,13 @@ import org.junit.runner.RunWith
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.UUID
 
 /**
  * Nombre: ExpiryReminderWorkerTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas instrumentadas de [ExpiryReminderWorker] con `WorkManagerTestInitHelper` (HU-INV-08, T037 y
- * T038). El trabajador se construye con dobles de los repositorios para no tocar Firebase. Comprueba que publica el
+ * T038). El trabajador se construye con los fakes compartidos de `sharedTest` para no tocar Firebase (#105). Comprueba que publica el
  * aviso con el producto más próximo (CA-INV-08-01, 08-02), que no publica si no hay productos por vencer
  * (CA-INV-08-03), que la notificación abre la app (CA-INV-08-04) y que sin sesión no publica (CA-INV-08-06).
  */
@@ -60,8 +55,8 @@ class ExpiryReminderWorkerTest {
     private val clock: Clock =
         Clock.fixed(today.atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault())
 
-    private var auth: FakeAuthRepository = FakeAuthRepository("uid-con-sesion")
-    private var inventory: FakeInventoryRepository = FakeInventoryRepository(emptyList())
+    private var auth: FakeAuthRepository = sesion("uid-con-sesion")
+    private var inventory: FakeInventoryRepository = inventario(emptyList())
 
     private lateinit var workManager: WorkManager
 
@@ -100,7 +95,7 @@ class ExpiryReminderWorkerTest {
 
     @Test
     fun ca_inv_08_01_y_08_02_publicaElAvisoYNombraElProductoMasProximo() {
-        inventory = FakeInventoryRepository(
+        inventory = inventario(
             listOf(
                 item("Leche Entera", 0),
                 item("Pan", 1),
@@ -122,7 +117,7 @@ class ExpiryReminderWorkerTest {
 
     @Test
     fun ca_inv_08_01_unSoloProductoUsaElTextoEnSingular() {
-        inventory = FakeInventoryRepository(listOf(item("Leche Entera", 2)))
+        inventory = inventario(listOf(item("Leche Entera", 2)))
 
         ejecutarWorker()
 
@@ -132,7 +127,7 @@ class ExpiryReminderWorkerTest {
 
     @Test
     fun ca_inv_08_03_sinProductosPorVencerNoPublicaNada() {
-        inventory = FakeInventoryRepository(listOf(item("Arroz", 10)))
+        inventory = inventario(listOf(item("Arroz", 10)))
 
         ejecutarWorker()
 
@@ -141,7 +136,7 @@ class ExpiryReminderWorkerTest {
 
     @Test
     fun ca_inv_08_04_laNotificacionLaPublicaLaAppParaAbrirlaAlTocarla() {
-        inventory = FakeInventoryRepository(listOf(item("Leche Entera", 1)))
+        inventory = inventario(listOf(item("Leche Entera", 1)))
 
         ejecutarWorker()
 
@@ -152,8 +147,8 @@ class ExpiryReminderWorkerTest {
 
     @Test
     fun ca_inv_08_06_sinSesionActivaNoPublicaNada() {
-        auth = FakeAuthRepository(null)
-        inventory = FakeInventoryRepository(listOf(item("Leche Entera", 1)))
+        auth = sesion(null)
+        inventory = inventario(listOf(item("Leche Entera", 1)))
 
         ejecutarWorker()
 
@@ -175,12 +170,14 @@ class ExpiryReminderWorkerTest {
 
     private fun notificacionesActivas() = NotificationManagerCompat.from(context).activeNotifications
 
-    private fun item(nombre: String, dias: Long) = InventoryItem(
-        id = nombre,
-        name = nombre,
-        category = FoodCategory.DAIRY,
-        expiresOn = today.plusDays(dias)
-    )
+    private fun item(nombre: String, dias: Long) =
+        inventoryItem(id = nombre, name = nombre, expiresOn = today.plusDays(dias))
+
+    /** Con [uid] `null` no hay sesión (CA-INV-08-06). */
+    private fun sesion(uid: String?) = FakeAuthRepository().apply { signedInUserId = uid }
+
+    /** El worker solo lee la primera emisión del inventario. */
+    private fun inventario(items: List<InventoryItem>) = FakeInventoryRepository().apply { this.items.value = items }
 
     /** En API 33+ la app necesita el permiso concedido para poder publicar; en el dispositivo lo concede la prueba. */
     private fun concederPermisoDeNotificaciones() {
@@ -205,40 +202,4 @@ class ExpiryReminderWorkerTest {
     private companion object {
         const val TIMEOUT_MS = 10_000L
     }
-}
-
-/** Doble de [AuthRepository]: solo importa si hay sesión activa (CA-INV-08-06). */
-private class FakeAuthRepository(private val userId: String?) : AuthRepository {
-
-    override fun currentUserId(): String? = userId
-
-    override suspend fun login(email: String, password: String): Result<Unit> = Result.success(Unit)
-
-    override suspend fun createAccount(email: String, password: String): Result<String> = Result.success("uid")
-
-    override suspend fun deleteCurrentAccount(): Result<Unit> = Result.success(Unit)
-
-    override fun logout() = Unit
-}
-
-/** Doble de [InventoryRepository]: el worker solo lee la primera emisión del inventario. */
-private class FakeInventoryRepository(private val items: List<InventoryItem>) : InventoryRepository {
-
-    override fun observeItems(): Flow<List<InventoryItem>> = flowOf(items)
-
-    override suspend fun getItem(id: String): Result<InventoryItem> =
-        Result.failure(IllegalStateException("no lo usa el aviso de vencimiento"))
-
-    override fun newItemId(): String = UUID.randomUUID().toString()
-
-    override suspend fun createItem(item: InventoryItem): Result<WriteOutcome> = Result.success(WriteOutcome.SYNCED)
-
-    override suspend fun updateItem(item: InventoryItem, photoChanged: Boolean): Result<WriteOutcome> =
-        Result.success(WriteOutcome.SYNCED)
-
-    override suspend fun deleteItem(id: String): Result<WriteOutcome> = Result.success(WriteOutcome.SYNCED)
-
-    override suspend fun setPhoto(id: String, photo: ItemPhoto?): Result<Unit> = Result.success(Unit)
-
-    override suspend fun hasPendingWrites(): Boolean = false
 }

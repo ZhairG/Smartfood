@@ -71,8 +71,8 @@ class InventorySearchViewModelTest {
         )
     }
 
-    private fun crearViewModel() = InventorySearchViewModel(
-        observeInventoryUseCase = ObserveInventoryUseCase(repository, FakePhotoSync(), ClassifyExpiryUseCase(fixedClock(today))),
+    private fun crearViewModel(inventario: InventoryRepository = repository) = InventorySearchViewModel(
+        observeInventoryUseCase = ObserveInventoryUseCase(inventario, FakePhotoSync(), ClassifyExpiryUseCase(fixedClock(today))),
         searchInventoryUseCase = SearchInventoryUseCase(),
         speechToText = speech,
         parseSpokenIngredientsUseCase = ParseSpokenIngredientsUseCase()
@@ -85,7 +85,7 @@ class InventorySearchViewModelTest {
     }
 
     @Test
-    fun `CA-INV-06-01 al abrir muestra todo el inventario con su estado`() = runTest {
+    fun `CA-INV-06-01 CA-INV-07-08 al abrir muestra todo el inventario con su estado y la tarjeta de voz si hay servicio`() = runTest {
         inventarioDePrueba()
 
         val state = crearViewModel().uiState.first { !it.isLoading }
@@ -95,156 +95,102 @@ class InventorySearchViewModelTest {
         assertEquals(listOf("item-1", "item-2", "item-3"), state.results.map { it.item.id })
         assertEquals(ExpiryStatus.EXPIRED, state.results.first { it.item.id == "item-1" }.status)
         assertEquals(ExpiryStatus.FRESH, state.results.first { it.item.id == "item-2" }.status)
+        assertTrue("con servicio de voz", state.isVoiceAvailable)
+
+        speech.available = false
+        assertFalse("sin servicio de voz", crearViewModel().uiState.first { !it.isLoading }.isVoiceAvailable)
     }
 
     @Test
-    fun `CA-INV-06-02 escribir en la barra filtra por nombre sin importar mayusculas`() = runTest {
+    fun `CA-INV-06-02 CA-INV-06-03 CA-INV-06-07 el texto y la categoria filtran y limpiar el texto conserva la categoria`() = runTest {
         inventarioDePrueba()
         val viewModel = crearViewModel()
 
+        // CA-INV-06-02: por nombre, sin importar mayúsculas.
         viewModel.onEvent(InventorySearchEvent.QueryChanged("MANZANA"))
-
-        val state = viewModel.uiState.first { !it.isLoading }
-        assertEquals("MANZANA", state.query)
+        var state = viewModel.uiState.first { !it.isLoading && it.query == "MANZANA" }
         assertEquals(listOf("item-2"), state.results.map { it.item.id })
-    }
 
-    @Test
-    fun `CA-INV-06-03 el filtro de categoria deja solo esa categoria`() = runTest {
-        inventarioDePrueba()
-        val viewModel = crearViewModel()
-
+        // CA-INV-06-03: el filtro de categoría deja solo esa categoría.
+        viewModel.onEvent(InventorySearchEvent.ClearQuery)
         viewModel.onEvent(InventorySearchEvent.CategorySelected(FoodCategory.FRUITS))
-
-        val state = viewModel.uiState.first { !it.isLoading }
+        state = viewModel.uiState.first { !it.isLoading && it.query.isEmpty() && it.selectedCategory != null }
         assertEquals(FoodCategory.FRUITS, state.selectedCategory)
         assertEquals(listOf("item-2", "item-3"), state.results.map { it.item.id })
-    }
 
-    @Test
-    fun `CA-INV-06-07 limpiar el texto conserva el filtro elegido`() = runTest {
-        inventarioDePrueba()
-        val viewModel = crearViewModel()
-        viewModel.onEvent(InventorySearchEvent.CategorySelected(FoodCategory.FRUITS))
+        // CA-INV-06-07: limpiar el texto conserva el filtro elegido.
         viewModel.onEvent(InventorySearchEvent.QueryChanged("manz"))
         viewModel.uiState.first { !it.isLoading && it.query == "manz" }
-
         viewModel.onEvent(InventorySearchEvent.ClearQuery)
-
-        val state = viewModel.uiState.first { !it.isLoading && it.query.isEmpty() }
+        state = viewModel.uiState.first { !it.isLoading && it.query.isEmpty() }
         assertEquals(FoodCategory.FRUITS, state.selectedCategory)
         assertEquals(listOf("item-2", "item-3"), state.results.map { it.item.id })
     }
 
     @Test
-    fun `CA-INV-06-08 tocar un resultado navega al editor de ese producto`() = runTest {
+    fun `CA-INV-06-08 tocar un resultado abre su editor y la flecha atras vuelve`() = runTest {
         val viewModel = crearViewModel()
 
         viewModel.onEvent(InventorySearchEvent.ResultClicked("item-2"))
-
         assertEquals(InventorySearchEffect.NavigateToEditor("item-2"), viewModel.effects.first())
-    }
-
-    @Test
-    fun `al tocar la flecha atras vuelve a la pantalla anterior`() = runTest {
-        val viewModel = crearViewModel()
 
         viewModel.onEvent(InventorySearchEvent.BackClicked)
-
         assertEquals(InventorySearchEffect.NavigateBack, viewModel.effects.first())
     }
 
     @Test
-    fun `CA-INV-07-01 el microfono pide permiso y con el permiso escucha`() = runTest {
-        val viewModel = crearViewModel()
-
-        viewModel.onEvent(InventorySearchEvent.VoiceClicked)
-        assertEquals(InventorySearchEffect.RequestMicPermission, viewModel.effects.first())
-
-        viewModel.onEvent(InventorySearchEvent.VoicePermissionResult(granted = true))
-
-        assertEquals(VoiceUiState.Listening, viewModel.uiState.first { it.voice != VoiceUiState.Hidden }.voice)
+    fun `CA-INV-07-01 CA-INV-07-06 el microfono pide permiso, con permiso escucha y sin permiso lo explica`() = runTest {
+        val conPermiso = crearViewModel()
+        conPermiso.onEvent(InventorySearchEvent.VoiceClicked)
+        assertEquals(InventorySearchEffect.RequestMicPermission, conPermiso.effects.first())
+        conPermiso.onEvent(InventorySearchEvent.VoicePermissionResult(granted = true))
+        assertEquals(VoiceUiState.Listening, conPermiso.uiState.first { it.voice != VoiceUiState.Hidden }.voice)
         assertEquals(1, speech.listenCalls)
+
+        val sinPermiso = crearViewModel()
+        sinPermiso.onEvent(InventorySearchEvent.VoiceClicked)
+        assertEquals(InventorySearchEffect.RequestMicPermission, sinPermiso.effects.first())
+        sinPermiso.onEvent(InventorySearchEvent.VoicePermissionResult(granted = false))
+        assertEquals(InventorySearchEffect.ShowPermissionRationale, sinPermiso.effects.first())
+        assertEquals("negar el permiso no escucha", 1, speech.listenCalls)
     }
 
     @Test
-    fun `CA-INV-07-02 tras hablar el aviso muestra los puntos suspensivos`() = runTest {
-        val viewModel = crearViewModel()
-        empezarEscucha(viewModel)
-
-        speech.send(SpeechEvent.Processing)
-
-        assertEquals(
-            VoiceUiState.Processing,
-            viewModel.uiState.first { it.voice == VoiceUiState.Processing }.voice
-        )
-    }
-
-    @Test
-    fun `CA-INV-07-03 el dictado llena la barra y muestra lo que coincide`() = runTest {
+    fun `CA-INV-07-02 CA-INV-07-03 tras hablar se procesa y el dictado llena la barra con lo que coincide`() = runTest {
         inventarioDePrueba()
         val viewModel = crearViewModel()
         empezarEscucha(viewModel)
 
-        speech.send(SpeechEvent.Result(listOf("carne, pollo y leche")))
+        speech.send(SpeechEvent.Processing)
+        viewModel.uiState.first { it.voice == VoiceUiState.Processing }
 
+        speech.send(SpeechEvent.Result(listOf("carne, pollo y leche")))
         val state = viewModel.uiState.first { it.query == "carne, pollo, leche" }
-        assertEquals("carne, pollo, leche", state.query)
         assertEquals(VoiceUiState.Hidden, state.voice)
         // Solo "Leche Entera" coincide con alguno de los tres ingredientes.
         assertEquals(listOf("item-1"), state.results.map { it.item.id })
     }
 
     @Test
-    fun `CA-INV-07-05 sin entender nada muestra el error y no cambia la barra`() = runTest {
+    fun `CA-INV-07-05 sin entender nada o sin red se muestra el error, la barra no cambia y reintentar vuelve a escuchar`() = runTest {
         inventarioDePrueba()
         val viewModel = crearViewModel()
         empezarEscucha(viewModel)
 
         speech.send(SpeechEvent.Result(emptyList()))
-
         val state = viewModel.uiState.first { it.voice is VoiceUiState.Failed }
         assertEquals(VoiceUiState.Failed(SpeechError.NO_MATCH), state.voice)
         assertEquals("", state.query)
-    }
-
-    @Test
-    fun `CA-INV-07-05 el error de red del reconocedor se muestra`() = runTest {
-        val viewModel = crearViewModel()
-        empezarEscucha(viewModel)
-
-        speech.send(SpeechEvent.Failed(SpeechError.NETWORK))
-
-        assertEquals(
-            VoiceUiState.Failed(SpeechError.NETWORK),
-            viewModel.uiState.first { it.voice is VoiceUiState.Failed }.voice
-        )
-    }
-
-    @Test
-    fun `CA-INV-07-05 reintentar vuelve a escuchar`() = runTest {
-        val viewModel = crearViewModel()
-        empezarEscucha(viewModel)
-        speech.send(SpeechEvent.Result(emptyList()))
-        viewModel.uiState.first { it.voice is VoiceUiState.Failed }
 
         viewModel.onEvent(InventorySearchEvent.VoiceRetry)
-
         assertEquals(2, speech.listenCalls)
-        assertEquals(VoiceUiState.Listening, viewModel.uiState.first { it.voice == VoiceUiState.Listening }.voice)
-    }
+        viewModel.uiState.first { it.voice == VoiceUiState.Listening }
 
-    @Test
-    fun `CA-INV-07-06 negar el permiso muestra la explicacion y no escucha`() = runTest {
-        val viewModel = crearViewModel()
-
-        viewModel.onEvent(InventorySearchEvent.VoiceClicked)
-        assertEquals(InventorySearchEffect.RequestMicPermission, viewModel.effects.first())
-
-        viewModel.onEvent(InventorySearchEvent.VoicePermissionResult(granted = false))
-
-        assertEquals(InventorySearchEffect.ShowPermissionRationale, viewModel.effects.first())
-        assertEquals(0, speech.listenCalls)
+        speech.send(SpeechEvent.Failed(SpeechError.NETWORK))
+        assertEquals(
+            VoiceUiState.Failed(SpeechError.NETWORK),
+            viewModel.uiState.first { it.voice == VoiceUiState.Failed(SpeechError.NETWORK) }.voice
+        )
     }
 
     @Test
@@ -261,22 +207,6 @@ class InventorySearchViewModelTest {
         assertEquals("", state.query)
         assertEquals(1, speech.cancellations)
         assertFalse(speech.isListening)
-    }
-
-    @Test
-    fun `CA-INV-07-08 sin servicio de voz la tarjeta no se muestra`() = runTest {
-        speech.available = false
-
-        val state = crearViewModel().uiState.first { !it.isLoading }
-
-        assertFalse(state.isVoiceAvailable)
-    }
-
-    @Test
-    fun `CA-INV-07-08 con servicio de voz la tarjeta se muestra`() = runTest {
-        val state = crearViewModel().uiState.first { !it.isLoading }
-
-        assertTrue(state.isVoiceAvailable)
     }
 
     @Test
@@ -301,12 +231,7 @@ class InventorySearchViewModelTest {
             override fun observeItems(): Flow<List<InventoryItem>> =
                 flow { throw InventoryException(InventoryError.NotAuthenticated) }
         }
-        val viewModel = InventorySearchViewModel(
-            observeInventoryUseCase = ObserveInventoryUseCase(sinSesion, FakePhotoSync(), ClassifyExpiryUseCase(fixedClock(today))),
-            searchInventoryUseCase = SearchInventoryUseCase(),
-            speechToText = speech,
-            parseSpokenIngredientsUseCase = ParseSpokenIngredientsUseCase()
-        )
+        val viewModel = crearViewModel(sinSesion)
 
         val state = viewModel.uiState.first { !it.isLoading }
 

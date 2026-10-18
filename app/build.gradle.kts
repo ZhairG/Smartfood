@@ -60,6 +60,11 @@ android {
         // Las excepciones de Firebase usan android.text.TextUtils en su constructor; en la JVM devuelve valores por defecto.
         unitTests.isReturnDefaultValues = true
     }
+    sourceSets {
+        // Fakes y utilidades que comparten las pruebas unitarias y las instrumentadas (#105).
+        getByName("test").kotlin.srcDir("src/sharedTest/java")
+        getByName("androidTest").kotlin.srcDir("src/sharedTest/java")
+    }
 }
 
 dependencies {

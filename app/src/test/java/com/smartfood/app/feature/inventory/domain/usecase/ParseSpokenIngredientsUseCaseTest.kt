@@ -1,79 +1,43 @@
 package com.smartfood.app.feature.inventory.domain.usecase
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
  * Nombre: ParseSpokenIngredientsUseCaseTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [ParseSpokenIngredientsUseCase] (RF-INV-06).
+ * Descripción: Pruebas unitarias de [ParseSpokenIngredientsUseCase] (RF-INV-06), como tabla de dictados y los
+ * ingredientes que deben salir (#105).
  */
 class ParseSpokenIngredientsUseCaseTest {
 
     private val parse = ParseSpokenIngredientsUseCase()
 
-    private fun parse(text: String) = parse(listOf(text))
-
     @Test
-    fun `CA-INV-07-03 comas e y separan los ingredientes`() {
-        assertEquals(listOf("carne", "pollo", "leche"), parse("carne, pollo y leche"))
-    }
-
-    @Test
-    fun `CA-INV-07-03 una coma seguida de y no deja la conjuncion en el ingrediente`() {
-        assertEquals(listOf("carne", "leche"), parse("carne, y leche"))
-    }
-
-    @Test
-    fun `CA-INV-07-03 la conjuncion e tambien separa`() {
-        assertEquals(listOf("tomate", "huevos", "arroz"), parse("tomate, huevos e arroz"))
-    }
-
-    @Test
-    fun `CA-INV-07-03 sin pausa tambien se separa por palabras`() {
-        // El reconocedor no siempre pone la coma en la pausa (checklist del #45).
-        assertEquals(listOf("leche", "tomate", "pasta"), parse("leche tomate y pasta"))
-    }
-
-    @Test
-    fun `CA-INV-07-03 el resultado va en minusculas y sin puntuacion`() {
-        assertEquals(listOf("carne", "pollo", "leche"), parse("Carne, Pollo y Leche."))
-    }
-
-    @Test
-    fun `CA-INV-07-03 se quitan los articulos iniciales`() {
-        assertEquals(
-            listOf("leche", "tomates", "pasta", "cebolla"),
-            parse("la leche, unos tomates, el pasta y una cebolla")
-        )
-    }
-
-    @Test
-    fun `CA-INV-07-03 los articulos y conectores dentro del dictado se quitan`() {
-        assertEquals(listOf("salsa", "casa", "arroz", "pollo"), parse("salsa de la casa, arroz con pollo"))
-    }
-
-    @Test
-    fun `CA-INV-07-03 las palabras que contienen y o e no se dividen`() {
-        assertEquals(listOf("yogur", "leche", "entera"), parse("yogur y leche entera"))
-    }
-
-    @Test
-    fun `CA-INV-07-03 los ingredientes repetidos aparecen una sola vez`() {
-        assertEquals(listOf("limón", "leche"), parse("limón, leche y limon"))
-    }
-
-    @Test
-    fun `CA-INV-07-03 se usa la primera alternativa no vacia`() {
-        assertEquals(listOf("pasta"), parse(listOf("  ", "pasta", "pastas")))
-    }
-
-    @Test
-    fun `CA-INV-07-05 un dictado vacio no da ingredientes`() {
-        assertTrue(parse(emptyList()).isEmpty())
-        assertTrue(parse(listOf("", " ")).isEmpty())
-        assertTrue(parse(" , y ").isEmpty())
+    fun `CA-INV-07-03 CA-INV-07-05 cada dictado se separa en sus ingredientes`() {
+        listOf(
+            // Comas, "y" y "e" separan, también después de una coma.
+            listOf("carne, pollo y leche") to listOf("carne", "pollo", "leche"),
+            listOf("carne, y leche") to listOf("carne", "leche"),
+            listOf("tomate, huevos e arroz") to listOf("tomate", "huevos", "arroz"),
+            // El reconocedor no siempre pone la coma en la pausa (checklist del #45): se separa por palabras.
+            listOf("leche tomate y pasta") to listOf("leche", "tomate", "pasta"),
+            // En minúsculas, sin puntuación, sin artículos ni conectores y sin repetidos.
+            listOf("Carne, Pollo y Leche.") to listOf("carne", "pollo", "leche"),
+            listOf("la leche, unos tomates, el pasta y una cebolla") to listOf("leche", "tomates", "pasta", "cebolla"),
+            listOf("salsa de la casa, arroz con pollo") to listOf("salsa", "casa", "arroz", "pollo"),
+            listOf("limón, leche y limon") to listOf("limón", "leche"),
+            // Las palabras que contienen "y" o "e" no se dividen.
+            listOf("yogur y leche entera") to listOf("yogur", "leche", "entera"),
+            // Se usa la primera alternativa no vacía.
+            listOf("  ", "pasta", "pastas") to listOf("pasta"),
+            // CA-INV-07-05: un dictado vacío no da ingredientes.
+            emptyList<String>() to emptyList(),
+            listOf("", " ") to emptyList(),
+            listOf(" , y ") to emptyList()
+        ).forEach { (dictado, ingredientes) ->
+            assertEquals("Dictado $dictado", ingredientes, parse(dictado))
+        }
     }
 }
