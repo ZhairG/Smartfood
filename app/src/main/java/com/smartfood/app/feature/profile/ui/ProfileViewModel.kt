@@ -3,6 +3,8 @@ package com.smartfood.app.feature.profile.ui
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartfood.app.core.designsystem.theme.ThemeMode
+import com.smartfood.app.core.preferences.ThemePreferences
 import com.smartfood.app.feature.auth.domain.usecase.LogoutUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.HasPendingChangesUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
@@ -32,6 +34,7 @@ import javax.inject.Inject
  * @param syncProfileEmail Iguala el correo del perfil al de la cuenta tras confirmar un correo nuevo.
  * @param logout Caso de uso de cierre de sesión.
  * @param observeInventory Inventario del usuario, para la tarjeta "Ingredientes en inventario".
+ * @param themePreferences Tema elegido en este teléfono, para la fila "Tema de la app" (spec 008, HU-PER-06).
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -40,6 +43,7 @@ class ProfileViewModel @Inject constructor(
     private val logout: LogoutUseCase,
     private val observeInventory: ObserveInventoryUseCase,
     private val hasPendingChanges: HasPendingChangesUseCase,
+    private val themePreferences: ThemePreferences,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -83,6 +87,9 @@ class ProfileViewModel @Inject constructor(
                 .catch { emit(emptyList()) }
                 .collect { sections -> _uiState.update { it.copy(inventoryCount = sections.sumOf { s -> s.items.size }) } }
         }
+        viewModelScope.launch {
+            themePreferences.themeMode.collect { mode -> _uiState.update { it.copy(themeMode = mode) } }
+        }
     }
 
     /** Procesa un evento de la UI. */
@@ -103,6 +110,12 @@ class ProfileViewModel @Inject constructor(
                 viewModelScope.launch { _effects.send(ProfileEffect.NavigateToFoodPreferences) }
             ProfileEvent.NotificationsClicked ->
                 viewModelScope.launch { _effects.send(ProfileEffect.NavigateToNotificationSettings) }
+            ProfileEvent.ThemeClicked -> _uiState.update { it.copy(isThemeSheetVisible = true) }
+            is ProfileEvent.ThemeSelected -> {
+                _uiState.update { it.copy(isThemeSheetVisible = false, themeMode = event.mode) }
+                viewModelScope.launch { themePreferences.setThemeMode(event.mode) }
+            }
+            ProfileEvent.ThemeSheetDismissed -> _uiState.update { it.copy(isThemeSheetVisible = false) }
         }
     }
 
@@ -129,6 +142,8 @@ class ProfileViewModel @Inject constructor(
  * @property initials Iniciales del avatar.
  * @property photoUrl Foto de perfil, o `null` para mostrar las iniciales (CA-PER-01-01).
  * @property inventoryCount Productos del inventario, para la tarjeta "Ingredientes en inventario".
+ * @property themeMode Tema elegido, que se muestra a la derecha de "Tema de la app" (CA-PER-06-01).
+ * @property isThemeSheetVisible `true` mientras está abierta la hoja para elegir el tema (CA-PER-06-02).
  * @property dialog Aviso abierto sobre el Perfil, o `null`.
  */
 @Immutable
@@ -140,6 +155,8 @@ data class ProfileUiState(
     val initials: String? = null,
     val photoUrl: String? = null,
     val inventoryCount: Int = 0,
+    val themeMode: ThemeMode = ThemeMode.Default,
+    val isThemeSheetVisible: Boolean = false,
     val dialog: ProfileDialog? = null,
 )
 
@@ -160,6 +177,9 @@ sealed interface ProfileEvent {
     data object EditProfileClicked : ProfileEvent
     data object PreferencesClicked : ProfileEvent
     data object NotificationsClicked : ProfileEvent
+    data object ThemeClicked : ProfileEvent
+    data class ThemeSelected(val mode: ThemeMode) : ProfileEvent
+    data object ThemeSheetDismissed : ProfileEvent
 }
 
 sealed interface ProfileEffect {

@@ -31,7 +31,7 @@
 - [x] T016 `ExpiryReminderWorker`: respeta "Productos por vencer" y publica "Inventario vacío" (CA-PER-04-03, 04-04); `ExpiryReminderWorkerTest` actualizado.
 - [x] T017 Pantalla `NotificationSettings` con interruptores y permiso de Android 13+ (CA-PER-04-01, 04-02, 04-05, 04-06).
 - [x] T018 `ThemePreferences` y `DataStoreThemePreferences` (`theme_prefs`) en `core/preferences`; `MainActivity` aplica el tema (RF-PER-07, CA-PER-06-03, 06-04).
-- [ ] T019 Fila "Tema de la app" y hoja de tema; revisión del tema oscuro en todas las pantallas (CA-PER-06-01, 06-02, 06-05). Pruebas de las dos pantallas.
+- [x] T019 Fila "Tema de la app" y hoja de tema; revisión del tema oscuro en todas las pantallas (CA-PER-06-01, 06-02, 06-05). Pruebas de las dos pantallas.
 
 ## Issue 4: Cambiar contraseña (intermedia)
 - [ ] T020 `AuthRepository.updatePassword` (+ fake) y `ChangePasswordUseCase` (reautentica y cambia) con pruebas (RF-PER-06).
@@ -83,8 +83,8 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **F** = 
 | CA-PER-05-04 | U `ChangePasswordUseCaseTest`, U `ChangePasswordViewModelTest`, M |
 | CA-PER-05-05 | U `ChangePasswordUseCaseTest`, I `ChangePasswordScreenTest` |
 | CA-PER-05-06 | U `ChangePasswordViewModelTest` |
-| CA-PER-06-01 | I `ProfileScreenTest` |
-| CA-PER-06-02 | I `ProfileScreenTest` |
+| CA-PER-06-01 | U `ProfileViewModelTest`, I `ProfileScreenTest` |
+| CA-PER-06-02 | U `ProfileViewModelTest`, I `ProfileScreenTest` |
 | CA-PER-06-03 | U `ThemeViewModelTest`, U `DataStoreThemePreferencesTest`, M |
 | CA-PER-06-04 | U `DataStoreThemePreferencesTest`, U `ThemeViewModelTest`, M |
 | CA-PER-06-05 | M |

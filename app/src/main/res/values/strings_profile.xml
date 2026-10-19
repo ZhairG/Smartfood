@@ -19,6 +19,10 @@
     <string name="profile_option_preferences">Preferencias alimentarias</string>
     <string name="profile_option_notifications">Notificaciones</string>
     <string name="profile_option_password">Cambiar contraseña</string>
+    <string name="profile_option_theme">Tema de la app</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_system">Según el teléfono</string>
 
     <!-- Errores del perfil (spec 008, AuthErrorText). -->
     <string name="error_invalid_name">El nombre debe tener entre 2 y 50 caracteres</string>

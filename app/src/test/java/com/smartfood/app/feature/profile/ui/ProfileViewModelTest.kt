@@ -12,12 +12,14 @@ import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCas
 import com.smartfood.app.feature.profile.domain.model.UserProfile
 import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
 import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
+import com.smartfood.app.core.designsystem.theme.ThemeMode
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.FakeProfileRepository
+import com.smartfood.app.testutil.FakeThemePreferences
 import com.smartfood.app.testutil.MainDispatcherRule
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
@@ -28,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -57,6 +60,7 @@ class ProfileViewModelTest {
     private val pepito = UserProfile(DEFAULT_UID, "Pepito Perez", "pepito@correo.com")
     private val inventoryRepository = FakeInventoryRepository()
     private val photoSync = FakePhotoSync()
+    private val themePreferences = FakeThemePreferences()
 
     private fun crearViewModel(repository: InventoryRepository = inventoryRepository) = ProfileViewModel(
         observeProfile = ObserveProfileUseCase(profileRepository),
@@ -67,7 +71,8 @@ class ProfileViewModelTest {
             FakePhotoSync(),
             ClassifyExpiryUseCase(fixedClock(LocalDate.of(2026, 9, 10)))
         ),
-        hasPendingChanges = HasPendingChangesUseCase(repository, photoSync)
+        hasPendingChanges = HasPendingChangesUseCase(repository, photoSync),
+        themePreferences = themePreferences
     )
 
     @Test
@@ -227,6 +232,40 @@ class ProfileViewModelTest {
         viewModel.onEvent(ProfileEvent.NotificationsClicked)
 
         assertEquals(ProfileEffect.NavigateToNotificationSettings, viewModel.effects.first())
+    }
+
+    @Test
+    fun `CA-PER-06-01 muestra el tema guardado en el telefono`() = runTest {
+        themePreferences.setThemeMode(ThemeMode.DARK)
+
+        val viewModel = crearViewModel()
+
+        assertEquals(ThemeMode.DARK, viewModel.uiState.value.themeMode)
+    }
+
+    @Test
+    fun `CA-PER-06-02 tocar la fila abre la hoja y elegir guarda el tema`() = runTest {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.ThemeClicked)
+        assertTrue(viewModel.uiState.value.isThemeSheetVisible)
+
+        viewModel.onEvent(ProfileEvent.ThemeSelected(ThemeMode.SYSTEM))
+
+        assertFalse(viewModel.uiState.value.isThemeSheetVisible)
+        assertEquals(listOf(ThemeMode.SYSTEM), themePreferences.saved)
+        assertEquals(ThemeMode.SYSTEM, viewModel.uiState.value.themeMode)
+    }
+
+    @Test
+    fun `CA-PER-06-02 cancelar la hoja no cambia el tema`() {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.ThemeClicked)
+        viewModel.onEvent(ProfileEvent.ThemeSheetDismissed)
+
+        assertFalse(viewModel.uiState.value.isThemeSheetVisible)
+        assertTrue(themePreferences.saved.isEmpty())
     }
 
     @Test

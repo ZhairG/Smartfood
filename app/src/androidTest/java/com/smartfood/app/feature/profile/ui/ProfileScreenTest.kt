@@ -17,6 +17,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.ThemeMode
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +29,11 @@ class ProfileScreenTest {
 
     private val eventos = mutableListOf<ProfileEvent>()
 
-    private fun mostrar(dialog: ProfileDialog? = null) {
+    private fun mostrar(
+        dialog: ProfileDialog? = null,
+        themeMode: ThemeMode = ThemeMode.Default,
+        isThemeSheetVisible: Boolean = false,
+    ) {
         composeTestRule.setContent {
             SmartfoodTheme {
                 ProfileScreen(
@@ -39,6 +44,8 @@ class ProfileScreenTest {
                         email = "pepito@correo.com",
                         initials = "PP",
                         inventoryCount = 34,
+                        themeMode = themeMode,
+                        isThemeSheetVisible = isThemeSheetVisible,
                         dialog = dialog
                     ),
                     onEvent = { eventos += it }
@@ -84,6 +91,35 @@ class ProfileScreenTest {
         composeTestRule.onNode(hasText("Notificaciones") and hasClickAction()).performClick()
 
         assertEquals(listOf<ProfileEvent>(ProfileEvent.NotificationsClicked), eventos)
+    }
+
+    @Test
+    fun caPer0601_laFilaDeTemaMuestraElValorActualYAbreLaHoja() {
+        mostrar(themeMode = ThemeMode.DARK)
+
+        composeTestRule.onNodeWithText("Oscuro").assertIsDisplayed()
+        composeTestRule.onNode(hasText("Tema de la app") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.ThemeClicked), eventos)
+    }
+
+    @Test
+    fun caPer0602_laHojaEligeElTemaYConfirmaOCancela() {
+        mostrar(isThemeSheetVisible = true)
+
+        composeTestRule.onNodeWithText("Oscuro").performClick()
+        composeTestRule.onNode(hasText("Guardar") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.ThemeSelected(ThemeMode.DARK)), eventos)
+    }
+
+    @Test
+    fun caPer0602_cancelarLaHojaNoCambiaElTema() {
+        mostrar(isThemeSheetVisible = true)
+
+        composeTestRule.onNode(hasText("Cancelar") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.ThemeSheetDismissed), eventos)
     }
 
     @Test

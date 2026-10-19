@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,9 +54,13 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodWarningDialog
 import com.smartfood.app.core.designsystem.theme.GreenCheck
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.ThemeMode
+import com.smartfood.app.core.designsystem.theme.formMetricsFor
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
+import com.smartfood.app.feature.inventory.ui.components.OptionSheet
 
 /**
  * Nombre: ProfileScreen.kt
@@ -139,9 +144,11 @@ fun ProfileScreen(
                 }
                 OptionsCard(
                     dimens = dimens,
+                    themeMode = state.themeMode,
                     onEditClick = { onEvent(ProfileEvent.EditProfileClicked) },
                     onPreferencesClick = { onEvent(ProfileEvent.PreferencesClicked) },
-                    onNotificationsClick = { onEvent(ProfileEvent.NotificationsClicked) }
+                    onNotificationsClick = { onEvent(ProfileEvent.NotificationsClicked) },
+                    onThemeClick = { onEvent(ProfileEvent.ThemeClicked) }
                 )
             }
 
@@ -169,6 +176,19 @@ fun ProfileScreen(
                         fontSize = dimens.logoutText,
                         fontWeight = FontWeight.Medium
                     )
+                )
+            }
+        }
+
+        if (state.isThemeSheetVisible) {
+            CompositionLocalProvider(LocalFormMetrics provides formMetricsFor(maxHeight)) {
+                OptionSheet(
+                    title = stringResource(id = R.string.profile_option_theme),
+                    options = ThemeMode.entries,
+                    selected = state.themeMode,
+                    label = { stringResource(id = it.titleRes) },
+                    onConfirm = { mode -> onEvent(ProfileEvent.ThemeSelected(mode)) },
+                    onDismiss = { onEvent(ProfileEvent.ThemeSheetDismissed) }
                 )
             }
         }
@@ -290,15 +310,18 @@ private fun StatCard(value: String, label: String, dimens: ProfileDimens, modifi
 }
 
 /**
- * Opciones de la cuenta, separadas por líneas. "Editar información personal" abre su pantalla; las demás todavía no
- * tienen pantalla y se ven deshabilitadas.
+ * Opciones de la cuenta, separadas por líneas. "Editar información personal", "Preferencias alimentarias",
+ * "Notificaciones" y "Tema de la app" abren su pantalla o su hoja; "Cambiar contraseña" se ve deshabilitada hasta
+ * tener la suya.
  */
 @Composable
 private fun OptionsCard(
     dimens: ProfileDimens,
+    themeMode: ThemeMode,
     onEditClick: () -> Unit,
     onPreferencesClick: () -> Unit,
     onNotificationsClick: () -> Unit,
+    onThemeClick: () -> Unit,
 ) {
     val options = listOf(
         R.drawable.ic_figma_profile_edit to R.string.profile_option_edit,
@@ -326,11 +349,26 @@ private fun OptionsCard(
             )
             if (index < options.lastIndex) HorizontalDivider(color = MaterialTheme.colorScheme.outline)
         }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+        // Desviación aprobada (spec 008 §9): fila que no está en el Figma, con el valor actual a la derecha.
+        OptionRow(
+            icon = R.drawable.ic_profile_theme,
+            text = stringResource(id = R.string.profile_option_theme),
+            trailingText = stringResource(id = themeMode.titleRes),
+            dimens = dimens,
+            onClick = onThemeClick
+        )
     }
 }
 
 @Composable
-private fun OptionRow(@DrawableRes icon: Int, text: String, dimens: ProfileDimens, onClick: (() -> Unit)?) {
+private fun OptionRow(
+    @DrawableRes icon: Int,
+    text: String,
+    dimens: ProfileDimens,
+    onClick: (() -> Unit)?,
+    trailingText: String? = null
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -361,6 +399,15 @@ private fun OptionRow(@DrawableRes icon: Int, text: String, dimens: ProfileDimen
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
+        if (trailingText != null) {
+            Text(
+                text = trailingText,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                modifier = Modifier.padding(start = MaterialTheme.spacing.small)
+            )
+        }
         Icon(
             painter = painterResource(id = R.drawable.ic_figma_chevron_right),
             contentDescription = null,
