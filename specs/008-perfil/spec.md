@@ -33,7 +33,7 @@ Esta spec deja el Perfil funcionando como el prototipo de Figma, más una opció
 | Código | Criterio |
 |---|---|
 | CA-PER-01-01 | **Dado** que abro la pestaña Perfil, **entonces** veo mi foto (o mis iniciales si no tengo foto), mi nombre completo y mi correo, como en el Figma `306:369`. |
-| CA-PER-01-02 | **Dado** el Perfil, **entonces** las tarjetas muestran: "Recetas guardadas" = 0 y "Ahorrados este mes" = $0 hasta que exista el módulo de Recetas + IA (spec 009), e "Ingredientes en inventario" = cantidad de productos de mi inventario (CA-INV-09-03). |
+| CA-PER-01-02 | **Dado** el Perfil, **entonces** las tarjetas muestran: "Recetas guardadas" = 0 hasta el módulo de recetas guardadas (#117), "Ahorrados este mes" = $0 hasta la spec 009, e "Ingredientes en inventario" = cantidad de productos de mi inventario (CA-INV-09-03). |
 | CA-PER-01-03 | **Dado** el Perfil, **cuando** toco "Editar información personal", "Preferencias alimentarias", "Notificaciones", "Cambiar contraseña" o "Tema de la app", **entonces** se abre esa pantalla u hoja con la transición de empuje, y la barra inferior sigue visible con "Perfil" seleccionado. |
 | CA-PER-01-04 | **Dado** una pantalla interna del Perfil, **cuando** toco la flecha o "atrás" del sistema, **entonces** vuelvo al Perfil. |
 
@@ -127,7 +127,7 @@ mi cuenta tenga mis datos reales.
 
 ## 6. Fuera de alcance
 
-- Calcular "Recetas guardadas" y "Ahorrados este mes" (spec 009).
+- Calcular "Recetas guardadas" (próximo módulo, #117) y "Ahorrados este mes" (spec 009).
 - Que la IA use las restricciones alimentarias (decisión del 18/10/2026; queda como trabajo futuro).
 - Eliminar la cuenta desde la app.
 - Sincronizar las notificaciones y el tema entre teléfonos (son de cada teléfono).
@@ -166,7 +166,7 @@ misma pantalla, y en Cambiar contraseña al Perfil.
 | La foto de perfil se toma con la **cámara del sistema** y no con un visor propio. | Pedido de Zhair: la cámara del Figma se mejorará más adelante. |
 | El correo es editable **con un código** y pide la contraseña actual en un **campo** "Contraseña actual" que aparece debajo del correo solo si cambió; el código se escribe en el aviso "Revisa tu correo" (casillas de `OtpCodeInput` de la recuperación). El Figma no tiene ninguno de los dos. | Firebase exige confirmar la identidad y el correo nuevo. Un campo es más claro que un segundo aviso (decisión de Zhair en el #109). |
 | Mientras se guarda se ve el diálogo de carga "Guardando cambios…", y los errores se muestran en rojo bajo los campos. | El Figma no define los estados de carga ni de error (como el inventario, CA-INV-02-12). |
-| "Recetas guardadas" y "Ahorrados este mes" muestran 0 y $0. | Dependen del módulo de Recetas + IA (spec 009). |
+| "Recetas guardadas" y "Ahorrados este mes" muestran 0 y $0. | "Recetas guardadas" depende del módulo de recetas guardadas (#117) y "Ahorrados este mes", de la spec 009. |
 | Notificaciones guarda al tocar cada interruptor; el Figma no muestra botón "Guardar". | El frame no tiene botón visible. |
 
 ## 10. Plan de entrega
