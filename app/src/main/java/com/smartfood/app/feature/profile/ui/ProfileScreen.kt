@@ -64,8 +64,9 @@ import com.smartfood.app.core.designsystem.util.SystemBarEffect
  * Descripción: Pestaña Perfil (spec 001 HU-05; spec 006 CA-INV-09-03; Figma "Perfil" `306:369`). Encabezado verde
  * con la foto o las iniciales, el nombre y el correo; tres tarjetas de cifras; las opciones de la cuenta y "Cerrar
  * Sesión". "Editar información personal" y la cámara del avatar abren "Editar información" (spec 008, CA-PER-01-03);
- * "Preferencias alimentarias" abre su pantalla (spec 008, HU-PER-03); las demás opciones se ven deshabilitadas hasta
- * tener su pantalla, y de las cifras solo "Ingredientes en inventario" es real (CA-PER-01-02).
+ * "Preferencias alimentarias" abre su pantalla (spec 008, HU-PER-03); "Notificaciones" también abre la suya (spec 008,
+ * HU-PER-04); "Cambiar contraseña" se ve deshabilitada hasta tener su pantalla, y de las cifras solo "Ingredientes en
+ * inventario" es real (CA-PER-01-02).
  *
  * Adaptable (spec 002): las medidas del Figma (412 dp de ancho) se escalan al ancho real, el encabezado se compacta
  * en pantallas bajas y "Cerrar Sesión" queda siempre visible abajo; las tarjetas y opciones se desplazan si no caben.
@@ -139,7 +140,8 @@ fun ProfileScreen(
                 OptionsCard(
                     dimens = dimens,
                     onEditClick = { onEvent(ProfileEvent.EditProfileClicked) },
-                    onPreferencesClick = { onEvent(ProfileEvent.PreferencesClicked) }
+                    onPreferencesClick = { onEvent(ProfileEvent.PreferencesClicked) },
+                    onNotificationsClick = { onEvent(ProfileEvent.NotificationsClicked) }
                 )
             }
 
@@ -296,6 +298,7 @@ private fun OptionsCard(
     dimens: ProfileDimens,
     onEditClick: () -> Unit,
     onPreferencesClick: () -> Unit,
+    onNotificationsClick: () -> Unit,
 ) {
     val options = listOf(
         R.drawable.ic_figma_profile_edit to R.string.profile_option_edit,
@@ -317,6 +320,7 @@ private fun OptionsCard(
                 onClick = when (textRes) {
                     R.string.profile_option_edit -> onEditClick
                     R.string.profile_option_preferences -> onPreferencesClick
+                    R.string.profile_option_notifications -> onNotificationsClick
                     else -> null
                 }
             )

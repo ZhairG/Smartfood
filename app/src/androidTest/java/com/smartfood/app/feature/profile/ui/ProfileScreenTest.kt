@@ -78,6 +78,15 @@ class ProfileScreenTest {
     }
 
     @Test
+    fun caPer0401_laFilaDeNotificacionesAbreSuPantalla() {
+        mostrar()
+
+        composeTestRule.onNode(hasText("Notificaciones") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.NotificationsClicked), eventos)
+    }
+
+    @Test
     fun ca0503_cerrarSesionEmiteLogoutClicked() {
         mostrar()
 

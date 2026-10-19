@@ -101,6 +101,8 @@ class ProfileViewModel @Inject constructor(
             ProfileEvent.EditProfileClicked -> viewModelScope.launch { _effects.send(ProfileEffect.NavigateToEditProfile) }
             ProfileEvent.PreferencesClicked ->
                 viewModelScope.launch { _effects.send(ProfileEffect.NavigateToFoodPreferences) }
+            ProfileEvent.NotificationsClicked ->
+                viewModelScope.launch { _effects.send(ProfileEffect.NavigateToNotificationSettings) }
         }
     }
 
@@ -157,10 +159,12 @@ sealed interface ProfileEvent {
     data object DialogDismissed : ProfileEvent
     data object EditProfileClicked : ProfileEvent
     data object PreferencesClicked : ProfileEvent
+    data object NotificationsClicked : ProfileEvent
 }
 
 sealed interface ProfileEffect {
     data object NavigateToLogin : ProfileEffect
     data object NavigateToEditProfile : ProfileEffect
     data object NavigateToFoodPreferences : ProfileEffect
+    data object NavigateToNotificationSettings : ProfileEffect
 }

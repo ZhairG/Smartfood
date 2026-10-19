@@ -78,4 +78,14 @@
     <!-- Notificaciones (spec 008, HU-PER-04) -->
     <string name="notification_empty_inventory_title">Tu inventario está vacío</string>
     <string name="notification_empty_inventory_body">Registra tus alimentos para no perder de vista sus fechas</string>
+    <string name="notifications_title">Notificaciones</string>
+    <string name="notification_option_expiring">Productos por vencer</string>
+    <string name="notification_option_expiring_description">Avisos cuando un ingrediente esté por caducar</string>
+    <string name="notification_option_suggested_recipes">Recetas sugeridas</string>
+    <string name="notification_option_suggested_recipes_description">Nuevas ideas según tu inventario</string>
+    <string name="notification_option_empty_inventory">Inventario vacío</string>
+    <string name="notification_option_empty_inventory_description">Recordatorio si no registras productos</string>
+    <string name="notification_permission_title">Notificaciones desactivadas</string>
+    <string name="notification_permission_body">Activa las notificaciones en los ajustes del teléfono para recibir los avisos.</string>
+    <string name="notification_permission_open_settings">Abrir ajustes</string>
 </resources>

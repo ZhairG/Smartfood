@@ -121,4 +121,10 @@ sealed interface Route {
     data object FoodPreferences : Route {
         override val screenRoute: ScreenRoute = ScreenRoute.FOOD_PREFERENCES
     }
+
+    /** "Notificaciones" del Perfil (spec 008, HU-PER-04). */
+    @Serializable
+    data object NotificationSettings : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.NOTIFICATION_SETTINGS
+    }
 }

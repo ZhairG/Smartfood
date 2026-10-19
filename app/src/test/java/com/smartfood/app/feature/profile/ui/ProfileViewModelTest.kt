@@ -221,6 +221,15 @@ class ProfileViewModelTest {
     }
 
     @Test
+    fun `CA-PER-04-01 Notificaciones abre su pantalla`() = runTest {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.NotificationsClicked)
+
+        assertEquals(ProfileEffect.NavigateToNotificationSettings, viewModel.effects.first())
+    }
+
+    @Test
     fun `CA-PER-02-12 si la cuenta tiene un correo nuevo el perfil lo toma una sola vez`() {
         profileRepository.profile.value = pepito
         authRepository.currentEmailValue = "nuevo@correo.com"

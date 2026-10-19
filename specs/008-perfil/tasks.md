@@ -29,7 +29,7 @@
 - [x] T014 `NotificationSettings`, `NotificationSettingsRepository` y `DataStoreNotificationSettings` (`notification_prefs`) (RF-PER-05).
 - [x] T015 `SetNotificationSettingUseCase`: programa o cancela el trabajo diario (CA-PER-04-03).
 - [x] T016 `ExpiryReminderWorker`: respeta "Productos por vencer" y publica "Inventario vacío" (CA-PER-04-03, 04-04); `ExpiryReminderWorkerTest` actualizado.
-- [ ] T017 Pantalla `NotificationSettings` con interruptores y permiso de Android 13+ (CA-PER-04-01, 04-02, 04-05, 04-06).
+- [x] T017 Pantalla `NotificationSettings` con interruptores y permiso de Android 13+ (CA-PER-04-01, 04-02, 04-05, 04-06).
 - [ ] T018 `ThemePreferences` y `DataStoreThemePreferences` (`theme_prefs`) en `core/preferences`; `MainActivity` aplica el tema (RF-PER-07, CA-PER-06-03, 06-04).
 - [ ] T019 Fila "Tema de la app" y hoja de tema; revisión del tema oscuro en todas las pantallas (CA-PER-06-01, 06-02, 06-05). Pruebas de las dos pantallas.
 
@@ -73,10 +73,10 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **F** = 
 | CA-PER-03-04 | U `PreferencesDocumentTest`, U `FoodPreferencesUseCasesTest`, U `FoodPreferencesViewModelTest`, R, M |
 | CA-PER-04-01 | U `DataStoreNotificationSettingsTest`, I `NotificationSettingsScreenTest` |
 | CA-PER-04-02 | U `DataStoreNotificationSettingsTest`, U `NotificationSettingsViewModelTest` |
-| CA-PER-04-03 | U `SetNotificationSettingUseCaseTest`, I `ExpiryReminderWorkerTest` |
+| CA-PER-04-03 | U `SetNotificationSettingUseCaseTest`, U `NotificationSettingsViewModelTest`, I `ExpiryReminderWorkerTest` |
 | CA-PER-04-04 | I `ExpiryReminderWorkerTest`, M |
-| CA-PER-04-05 | U `NotificationSettingsViewModelTest` |
-| CA-PER-04-06 | M |
+| CA-PER-04-05 | U `NotificationSettingsViewModelTest`, I `NotificationSettingsScreenTest` |
+| CA-PER-04-06 | I `NotificationSettingsScreenTest`, M |
 | CA-PER-05-01 | I `ChangePasswordScreenTest` |
 | CA-PER-05-02 | I `ChangePasswordScreenTest` |
 | CA-PER-05-03 | U `ChangePasswordViewModelTest` |
