@@ -8,7 +8,7 @@
 
 ## Issue 1: Catálogo, Descubrir y Detalle (intermedia)
 - [x] T002 Modelos `Recipe`, `RecipeIngredient`, `RecipeStep`, `Ingredient` y contrato `RecipeCatalog` (RF-RIA-01). *Hecha en el #114, porque el agente los necesita; el #113 los reutiliza.*
-- [ ] T003 `assets/ingredientes.json` y `assets/recetas.json` (30 a 50 recetas) con fotos en `drawable-nodpi` y sus fuentes en `docs/licenses/fotos-recetas.md`; `RecipeCatalogTest` (RNF-RIA-05).
+- [ ] T003 `assets/ingredientes.json` (con `"etiquetas"`, plan §2) y `assets/recetas.json` (30 a 50 recetas) con fotos en `drawable-nodpi` y sus fuentes en `docs/licenses/fotos-recetas.md`; `RecipeCatalogTest` (RNF-RIA-05).
 - [ ] T004 `AssetsRecipeCatalog` con kotlinx.serialization y `RecipesDataModule`.
 - [ ] T005 `IngredientMatcher` con `IngredientMatcherTest` (RF-RIA-02).
 - [ ] T006 Pestaña Recetas habilitada (Guardadas sigue gris, §9), rutas y `RecipesNavGraph` (CA-RIA-01-01).
@@ -20,11 +20,12 @@
 - [x] T010 `RecipeEvaluator` (uso, faltantes, costo, rescate, desperdicio, utilidad) con `RecipeEvaluatorTest`.
 - [x] T011 `MealPlanner` (backtracking + forward checking + ramificación y poda, sugerencias si no hay plan) con `MealPlannerTest` contra fuerza bruta (CA-RIA-02-04, 02-05, 02-07).
 - [x] T012 `PlanExplainer` con `PlanExplainerTest` (CA-RIA-02-06).
+- [x] T012a Restricciones alimentarias en el agente: `FoodTag`, `Ingredient.tags`, `DietRule` y `PlanContext.diet`; filtro del dominio en `MealPlanner` y casos en `MealPlannerTest`, incluida la fuerza bruta (CA-RIA-02-09).
 - [ ] T013 `AgentEvaluationTest` (30 inventarios, líneas base, métricas) y `MealPlannerPerformanceTest` (RNF-RIA-02, RNF-RIA-03). *Se corre con el catálogo real (`recetas.json` del #113), decisión de Zhair.*
 
 ## Issue 3: Flujo de la IA (intermedia) — después de los Issues 1 y 2
-- [ ] T014 `GeneratePlanUseCase` y `AiPlanViewModel` (`Context`, `Loading`, `Plan`, `NoPlan`, cancelar, ajustar) con pruebas.
-- [ ] T015 Pantalla de contexto: inventario detectado, aviso del que vence primero, presupuesto, porciones, picante y tiempo (CA-RIA-02-01).
+- [ ] T014 `GeneratePlanUseCase` (con las restricciones del Perfil como `PlanContext.diet`, CA-RIA-02-09) y `AiPlanViewModel` (`Context`, `Loading`, `Plan`, `NoPlan`, cancelar, ajustar) con pruebas.
+- [ ] T015 Pantalla de contexto: inventario detectado, aviso del que vence primero, presupuesto, porciones, picante, tiempo y "Según tus preferencias" (CA-RIA-02-01).
 - [ ] T016 "Analizando opciones" con el arco de progreso y "Cancelar" (CA-RIA-02-02).
 - [ ] T017 "Tu plan de 3 días" con "¿Por qué te conviene?" y "Ajustar"; "Sin coincidencias" con sugerencias (CA-RIA-02-03, 02-06 a 02-08).
 - [ ] T018 Ayuda y "Contactar soporte" (CA-RIA-03-01); `AiFlowScreenTest`.
@@ -59,6 +60,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-06 | U `PlanExplainerTest` |
 | CA-RIA-02-07 | U `MealPlannerTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-08 | U `AiPlanViewModelTest` |
+| CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `GeneratePlanUseCaseTest` |
 | CA-RIA-02-09 | U `MealPlannerPerformanceTest`, M (release) |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |

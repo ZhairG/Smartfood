@@ -40,7 +40,8 @@ Modelos a copiar: estructura de `feature/inventory` (contratos `XContract.kt`, `
 ```jsonc
 // ingredientes.json
 [{ "id": "pollo", "nombre": "Pollo", "sinonimos": ["pechuga", "muslo", "pollo entero"],
-   "seccion": "Carnes", "unidad": "g", "precioCop": 14500, "precioPor": 1000, "vidaUtilDias": 2 }]
+   "seccion": "Carnes", "unidad": "g", "precioCop": 14500, "precioPor": 1000, "vidaUtilDias": 2,
+   "etiquetas": ["carne", "origen_animal"] }]
 // recetas.json
 [{ "id": "pollo-guisado", "nombre": "Pollo guisado con arroz", "foto": "receta_pollo_guisado",
    "porciones": 4, "prepMin": 15, "coccionMin": 25, "reposoMin": 0, "dificultad": "Media",
@@ -50,6 +51,9 @@ Modelos a copiar: estructura de `feature/inventory` (contratos `XContract.kt`, `
    "pasos": [{ "titulo": "Sofríe la cebolla y el tomate", "texto": "Cocina a fuego medio…", "minutos": 5 }] }]
 ```
 
+- `etiquetas` (opcional) ⊆ `carne`, `marisco`, `origen_animal`, `gluten`, `lactosa`, `frutos_secos` (`FoodTag`): el
+  huevo, la leche, el queso y la miel llevan `origen_animal`; los lácteos, además, `lactosa`. Con ellas el agente sabe
+  qué recetas admite cada restricción alimentaria (§3.3).
 - `unidad` ∈ `g`, `ml`, `und`. `precioCop` es el precio de `precioPor` unidades (p. ej. 1000 g).
 - Las fotos van en `res/drawable-nodpi/receta_*.webp` (≤ 150 KB cada una); su fuente, en `docs/licenses/fotos-recetas.md`.
 - Contenido: 30 a 50 recetas de cocina colombiana cotidiana. El catálogo se valida con una prueba unitaria
@@ -77,7 +81,8 @@ Para una receta escalada a `porciones`, con el inventario **restante**:
 
 ### 3.3 Búsqueda (`MealPlanner.plan(context): PlanResult`)
 ```
-dominio = recetas que cumplen tiempo ≤ máx, picante permitido y faltantes ≤ 3 con el inventario completo
+dominio = recetas que cumplen tiempo ≤ máx, picante permitido, dieta (ningún ingrediente con una etiqueta
+          prohibida por PlanContext.diet) y faltantes ≤ 3 con el inventario completo
 mejor = null
 fun buscar(día, asignadas, inventarioRestante, presupuestoRestante, utilidadParcial):
     si día == 4: si utilidad > mejor.utilidad → mejor = plan; return
@@ -125,6 +130,9 @@ valor de referencia de los ingredientes por vencer usados.
 - El flujo de la IA (contexto → cargando → plan / sin coincidencias) usa **un solo** `AiPlanViewModel` con
   `AiUiState` (`Context`, `Loading`, `Plan`, `NoPlan`) para no pasar el plan entre rutas. El cálculo corre en
   `Dispatchers.Default` y se cancela con "Cancelar".
+- Restricciones alimentarias (CA-RIA-02-09): `GeneratePlanUseCase` lee `GetFoodPreferencesUseCase` (spec 008) y
+  traduce cada `DietaryRestriction` a `DietRule` por nombre (`PlanContext.diet`); el contexto las muestra. Requiere la
+  spec 008 en `master` y `git merge master` en `feature/009-recetas-ia`.
 - Componentes a reutilizar: la barra de búsqueda de `InventorySearchScreen`, `CategoryChips` para los
   filtros, tarjetas con `AsyncImage`, `SmartFoodPrimaryButton`, `SmartFoodResultDialog`/`SmartFoodWarningDialog`,
   el arco "Progreso" como `CircularProgressIndicator` con los colores del Figma.

@@ -19,9 +19,10 @@ presupuesto. El profesor pidió precisar la formulación computacional: **variab
 restricciones duras y función objetivo**, y verlo como un **problema de satisfacción de restricciones con búsqueda**,
 "no como un simple filtro" (retroalimentación escrita y sustentación del 2026-10).
 
-Decisiones de Zhair (2026-10-18): el agente arma un **plan de 3 días**, el **presupuesto es total para el plan**, no
-se usan restricciones de dieta en esta versión, el catálogo vive **dentro de la app** y los ingredientes se emparejan
-por **nombre normalizado y sinónimos**.
+Decisiones de Zhair (2026-10-18): el agente arma un **plan de 3 días**, el **presupuesto es total para el plan**, el
+catálogo vive **dentro de la app** y los ingredientes se emparejan
+por **nombre normalizado y sinónimos**. Decisión del 2026-10-19: el agente respeta las **restricciones alimentarias**
+de Preferencias alimentarias (spec 008) como restricciones duras.
 
 ## 2. Formulación del agente (CSP con optimización)
 
@@ -29,7 +30,7 @@ por **nombre normalizado y sinónimos**.
 |---|---|
 | **Variables** | `D1`, `D2`, `D3`: la receta que se cocina cada día. |
 | **Dominio** | Las recetas del catálogo que pasan las restricciones de una sola receta (consistencia de nodo). |
-| **Restricciones de una receta** | tiempo total ≤ tiempo máximo elegido; sin picante si se eligió "Sin picante"; como máximo `M` ingredientes por comprar (`M` = 3). |
+| **Restricciones de una receta** | tiempo total ≤ tiempo máximo elegido; sin picante si se eligió "Sin picante"; ningún ingrediente excluido por mis restricciones alimentarias (vegetariano, vegano, sin gluten, sin lactosa, sin frutos secos), según las etiquetas de cada ingrediente; como máximo `M` ingredientes por comprar (`M` = 3). |
 | **Restricciones entre recetas** | (1) `D1`, `D2` y `D3` distintas; (2) **inventario compartido**: lo que usan las tres no supera lo disponible (lo que falta se compra); (3) **presupuesto total**: lo que hay que comprar para las tres, escalado a las porciones, no supera el presupuesto máximo. |
 | **Objetivo** | Maximizar `U = w₁·rescate − w₂·costo − w₃·desperdicio`: *rescate* = cantidad de ingredientes que vencen en ≤ 3 días y se usan **antes** de vencer, ponderada por urgencia `1/(días + 1)`; *costo* = compras del plan en COP; *desperdicio* = lo que vence dentro de los 3 días y el plan no usa. Pesos iniciales `w₁ = 1`, `w₂ = 0,3`, `w₃ = 0,5` (heurísticos, se justifican con prueba de sensibilidad). |
 | **Búsqueda** | Backtracking que asigna `D1`, `D2`, `D3` en orden; **forward checking** quita del dominio de los días pendientes las recetas que ya no caben en el inventario o el presupuesto restante; **ramificación y poda** descarta un plan parcial cuya utilidad máxima posible no supera la del mejor plan encontrado. |
@@ -48,14 +49,15 @@ por **nombre normalizado y sinónimos**.
 ### HU-RIA-02: Pedirle un plan a la IA
 | Código | Criterio |
 |---|---|
-| CA-RIA-02-01 | **Dado** que toco "Sugerirme recetas", **entonces** veo "Sugerencia con IA" (Figma `633:2948`): los ingredientes de mi inventario detectados, el aviso del que vence primero ("⚠ El pollo vence mañana."), el presupuesto máximo con un control deslizante (COP $2.000 a $100.000), las porciones, "Sin picante" y el tiempo máximo, y "Generar recomendaciones". |
+| CA-RIA-02-01 | **Dado** que toco "Sugerirme recetas", **entonces** veo "Sugerencia con IA" (Figma `633:2948`): los ingredientes de mi inventario detectados, el aviso del que vence primero ("⚠ El pollo vence mañana."), el presupuesto máximo con un control deslizante (COP $2.000 a $100.000), las porciones, "Sin picante" y el tiempo máximo, y "Generar recomendaciones". Si tengo restricciones en Preferencias alimentarias, veo "Según tus preferencias: <restricciones>" (no se cambian aquí, ver §9). |
 | CA-RIA-02-02 | **Dado** que toco "Generar recomendaciones", **entonces** veo "Analizando opciones" (Figma `666:3546`) con el arco de progreso, el texto con mi presupuesto y "Cancelar", que vuelve al contexto sin resultado. |
 | CA-RIA-02-03 | **Dado** que existe al menos un plan que cumple todas las restricciones, **entonces** veo **"Tu plan de 3 días"** con Día 1, Día 2 y Día 3, cada uno con la tarjeta de su receta (foto, nombre, % del inventario usado, costo y tiempo), y la tarjeta "¿Por qué te conviene?". |
 | CA-RIA-02-04 | **Dado** el plan, **entonces** es el de **mayor utilidad** entre todos los planes válidos (comprobado contra una búsqueda exhaustiva en las pruebas). |
-| CA-RIA-02-05 | **Dado** el plan, **entonces** ninguna receta pasa el tiempo máximo ni es picante si elegí "Sin picante", las tres son distintas, sus compras juntas no pasan el presupuesto y ninguna necesita más de 3 ingredientes por comprar. |
+| CA-RIA-02-05 | **Dado** el plan, **entonces** ninguna receta pasa el tiempo máximo ni es picante si elegí "Sin picante", las tres son distintas, sus compras juntas no pasan el presupuesto, ninguna necesita más de 3 ingredientes por comprar y ninguna incumple mis restricciones alimentarias. |
 | CA-RIA-02-06 | **Dado** "¿Por qué te conviene?", **entonces** explica con datos del plan: qué ingredientes por vencer usa y en qué día, cuántos ingredientes del inventario aprovecha, qué falta comprar con su costo y cuánto queda del presupuesto. |
-| CA-RIA-02-07 | **Dado** que ningún plan cumple las restricciones, **entonces** veo "Sin coincidencias" (Figma `557:2515`) con el presupuesto que usé y sugerencias calculadas (por ejemplo, el presupuesto mínimo con el que sí habría plan), "Ajustar contexto" (vuelve al contexto) y "Ver recetas económicas" (Descubrir con el filtro "Económicas"). |
+| CA-RIA-02-07 | **Dado** que ningún plan cumple las restricciones, **entonces** veo "Sin coincidencias" (Figma `557:2515`) con el presupuesto que usé y sugerencias calculadas (por ejemplo, el presupuesto mínimo con el que sí habría plan; nunca quitar mis restricciones alimentarias), "Ajustar contexto" (vuelve al contexto) y "Ver recetas económicas" (Descubrir con el filtro "Económicas"). |
 | CA-RIA-02-08 | **Dado** "Ajustar" en el plan, **entonces** vuelvo al contexto con los mismos datos para cambiarlos. |
+| CA-RIA-02-09 | **Dado** que tengo restricciones en Preferencias alimentarias (CA-PER-03-01), **entonces** ninguna receta del plan contiene un ingrediente que esas restricciones excluyen. |
 | CA-RIA-02-09 | **Dado** 50 recetas en el catálogo, **entonces** el plan se calcula en 2 segundos o menos en el teléfono (meta del Avance 2). |
 
 ### HU-RIA-03: Entender cómo decide la IA
@@ -99,7 +101,7 @@ por **nombre normalizado y sinónimos**.
 - Videos reales de las recetas y "Omitir video".
 - "Creadas por mí" (recetas propias) y editar recetas.
 - **Recetas guardadas (favoritas): próximo módulo (#117).** El ♡ de las recetas, la pestaña Guardadas (Figma `633:2723`) con búsqueda, "Favoritas", "Recientes" y aviso sin conexión, y el contador "Recetas guardadas" del Perfil (antes CA-RIA-01-05 y HU-RIA-05, CA-RIA-05-01 a 05-03). Decisión de Zhair del 2026-10-19.
-- Restricciones de dieta en el agente (decisión del 2026-10-18; las preferencias del Perfil quedan guardadas).
+- Cocinas, nivel de picante y presupuesto de Preferencias alimentarias: quedan guardados y el agente no los usa (solo las restricciones, CA-RIA-02-09).
 - Precios reales de supermercados (se usa la tabla de referencia del catálogo).
 - Aprendizaje de pesos con datos de uso.
 
@@ -138,6 +140,7 @@ solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
 | Las tarjetas de recetas no muestran el ♡ y la pestaña Guardadas sigue gris (como en la spec 006). Aprobada el 2026-10-19. | Las recetas guardadas pasan al próximo módulo (#117). |
 | El cierre de la cocina guiada pregunta "¿Cocinaste esta receta?". | Necesario para descontar el inventario sin errores. |
 | "Carulla - Optimizado para tu zona" se muestra como "Precios de referencia". | No hay integración con supermercados. |
+| El contexto de la IA muestra "Según tus preferencias: <restricciones>" (aprobada el 2026-10-19). | El Figma no tiene restricciones alimentarias; sin la línea, el usuario no sabe por qué faltan recetas. |
 
 ## 10. Plan de entrega
 
