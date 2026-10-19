@@ -14,13 +14,15 @@ import com.smartfood.app.core.navigation.Route
 import com.smartfood.app.core.navigation.navigateToLoginClearingBackStack
 import com.smartfood.app.core.navigation.navigateToTab
 import com.smartfood.app.feature.profile.ui.edit.EditProfileRoute
+import com.smartfood.app.feature.profile.ui.preferences.FoodPreferencesRoute
 
 /**
  * Nombre: ProfileNavGraph.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Destinos del Perfil dentro de `MainGraph` (spec 006, CA-INV-09-02 y 09-03; spec 008): la pestaña y
- * "Editar información", ambas con la barra inferior. Cerrar sesión limpia toda la pila y vuelve al inicio de sesión (CA-05-03).
+ * Descripción: Destinos del Perfil dentro de `MainGraph` (spec 006, CA-INV-09-02 y 09-03; spec 008): la pestaña,
+ * "Editar información" y "Preferencias alimentarias", todas con la barra inferior. Cerrar sesión limpia toda la pila y
+ * vuelve al inicio de sesión (CA-05-03).
  *
  * @param navController Controlador de navegación de la app.
  */
@@ -38,6 +40,7 @@ fun NavGraphBuilder.profileDestination(navController: NavHostController) {
             when (effect) {
                 ProfileEffect.NavigateToLogin -> navController.navigateToLoginClearingBackStack()
                 ProfileEffect.NavigateToEditProfile -> navController.navigate(Route.EditProfile)
+                ProfileEffect.NavigateToFoodPreferences -> navController.navigate(Route.FoodPreferences)
             }
         }
 
@@ -54,6 +57,15 @@ fun NavGraphBuilder.profileDestination(navController: NavHostController) {
             onCurrentTabReselected = { navController.popBackStack<Route.Profile>(inclusive = false) }
         ) {
             EditProfileRoute(onBack = { navController.popBackStack() })
+        }
+    }
+    composable<Route.FoodPreferences> {
+        MainTabScaffold(
+            currentTab = MainTab.PROFILE,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Profile>(inclusive = false) }
+        ) {
+            FoodPreferencesRoute(onBack = { navController.popBackStack() })
         }
     }
 }

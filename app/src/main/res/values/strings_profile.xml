@@ -47,4 +47,32 @@
     <string name="edit_profile_code_title">Revisa tu correo</string>
     <string name="edit_profile_code_body">Escribe el código de 4 dígitos que enviamos a %1$s.</string>
     <string name="edit_profile_code_confirm">Confirmar</string>
+
+    <!-- Preferencias alimentarias (spec 008, HU-PER-03, Figma 376:1260, 593:1976 y 593:1898). -->
+    <string name="preferences_title">Preferencias alimentarias</string>
+    <string name="preferences_restrictions">Restricciones alimentarias</string>
+    <string name="preferences_cuisines">Cocina Favorita</string>
+    <string name="preferences_spice">Nivel de Picante</string>
+    <string name="preferences_budget">Presupuesto por comida</string>
+    <string name="preference_vegetarian">Vegetariano</string>
+    <string name="preference_vegan">Vegano</string>
+    <string name="preference_gluten_free">Sin gluten</string>
+    <string name="preference_lactose_free">Sin lácteos</string>
+    <string name="preference_nut_free">Sin frutos secos</string>
+    <string name="preference_colombian">Colombiana</string>
+    <string name="preference_italian">Italiana</string>
+    <string name="preference_asian">Asiática</string>
+    <string name="preference_mexican">Mexicana</string>
+    <string name="preference_mediterranean">Mediterránea</string>
+    <string name="preference_spice_mild">Suave</string>
+    <string name="preference_spice_medium">Medio</string>
+    <string name="preference_spice_hot">Picante</string>
+    <string name="preference_budget_economic">Económico</string>
+    <string name="preference_budget_moderate">Moderado</string>
+    <string name="preference_budget_unlimited">Sin restricción</string>
+    <string name="preferences_save">Guardar Preferencias</string>
+    <string name="preferences_confirm_save">¿Desea guardar los cambios?</string>
+    <string name="preferences_saving">Guardando cambios…</string>
+    <string name="preferences_saved">Guardado</string>
+    <string name="preferences_saved_body">Preferencias se actualizó</string>
 </resources>

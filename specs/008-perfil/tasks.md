@@ -22,7 +22,7 @@
 ## Issue 2: Preferencias alimentarias (intermedia)
 - [x] T010 `FoodPreferences` y enums; `getPreferences`/`savePreferences` en el repositorio; validación del mapa `preferences` en `firestore.rules` y `rules-test/` (RF-PER-04).
 - [ ] T011 Casos de uso `GetFoodPreferences` y `SaveFoodPreferences` con pruebas.
-- [ ] T012 Pantalla `FoodPreferences` con `PreferenceChip`, selección múltiple o única, aviso, carga y "Guardado" (CA-PER-03-01 a 03-04).
+- [x] T012 Pantalla `FoodPreferences` con `PreferenceChip`, selección múltiple o única, aviso, carga y "Guardado" (CA-PER-03-01 a 03-04).
 - [ ] T013 Pruebas: `FoodPreferencesViewModelTest` y `FoodPreferencesScreenTest`.
 
 ## Issue 3: Notificaciones y tema (intermedia)
