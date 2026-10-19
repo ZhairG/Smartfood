@@ -22,9 +22,10 @@ import javax.inject.Singleton
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Módulo Hilt que provee los SDK compartidos por todas las features:
- * Firebase Authentication, Cloud Firestore, Cloud Functions, Cloud Storage (spec 006, T015) y el DataStore de
- * preferencias de sesión. Las instancias se inyectan siempre no nulas; las pruebas usan fakes de las interfaces del
- * dominio. Con `-PuseFirebaseEmulator=true` (solo debug), los SDK apuntan a la Emulator Suite (spec 003, plan §6).
+ * Firebase Authentication, Cloud Firestore, Cloud Functions, Cloud Storage (spec 006, T015) y los DataStore de
+ * preferencias: sesión, ajustes de notificaciones (spec 008, T014) y tema (spec 008, T018). Las instancias se inyectan
+ * siempre no nulas; las pruebas usan fakes de las interfaces del dominio. Con `-PuseFirebaseEmulator=true` (solo
+ * debug), los SDK apuntan a la Emulator Suite (spec 003, plan §6).
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -67,12 +68,24 @@ object CoreDataModule {
     @NotificationPreferencesDataStore
     fun provideNotificationPreferencesDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
         context.notificationDataStore
+
+    /** Tema elegido por el usuario (spec 008, T018). */
+    @Provides
+    @Singleton
+    @ThemePreferencesDataStore
+    fun provideThemePreferencesDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+        context.themeDataStore
 }
 
 /** DataStore de los ajustes de notificaciones (archivo `notification_prefs`). */
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class NotificationPreferencesDataStore
+
+/** DataStore del tema de la app (archivo `theme_prefs`). */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ThemePreferencesDataStore
 
 /** SDK ya conectados a la Emulator Suite en este proceso. */
 private val connectedEmulators = mutableSetOf<String>()
@@ -101,3 +114,6 @@ private val Context.sessionDataStore: DataStore<Preferences> by preferencesDataS
 
 /** DataStore de los ajustes de notificaciones (archivo `notification_prefs`). */
 private val Context.notificationDataStore: DataStore<Preferences> by preferencesDataStore(name = "notification_prefs")
+
+/** DataStore del tema de la app (archivo `theme_prefs`). */
+private val Context.themeDataStore: DataStore<Preferences> by preferencesDataStore(name = "theme_prefs")
