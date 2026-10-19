@@ -14,6 +14,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 /**
@@ -59,7 +60,19 @@ object CoreDataModule {
     @Singleton
     fun provideSessionDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
         context.sessionDataStore
+
+    /** Ajustes de notificaciones del teléfono (spec 008, T014). */
+    @Provides
+    @Singleton
+    @NotificationPreferencesDataStore
+    fun provideNotificationPreferencesDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+        context.notificationDataStore
 }
+
+/** DataStore de los ajustes de notificaciones (archivo `notification_prefs`). */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class NotificationPreferencesDataStore
 
 /** SDK ya conectados a la Emulator Suite en este proceso. */
 private val connectedEmulators = mutableSetOf<String>()
@@ -85,3 +98,6 @@ private const val STORAGE_EMULATOR_PORT = 9199
 
 /** DataStore único de preferencias de sesión (archivo `session_prefs`). */
 private val Context.sessionDataStore: DataStore<Preferences> by preferencesDataStore(name = "session_prefs")
+
+/** DataStore de los ajustes de notificaciones (archivo `notification_prefs`). */
+private val Context.notificationDataStore: DataStore<Preferences> by preferencesDataStore(name = "notification_prefs")

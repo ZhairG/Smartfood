@@ -26,7 +26,7 @@
 - [x] T013 Pruebas: `FoodPreferencesViewModelTest` y `FoodPreferencesScreenTest`.
 
 ## Issue 3: Notificaciones y tema (intermedia)
-- [ ] T014 `NotificationSettings`, `NotificationSettingsRepository` y `DataStoreNotificationSettings` (`notification_prefs`) (RF-PER-05).
+- [x] T014 `NotificationSettings`, `NotificationSettingsRepository` y `DataStoreNotificationSettings` (`notification_prefs`) (RF-PER-05).
 - [ ] T015 `SetNotificationSettingUseCase`: programa o cancela el trabajo diario (CA-PER-04-03).
 - [ ] T016 `ExpiryReminderWorker`: respeta "Productos por vencer" y publica "Inventario vacío" (CA-PER-04-03, 04-04); `ExpiryReminderWorkerTest` actualizado.
 - [ ] T017 Pantalla `NotificationSettings` con interruptores y permiso de Android 13+ (CA-PER-04-01, 04-02, 04-05, 04-06).
@@ -71,8 +71,8 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **F** = 
 | CA-PER-03-02 | U `FoodPreferencesViewModelTest` |
 | CA-PER-03-03 | U `FoodPreferencesViewModelTest`, I `FoodPreferencesScreenTest` |
 | CA-PER-03-04 | U `PreferencesDocumentTest`, U `FoodPreferencesUseCasesTest`, U `FoodPreferencesViewModelTest`, R, M |
-| CA-PER-04-01 | I `NotificationSettingsScreenTest` |
-| CA-PER-04-02 | U `NotificationSettingsViewModelTest` |
+| CA-PER-04-01 | U `DataStoreNotificationSettingsTest`, I `NotificationSettingsScreenTest` |
+| CA-PER-04-02 | U `DataStoreNotificationSettingsTest`, U `NotificationSettingsViewModelTest` |
 | CA-PER-04-03 | U `SetNotificationSettingUseCaseTest`, I `ExpiryReminderWorkerTest` |
 | CA-PER-04-04 | I `ExpiryReminderWorkerTest`, M |
 | CA-PER-04-05 | U `NotificationSettingsViewModelTest` |
