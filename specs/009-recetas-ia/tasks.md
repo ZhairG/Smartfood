@@ -16,10 +16,10 @@
 - [ ] T008 Detalle de receta con porciones, ingredientes agrupados y "En tu inventario" (CA-RIA-04-01, 04-02); pruebas de las dos pantallas.
 
 ## Issue 2: Agente CSP y evaluación (avanzada) — solo `domain` y pruebas
-- [ ] T009 `PlanContext`, `MealPlan`, `PlannedDay`, `IngredientUse`, `PlanResult` y `PlannerWeights`.
-- [ ] T010 `RecipeEvaluator` (uso, faltantes, costo, rescate, desperdicio, utilidad) con `RecipeEvaluatorTest`.
-- [ ] T011 `MealPlanner` (backtracking + forward checking + ramificación y poda, sugerencias si no hay plan) con `MealPlannerTest` contra fuerza bruta (CA-RIA-02-04, 02-05, 02-07).
-- [ ] T012 `PlanExplainer` con `PlanExplainerTest` (CA-RIA-02-06).
+- [x] T009 `PlanContext`, `MealPlan`, `PlannedDay`, `IngredientUse`, `PlanResult` y `PlannerWeights`.
+- [x] T010 `RecipeEvaluator` (uso, faltantes, costo, rescate, desperdicio, utilidad) con `RecipeEvaluatorTest`.
+- [x] T011 `MealPlanner` (backtracking + forward checking + ramificación y poda, sugerencias si no hay plan) con `MealPlannerTest` contra fuerza bruta (CA-RIA-02-04, 02-05, 02-07).
+- [x] T012 `PlanExplainer` con `PlanExplainerTest` (CA-RIA-02-06).
 - [ ] T013 `AgentEvaluationTest` (30 inventarios, líneas base, métricas) y `MealPlannerPerformanceTest` (RNF-RIA-02, RNF-RIA-03). *Se corre con el catálogo real (`recetas.json` del #113), decisión de Zhair.*
 
 ## Issue 3: Flujo de la IA (intermedia) — después de los Issues 1 y 2
