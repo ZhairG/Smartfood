@@ -3,7 +3,7 @@
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas instrumentadas de [ProfileScreen] sin estado (spec 006, CA-INV-09-03; Figma `306:369`): el
- * encabezado, las cifras, las opciones deshabilitadas y "Cerrar Sesión". No cierra la sesión real del dispositivo:
+ * encabezado, las cifras, las opciones (spec 008, CA-PER-01-03) y "Cerrar Sesión". No cierra la sesión real del dispositivo:
  * solo comprueba el evento.
  */
 package com.smartfood.app.feature.profile.ui
@@ -67,12 +67,14 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun caInv0903_lasOpcionesSinPantallaEstanDeshabilitadas() {
+    fun caPer0103_editarInformacionYLaCamaraAbrenLaPantallaYLasDemasSiguenDeshabilitadas() {
         mostrar()
 
-        composeTestRule.onNode(hasText("Editar información personal") and hasClickAction()).assertIsNotEnabled()
+        composeTestRule.onNode(hasText("Editar información personal") and hasClickAction()).performClick()
+        composeTestRule.onNodeWithContentDescription("Cambiar foto de perfil").performClick()
         composeTestRule.onNode(hasText("Cambiar contraseña") and hasClickAction()).assertIsNotEnabled()
-        composeTestRule.onNodeWithContentDescription("Cambiar foto de perfil").assertIsNotEnabled()
+
+        assertEquals(listOf(ProfileEvent.EditProfileClicked, ProfileEvent.EditProfileClicked), eventos)
     }
 
     @Test

@@ -187,5 +187,38 @@ class ProfileViewModelTest {
         assertEquals(ProfileDialog.ConfirmLogout(hasPendingChanges = false), viewModel.uiState.value.dialog)
         assertEquals(DEFAULT_UID, authRepository.currentUserId())
     }
-}
 
+    // Spec 008: Perfil en vivo, foto y acceso a "Editar información".
+
+    @Test
+    fun `CA-PER-01-01 muestra la foto y se actualiza al guardar en Editar informacion`() {
+        profileRepository.profile.value = pepito
+        val viewModel = crearViewModel()
+        assertNull(viewModel.uiState.value.photoUrl)
+
+        profileRepository.profile.value = pepito.copy(fullName = "Pepito José", photoUrl = "https://foto")
+
+        assertEquals("https://foto", viewModel.uiState.value.photoUrl)
+        assertEquals("Pepito José", viewModel.uiState.value.fullName)
+    }
+
+    @Test
+    fun `CA-PER-01-03 Editar informacion personal abre su pantalla`() = runTest {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.EditProfileClicked)
+
+        assertEquals(ProfileEffect.NavigateToEditProfile, viewModel.effects.first())
+    }
+
+    @Test
+    fun `CA-PER-02-12 si la cuenta tiene un correo nuevo el perfil lo toma una sola vez`() {
+        profileRepository.profile.value = pepito
+        authRepository.currentEmailValue = "nuevo@correo.com"
+
+        val state = crearViewModel().uiState.value
+
+        assertEquals(listOf("nuevo@correo.com"), profileRepository.syncedEmails)
+        assertEquals("nuevo@correo.com", state.email)
+    }
+}

@@ -15,7 +15,7 @@
 - [x] T006 Foto: `FileProvider` y `file_paths.xml`, cámara del sistema con `TakePicture`, galería, `ProfilePhotoRepository` sobre Storage con `PhotoCompressor` (CA-PER-02-08, 02-09).
 - [x] T007 Pantalla `EditProfile` (contrato, ViewModel, pantalla, ruta) con aviso, carga y "Guardado" (CA-PER-02-01 a 02-04, 02-13).
 - [x] T008 Perfil: foto o iniciales desde `observeProfile`, filas que navegan y tarjetas 0 / inventario / $0 (CA-PER-01-01 a 01-04).
-- [ ] T009 Pruebas: `EditProfileViewModelTest`, `EditProfileScreenTest`, `ProfileScreenTest` y navegación en `MainNavigationTest`.
+- [x] T009 Pruebas: `EditProfileViewModelTest`, `EditProfileScreenTest`, `ProfileScreenTest` y navegación en `MainNavigationTest`.
 
 ## Issue 2: Preferencias alimentarias (intermedia)
 - [ ] T010 `FoodPreferences` y enums; `getPreferences`/`savePreferences` en el repositorio; validación del mapa `preferences` en `firestore.rules` y `rules-test/` (RF-PER-04).
@@ -48,22 +48,22 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 
 | Criterio | Pruebas |
 |---|---|
-| CA-PER-01-01 | I `ProfileScreenTest`, M |
+| CA-PER-01-01 | U `ProfileViewModelTest`, I `ProfileScreenTest`, M |
 | CA-PER-01-02 | U `ProfileViewModelTest`, I `ProfileScreenTest` |
-| CA-PER-01-03 | I `MainNavigationTest` |
+| CA-PER-01-03 | U `ProfileViewModelTest`, I `ProfileScreenTest`, I `MainNavigationTest` |
 | CA-PER-01-04 | I `MainNavigationTest` |
 | CA-PER-02-01 | I `EditProfileScreenTest` |
 | CA-PER-02-02 | U `EditProfileViewModelTest`, I `EditProfileScreenTest` |
 | CA-PER-02-03 | U `EditProfileViewModelTest`, I `EditProfileScreenTest` |
-| CA-PER-02-04 | U `EditProfileViewModelTest`, U `UpdateProfileUseCaseTest` |
-| CA-PER-02-05 | U `ValidateProfileUseCaseTest`, R |
-| CA-PER-02-06 | U `ValidateProfileUseCaseTest`, R |
-| CA-PER-02-07 | U `ValidateProfileUseCaseTest` |
-| CA-PER-02-08 | I `EditProfileScreenTest`, M |
-| CA-PER-02-09 | U `UpdateProfileUseCaseTest`, R, M |
-| CA-PER-02-10 | U `RequestEmailChangeUseCaseTest`, U `EditProfileViewModelTest`, M |
-| CA-PER-02-11 | U `RequestEmailChangeUseCaseTest` |
-| CA-PER-02-12 | U `SyncProfileEmailUseCaseTest`, M |
+| CA-PER-02-04 | U `EditProfileViewModelTest`, U `ProfileUseCasesTest`, I `EditProfileScreenTest` |
+| CA-PER-02-05 | U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, R |
+| CA-PER-02-06 | U `ProfileUseCasesTest`, R |
+| CA-PER-02-07 | U `ProfileUseCasesTest` |
+| CA-PER-02-08 | U `EditProfileViewModelTest`, I `EditProfileScreenTest`, M |
+| CA-PER-02-09 | U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, R, M |
+| CA-PER-02-10 | U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, I `EditProfileScreenTest`, M |
+| CA-PER-02-11 | U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, I `EditProfileScreenTest` |
+| CA-PER-02-12 | U `ProfileUseCasesTest`, U `ProfileViewModelTest`, M |
 | CA-PER-02-13 | U `EditProfileViewModelTest` |
 | CA-PER-03-01 | I `FoodPreferencesScreenTest` |
 | CA-PER-03-02 | U `FoodPreferencesViewModelTest` |
