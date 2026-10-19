@@ -270,7 +270,7 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
   - El tema XML es claro (`Base.Theme.Smartfood`, ventana `GreenLight`). `values-v31` hace que la pantalla de arranque de Android 12+ sea igual a la Splash (`splash_icon`).
 - **Fidelidad con Figma (spec 002, HU-UI-07):** referencia en los frames "_Claro" del archivo Figma `z1AoQvluQcmx98gjP4vHF6`.
   - Tipografía Poppins empaquetada en `res/font` (licencia en `docs/licenses/OFL-Poppins.txt`).
-  - Para ajustar un color a Figma se cambia el **rol** en `LightColorScheme` (`Theme.kt`), nunca el valor de un token. El único token agregado es `GreenCheck`.
+  - Para ajustar un color a Figma se cambia el **rol** en `LightColorScheme` (`Theme.kt`), nunca el valor de un token. Los únicos tokens agregados son `GreenCheck` y `GreenSoft` (`#DCFCE7`, círculo de las iniciales del Perfil, spec 008; aprobado por Zhair el 2026-10-18).
 - **Ícono (spec 002, HU-UI-06):** los `mipmap-*/ic_launcher*` y `ic_launcher-playstore.png` los genera `tools/generate_launcher_icon.py` desde `drawable-nodpi/logo_smartfood_circle.png`. Nunca se editan a mano; si cambia el logo, se vuelve a ejecutar el script.
 - **Foco y teclado (spec 002):**
   - **Prohibido el scroll programático** (`scrollTo`, `animateScrollTo`) en las pantallas. El panel aplica el inset del teclado fuera del `verticalScroll` y Compose mantiene visible el campo enfocado.
