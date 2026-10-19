@@ -7,7 +7,7 @@
 - [ ] T001 La spec, el plan, las tareas y las capturas de `disenos-figma/Modulo 4 - Recetas + IA`.
 
 ## Issue 1: Catálogo, Descubrir y Detalle (intermedia)
-- [ ] T002 Modelos `Recipe`, `RecipeIngredient`, `RecipeStep`, `Ingredient` y contrato `RecipeCatalog` (RF-RIA-01).
+- [x] T002 Modelos `Recipe`, `RecipeIngredient`, `RecipeStep`, `Ingredient` y contrato `RecipeCatalog` (RF-RIA-01). *Hecha en el #114, porque el agente los necesita; el #113 los reutiliza.*
 - [ ] T003 `assets/ingredientes.json` y `assets/recetas.json` (30 a 50 recetas) con fotos en `drawable-nodpi` y sus fuentes en `docs/licenses/fotos-recetas.md`; `RecipeCatalogTest` (RNF-RIA-05).
 - [ ] T004 `AssetsRecipeCatalog` con kotlinx.serialization y `RecipesDataModule`.
 - [ ] T005 `IngredientMatcher` con `IngredientMatcherTest` (RF-RIA-02).
@@ -20,7 +20,7 @@
 - [ ] T010 `RecipeEvaluator` (uso, faltantes, costo, rescate, desperdicio, utilidad) con `RecipeEvaluatorTest`.
 - [ ] T011 `MealPlanner` (backtracking + forward checking + ramificación y poda, sugerencias si no hay plan) con `MealPlannerTest` contra fuerza bruta (CA-RIA-02-04, 02-05, 02-07).
 - [ ] T012 `PlanExplainer` con `PlanExplainerTest` (CA-RIA-02-06).
-- [ ] T013 `AgentEvaluationTest` (30 inventarios, líneas base, métricas) y `MealPlannerPerformanceTest` (RNF-RIA-02, RNF-RIA-03).
+- [ ] T013 `AgentEvaluationTest` (30 inventarios, líneas base, métricas) y `MealPlannerPerformanceTest` (RNF-RIA-02, RNF-RIA-03). *Se corre con el catálogo real (`recetas.json` del #113), decisión de Zhair.*
 
 ## Issue 3: Flujo de la IA (intermedia) — después de los Issues 1 y 2
 - [ ] T014 `GeneratePlanUseCase` y `AiPlanViewModel` (`Context`, `Loading`, `Plan`, `NoPlan`, cancelar, ajustar) con pruebas.
