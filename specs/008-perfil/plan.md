@@ -113,7 +113,7 @@ interface ThemePreferences {
 fun currentEmail(): String?
 suspend fun reauthenticate(currentPassword: String): Result<Unit>        // EmailAuthProvider.getCredential
 suspend fun updatePassword(newPassword: String): Result<Unit>
-suspend fun requestEmailChange(newEmail: String): Result<Unit>          // user.verifyBeforeUpdateEmail(newEmail)
+suspend fun refreshSession(email: String, password: String): Result<Unit> // reload(); si falla, vuelve a iniciar sesión
 ```
 
 `FirebaseAuthRepository` implementa los nuevos métodos con `safeRunCatching { … }.mapFirebaseError()`;
@@ -149,10 +149,18 @@ Los avisos "¿Desea guardar los cambios?" y "Guardado" son los mismos componente
 - **Subida:** al confirmar el guardado, `FirebaseStorageProfilePhotoRepository.upload` comprime con `PhotoCompressor`
   (1080 px, JPEG) y sube a `users/{uid}/profile/{uuid}.jpg`; si había una foto anterior se borra después. Sin red,
   error `Network` y no se guarda nada (CA-PER-02-09). No se usa WorkManager en el Perfil.
-- **Correo (CA-PER-02-10 a 02-12):** si el correo cambió, el ViewModel muestra un aviso con un campo de contraseña
-  ("Confirma tu contraseña"). `RequestEmailChangeUseCase` valida el correo (`ValidateEmailUseCase`), llama a
-  `reauthenticate` y luego a `requestEmailChange`. El resto de datos se guarda igual. El perfil conserva el correo
-  anterior hasta la confirmación.
+- **Correo (CA-PER-02-10 a 02-12, aprobado el 2026-10-19):** código por SMTP, como la recuperación (spec 003).
+  1. Si el correo cambió, aparece el campo "Contraseña actual". Al confirmar "Guardar", `RequestEmailChangeUseCase`
+     valida el correo, llama a `reauthenticate` y a `EmailChangeRepository.requestCode(newEmail)` (callable
+     `requestEmailChangeCode`, que exige sesión y un inicio de sesión de hace menos de 5 min). Los demás datos se
+     guardan en el mismo paso.
+  2. El aviso `EmailCodeDialog` pide el código (4 casillas, `OtpCodeInput`) con "Reenviar código" a los 60 s.
+  3. `ConfirmEmailChangeUseCase` llama a `confirm(code)` (callable `confirmEmailChange`): el servidor cambia el correo
+     con el Admin SDK (`emailVerified: true`) y `users/{uid}.email`. Luego `AuthRepository.refreshSession(email,
+     password)` recarga el usuario y, si la sesión quedó invalidada, inicia sesión de nuevo con el correo nuevo.
+  4. Servidor: `functions/src/emailChangeService.ts` (sin Firebase, probado con fakes), registro `emailChanges/{uid}`
+     cerrado a los clientes, plantilla `emailChangeEmail` y errores `INVALID_EMAIL`, `SAME_EMAIL`, `EMAIL_IN_USE`,
+     `REQUIRES_RECENT_LOGIN`, `INVALID_CODE`, `CODE_EXPIRED`, `TOO_MANY_ATTEMPTS`, `TOO_MANY_REQUESTS`.
 - **Sincronización:** `ProfileViewModel` llama a `SyncProfileEmailUseCase` con la primera lectura del perfil en cada
   sesión: si `currentEmail()` difiere del correo del perfil, llama a `syncEmail` (así no se tocan Splash ni Login).
 
@@ -201,7 +209,7 @@ Ambas se prueban en `rules-test/` antes de desplegar; el despliegue lo confirma 
 | Notificaciones y tema en DataStore (por teléfono) | En Firestore | Son ajustes del dispositivo; funcionan sin conexión. |
 | Preferencias en `users/{uid}.preferences` | Subcolección | Un solo documento, una sola lectura; las reglas validan el mapa. |
 | Un solo trabajo diario para los dos avisos | Un worker nuevo para inventario vacío | Menos código y un solo horario. |
-| Correo con `verifyBeforeUpdateEmail` | `updateEmail` directo | `updateEmail` está obsoleto y no verifica el correo nuevo. |
+| Correo con código por SMTP y Cloud Functions (2026-10-19) | `verifyBeforeUpdateEmail` | Con el enlace de Firebase el correo llega en inglés, el cambio solo se ve tras volver a iniciar sesión y, con la protección contra enumeración, un correo en uso no recibe nada. |
 
 ## 9. Estrategia de pruebas
 

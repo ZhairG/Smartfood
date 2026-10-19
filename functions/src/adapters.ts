@@ -10,8 +10,12 @@ import * as logger from "firebase-functions/logger";
 import type { Auth } from "firebase-admin/auth";
 import { FieldValue, type Firestore } from "firebase-admin/firestore";
 import nodemailer from "nodemailer";
-import { EmailContent, recoveryEmail, welcomeEmail } from "./emailTemplates.js";
+import { EmailContent, emailChangeEmail, recoveryEmail, welcomeEmail } from "./emailTemplates.js";
 import {
+  AccountEmails,
+  EmailChangeMailer,
+  EmailChangeRecord,
+  EmailChangeStore,
   Mailer,
   RegisteredAccount,
   RegisteredAccounts,
@@ -43,6 +47,67 @@ export class FirestoreResetStore implements ResetStore {
 
   async delete(key: string): Promise<void> {
     await this.db.collection(COLLECTION).doc(key).delete();
+  }
+}
+
+/** Colección privada del cambio de correo (spec 008); las reglas niegan todo acceso de los clientes. */
+const EMAIL_CHANGES = "emailChanges";
+
+/** Cambios de correo en Firestore, modificados dentro de transacciones. */
+export class FirestoreEmailChangeStore implements EmailChangeStore {
+  constructor(private readonly db: Firestore) {}
+
+  update<T>(uid: string, change: (current: EmailChangeRecord | null) => StoreUpdate<T, EmailChangeRecord>): Promise<T> {
+    const ref = this.db.collection(EMAIL_CHANGES).doc(uid);
+    return this.db.runTransaction(async (tx) => {
+      const snapshot = await tx.get(ref);
+      const { next, result } = change(snapshot.exists ? (snapshot.data() as EmailChangeRecord) : null);
+      if (next === null) tx.delete(ref);
+      else if (next !== undefined) tx.set(ref, next);
+      return result;
+    });
+  }
+
+  async delete(uid: string): Promise<void> {
+    await this.db.collection(EMAIL_CHANGES).doc(uid).delete();
+  }
+}
+
+/** Código del Admin SDK cuando otra cuenta ya tiene ese correo. */
+const EMAIL_EXISTS = "auth/email-already-exists";
+
+/** Correos de la cuenta (Admin SDK) y del perfil (`users/{uid}`), spec 008. */
+export class AdminAccountEmails implements AccountEmails {
+  private readonly directory: AdminUserDirectory;
+
+  constructor(
+    private readonly auth: Auth,
+    private readonly db: Firestore,
+  ) {
+    this.directory = new AdminUserDirectory(auth);
+  }
+
+  findUidByEmail(email: string): Promise<string | null> {
+    return this.directory.findUidByEmail(email);
+  }
+
+  async currentEmail(uid: string): Promise<string | null> {
+    return (await this.directory.find(uid))?.email ?? null;
+  }
+
+  async updateEmail(uid: string, email: string): Promise<boolean> {
+    try {
+      // El código probó que el correo es de la persona: queda verificado.
+      await this.auth.updateUser(uid, { email, emailVerified: true });
+      return true;
+    } catch (error) {
+      if ((error as { code?: string }).code === EMAIL_EXISTS) return false;
+      throw error;
+    }
+  }
+
+  async setProfileEmail(uid: string, email: string): Promise<void> {
+    await this.db.collection("users").doc(uid).update({ email, updatedAt: FieldValue.serverTimestamp() });
   }
 }
 
@@ -120,7 +185,7 @@ export function gmailCredentials(user: string, appPassword: string): { user: str
 }
 
 /** Envío por Gmail SMTP con una contraseña de aplicación (ADR-REC-04). */
-export class GmailMailer implements Mailer, WelcomeMailer {
+export class GmailMailer implements Mailer, WelcomeMailer, EmailChangeMailer {
   private readonly auth: { user: string; pass: string };
 
   constructor(user: string, appPassword: string) {
@@ -135,6 +200,10 @@ export class GmailMailer implements Mailer, WelcomeMailer {
     return this.send(email, welcomeEmail(name, verificationLink));
   }
 
+  sendEmailChangeCode(email: string, code: string): Promise<void> {
+    return this.send(email, emailChangeEmail(code));
+  }
+
   private async send(to: string, content: EmailContent): Promise<void> {
     const transport = nodemailer.createTransport({ service: "gmail", auth: this.auth });
     await transport.sendMail({ from: `"SmartFood" <${this.auth.user}>`, to, ...content });
@@ -142,13 +211,17 @@ export class GmailMailer implements Mailer, WelcomeMailer {
 }
 
 /** En la Emulator Suite el código y el enlace se leen en el log en lugar de enviarse (RNF-REC-04, RNF-MAIL-02). */
-export class LoggingMailer implements Mailer, WelcomeMailer {
+export class LoggingMailer implements Mailer, WelcomeMailer, EmailChangeMailer {
   async sendRecoveryCode(email: string, code: string): Promise<void> {
     logger.info(`[EMULADOR] Código de recuperación para ${email}: ${code}`);
   }
 
   async sendWelcome(email: string, name: string, verificationLink: string): Promise<void> {
     logger.info(`[EMULADOR] Correo de bienvenida para ${email} (${name || "sin nombre"}): ${verificationLink}`);
+  }
+
+  async sendEmailChangeCode(email: string, code: string): Promise<void> {
+    logger.info(`[EMULADOR] Código de cambio de correo para ${email}: ${code}`);
   }
 }
 

@@ -52,9 +52,9 @@ mi cuenta tenga mis datos reales.
 | CA-PER-02-07 | **Dado** la fecha de nacimiento, **entonces** es opcional, se elige con un calendario (DD/MM/AAAA) y no puede ser posterior a hoy. |
 | CA-PER-02-08 | **Dado** que toco la foto, **entonces** se abre la hoja "Agregar foto" con "Galería" y "Cámara". "Cámara" abre la **cámara del sistema** del teléfono; "Galería" abre el selector de fotos. La foto elegida se ve en el círculo antes de guardar. |
 | CA-PER-02-09 | **Dado** que guardé una foto nueva, **entonces** se sube reducida (máx. 1080 px, JPEG) y queda como mi foto en el Perfil. Si no hay conexión, aparece el error de red y la foto anterior se conserva. |
-| CA-PER-02-10 | **Dado** que cambio el correo a uno distinto, **entonces** aparece debajo el campo "Contraseña actual"; **cuando** confirmo el guardado y la contraseña es correcta, **entonces** "Guardado" dice "Te enviamos un enlace a <correo nuevo>. Tu correo cambiará cuando lo confirmes." (4 s). El correo de la cuenta no cambia hasta que abro ese enlace. |
-| CA-PER-02-11 | **Dado** el cambio de correo, **cuando** la contraseña es incorrecta, el correo ya está en uso o no hay conexión, **entonces** se muestra el error correspondiente y el correo no cambia. |
-| CA-PER-02-12 | **Dado** que confirmé el enlace del correo nuevo, **cuando** vuelvo a iniciar sesión con ese correo, **entonces** el Perfil muestra el correo nuevo (el perfil en Firestore se iguala al de la cuenta). |
+| CA-PER-02-10 | **Dado** que cambio el correo a uno distinto, **entonces** aparece debajo el campo "Contraseña actual"; **cuando** confirmo el guardado y la contraseña es correcta, **entonces** llega al correo nuevo un código de 4 dígitos (en español, desde el correo de SmartFood) y aparece el aviso "Revisa tu correo" para escribirlo, con "Reenviar código" a los 60 s. El correo de la cuenta no cambia hasta escribir el código correcto. |
+| CA-PER-02-11 | **Dado** el cambio de correo, **cuando** la contraseña es incorrecta, el correo ya está en uso, el código es incorrecto o venció (10 min, 5 intentos) o no hay conexión, **entonces** se muestra el error correspondiente y el correo no cambia. |
+| CA-PER-02-12 | **Dado** que escribí el código correcto, **entonces** "Guardado" dice "Tu correo ahora es <correo nuevo>", la cuenta y el perfil cambian al instante y el Perfil muestra el correo nuevo **sin cerrar sesión**; el próximo inicio de sesión es con el correo nuevo. |
 | CA-PER-02-13 | **Dado** cambios sin guardar, **cuando** salgo con la flecha o "atrás", **entonces** se descartan sin preguntar, igual que el editor de productos (CA-INV-03-04). |
 
 ### HU-PER-03: Mis preferencias alimentarias
@@ -109,7 +109,7 @@ mi cuenta tenga mis datos reales.
 |---|---|---|
 | RF-PER-01 | Perfil del usuario con nombre, correo, teléfono, fecha de nacimiento y foto, guardado en `users/{uid}`. | HU-PER-01, HU-PER-02 |
 | RF-PER-02 | Foto de perfil en Storage (`users/{uid}/profile/`), tomada con la cámara del sistema o de la galería. | HU-PER-02 |
-| RF-PER-03 | Cambio de correo con verificación del correo nuevo (Firebase Authentication) y sincronización del perfil al iniciar sesión. | HU-PER-02 |
+| RF-PER-03 | Cambio de correo con un código enviado por el SMTP de SmartFood al correo nuevo; las Cloud Functions `requestEmailChangeCode` y `confirmEmailChange` cambian la cuenta y el perfil (mismo patrón y límites que la spec 003). | HU-PER-02 |
 | RF-PER-04 | Preferencias alimentarias en `users/{uid}`. | HU-PER-03 |
 | RF-PER-05 | Preferencias de notificaciones en el teléfono, que encienden o apagan el aviso diario y el aviso de inventario vacío. | HU-PER-04 |
 | RF-PER-06 | Cambio de contraseña confirmando la actual. | HU-PER-05 |
@@ -135,9 +135,9 @@ mi cuenta tenga mis datos reales.
 
 ## 7. Supuestos
 
-- El proyecto de Firebase permite `verifyBeforeUpdateEmail` (correo/contraseña ya está habilitado). Después de
-  confirmar el correo nuevo, Firebase puede cerrar la sesión; volver a iniciarla con el correo nuevo es el flujo
-  esperado (CA-PER-02-12).
+- El cambio de correo usa los secretos `SMTP_USER` y `SMTP_PASS` de la spec 003. Si Firebase invalida la sesión al
+  cambiar el correo, la app vuelve a iniciarla sola con el correo nuevo y la contraseña recién confirmada
+  (CA-PER-02-12).
 - El esquema oscuro de `Theme.kt` se usa tal cual; si una pantalla no se lee bien en oscuro, se corrige el rol de
   color, no el token (spec 002).
 
@@ -164,9 +164,8 @@ misma pantalla, y en Cambiar contraseña al Perfil.
 |---|---|
 | Fila "Tema de la app" y su hoja (HU-PER-06), que no están en el Figma. | Pedido de Zhair; reutiliza el esquema oscuro de la spec 002. |
 | La foto de perfil se toma con la **cámara del sistema** y no con un visor propio. | Pedido de Zhair: la cámara del Figma se mejorará más adelante. |
-| El correo es editable **con verificación** y pide la contraseña actual en un **campo** "Contraseña actual" que aparece debajo del correo solo si cambió; el Figma no lo tiene. | Firebase exige confirmar la identidad y el correo nuevo. Un campo es más claro que un segundo aviso (decisión de Zhair en el #109). |
+| El correo es editable **con un código** y pide la contraseña actual en un **campo** "Contraseña actual" que aparece debajo del correo solo si cambió; el código se escribe en el aviso "Revisa tu correo" (casillas de `OtpCodeInput` de la recuperación). El Figma no tiene ninguno de los dos. | Firebase exige confirmar la identidad y el correo nuevo. Un campo es más claro que un segundo aviso (decisión de Zhair en el #109). |
 | Mientras se guarda se ve el diálogo de carga "Guardando cambios…", y los errores se muestran en rojo bajo los campos. | El Figma no define los estados de carga ni de error (como el inventario, CA-INV-02-12). |
-| Con correo nuevo, "Guardado" muestra el texto del enlace durante 4 s en vez de 2 s. | El texto es más largo y debe poder leerse. |
 | "Recetas guardadas" y "Ahorrados este mes" muestran 0 y $0. | Dependen del módulo de Recetas + IA (spec 009). |
 | Notificaciones guarda al tocar cada interruptor; el Figma no muestra botón "Guardar". | El frame no tiene botón visible. |
 

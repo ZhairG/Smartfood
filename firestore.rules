@@ -80,5 +80,10 @@ service cloud.firestore {
     match /welcomeEmails/{id} {
       allow read, write: if false;
     }
+
+    // Cambios de correo con código: solo los usan las funciones requestEmailChangeCode y confirmEmailChange (spec 008).
+    match /emailChanges/{uid} {
+      allow read, write: if false;
+    }
   }
 }

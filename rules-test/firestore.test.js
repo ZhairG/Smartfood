@@ -217,6 +217,15 @@ describe('perfil: edición (spec 008, RNF-PER-01)', () => {
   });
 });
 
+describe('cambio de correo (spec 008, T010)', () => {
+  test('CA-PER-02-10 emailChanges es solo del servidor: ni el dueño lo lee ni lo escribe', async () => {
+    const registro = doc(db('u1'), 'emailChanges/u1');
+    await assertFails(getDoc(registro));
+    await assertFails(setDoc(registro, { newEmail: 'nuevo@correo.com', codeHash: 'x' }));
+    await assertFails(getDoc(doc(db(null), 'emailChanges/u1')));
+  });
+});
+
 describe('perfil (regresión, spec 005)', () => {
   test('CA-LEG-02-02 el perfil sigue exigiendo la constancia legal', async () => {
     const perfil = doc(db('u1'), 'users/u1');

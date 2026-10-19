@@ -16,6 +16,8 @@
 - [x] T007 Pantalla `EditProfile` (contrato, ViewModel, pantalla, ruta) con aviso, carga y "Guardado" (CA-PER-02-01 a 02-04, 02-13).
 - [x] T008 Perfil: foto o iniciales desde `observeProfile`, filas que navegan y tarjetas 0 / inventario / $0 (CA-PER-01-01 a 01-04).
 - [x] T009 Pruebas: `EditProfileViewModelTest`, `EditProfileScreenTest`, `ProfileScreenTest` y navegación en `MainNavigationTest`.
+- [x] T009a Servidor del cambio de correo con código: `emailChangeService.ts`, adaptadores, plantilla, callable `requestEmailChangeCode` y `confirmEmailChange`, `emailChanges` cerrado en `firestore.rules`, con pruebas (CA-PER-02-10 a 02-12, RF-PER-03).
+- [ ] T009b App del cambio de correo con código: `EmailChangeRepository`, `refreshSession`, casos de uso, aviso `EmailCodeDialog` y pruebas (CA-PER-02-10 a 02-12).
 
 ## Issue 2: Preferencias alimentarias (intermedia)
 - [ ] T010 `FoodPreferences` y enums; `getPreferences`/`savePreferences` en el repositorio; validación del mapa `preferences` en `firestore.rules` y `rules-test/` (RF-PER-04).
@@ -44,7 +46,7 @@
 
 ## Matriz de trazabilidad
 
-Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = manual.
+Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **F** = `functions` (`npm --prefix functions test`), **M** = manual.
 
 | Criterio | Pruebas |
 |---|---|
@@ -61,9 +63,9 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-PER-02-07 | U `ProfileUseCasesTest` |
 | CA-PER-02-08 | U `EditProfileViewModelTest`, I `EditProfileScreenTest`, M |
 | CA-PER-02-09 | U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, R, M |
-| CA-PER-02-10 | U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, I `EditProfileScreenTest`, M |
-| CA-PER-02-11 | U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, I `EditProfileScreenTest` |
-| CA-PER-02-12 | U `ProfileUseCasesTest`, U `ProfileViewModelTest`, M |
+| CA-PER-02-10 | F `emailChangeService.test`, R, U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, I `EditProfileScreenTest`, M |
+| CA-PER-02-11 | F `emailChangeService.test`, U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, I `EditProfileScreenTest` |
+| CA-PER-02-12 | F `emailChangeService.test`, U `ProfileUseCasesTest`, U `ProfileViewModelTest`, M |
 | CA-PER-02-13 | U `EditProfileViewModelTest` |
 | CA-PER-03-01 | I `FoodPreferencesScreenTest` |
 | CA-PER-03-02 | U `FoodPreferencesViewModelTest` |
