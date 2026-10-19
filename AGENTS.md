@@ -105,8 +105,13 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 ### 1. Ramas
 
 - Siempre se parte de `master` actualizado: `git switch master && git pull`, luego `git switch -c <rama>`.
-- **Una rama por Issue:** `feature/NNN-<issue>-<tema>` para las tareas de una spec (`feature/006-42-busqueda`), y `fix/<tema>`, `docs/<tema>` o `refactor/<tema>` para lo demás.
+- **Una rama por módulo** cuando la spec lo indica en su "Plan de entrega" (`feature/008-perfil`, `feature/009-recetas-ia`): todos los Issues del módulo trabajan en esa rama compartida y el módulo llega a `master` en un solo PR. Si la spec no lo indica, **una rama por Issue**: `feature/NNN-<issue>-<tema>` (`feature/006-42-busqueda`). Para lo demás, `fix/<tema>`, `docs/<tema>` o `refactor/<tema>`.
 - **Nunca** se trabaja ni se hace push directo a `master`.
+- **Ramas compartidas (varias personas en la misma rama):**
+  - Antes de empezar y antes de cada `git push`: `git pull` en la rama del módulo.
+  - Si `git push` se rechaza ("rejected", "non-fast-forward", "fetch first"), es porque otra persona subió commits: hacer `git pull`, resolver los conflictos si aparecen, volver a correr las pruebas y repetir el `git push`.
+  - **Prohibido** `git push --force`, `--force-with-lease`, `git reset --hard`, `git rebase` sobre commits ya subidos y borrar la rama compartida: borran el trabajo de los demás. Si un agente propone cualquiera de estos comandos para "arreglar" un rechazo, se detiene y se pregunta en el Issue.
+  - Si un conflicto toca código de otra persona y no está claro qué conservar, se pregunta en el Issue antes de resolverlo.
 
 ### 2. Commits
 
@@ -197,6 +202,7 @@ Zhair (planeador) da recomendaciones durante el trabajo. **Toda recomendación n
 | 2026-10-18 | La app debe ser 100 % fiel al Figma: íconos, animaciones, colores y componentes. | Ver "Fidelidad total con Figma" y la constitución §1. |
 | 2026-10-18 | Escribir los Issues y planes para que los siga DeepSeek (OpenCode) del resto del equipo. | Ver "Issues y planes para modelos más débiles". |
 | 2026-10-18 | Guardar las capturas de Figma por módulo en la raíz del proyecto. | `disenos-figma/Modulo N - Nombre/`, con `README.md` de índice (pantalla, `node-id`). |
+| 2026-10-18 | Que nadie borre trabajo ajeno en las ramas compartidas del módulo. | Ver §1 "Ramas compartidas": `git pull` ante un rechazo y nunca `--force`. |
 | 2026-10-18 | Medir la fluidez de las animaciones en el build release. | En debug, Compose pierde ~300 ms al iniciar cada pantalla; las animaciones se juzgan con el APK release en el teléfono (medición del 18/10/2026). |
 
 ## Comandos
