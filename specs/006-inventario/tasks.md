@@ -158,6 +158,7 @@ verificación manual (checklist).
 | CA-INV-08-04 | I `ExpiryReminderWorkerTest` (la notificación abre la app), M 8 |
 | CA-INV-08-05 | U `DataStoreInventoryPreferencesTest`, U `ProductEditorViewModelTest`, I `InventoryDataModuleTest`, M 8 |
 | CA-INV-08-06 | U `SessionUseCasesTest` (cerrar sesión cancela los avisos), U `SplashViewModelTest` (sin sesión no reprograma), I `InventoryDataModuleTest` |
+| CA-INV-08-07 | U `LoginUseCaseTest` (iniciar sesión programa el aviso; si falla, no) |
 | CA-INV-09-01 | I `MainNavigationTest` |
 | CA-INV-09-02 | I `MainNavigationTest`, I `SmartFoodNavigationTest` |
 | CA-INV-09-03 | I `MainNavigationTest`, U `ProfileViewModelTest`, I `ProfileScreenTest` |

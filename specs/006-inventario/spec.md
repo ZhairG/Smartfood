@@ -154,6 +154,7 @@ tengo.
 | CA-INV-08-04 | **Dado** la notificación, **cuando** la toco, **entonces** se abre la app en "Mi Inventario" (o en el inicio de sesión, si la sesión ya no está activa). |
 | CA-INV-08-05 | **Dado** un teléfono que pide permiso para notificar, **cuando** guardo mi primer producto, **entonces** se me pide el permiso; **si** lo niego, **entonces** el inventario funciona igual y no se me vuelve a pedir automáticamente. |
 | CA-INV-08-06 | **Dado** que cerré sesión, **entonces** no recibo más avisos de esa cuenta en el teléfono. |
+| CA-INV-08-07 | **Dado** que inicio sesión, **entonces** el aviso diario queda programado de nuevo en el teléfono (añadido en la spec 008, T019a, #111). |
 
 ### HU-INV-09: Navegación principal
 **Como** usuario **quiero** moverme entre el inventario y mi perfil **para** usar la app sin perderme.

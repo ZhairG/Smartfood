@@ -32,6 +32,7 @@
 - [x] T017 Pantalla `NotificationSettings` con interruptores y permiso de Android 13+ (CA-PER-04-01, 04-02, 04-05, 04-06).
 - [x] T018 `ThemePreferences` y `DataStoreThemePreferences` (`theme_prefs`) en `core/preferences`; `MainActivity` aplica el tema (RF-PER-07, CA-PER-06-03, 06-04).
 - [x] T019 Fila "Tema de la app" y hoja de tema; revisión del tema oscuro en todas las pantallas (CA-PER-06-01, 06-02, 06-05). Pruebas de las dos pantallas.
+- [x] T019a `LoginUseCase` vuelve a programar el aviso diario al iniciar sesión, porque `LogoutUseCase` lo cancela (spec 006, CA-INV-08-07); `LoginUseCaseTest` actualizado.
 
 ## Issue 4: Cambiar contraseña (intermedia)
 - [ ] T020 `AuthRepository.updatePassword` (+ fake) y `ChangePasswordUseCase` (reautentica y cambia) con pruebas (RF-PER-06).
