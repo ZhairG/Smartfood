@@ -1,5 +1,8 @@
 package com.smartfood.app.feature.recipes.domain.agent
 
+import com.smartfood.app.feature.recipes.domain.model.DietRule
+import com.smartfood.app.feature.recipes.domain.model.FoodTag
+import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.MealPlan
 import com.smartfood.app.feature.recipes.domain.model.PlanContext
 import com.smartfood.app.feature.recipes.domain.model.PlanResult
@@ -7,6 +10,7 @@ import com.smartfood.app.feature.recipes.domain.model.PlanSuggestion
 import com.smartfood.app.feature.recipes.domain.model.PlannerWeights
 import com.smartfood.app.feature.recipes.domain.model.Recipe
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -17,17 +21,19 @@ import org.junit.Test
  * Fecha: Octubre 2026
  * Descripción: Pruebas unitarias del agente [MealPlanner] (spec 009 §2, plan §3.4, T011): cada restricción del CSP, la
  * optimalidad del plan contra una búsqueda exhaustiva (fuerza bruta) en catálogos aleatorios con semilla fija, el
- * determinismo y las sugerencias cuando no hay plan.
+ * determinismo, las sugerencias cuando no hay plan y las restricciones alimentarias (T012a).
  */
 class MealPlannerTest {
 
     private val ingredients = listOf(
-        ingredient("pollo", priceCop = 14_000),
+        ingredient("pollo", 14_000, IngredientUnit.GRAM, FoodTag.MEAT, FoodTag.ANIMAL_PRODUCT),
         ingredient("arroz", priceCop = 6_000),
-        ingredient("pasta", priceCop = 8_000),
+        ingredient("pasta", 8_000, IngredientUnit.GRAM, FoodTag.GLUTEN),
         ingredient("tomate", priceCop = 4_000),
-        ingredient("huevo", priceCop = 12_000),
+        ingredient("huevo", 12_000, IngredientUnit.GRAM, FoodTag.ANIMAL_PRODUCT),
         ingredient("aji", priceCop = 3_000),
+        ingredient("queso", 20_000, IngredientUnit.GRAM, FoodTag.LACTOSE, FoodTag.ANIMAL_PRODUCT),
+        ingredient("lenteja", priceCop = 7_000),
     ).associateBy { it.id }
     private val planner = MealPlanner(ingredients)
 
@@ -45,8 +51,12 @@ class MealPlannerTest {
         pantry("h1", "huevo", null, 5),
     )
 
-    private fun ctx(budget: Long = 50_000, maxMinutes: Int? = null, noSpicy: Boolean = false) =
-        PlanContext(budgetCop = budget, servings = 4, maxMinutes = maxMinutes, noSpicy = noSpicy)
+    private fun ctx(
+        budget: Long = 50_000,
+        maxMinutes: Int? = null,
+        noSpicy: Boolean = false,
+        diet: Set<DietRule> = emptySet(),
+    ) = PlanContext(budgetCop = budget, servings = 4, maxMinutes = maxMinutes, noSpicy = noSpicy, diet = diet)
 
     private fun found(result: PlanResult): MealPlan = (result as PlanResult.Found).plan
 
@@ -88,6 +98,11 @@ class MealPlannerTest {
                 servings = listOf(2, 4, 6)[seed % 3],
                 maxMinutes = if (seed % 4 == 0) 45 else null,
                 noSpicy = seed % 5 == 0,
+                diet = when (seed % 6) {
+                    1 -> setOf(DietRule.VEGETARIAN)
+                    4 -> setOf(DietRule.GLUTEN_FREE)
+                    else -> emptySet()
+                },
             )
             val expected = bruteForce(s, context)
             val actual = MealPlanner(s.ingredients).search(s.recipes, s.pantry, context)
@@ -141,6 +156,40 @@ class MealPlannerTest {
         assertEquals(listOf(PlanSuggestion.NotEnoughRecipes), pocas.suggestions)
     }
 
+    @Test
+    fun `CA-RIA-02-09 vegetariano excluye las recetas con carne y vegano tambien las de huevo o queso`() {
+        val conVerduras = catalogo + listOf(
+            recipe("lentejas", "lenteja" to 300.0, "tomate" to 100.0),
+            recipe("arroz-tomate", "arroz" to 300.0, "tomate" to 200.0),
+            recipe("pasta-queso", "pasta" to 250.0, "queso" to 100.0),
+        )
+
+        val vegetariano = found(planner.plan(conVerduras, despensa, ctx(diet = setOf(DietRule.VEGETARIAN))))
+        assertTrue(vegetariano.days.none { d -> d.recipe.ingredients.any { it.ingredientId == "pollo" } })
+
+        val vegano = found(planner.plan(conVerduras, despensa, ctx(diet = setOf(DietRule.VEGAN))))
+        assertEquals(setOf("lentejas", "arroz-tomate", "pasta-tomate"), vegano.days.map { it.recipe.id }.toSet())
+    }
+
+    @Test
+    fun `CA-RIA-02-09 sin gluten y sin lactosa excluyen la pasta y el queso, y las reglas se suman`() {
+        val pastaQueso = recipe("pasta-queso", "pasta" to 250.0, "queso" to 100.0)
+
+        assertTrue(planner.fitsDiet(pastaQueso, ctx()))
+        assertFalse(planner.fitsDiet(pastaQueso, ctx(diet = setOf(DietRule.GLUTEN_FREE))))
+        assertFalse(planner.fitsDiet(pastaQueso, ctx(diet = setOf(DietRule.LACTOSE_FREE))))
+        assertFalse(planner.fitsDiet(pastaQueso, ctx(diet = setOf(DietRule.NUT_FREE, DietRule.VEGAN))))
+        assertTrue(planner.fitsDiet(pastaQueso, ctx(diet = setOf(DietRule.NUT_FREE, DietRule.VEGETARIAN))))
+    }
+
+    @Test
+    fun `CA-RIA-02-07 CA-RIA-02-09 sin plan por la dieta no sugiere quitarla`() {
+        // Con el catálogo base, vegano solo admite una receta (pasta con tomate): aun con presupuesto y tiempo de sobra no hay plan.
+        val resultado = planner.plan(catalogo, despensa, ctx(budget = 1_000_000, diet = setOf(DietRule.VEGAN)))
+
+        assertEquals(listOf(PlanSuggestion.NotEnoughRecipes), (resultado as PlanResult.NoPlan).suggestions)
+    }
+
     /**
      * Búsqueda exhaustiva: prueba todas las secuencias de recetas distintas, simulando el inventario y el presupuesto
      * día a día con el mismo evaluador. Devuelve la utilidad máxima y sus ids (desempate por ids menores).
@@ -163,6 +212,8 @@ class MealPlannerTest {
                 if (seq.any { it.id == r.id }) continue
                 if (context.maxMinutes != null && r.totalMinutes > context.maxMinutes) continue
                 if (context.noSpicy && r.spicy) continue
+                val forbidden = context.diet.flatMap { it.forbidden }
+                if (r.ingredients.any { ri -> scenario.ingredients.getValue(ri.ingredientId).tags.any { it in forbidden } }) continue
                 val e = evaluator.evaluate(r, context.servings, seq.size + 1, stock)
                 if (e.missingCount > context.maxMissing || spent + e.costCop > context.budgetCop) continue
                 go(seq + r, e.remaining, spent + e.costCop, partial + e.utility)

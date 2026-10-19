@@ -8,6 +8,13 @@ package com.smartfood.app.feature.recipes.domain.model
  * y las recetas con sus tiempos, ingredientes y pasos. El catálogo vive dentro de la app (`assets/`).
  */
 
+/**
+ * Lo que contiene un ingrediente y algunas dietas excluyen (spec 009, CA-RIA-02-09). En `ingredientes.json` va en
+ * `"etiquetas"` con los valores `carne`, `marisco`, `origen_animal`, `gluten`, `lactosa` y `frutos_secos`. El huevo, la
+ * leche, el queso y la miel llevan [ANIMAL_PRODUCT]; los lácteos, además, [LACTOSE].
+ */
+enum class FoodTag { MEAT, SEAFOOD, ANIMAL_PRODUCT, GLUTEN, LACTOSE, NUTS }
+
 /** Unidad base de un ingrediente del catálogo. Todas las cantidades del catálogo y del agente van en esta unidad. */
 enum class IngredientUnit { GRAM, MILLILITER, UNIT }
 
@@ -22,6 +29,7 @@ enum class IngredientUnit { GRAM, MILLILITER, UNIT }
  * @property priceCop Precio de referencia en pesos de [priceQuantity] unidades base.
  * @property priceQuantity Cantidad, en la unidad base, que cuesta [priceCop] (por ejemplo, 1000 g).
  * @property shelfLifeDays Vida útil típica en días, para los productos frescos sin fecha; `null` si no aplica.
+ * @property tags Lo que contiene y algunas dietas excluyen ([FoodTag]).
  */
 data class Ingredient(
     val id: String,
@@ -32,6 +40,7 @@ data class Ingredient(
     val priceCop: Long,
     val priceQuantity: Double,
     val shelfLifeDays: Int? = null,
+    val tags: Set<FoodTag> = emptySet(),
 ) {
     /** Precio de referencia de una unidad base, en pesos. */
     val pricePerUnitCop: Double get() = priceCop / priceQuantity

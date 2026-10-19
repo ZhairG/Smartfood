@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.recipes.domain.agent
 
+import com.smartfood.app.feature.recipes.domain.model.FoodTag
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.PantryItem
@@ -16,14 +17,20 @@ import kotlin.random.Random
  * generador de catálogos aleatorios con semilla fija para comparar el agente contra la fuerza bruta.
  */
 
-/** Ingrediente de prueba: [priceCop] por cada 1000 unidades base (g o ml) o por unidad. */
-fun ingredient(id: String, priceCop: Long = 10_000, unit: IngredientUnit = IngredientUnit.GRAM) = Ingredient(
+/** Ingrediente de prueba: [priceCop] por cada 1000 unidades base (g o ml) o por unidad, con sus [tags]. */
+fun ingredient(
+    id: String,
+    priceCop: Long = 10_000,
+    unit: IngredientUnit = IngredientUnit.GRAM,
+    vararg tags: FoodTag,
+) = Ingredient(
     id = id,
     name = id.replaceFirstChar { it.uppercase() },
     section = "Otros",
     unit = unit,
     priceCop = priceCop,
     priceQuantity = if (unit == IngredientUnit.UNIT) 1.0 else 1000.0,
+    tags = tags.toSet(),
 )
 
 /** Receta de prueba para 4 porciones; [ingredients] son pares (ingrediente, cantidad). */
@@ -66,6 +73,8 @@ data class RandomScenario(
 fun randomScenario(seed: Int, recipeCount: Int): RandomScenario {
     val random = Random(seed)
     val ingredients = (1..12).map { i -> ingredient("ing$i", priceCop = 2_000L + random.nextLong(0, 20_000)) }
+        // Etiquetas fijas por número (no consumen la semilla): carne, gluten y lácteos en algunos ingredientes.
+        .map { it.copy(tags = RANDOM_TAGS[it.id.removePrefix("ing").toInt() % RANDOM_TAGS.size]) }
         .associateBy { it.id }
     val ids = ingredients.keys.toList()
     val recipes = (1..recipeCount).map { r ->
@@ -83,3 +92,11 @@ fun randomScenario(seed: Int, recipeCount: Int): RandomScenario {
     }
     return RandomScenario(ingredients, recipes, pantry)
 }
+
+/** Etiquetas de los ingredientes aleatorios según su número: uno de cada cuatro sin etiquetas. */
+private val RANDOM_TAGS = listOf(
+    emptySet(),
+    setOf(FoodTag.MEAT, FoodTag.ANIMAL_PRODUCT),
+    setOf(FoodTag.GLUTEN),
+    setOf(FoodTag.LACTOSE, FoodTag.ANIMAL_PRODUCT),
+)

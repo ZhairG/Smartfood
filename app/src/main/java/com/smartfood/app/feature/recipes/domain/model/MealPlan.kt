@@ -26,6 +26,20 @@ data class PantryItem(
 )
 
 /**
+ * Restricción alimentaria que el agente respeta (spec 009, CA-RIA-02-09). Tiene los mismos nombres que
+ * `DietaryRestriction` de Preferencias alimentarias (spec 008), que el flujo de la IA traduce 1:1 por nombre.
+ *
+ * @property forbidden Etiquetas de ingrediente que la dieta no admite.
+ */
+enum class DietRule(val forbidden: Set<FoodTag>) {
+    VEGETARIAN(setOf(FoodTag.MEAT, FoodTag.SEAFOOD)),
+    VEGAN(setOf(FoodTag.MEAT, FoodTag.SEAFOOD, FoodTag.ANIMAL_PRODUCT)),
+    GLUTEN_FREE(setOf(FoodTag.GLUTEN)),
+    LACTOSE_FREE(setOf(FoodTag.LACTOSE)),
+    NUT_FREE(setOf(FoodTag.NUTS)),
+}
+
+/**
  * Lo que la persona eligió en "Sugerencia con IA" (CA-RIA-02-01).
  *
  * @property budgetCop Presupuesto máximo en pesos para las compras de todo el plan.
@@ -34,6 +48,7 @@ data class PantryItem(
  * @property noSpicy `true` si eligió "Sin picante".
  * @property maxMissing Máximo de ingredientes por comprar en cada receta (spec §2: 3).
  * @property days Días del plan (spec §2: 3).
+ * @property diet Restricciones alimentarias del Perfil; son duras y nunca se sugiere quitarlas (CA-RIA-02-09).
  */
 data class PlanContext(
     val budgetCop: Long,
@@ -42,6 +57,7 @@ data class PlanContext(
     val noSpicy: Boolean = false,
     val maxMissing: Int = 3,
     val days: Int = 3,
+    val diet: Set<DietRule> = emptySet(),
 )
 
 /**

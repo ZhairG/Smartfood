@@ -18,7 +18,8 @@ import com.smartfood.app.feature.recipes.domain.model.Recipe
  * restricciones con optimización:
  * - **Variables:** `D1…Dn` (n = `PlanContext.days`), la receta de cada día.
  * - **Dominio:** las recetas que cumplen las restricciones de una sola receta (consistencia de nodo): tiempo máximo,
- *   picante y como máximo `maxMissing` faltantes con el inventario completo.
+ *   picante, restricciones alimentarias (ningún ingrediente con una etiqueta que la dieta prohíbe) y como máximo
+ *   `maxMissing` faltantes con el inventario completo.
  * - **Restricciones entre variables:** recetas distintas, inventario compartido (cada receta usa lo que dejaron las
  *   anteriores), presupuesto total y faltantes de cada receta con el inventario que le queda.
  * - **Objetivo:** maximizar la utilidad del plan ([RecipeEvaluator.planUtility]).
@@ -42,6 +43,16 @@ class MealPlanner(
         search(recipes, pantry, context)?.let { PlanResult.Found(it) }
             ?: PlanResult.NoPlan(suggestions(recipes, pantry, context))
 
+    /**
+     * `true` si ningún ingrediente de [recipe] tiene una etiqueta que la dieta de [context] prohíbe (CA-RIA-02-09).
+     * Un ingrediente que no está en el catálogo no tiene etiquetas.
+     */
+    fun fitsDiet(recipe: Recipe, context: PlanContext): Boolean {
+        val forbidden = context.diet.flatMapTo(mutableSetOf()) { it.forbidden }
+        if (forbidden.isEmpty()) return true
+        return recipe.ingredients.none { ri -> ingredients[ri.ingredientId]?.tags.orEmpty().any { it in forbidden } }
+    }
+
     /** El plan de mayor utilidad que cumple todas las restricciones, o `null` si no existe. */
     fun search(recipes: List<Recipe>, pantry: List<PantryItem>, context: PlanContext): MealPlan? {
         val full = PantryStock.of(pantry)
@@ -50,6 +61,7 @@ class MealPlanner(
         val domain = recipes
             .filter { context.maxMinutes == null || it.totalMinutes <= context.maxMinutes }
             .filter { !(context.noSpicy && it.spicy) }
+            .filter { fitsDiet(it, context) }
             .filter {
                 val e = evaluator.evaluate(it, context.servings, day = 1, stock = full)
                 e.missingCount <= context.maxMissing && e.costCop <= context.budgetCop
