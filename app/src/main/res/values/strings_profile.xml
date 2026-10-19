@@ -75,4 +75,7 @@
     <string name="preferences_saving">Guardando cambios…</string>
     <string name="preferences_saved">Guardado</string>
     <string name="preferences_saved_body">Preferencias se actualizó</string>
+    <!-- Notificaciones (spec 008, HU-PER-04) -->
+    <string name="notification_empty_inventory_title">Tu inventario está vacío</string>
+    <string name="notification_empty_inventory_body">Registra tus alimentos para no perder de vista sus fechas</string>
 </resources>

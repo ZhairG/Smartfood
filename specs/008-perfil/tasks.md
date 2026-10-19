@@ -28,7 +28,7 @@
 ## Issue 3: Notificaciones y tema (intermedia)
 - [x] T014 `NotificationSettings`, `NotificationSettingsRepository` y `DataStoreNotificationSettings` (`notification_prefs`) (RF-PER-05).
 - [x] T015 `SetNotificationSettingUseCase`: programa o cancela el trabajo diario (CA-PER-04-03).
-- [ ] T016 `ExpiryReminderWorker`: respeta "Productos por vencer" y publica "Inventario vacío" (CA-PER-04-03, 04-04); `ExpiryReminderWorkerTest` actualizado.
+- [x] T016 `ExpiryReminderWorker`: respeta "Productos por vencer" y publica "Inventario vacío" (CA-PER-04-03, 04-04); `ExpiryReminderWorkerTest` actualizado.
 - [ ] T017 Pantalla `NotificationSettings` con interruptores y permiso de Android 13+ (CA-PER-04-01, 04-02, 04-05, 04-06).
 - [ ] T018 `ThemePreferences` y `DataStoreThemePreferences` (`theme_prefs`) en `core/preferences`; `MainActivity` aplica el tema (RF-PER-07, CA-PER-06-03, 06-04).
 - [ ] T019 Fila "Tema de la app" y hoja de tema; revisión del tema oscuro en todas las pantallas (CA-PER-06-01, 06-02, 06-05). Pruebas de las dos pantallas.

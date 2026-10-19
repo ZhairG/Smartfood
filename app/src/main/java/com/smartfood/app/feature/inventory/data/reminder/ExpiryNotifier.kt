@@ -66,6 +66,28 @@ class ExpiryNotifier @Inject constructor(
         )
     }
 
+    /**
+     * Crea el canal y publica el aviso de inventario vacío (spec 008, CA-PER-04-04). Usa el mismo canal, icono y
+     * `PendingIntent` que el aviso de vencimientos: cuando el inventario está vacío no puede haber productos por
+     * vencer, así que ambos avisos nunca se muestran a la vez.
+     */
+    fun notifyEmptyInventory() {
+        if (!canPostNotifications()) return
+        createChannel()
+        val body = context.getString(R.string.notification_empty_inventory_body)
+        publish(
+            NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification_expiry)
+                .setContentTitle(context.getString(R.string.notification_empty_inventory_title))
+                .setContentText(body)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(openApp())
+                .setAutoCancel(true)
+                .build()
+        )
+    }
+
     /** Descarta la notificación visible, por ejemplo al cerrar sesión (CA-INV-08-06). */
     fun cancel() {
         NotificationManagerCompat.from(context).cancel(NOTIFICATION_ID)
