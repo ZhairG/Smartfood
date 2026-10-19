@@ -1,6 +1,8 @@
 package com.smartfood.app.feature.profile.data.di
 
+import com.smartfood.app.feature.profile.data.repository.FirebaseStorageProfilePhotoRepository
 import com.smartfood.app.feature.profile.data.repository.FirestoreProfileRepository
+import com.smartfood.app.feature.profile.domain.repository.ProfilePhotoRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfileRepository
 import dagger.Binds
 import dagger.Module
@@ -24,4 +26,9 @@ abstract class ProfileDataModule {
     @Binds
     @Singleton
     abstract fun bindProfileRepository(impl: FirestoreProfileRepository): ProfileRepository
+
+    /** Foto de perfil en Cloud Storage (RF-PER-02, T006). */
+    @Binds
+    @Singleton
+    abstract fun bindProfilePhotoRepository(impl: FirebaseStorageProfilePhotoRepository): ProfilePhotoRepository
 }
