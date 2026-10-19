@@ -23,7 +23,7 @@
 - [x] T010 `FoodPreferences` y enums; `getPreferences`/`savePreferences` en el repositorio; validación del mapa `preferences` en `firestore.rules` y `rules-test/` (RF-PER-04).
 - [ ] T011 Casos de uso `GetFoodPreferences` y `SaveFoodPreferences` con pruebas.
 - [x] T012 Pantalla `FoodPreferences` con `PreferenceChip`, selección múltiple o única, aviso, carga y "Guardado" (CA-PER-03-01 a 03-04).
-- [ ] T013 Pruebas: `FoodPreferencesViewModelTest` y `FoodPreferencesScreenTest`.
+- [x] T013 Pruebas: `FoodPreferencesViewModelTest` y `FoodPreferencesScreenTest`.
 
 ## Issue 3: Notificaciones y tema (intermedia)
 - [ ] T014 `NotificationSettings`, `NotificationSettingsRepository` y `DataStoreNotificationSettings` (`notification_prefs`) (RF-PER-05).
@@ -70,7 +70,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **F** = 
 | CA-PER-03-01 | I `FoodPreferencesScreenTest` |
 | CA-PER-03-02 | U `FoodPreferencesViewModelTest` |
 | CA-PER-03-03 | U `FoodPreferencesViewModelTest`, I `FoodPreferencesScreenTest` |
-| CA-PER-03-04 | U `FoodPreferencesViewModelTest`, R, M |
+| CA-PER-03-04 | U `PreferencesDocumentTest`, U `FoodPreferencesUseCasesTest`, U `FoodPreferencesViewModelTest`, R, M |
 | CA-PER-04-01 | I `NotificationSettingsScreenTest` |
 | CA-PER-04-02 | U `NotificationSettingsViewModelTest` |
 | CA-PER-04-03 | U `SetNotificationSettingUseCaseTest`, I `ExpiryReminderWorkerTest` |

@@ -149,6 +149,22 @@ class MainNavigationTest {
     }
 
     @Test
+    fun caPer0103_caPer0104_preferenciasSeAbreConLaBarra_yPerfilVuelve() {
+        composeTestRule.onNodeWithText("Perfil").performClick()
+        composeTestRule.onNode(hasText("Preferencias alimentarias") and hasClickAction()).performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.FoodPreferences>() == true)
+        composeTestRule.onNodeWithText("Preferencias alimentarias").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Perfil").assertIsSelected()
+
+        // Volver a tocar "Perfil" regresa al Perfil (CA-PER-01-04).
+        composeTestRule.onNodeWithText("Perfil").performClick()
+        composeTestRule.waitForIdle()
+        assertTrue(navController.currentDestination?.hasRoute<Route.Profile>() == true)
+    }
+
+    @Test
     fun caInv0905_enMiInventarioNoHayNadaDebajo_atrasCierraLaApp() {
         composeTestRule.onNodeWithText("Mi Inventario").assertIsDisplayed()
 
