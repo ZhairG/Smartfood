@@ -3,12 +3,15 @@ package com.smartfood.app.testutil
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthException
 import com.smartfood.app.feature.profile.domain.model.UserProfile
+import com.smartfood.app.feature.profile.domain.repository.EmailChangeRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfilePhotoRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Nombre: ProfileFakes.kt
@@ -74,5 +77,25 @@ class FakeProfilePhotoRepository : ProfilePhotoRepository {
     override suspend fun delete(path: String): Result<Unit> {
         deletes += path
         return Result.success(Unit)
+    }
+}
+
+/** Fake de [EmailChangeRepository]: registra los correos pedidos y los códigos confirmados. */
+class FakeEmailChangeRepository : EmailChangeRepository {
+    var requestResult: Result<Duration> = Result.success(60.seconds)
+    /** Si no es `null`, [confirm] devuelve este fallo. */
+    var confirmError: Result<String>? = null
+    val requested = mutableListOf<String>()
+    val confirmedCodes = mutableListOf<String>()
+
+    override suspend fun requestCode(newEmail: String): Result<Duration> {
+        requested += newEmail
+        return requestResult
+    }
+
+    override suspend fun confirm(code: String): Result<String> {
+        confirmError?.let { return it }
+        confirmedCodes += code
+        return Result.success(requested.last())
     }
 }

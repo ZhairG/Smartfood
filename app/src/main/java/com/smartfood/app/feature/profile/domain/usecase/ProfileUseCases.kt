@@ -6,19 +6,21 @@ import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.feature.auth.domain.repository.AuthRepository
 import com.smartfood.app.feature.auth.domain.usecase.ValidateEmailUseCase
 import com.smartfood.app.feature.profile.domain.model.UserProfile
+import com.smartfood.app.feature.profile.domain.repository.EmailChangeRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfilePhotoRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlin.time.Duration
 
 /**
  * Nombre: ProfileUseCases.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Casos de uso de "Editar información" (spec 008, HU-PER-02, T005): validar los datos, guardarlos con la
- * foto, pedir el cambio de correo con verificación y sincronizar el correo del perfil con el de la cuenta. Las
+ * foto, cambiar el correo con un código y sincronizar el correo del perfil con el de la cuenta. Las
  * validaciones viven solo aquí (constitución §3); el ViewModel no las repite.
  */
 
@@ -106,19 +108,45 @@ class UpdateProfileUseCase @Inject constructor(
 }
 
 /**
- * Pide cambiar el correo (CA-PER-02-10, 02-11): valida el correo nuevo, confirma la contraseña actual y pide a la cuenta
- * que envíe el enlace de verificación. El correo no cambia hasta abrir ese enlace.
+ * Pide el código para cambiar el correo (CA-PER-02-10, 02-11): valida el correo nuevo, confirma la contraseña actual
+ * (el servidor exige un inicio de sesión reciente) y pide que se envíe el código al correo nuevo. El correo no cambia
+ * hasta confirmar el código. Sirve también para "Reenviar código".
+ *
+ * @return Espera antes de poder pedir otro código.
  */
 class RequestEmailChangeUseCase @Inject constructor(
     private val validateEmail: ValidateEmailUseCase,
     private val auth: AuthRepository,
+    private val emailChange: EmailChangeRepository,
 ) {
-    suspend operator fun invoke(newEmail: String, currentPassword: String): Result<Unit> {
+    suspend operator fun invoke(newEmail: String, currentPassword: String): Result<Duration> {
         val email = newEmail.trim()
         if (currentPassword.isEmpty()) return authFailure(AuthError.EmptyFields(setOf(AuthField.PASSWORD)))
         if (!validateEmail.execute(email)) return authFailure(AuthError.InvalidEmail)
         auth.reauthenticate(currentPassword).onFailure { return Result.failure(it) }
-        return auth.requestEmailChange(email)
+        return emailChange.requestCode(email)
+    }
+}
+
+/**
+ * Confirma el código del correo nuevo (CA-PER-02-11, 02-12): el servidor cambia la cuenta y el perfil, y la sesión se
+ * pone al día con el correo nuevo sin cerrarse.
+ *
+ * @return Correo nuevo de la cuenta.
+ */
+class ConfirmEmailChangeUseCase @Inject constructor(
+    private val auth: AuthRepository,
+    private val emailChange: EmailChangeRepository,
+) {
+    suspend operator fun invoke(code: String, currentPassword: String): Result<String> {
+        val digits = code.trim()
+        if (digits.length != CODE_LENGTH || !digits.all { it.isDigit() }) return authFailure(AuthError.InvalidOtpCode)
+        val email = emailChange.confirm(digits).getOrElse { return Result.failure(it) }
+        return auth.refreshSession(email, currentPassword).map { email }
+    }
+
+    private companion object {
+        const val CODE_LENGTH = 4
     }
 }
 

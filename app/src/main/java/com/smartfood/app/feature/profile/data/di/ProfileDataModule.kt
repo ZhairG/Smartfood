@@ -1,7 +1,9 @@
 package com.smartfood.app.feature.profile.data.di
 
 import com.smartfood.app.feature.profile.data.repository.FirebaseStorageProfilePhotoRepository
+import com.smartfood.app.feature.profile.data.repository.RemoteEmailChangeRepository
 import com.smartfood.app.feature.profile.data.repository.FirestoreProfileRepository
+import com.smartfood.app.feature.profile.domain.repository.EmailChangeRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfilePhotoRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfileRepository
 import dagger.Binds
@@ -31,4 +33,9 @@ abstract class ProfileDataModule {
     @Binds
     @Singleton
     abstract fun bindProfilePhotoRepository(impl: FirebaseStorageProfilePhotoRepository): ProfilePhotoRepository
+
+    /** Cambio de correo con código por las Cloud Functions (RF-PER-03, T009b). */
+    @Binds
+    @Singleton
+    abstract fun bindEmailChangeRepository(impl: RemoteEmailChangeRepository): EmailChangeRepository
 }

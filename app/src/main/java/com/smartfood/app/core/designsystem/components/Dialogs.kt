@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -403,6 +404,53 @@ fun SmartFoodSaveChangesDialog(
             modifier = modifier,
             style = WarningDialogStyle.SAVE
         )
+    }
+}
+
+/**
+ * Tarjeta de diálogo con contenido libre, con el mismo fondo, radio, sombra y desenfoque de los demás avisos. Sirve
+ * para pasos que el Figma no define, como escribir el código del correo nuevo (spec 008, CA-PER-02-10).
+ *
+ * @param title Título en verde oscuro, Bold de 20 sp.
+ * @param onDismissRequest Acción con atrás; tocar fuera no cierra.
+ * @param modifier Modificador opcional para la tarjeta.
+ * @param content Contenido debajo del título.
+ */
+@Composable
+fun SmartFoodContentDialog(
+    title: String,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(dismissOnClickOutside = false)) {
+        BlurBehindDialog()
+        val spacing = MaterialTheme.spacing
+        val metrics = LocalFormMetrics.current
+        Column(
+            modifier = modifier
+                .widthIn(max = 480.dp)
+                .fillMaxWidth()
+                .padding(horizontal = spacing.extraSmall, vertical = spacing.small)
+                .figmaShadow(
+                    color = ShadowColorModal,
+                    borderRadius = spacing.panelRadius,
+                    blurRadius = spacing.extraSmall,
+                    offsetY = spacing.extraSmall
+                )
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(spacing.panelRadius))
+                .padding(horizontal = metrics.formHorizontalPadding, vertical = metrics.sectionSpacing),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(spacing.medium)
+        ) {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                textAlign = TextAlign.Center
+            )
+            content()
+        }
     }
 }
 

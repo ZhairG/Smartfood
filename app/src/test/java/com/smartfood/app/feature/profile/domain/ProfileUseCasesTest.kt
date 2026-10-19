@@ -4,12 +4,14 @@ import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthField
 import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.feature.auth.domain.usecase.ValidateEmailUseCase
+import com.smartfood.app.feature.profile.domain.usecase.ConfirmEmailChangeUseCase
 import com.smartfood.app.feature.profile.domain.usecase.ProfileEdits
 import com.smartfood.app.feature.profile.domain.usecase.RequestEmailChangeUseCase
 import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
 import com.smartfood.app.feature.profile.domain.usecase.UpdateProfileUseCase
 import com.smartfood.app.feature.profile.domain.usecase.ValidateProfileUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
+import com.smartfood.app.testutil.FakeEmailChangeRepository
 import com.smartfood.app.testutil.FakeProfilePhotoRepository
 import com.smartfood.app.testutil.FakeProfileRepository
 import com.smartfood.app.testutil.authError
@@ -20,6 +22,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Nombre: ProfileUseCasesTest.kt
@@ -35,6 +38,7 @@ class ProfileUseCasesTest {
     private val repository = FakeProfileRepository()
     private val photos = FakeProfilePhotoRepository()
     private val auth = FakeAuthRepository()
+    private val emailChange = FakeEmailChangeRepository()
     private val update = UpdateProfileUseCase(validate, repository, photos)
     private val current = FakeProfileRepository.defaultProfile()
 
@@ -101,24 +105,43 @@ class ProfileUseCasesTest {
     }
 
     @Test
-    fun `CA-PER-02-10 CA-PER-02-11 cambiar el correo pide la contrasena y envia el enlace`() = runTest {
-        val change = RequestEmailChangeUseCase(ValidateEmailUseCase(), auth)
+    fun `CA-PER-02-10 CA-PER-02-11 cambiar el correo pide la contrasena y envia el codigo`() = runTest {
+        val change = RequestEmailChangeUseCase(ValidateEmailUseCase(), auth, emailChange)
 
         assertEquals(AuthError.EmptyFields(setOf(AuthField.PASSWORD)), change("nuevo@correo.com", "").authError)
         assertEquals(AuthError.InvalidEmail, change("no-es-correo", "Clave#123").authError)
 
         auth.reauthenticateResult = authFailure(AuthError.InvalidCredentials)
         assertEquals(AuthError.InvalidCredentials, change("nuevo@correo.com", "mala").authError)
-        assertNull("no pide el cambio si la contraseña es incorrecta", auth.lastRequestedEmail)
+        assertTrue("no pide el código si la contraseña es incorrecta", emailChange.requested.isEmpty())
 
         auth.reauthenticateResult = Result.success(Unit)
-        auth.requestEmailChangeResult = authFailure(AuthError.EmailAlreadyInUse)
+        emailChange.requestResult = authFailure(AuthError.EmailAlreadyInUse)
         assertEquals(AuthError.EmailAlreadyInUse, change("usado@correo.com", "Clave#123").authError)
 
-        auth.requestEmailChangeResult = Result.success(Unit)
-        assertTrue(change("  nuevo@correo.com ", "Clave#123").isSuccess)
-        assertEquals("nuevo@correo.com", auth.lastRequestedEmail)
+        emailChange.requestResult = Result.success(42.seconds)
+        assertEquals(42.seconds, change("  nuevo@correo.com ", "Clave#123").getOrThrow())
+        assertEquals("nuevo@correo.com", emailChange.requested.last())
         assertEquals("Clave#123", auth.lastReauthPassword)
+    }
+
+    @Test
+    fun `CA-PER-02-11 CA-PER-02-12 confirmar el codigo cambia el correo y pone al dia la sesion`() = runTest {
+        val confirm = ConfirmEmailChangeUseCase(auth, emailChange)
+        emailChange.requestCode("nuevo@correo.com")
+
+        assertEquals(AuthError.InvalidOtpCode, confirm("12a4", "Clave#123").authError)
+        assertEquals(AuthError.InvalidOtpCode, confirm("123", "Clave#123").authError)
+        assertTrue("no llama al servidor con un código mal formado", emailChange.confirmedCodes.isEmpty())
+
+        emailChange.confirmError = authFailure(AuthError.OtpCodeExpired)
+        assertEquals(AuthError.OtpCodeExpired, confirm("4821", "Clave#123").authError)
+        assertNull(auth.lastRefreshedEmail)
+
+        emailChange.confirmError = null
+        assertEquals("nuevo@correo.com", confirm(" 4821 ", "Clave#123").getOrThrow())
+        assertEquals("nuevo@correo.com", auth.lastRefreshedEmail)
+        assertEquals("nuevo@correo.com", auth.currentEmail())
     }
 
     @Test

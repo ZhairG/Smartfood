@@ -15,7 +15,7 @@ import java.time.LocalDate
  */
 
 /** Campo del formulario que puede marcarse en rojo. */
-enum class EditProfileField { FULL_NAME, EMAIL, PHONE, BIRTH_DATE, CURRENT_PASSWORD }
+enum class EditProfileField { FULL_NAME, EMAIL, PHONE, BIRTH_DATE, CURRENT_PASSWORD, EMAIL_CODE }
 
 /** Hoja, calendario o aviso abierto sobre la pantalla. */
 sealed interface EditProfileDialog {
@@ -29,12 +29,18 @@ sealed interface EditProfileDialog {
     data object ConfirmSave : EditProfileDialog
 
     /**
+     * "Revisa tu correo": pide el código enviado al correo nuevo (CA-PER-02-10; desviación, el Figma no lo tiene).
+     *
+     * @property email Correo nuevo al que se envió el código.
+     */
+    data class EmailCode(val email: String) : EditProfileDialog
+
+    /**
      * "Guardado" (Figma `369:905`, CA-PER-02-04), que se cierra solo.
      *
-     * @property emailSentTo Correo nuevo al que se envió el enlace de verificación, o `null` si el correo no cambió
-     *   (CA-PER-02-10).
+     * @property emailChangedTo Correo nuevo de la cuenta si el correo cambió, o `null` (CA-PER-02-12).
      */
-    data class Saved(val emailSentTo: String? = null) : EditProfileDialog
+    data class Saved(val emailChangedTo: String? = null) : EditProfileDialog
 }
 
 /**
@@ -48,6 +54,8 @@ sealed interface EditProfileDialog {
  * @property birthDate Fecha de nacimiento elegida.
  * @property newPhotoPath Foto nueva en el teléfono (`cacheDir/profile`), todavía sin subir.
  * @property currentPassword Contraseña actual; se pide solo si el correo cambió (CA-PER-02-10).
+ * @property emailCode Código de 4 dígitos que llegó al correo nuevo.
+ * @property resendCooldownSeconds Segundos que faltan para poder reenviar el código; 0 si ya se puede.
  * @property isSaving `true` mientras se guarda: se ve el diálogo de carga.
  * @property error Último error, de validación o del guardado.
  * @property dialog Hoja, calendario o aviso abierto.
@@ -61,6 +69,8 @@ data class EditProfileUiState(
     val birthDate: LocalDate? = null,
     val newPhotoPath: String? = null,
     val currentPassword: String = "",
+    val emailCode: String = "",
+    val resendCooldownSeconds: Int = 0,
     val isSaving: Boolean = false,
     val error: AuthError? = null,
     val dialog: EditProfileDialog? = null,
@@ -78,16 +88,19 @@ data class EditProfileUiState(
     val isEmailChanged: Boolean
         get() = original != null && !email.trim().equals(original.email, ignoreCase = true)
 
-    /** `true` si algún dato difiere del perfil guardado (CA-PER-02-02). */
-    val hasChanges: Boolean
+    /** `true` si cambió algún dato del perfil distinto del correo: nombre, teléfono, fecha o foto. */
+    val hasProfileChanges: Boolean
         get() {
             val saved = original ?: return false
             return fullName != saved.fullName ||
-                isEmailChanged ||
                 ValidateProfileUseCase.normalizePhone(phone) != saved.phone ||
                 birthDate != saved.birthDate ||
                 newPhotoPath != null
         }
+
+    /** `true` si algún dato difiere del perfil guardado (CA-PER-02-02). */
+    val hasChanges: Boolean
+        get() = hasProfileChanges || isEmailChanged
 
     /** "Guardar" se habilita al cambiar algún dato (CA-PER-02-02). */
     val isSaveEnabled: Boolean
@@ -101,6 +114,7 @@ data class EditProfileUiState(
             AuthError.InvalidBirthDate -> EditProfileField.BIRTH_DATE
             AuthError.InvalidEmail, AuthError.EmailAlreadyInUse -> EditProfileField.EMAIL
             AuthError.InvalidCredentials -> EditProfileField.CURRENT_PASSWORD
+            AuthError.InvalidOtpCode, AuthError.OtpCodeExpired, AuthError.TooManyAttempts -> EditProfileField.EMAIL_CODE
             is AuthError.EmptyFields -> if (AuthField.PASSWORD in e.fields) EditProfileField.CURRENT_PASSWORD else null
             else -> null
         }
@@ -120,6 +134,10 @@ sealed interface EditProfileEvent {
     data class PhotoPicked(val path: String) : EditProfileEvent
     data object SaveClicked : EditProfileEvent
     data object SaveConfirmed : EditProfileEvent
+    data class EmailCodeChanged(val value: String) : EditProfileEvent
+    data object ConfirmEmailCode : EditProfileEvent
+    data object ResendEmailCode : EditProfileEvent
+    data object CancelEmailCode : EditProfileEvent
     data object DialogDismissed : EditProfileEvent
     data object BackClicked : EditProfileEvent
 }

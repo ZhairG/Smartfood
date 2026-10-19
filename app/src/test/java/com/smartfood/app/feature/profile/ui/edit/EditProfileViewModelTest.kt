@@ -3,11 +3,13 @@ package com.smartfood.app.feature.profile.ui.edit
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.feature.auth.domain.usecase.ValidateEmailUseCase
+import com.smartfood.app.feature.profile.domain.usecase.ConfirmEmailChangeUseCase
 import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
 import com.smartfood.app.feature.profile.domain.usecase.RequestEmailChangeUseCase
 import com.smartfood.app.feature.profile.domain.usecase.UpdateProfileUseCase
 import com.smartfood.app.feature.profile.domain.usecase.ValidateProfileUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
+import com.smartfood.app.testutil.FakeEmailChangeRepository
 import com.smartfood.app.testutil.FakeProfilePhotoRepository
 import com.smartfood.app.testutil.FakeProfileRepository
 import com.smartfood.app.testutil.MainDispatcherRule
@@ -40,6 +42,7 @@ class EditProfileViewModelTest {
     private val repository = FakeProfileRepository()
     private val photos = FakeProfilePhotoRepository()
     private val auth = FakeAuthRepository()
+    private val emailChange = FakeEmailChangeRepository()
 
     private fun crearViewModel(): EditProfileViewModel {
         val validate = ValidateProfileUseCase(fixedClock(today))
@@ -47,7 +50,8 @@ class EditProfileViewModelTest {
             observeProfile = ObserveProfileUseCase(repository),
             validateProfile = validate,
             updateProfile = UpdateProfileUseCase(validate, repository, photos),
-            requestEmailChange = RequestEmailChangeUseCase(ValidateEmailUseCase(), auth)
+            requestEmailChange = RequestEmailChangeUseCase(ValidateEmailUseCase(), auth, emailChange),
+            confirmEmailChange = ConfirmEmailChangeUseCase(auth, emailChange)
         )
     }
 
@@ -137,23 +141,85 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `CA-PER-02-10 cambiar el correo pide la contrasena y envia el enlace sin cambiar el correo`() = runTest {
+    fun `CA-PER-02-10 cambiar el correo guarda lo demas y pide el codigo enviado al correo nuevo`() = runTest {
         val viewModel = crearViewModel()
         viewModel.onEvent(EditProfileEvent.EmailChanged("nuevo@correo.com"))
+        viewModel.onEvent(EditProfileEvent.FullNameChanged("Ana María"))
         assertTrue("aparece el campo de contraseña", viewModel.state.isEmailChanged)
 
         viewModel.onEvent(EditProfileEvent.CurrentPasswordChanged("Clave#123"))
         viewModel.onEvent(EditProfileEvent.SaveConfirmed)
         runCurrent()
 
-        assertEquals("nuevo@correo.com", auth.lastRequestedEmail)
+        assertEquals(listOf("nuevo@correo.com"), emailChange.requested)
         assertEquals("Clave#123", auth.lastReauthPassword)
-        assertEquals(EditProfileDialog.Saved(emailSentTo = "nuevo@correo.com"), viewModel.state.dialog)
-        assertEquals("el correo sigue igual hasta confirmar", FakeAuthRepository.DEFAULT_EMAIL, viewModel.state.email)
-        assertEquals("", viewModel.state.currentPassword)
+        assertEquals("Ana María", repository.updates.single().fullName)
+        assertEquals(EditProfileDialog.EmailCode("nuevo@correo.com"), viewModel.state.dialog)
+        assertEquals(60, viewModel.state.resendCooldownSeconds)
+        assertEquals("la cuenta aún no cambia", FakeAuthRepository.DEFAULT_EMAIL, viewModel.state.original?.email)
+    }
 
-        advanceTimeBy(EditProfileViewModel.EMAIL_RESULT_MILLIS + 1)
+    @Test
+    fun `CA-PER-02-12 el codigo correcto cambia el correo al instante y muestra Guardado`() = runTest {
+        val viewModel = crearViewModel()
+        viewModel.onEvent(EditProfileEvent.EmailChanged("nuevo@correo.com"))
+        viewModel.onEvent(EditProfileEvent.CurrentPasswordChanged("Clave#123"))
+        viewModel.onEvent(EditProfileEvent.SaveConfirmed)
+        runCurrent()
+
+        viewModel.onEvent(EditProfileEvent.EmailCodeChanged("48a21"))
+        assertEquals("solo dígitos y como mucho 4", "4821", viewModel.state.emailCode)
+        viewModel.onEvent(EditProfileEvent.ConfirmEmailCode)
+        runCurrent()
+
+        assertEquals(listOf("4821"), emailChange.confirmedCodes)
+        assertEquals("nuevo@correo.com", auth.lastRefreshedEmail)
+        assertEquals(EditProfileDialog.Saved(emailChangedTo = "nuevo@correo.com"), viewModel.state.dialog)
+        assertEquals("nuevo@correo.com", viewModel.state.original?.email)
+        assertFalse("sin cambios pendientes", viewModel.state.hasChanges)
+
+        advanceTimeBy(EditProfileViewModel.RESULT_DIALOG_MILLIS + 1)
         assertNull(viewModel.state.dialog)
+    }
+
+    @Test
+    fun `CA-PER-02-11 un codigo incorrecto se marca en el aviso y Cancelar deja el correo como estaba`() = runTest {
+        val viewModel = crearViewModel()
+        viewModel.onEvent(EditProfileEvent.EmailChanged("nuevo@correo.com"))
+        viewModel.onEvent(EditProfileEvent.CurrentPasswordChanged("Clave#123"))
+        viewModel.onEvent(EditProfileEvent.SaveConfirmed)
+        runCurrent()
+
+        emailChange.confirmError = authFailure(AuthError.InvalidOtpCode)
+        viewModel.onEvent(EditProfileEvent.EmailCodeChanged("0000"))
+        viewModel.onEvent(EditProfileEvent.ConfirmEmailCode)
+        runCurrent()
+        assertEquals(EditProfileField.EMAIL_CODE, viewModel.state.errorField)
+        assertEquals(EditProfileDialog.EmailCode("nuevo@correo.com"), viewModel.state.dialog)
+
+        viewModel.onEvent(EditProfileEvent.CancelEmailCode)
+        assertNull(viewModel.state.dialog)
+        assertEquals(FakeAuthRepository.DEFAULT_EMAIL, viewModel.state.email)
+        assertFalse(viewModel.state.isEmailChanged)
+    }
+
+    @Test
+    fun `CA-PER-02-10 Reenviar codigo espera la cuenta regresiva y vuelve a confirmar la contrasena`() = runTest {
+        val viewModel = crearViewModel()
+        viewModel.onEvent(EditProfileEvent.EmailChanged("nuevo@correo.com"))
+        viewModel.onEvent(EditProfileEvent.CurrentPasswordChanged("Clave#123"))
+        viewModel.onEvent(EditProfileEvent.SaveConfirmed)
+        runCurrent()
+
+        viewModel.onEvent(EditProfileEvent.ResendEmailCode)
+        assertEquals("durante la espera no reenvía", 1, emailChange.requested.size)
+
+        advanceTimeBy(60_001)
+        assertEquals(0, viewModel.state.resendCooldownSeconds)
+        viewModel.onEvent(EditProfileEvent.ResendEmailCode)
+        runCurrent()
+        assertEquals(2, emailChange.requested.size)
+        assertEquals(60, viewModel.state.resendCooldownSeconds)
     }
 
     @Test
@@ -168,7 +234,7 @@ class EditProfileViewModelTest {
         runCurrent()
 
         assertEquals(EditProfileField.CURRENT_PASSWORD, viewModel.state.errorField)
-        assertNull(auth.lastRequestedEmail)
+        assertTrue(emailChange.requested.isEmpty())
         assertTrue(repository.updates.isEmpty())
     }
 

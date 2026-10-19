@@ -197,7 +197,7 @@ private fun EditProfileForm(state: EditProfileUiState, onEvent: (EditProfileEven
             isError = errorField == EditProfileField.BIRTH_DATE
         )
 
-        state.error?.let { error ->
+        state.error?.takeIf { state.dialog !is EditProfileDialog.EmailCode }?.let { error ->
             Text(
                 text = stringResource(id = error.messageRes()),
                 color = MaterialTheme.colorScheme.error,
@@ -215,7 +215,10 @@ private fun EditProfileForm(state: EditProfileUiState, onEvent: (EditProfileEven
 @Composable
 private fun EditProfileDialogs(state: EditProfileUiState, onEvent: (EditProfileEvent) -> Unit) {
     val dismiss = { onEvent(EditProfileEvent.DialogDismissed) }
-    if (state.isSaving) SmartFoodLoadingDialog(text = stringResource(id = R.string.edit_profile_saving))
+    // Con el aviso del código abierto, la carga se ve en su botón "Confirmar".
+    if (state.isSaving && state.dialog !is EditProfileDialog.EmailCode) {
+        SmartFoodLoadingDialog(text = stringResource(id = R.string.edit_profile_saving))
+    }
     when (val dialog = state.dialog) {
         EditProfileDialog.PhotoSourceSheet -> PhotoSourceSheet(
             onGallery = { onEvent(EditProfileEvent.GalleryChosen) },
@@ -234,6 +237,7 @@ private fun EditProfileDialogs(state: EditProfileUiState, onEvent: (EditProfileE
             onConfirm = { onEvent(EditProfileEvent.SaveConfirmed) },
             onDismiss = dismiss
         )
+        is EditProfileDialog.EmailCode -> EmailCodeDialog(state = state, email = dialog.email, onEvent = onEvent)
         // Figma 369:905: círculo verde claro con el chulo verde y "Perfil se actualizó" en naranja.
         is EditProfileDialog.Saved -> SmartFoodResultDialog(
             icon = {
@@ -245,7 +249,7 @@ private fun EditProfileDialogs(state: EditProfileUiState, onEvent: (EditProfileE
                 )
             },
             title = stringResource(id = R.string.edit_profile_saved),
-            body = dialog.emailSentTo?.let { stringResource(id = R.string.edit_profile_email_sent, it) }
+            body = dialog.emailChangedTo?.let { stringResource(id = R.string.edit_profile_email_changed, it) }
                 ?: stringResource(id = R.string.edit_profile_saved_body)
         )
         null -> Unit

@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.auth.data.repository
 
+import com.google.firebase.FirebaseException
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.smartfood.app.core.common.safeRunCatching
@@ -52,9 +53,17 @@ class FirebaseAuthRepository @Inject constructor(
         Unit
     }.mapFirebaseError()
 
-    override suspend fun requestEmailChange(newEmail: String): Result<Unit> = safeRunCatching {
-        val user = firebaseAuth.currentUser ?: throw AuthException(AuthError.AccountNotFound)
-        user.verifyBeforeUpdateEmail(newEmail).await()
+    override suspend fun refreshSession(email: String, password: String): Result<Unit> = safeRunCatching {
+        val user = firebaseAuth.currentUser
+        val refreshed = user != null && try {
+            user.reload().await()
+            user.getIdToken(true).await()
+            user.email.equals(email, ignoreCase = true)
+        } catch (e: FirebaseException) {
+            // Firebase puede invalidar la sesión al cambiar el correo: se inicia de nuevo con el correo nuevo.
+            false
+        }
+        if (!refreshed) firebaseAuth.signInWithEmailAndPassword(email, password).await()
         Unit
     }.mapFirebaseError()
 }

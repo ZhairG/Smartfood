@@ -39,8 +39,8 @@ interface AuthRepository {
     suspend fun reauthenticate(currentPassword: String): Result<Unit>
 
     /**
-     * Pide cambiar el correo: Firebase envía un enlace a [newEmail] y el cambio se aplica cuando se abre
-     * (spec 008, CA-PER-02-10). Requiere haber llamado antes a [reauthenticate].
+     * Pone al día la sesión después de que el servidor cambió el correo (spec 008, CA-PER-02-12): recarga el usuario
+     * y, si la sesión quedó invalidada, vuelve a iniciarla con [email] y [password], sin que la persona lo note.
      */
-    suspend fun requestEmailChange(newEmail: String): Result<Unit>
+    suspend fun refreshSession(email: String, password: String): Result<Unit>
 }

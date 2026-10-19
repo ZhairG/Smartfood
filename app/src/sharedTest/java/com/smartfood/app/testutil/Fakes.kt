@@ -66,9 +66,9 @@ class FakeAuthRepository : AuthRepository {
     /** Correo de la cuenta con sesión (spec 008). */
     var currentEmailValue: String? = DEFAULT_EMAIL
     var reauthenticateResult: Result<Unit> = Result.success(Unit)
-    var requestEmailChangeResult: Result<Unit> = Result.success(Unit)
+    var refreshSessionResult: Result<Unit> = Result.success(Unit)
     var lastReauthPassword: String? = null
-    var lastRequestedEmail: String? = null
+    var lastRefreshedEmail: String? = null
 
     override fun currentEmail(): String? = currentEmailValue
 
@@ -77,9 +77,9 @@ class FakeAuthRepository : AuthRepository {
         return reauthenticateResult
     }
 
-    override suspend fun requestEmailChange(newEmail: String): Result<Unit> {
-        lastRequestedEmail = newEmail
-        return requestEmailChangeResult
+    override suspend fun refreshSession(email: String, password: String): Result<Unit> {
+        lastRefreshedEmail = email
+        return refreshSessionResult.onSuccess { currentEmailValue = email }
     }
 
     companion object {

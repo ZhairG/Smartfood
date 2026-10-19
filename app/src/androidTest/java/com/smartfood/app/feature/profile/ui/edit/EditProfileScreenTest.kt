@@ -134,13 +134,48 @@ class EditProfileScreenTest {
     }
 
     @Test
-    fun caPer0210_alCambiarElCorreoApareceLaContrasenaActual_yElEnlaceSeAnunciaAlGuardar() {
-        mostrar(estado(email = "nuevo@correo.com", dialog = EditProfileDialog.Saved(emailSentTo = "nuevo@correo.com")))
+    fun caPer0210_alCambiarElCorreoApareceLaContrasenaActual() {
+        mostrar(estado(email = "nuevo@correo.com"))
 
         composeTestRule.onNodeWithText("Contraseña actual").assertExists()
-        composeTestRule
-            .onNodeWithText("Te enviamos un enlace a nuevo@correo.com. Tu correo cambiará cuando lo confirmes.")
-            .assertIsDisplayed()
+    }
+
+    @Test
+    fun caPer0210_elAvisoDelCodigoPideLos4Digitos_yConfirmarSeHabilitaCompleto() {
+        mostrar(estado(email = "nuevo@correo.com", dialog = EditProfileDialog.EmailCode("nuevo@correo.com")).copy(
+            emailCode = "4821",
+            resendCooldownSeconds = 42
+        ))
+
+        composeTestRule.onNodeWithText("Revisa tu correo").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Escribe el código de 4 dígitos que enviamos a nuevo@correo.com.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Reenviar código en").assertIsDisplayed()
+        composeTestRule.onNode(hasText("Confirmar") and hasClickAction()).assertIsEnabled().performClick()
+        composeTestRule.onNode(hasText("Cancelar") and hasClickAction()).performClick()
+
+        assertEquals(listOf(EditProfileEvent.ConfirmEmailCode, EditProfileEvent.CancelEmailCode), eventos)
+    }
+
+    @Test
+    fun caPer0211_elCodigoIncorrectoSeExplicaEnElAviso_yReenviarSeOfreceSinEspera() {
+        mostrar(estado(
+            email = "nuevo@correo.com",
+            dialog = EditProfileDialog.EmailCode("nuevo@correo.com"),
+            error = AuthError.InvalidOtpCode
+        ).copy(emailCode = "12"))
+
+        composeTestRule.onNode(hasText("Confirmar") and hasClickAction()).assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Reenviar código").performClick()
+
+        assertEquals(listOf<EditProfileEvent>(EditProfileEvent.ResendEmailCode), eventos)
+    }
+
+    @Test
+    fun caPer0212_guardadoAnunciaElCorreoNuevo() {
+        mostrar(estado(dialog = EditProfileDialog.Saved(emailChangedTo = "nuevo@correo.com")))
+
+        composeTestRule.onNodeWithText("Guardado").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Tu correo ahora es nuevo@correo.com").assertIsDisplayed()
     }
 
     @Test
