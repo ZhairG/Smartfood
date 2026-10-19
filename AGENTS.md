@@ -12,7 +12,7 @@ App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, pa
 
 Antes de escribir código, leer **`specs/constitution.md`** (principios no negociables) y la spec de la feature.
 
-- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario` (implementada) y `008-perfil` (en especificación). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`).
+- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario` (implementada), `008-perfil` y `009-recetas-ia` (en especificación). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`, `CA-RIA-01-01`).
 - Las capturas de referencia de cada módulo están en `disenos-figma/` (índice en su `README.md`); la fuente de verdad sigue siendo el Figma.
 - Cada feature vive en `specs/NNN-nombre/` con `spec.md` (QUÉ: historias, criterios Dado/Cuando/Entonces), `plan.md` (CÓMO: contratos, decisiones) y `tasks.md` (tareas + matriz CA → test).
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
