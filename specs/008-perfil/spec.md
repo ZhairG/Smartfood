@@ -170,7 +170,7 @@ misma pantalla, y en Cambiar contraseña al Perfil.
 
 ## 10. Plan de entrega
 
-Un PR para todo el módulo (`feature/008-perfil` → `master`), con **4 Issues verticales**, cada uno un commit con su
+Un PR para todo el módulo (`feature/008-perfil` → `master`), con **4 Issues verticales**, con un **commit por tarea** (`Tnnn`) y cada Issue con su
 domain, data, estructura, UI y pruebas. Los Issues se trabajan **en orden** sobre la misma rama (cada persona hace
 `git pull` antes de empezar), porque comparten `Routes.kt`, `MainNavGraph.kt` y las reglas.
 

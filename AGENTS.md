@@ -111,7 +111,7 @@ Repositorio `ZhairG/Smartfood`, rama principal `master`. Todo cambio llega a `ma
 ### 2. Commits
 
 - Convencionales y en español: `feat`, `fix`, `test`, `docs`, `refactor` o `chore`, con ámbito y la spec o el CA que cubren. Ejemplos: `feat(inventario): agregar producto con fecha de vencimiento (spec 006, CA-INV-01-01)` y `fix(ui): … (spec 002, CA-UI-07-08)`.
-- **Un commit por feature completa:** su `domain`, `data`, estructura (DI, navegación, recursos) y `ui`, con sus pruebas, van juntos, no un commit por capa ni por archivo. Un Issue suele ser una feature y un commit (más uno de spec o documentación si hace falta). Las correcciones de la feature se integran en ese commit mientras no se haya hecho push; después, van en commits nuevos. Antes de confirmar, revisar `git status` y `git diff --cached`. Nunca se suben `app/google-services.json`, keystores ni otros secretos (RNF-01).
+- **Un commit por tarea (`Tnnn`):** cada tarea de `tasks.md` va en su propio commit, con su código y sus pruebas, y el mensaje cita la tarea y su CA (por ejemplo, `feat(perfil): pantalla Editar información (spec 008, T007, CA-PER-02-01)`). No se hacen commits por archivo ni de "avance" sin terminar la tarea. Las correcciones de una tarea se integran en su commit mientras no se haya hecho push; después, van en commits nuevos. Antes de confirmar, revisar `git status` y `git diff --cached`. Nunca se suben `app/google-services.json`, keystores ni otros secretos (RNF-01).
 
 ### 3. Antes de abrir el PR (todo obligatorio)
 
@@ -191,8 +191,9 @@ Zhair (planeador) da recomendaciones durante el trabajo. **Toda recomendación n
 |---|---|---|
 | 2026-10-17 | Terminar cada Issue más rápido sin saltarse pasos. | Una compilación por ronda (unitarias, assemble, androidTest y lint juntos) y las preguntas del modo plan en una sola ronda. |
 | 2026-10-17 | Pruebas instrumentadas específicas. | En cada Issue solo las clases de las pantallas y componentes que toca, más las de navegación si cambia; la suite completa, en el cierre de la spec. |
-| 2026-10-18 | Commits por feature grande y pocos PR, porque el profesor ve demasiados cambios en GitHub. | Ver §2 Commits y §4 PR: un commit por feature completa y varios Issues por PR. |
-| 2026-10-18 | Asociar en un solo Issue el domain, data, estructura y ui de cada feature. | Issues por feature vertical (§0); así un Issue es un commit. |
+| 2026-10-18 | Pocos PR, porque el profesor ve demasiados cambios en GitHub. | Ver §4 PR: varios Issues por PR (un PR por módulo). |
+| 2026-10-18 | Asociar en un solo Issue el domain, data, estructura y ui de cada feature. | Issues por feature vertical (§0). |
+| 2026-10-18 | Un commit por tarea (`Tnnn`), no uno por Issue. | Ver §2 Commits; reemplaza el "un commit por feature" de la fila anterior. |
 | 2026-10-18 | La app debe ser 100 % fiel al Figma: íconos, animaciones, colores y componentes. | Ver "Fidelidad total con Figma" y la constitución §1. |
 | 2026-10-18 | Escribir los Issues y planes para que los siga DeepSeek (OpenCode) del resto del equipo. | Ver "Issues y planes para modelos más débiles". |
 | 2026-10-18 | Guardar las capturas de Figma por módulo en la raíz del proyecto. | `disenos-figma/Modulo N - Nombre/`, con `README.md` de índice (pantalla, `node-id`). |

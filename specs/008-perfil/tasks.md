@@ -2,7 +2,7 @@
 
 > Derivadas de [`plan.md`](./plan.md). Cada tarea cita los criterios que cubre y se marca `[x]` cuando cumple la
 > Definition of Done de la [constitución](../constitution.md#7-definition-of-done). Los Issues agrupan tareas por
-> feature vertical (spec §10): **cada Issue es un commit** en la rama `feature/008-perfil`, en orden.
+> feature vertical (spec §10) y se trabajan en orden en la rama `feature/008-perfil`, con **un commit por tarea** (`Tnnn`).
 
 ## Fase 0: Preparación
 - [ ] T001 La spec, el plan, las tareas y las capturas de `disenos-figma/Modulo 3 - Perfil`.

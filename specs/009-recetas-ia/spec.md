@@ -148,7 +148,7 @@ solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
 
 ## 10. Plan de entrega
 
-Un PR para el módulo (`feature/009-recetas-ia` → `master`) con **5 Issues verticales**, un commit cada uno.
+Un PR para el módulo (`feature/009-recetas-ia` → `master`) con **5 Issues verticales** y **un commit por tarea** (`Tnnn`).
 
 | Issue | Contenido | Tareas | Dificultad | Puede ir en paralelo con |
 |---|---|---|---|---|

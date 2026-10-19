@@ -1,6 +1,6 @@
 # Tareas 009: Recetas + IA
 
-> Derivadas de [`plan.md`](./plan.md). Cada Issue es un commit en `feature/009-recetas-ia` (spec §10). Se marca `[x]`
+> Derivadas de [`plan.md`](./plan.md). Cada tarea es un commit en `feature/009-recetas-ia` (spec §10). Se marca `[x]`
 > cuando cumple la Definition of Done de la [constitución](../constitution.md#7-definition-of-done).
 
 ## Fase 0: Preparación
