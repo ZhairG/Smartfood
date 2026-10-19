@@ -24,4 +24,23 @@
     <string name="error_invalid_name">El nombre debe tener entre 2 y 50 caracteres</string>
     <string name="error_invalid_phone">Escribe un celular colombiano de 10 dígitos que empiece por 3</string>
     <string name="error_invalid_birth_date">La fecha de nacimiento no puede ser posterior a hoy</string>
+
+    <!-- Editar información (spec 008, HU-PER-02, Figma 361:649, 369:1195 y 369:905). -->
+    <string name="edit_profile_title">Editar información</string>
+    <string name="edit_profile_save">Guardar</string>
+    <string name="edit_profile_change_photo">Toca para cambiar tu foto</string>
+    <string name="edit_profile_name">Nombre completo</string>
+    <string name="edit_profile_email">Correo electrónico</string>
+    <string name="edit_profile_phone">Teléfono</string>
+    <string name="edit_profile_phone_placeholder">+57 300 000 0000</string>
+    <string name="edit_profile_birth_date">Fecha de nacimiento</string>
+    <string name="edit_profile_birth_date_placeholder">DD/MM/AAAA</string>
+    <string name="edit_profile_current_password">Contraseña actual</string>
+    <string name="edit_profile_current_password_hint">Para cambiar tu correo, confirma tu contraseña</string>
+    <string name="edit_profile_confirm_save">¿Desea guardar los cambios?</string>
+    <string name="edit_profile_cancel">Cancelar</string>
+    <string name="edit_profile_saving">Guardando cambios…</string>
+    <string name="edit_profile_saved">Guardado</string>
+    <string name="edit_profile_saved_body">Perfil se actualizó</string>
+    <string name="edit_profile_email_sent">Te enviamos un enlace a %1$s. Tu correo cambiará cuando lo confirmes.</string>
 </resources>

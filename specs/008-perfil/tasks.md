@@ -12,8 +12,8 @@
 - [ ] T003 `firestore.rules` (update de `users/{uid}`) y `storage.rules` (`users/{uid}/profile/`), con sus casos en `rules-test/` (RNF-PER-01).
 - [ ] T004 `AuthRepository`/`FirebaseAuthRepository`/`FakeAuthRepository`: `currentEmail`, `reauthenticate`, `requestEmailChange`; errores `InvalidName`, `InvalidPhone`, `InvalidBirthDate` en `AuthError` y `AuthErrorText` (RF-PER-03).
 - [ ] T005 Casos de uso `ValidateProfile`, `UpdateProfile`, `RequestEmailChange`, `SyncProfileEmail` (y llamada después de iniciar sesión) con sus pruebas (CA-PER-02-05 a 02-07, 02-10 a 02-12).
-- [ ] T006 Foto: `FileProvider` y `file_paths.xml`, cámara del sistema con `TakePicture`, galería, `ProfilePhotoRepository` sobre Storage con `PhotoCompressor` (CA-PER-02-08, 02-09).
-- [ ] T007 Pantalla `EditProfile` (contrato, ViewModel, pantalla, ruta) con aviso, carga y "Guardado" (CA-PER-02-01 a 02-04, 02-13).
+- [x] T006 Foto: `FileProvider` y `file_paths.xml`, cámara del sistema con `TakePicture`, galería, `ProfilePhotoRepository` sobre Storage con `PhotoCompressor` (CA-PER-02-08, 02-09).
+- [x] T007 Pantalla `EditProfile` (contrato, ViewModel, pantalla, ruta) con aviso, carga y "Guardado" (CA-PER-02-01 a 02-04, 02-13).
 - [ ] T008 Perfil: foto o iniciales desde `observeProfile`, filas que navegan y tarjetas 0 / inventario / $0 (CA-PER-01-01 a 01-04).
 - [ ] T009 Pruebas: `EditProfileViewModelTest`, `EditProfileScreenTest`, `ProfileScreenTest` y navegación en `MainNavigationTest`.
 
