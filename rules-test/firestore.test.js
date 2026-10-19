@@ -215,6 +215,42 @@ describe('perfil: edición (spec 008, RNF-PER-01)', () => {
     await assertFails(setDoc(perfil(), { ...base, fullName: 'Ana María', updatedAt: Timestamp.fromMillis(0) }));
     await assertFails(editar({ fullName: 'Intruso' }, 'u2'));
   });
+
+  test('CA-PER-03-04 el dueño guarda sus preferencias alimentarias', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({
+      preferences: {
+        restrictions: ['VEGETARIAN', 'GLUTEN_FREE'],
+        cuisines: ['COLOMBIAN', 'ITALIAN'],
+        spice: 'MEDIUM',
+        budget: 'MODERATE',
+      },
+    }));
+  });
+
+  test('CA-PER-03-04 se aceptan listas vacías y sin picante ni presupuesto, y quitarlos al reemplazar el mapa', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({ preferences: { restrictions: [], cuisines: [] } }));
+    await assertSucceeds(editar({ preferences: { restrictions: ['VEGAN'], cuisines: ['ASIAN'], spice: 'HOT' } }));
+    // Guardar de nuevo sin `spice` reemplaza el mapa y lo borra, como hace la app al quitar el chip.
+    await assertSucceeds(editar({ preferences: { restrictions: ['VEGAN'], cuisines: ['ASIAN'] } }));
+  });
+
+  test('CA-PER-03-04 valores, listas, claves y tipos fuera de la lista se rechazan', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ preferences: { restrictions: ['CARNIVORE'] } }));
+    await assertFails(editar({ preferences: { cuisines: ['FRENCH'] } }));
+    await assertFails(editar({ preferences: { spice: 'EXTREME' } }));
+    await assertFails(editar({ preferences: { budget: 'FREE' } }));
+    await assertFails(editar({ preferences: { restrictions: 'VEGAN' } }));
+    await assertFails(editar({ preferences: { other: [] } }));
+    await assertFails(editar({ preferences: 'ninguna' }));
+  });
+
+  test('RNF-PER-01 otro usuario no puede guardar preferencias ajenas', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ preferences: { restrictions: ['VEGAN'] } }, 'u2'));
+  });
 });
 
 describe('cambio de correo (spec 008, T010)', () => {

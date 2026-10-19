@@ -20,7 +20,7 @@
 - [x] T009b App del cambio de correo con código: `EmailChangeRepository`, `refreshSession`, casos de uso, aviso `EmailCodeDialog` y pruebas (CA-PER-02-10 a 02-12).
 
 ## Issue 2: Preferencias alimentarias (intermedia)
-- [ ] T010 `FoodPreferences` y enums; `getPreferences`/`savePreferences` en el repositorio; validación del mapa `preferences` en `firestore.rules` y `rules-test/` (RF-PER-04).
+- [x] T010 `FoodPreferences` y enums; `getPreferences`/`savePreferences` en el repositorio; validación del mapa `preferences` en `firestore.rules` y `rules-test/` (RF-PER-04).
 - [ ] T011 Casos de uso `GetFoodPreferences` y `SaveFoodPreferences` con pruebas.
 - [ ] T012 Pantalla `FoodPreferences` con `PreferenceChip`, selección múltiple o única, aviso, carga y "Guardado" (CA-PER-03-01 a 03-04).
 - [ ] T013 Pruebas: `FoodPreferencesViewModelTest` y `FoodPreferencesScreenTest`.

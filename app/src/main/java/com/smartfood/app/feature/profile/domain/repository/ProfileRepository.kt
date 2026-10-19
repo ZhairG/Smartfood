@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.profile.domain.repository
 
+import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.UserProfile
 import kotlinx.coroutines.flow.Flow
 
@@ -23,4 +24,10 @@ interface ProfileRepository {
 
     /** Iguala el correo del perfil al de la cuenta (CA-PER-02-12). */
     suspend fun syncEmail(email: String): Result<Unit>
+
+    /** Preferencias alimentarias guardadas (CA-PER-03-04); si nunca se guardaron, devuelve unas vacías. */
+    suspend fun getPreferences(): Result<FoodPreferences>
+
+    /** Reemplaza el mapa `preferences` del perfil (CA-PER-03-04). Quitar una elección también la borra. */
+    suspend fun savePreferences(preferences: FoodPreferences): Result<Unit>
 }

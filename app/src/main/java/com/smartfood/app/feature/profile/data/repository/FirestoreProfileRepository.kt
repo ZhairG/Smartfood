@@ -10,6 +10,7 @@ import com.smartfood.app.feature.auth.data.mapper.FirebaseErrorMapper
 import com.smartfood.app.feature.auth.data.mapper.mapFirebaseError
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthException
+import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.UserProfile
 import com.smartfood.app.feature.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
@@ -55,6 +56,23 @@ class FirestoreProfileRepository @Inject constructor(
         val uid = auth.currentUser?.uid ?: throw AuthException(AuthError.AccountNotFound)
         userDocument(uid).update(
             mapOf(ProfileDocument.EMAIL to email, ProfileDocument.UPDATED_AT to FieldValue.serverTimestamp())
+        )
+    }
+
+    override suspend fun getPreferences(): Result<FoodPreferences> = safeRunCatching {
+        val uid = auth.currentUser?.uid ?: throw AuthException(AuthError.AccountNotFound)
+        preferencesFromDocument(userDocument(uid).get().await().data.orEmpty())
+    }.mapFirebaseError()
+
+    override suspend fun savePreferences(preferences: FoodPreferences): Result<Unit> = write {
+        val uid = auth.currentUser?.uid ?: throw AuthException(AuthError.AccountNotFound)
+        // Al escribir el mapa completo se borran las claves que el usuario quitó (CA-PER-03-04). Firestore no acepta
+        // `null`: `spice` y `budget` solo viajan cuando hay elección.
+        userDocument(uid).update(
+            mapOf(
+                PreferencesDocument.PREFERENCES to preferences.toDocumentFields(),
+                ProfileDocument.UPDATED_AT to FieldValue.serverTimestamp()
+            )
         )
     }
 

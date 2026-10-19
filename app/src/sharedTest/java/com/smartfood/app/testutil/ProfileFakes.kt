@@ -2,6 +2,7 @@ package com.smartfood.app.testutil
 
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthException
+import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.UserProfile
 import com.smartfood.app.feature.profile.domain.repository.EmailChangeRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfilePhotoRepository
@@ -33,6 +34,16 @@ class FakeProfileRepository(initial: UserProfile? = defaultProfile()) : ProfileR
     /** Si no es `null`, [observeProfile] falla con este error (perfil ilegible, CA-05-02). */
     var observeError: AuthError? = null
 
+    /** Preferencias guardadas; [getPreferences] las devuelve salvo que [getPreferencesResult] no sea `null`. */
+    var preferences = FoodPreferences()
+
+    /** Si no es `null`, [getPreferences] devuelve este resultado. */
+    var getPreferencesResult: Result<FoodPreferences>? = null
+
+    /** Si no es `null`, [savePreferences] devuelve este resultado sin cambiar nada. */
+    var savePreferencesResult: Result<Unit>? = null
+    val savedPreferences = mutableListOf<FoodPreferences>()
+
     override fun observeProfile(): Flow<UserProfile> =
         observeError?.let { error -> flow { throw AuthException(error) } } ?: profile.filterNotNull()
 
@@ -46,6 +57,18 @@ class FakeProfileRepository(initial: UserProfile? = defaultProfile()) : ProfileR
     override suspend fun syncEmail(email: String): Result<Unit> {
         syncedEmails += email
         profile.value = profile.value?.copy(email = email)
+        return Result.success(Unit)
+    }
+
+    override suspend fun getPreferences(): Result<FoodPreferences> {
+        getPreferencesResult?.let { return it }
+        return Result.success(preferences)
+    }
+
+    override suspend fun savePreferences(preferences: FoodPreferences): Result<Unit> {
+        savePreferencesResult?.let { return it }
+        this.preferences = preferences
+        savedPreferences += preferences
         return Result.success(Unit)
     }
 
