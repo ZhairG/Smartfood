@@ -16,19 +16,18 @@ feature/recipes/
 │   │   ├── RecipeEvaluator.kt        uso de inventario, faltantes, costo y utilidad de una receta o un plan
 │   │   ├── MealPlanner.kt            CSP: backtracking + forward checking + ramificación y poda
 │   │   └── PlanExplainer.kt          "¿Por qué te conviene?" a partir del plan
-│   ├── repository/   RecipeCatalog, FavoritesRepository, CookingHistoryRepository
+│   ├── repository/   RecipeCatalog, CookingHistoryRepository
 │   └── usecase/      GetRecipes, SearchRecipes, RankRecipesForMe, GeneratePlan, GetRecipeDetail,
-│                     ToggleFavorite, ObserveFavorites, FinishCooking, GetMonthlySavings
+│                     FinishCooking, GetMonthlySavings
 ├── data/
 │   ├── catalog/      AssetsRecipeCatalog (lee assets/recetas.json e ingredientes.json con kotlinx.serialization)
-│   ├── repository/   FirestoreFavoritesRepository, FirestoreCookingHistoryRepository
+│   ├── repository/   FirestoreCookingHistoryRepository
 │   └── di/           RecipesDataModule
 └── ui/
     ├── discover/     Descubrir (pestaña Recetas)
     ├── ai/           Contexto, Cargando, Plan, Sin coincidencias, Ayuda (un ViewModel compartido: AiPlanViewModel)
     ├── detail/       Detalle de receta
     ├── cooking/      Antes de empezar y Cocina guiada (temporizador)
-    ├── saved/        Guardadas
     └── RecipesNavGraph.kt
 app/src/main/assets/recetas.json, ingredientes.json
 ```
@@ -111,17 +110,17 @@ return mejor?.let(::Found) ?: NoPlan(sugerencias)
 
 | Ruta | Campos | Reglas |
 |---|---|---|
-| `users/{uid}/favorites/{recipeId}` | `savedAt` (timestamp del servidor) | dueño; solo ese campo |
 | `users/{uid}/cookings/{id}` | `recipeId` (string), `cookedAt` (timestamp del servidor), `rescuedValueCop` (int ≥ 0) | dueño; crear y leer, no editar |
 
-Se escriben con `Map`, como el inventario. Funcionan sin conexión gracias a la caché de Firestore (CA-RIA-05-03).
+Se escribe con `Map`, como el inventario, y funciona sin conexión gracias a la caché de Firestore. Las favoritas
+(`users/{uid}/favorites`, carpeta `ui/saved/`) pasan al próximo módulo (#117, spec §6).
 "Ahorrados este mes" = Σ `rescuedValueCop` de `cookings` con `cookedAt` en el mes actual; `rescuedValueCop` =
 valor de referencia de los ingredientes por vencer usados.
 
 ## 5. Pantallas y navegación
 
-- `MainTab.RECIPES` y `MainTab.SAVED` pasan a `enabled = true` (`core/navigation/MainTabScaffold.kt`); rutas nuevas
-  en `Routes.kt`: `Recipes`, `Saved`, `AiContext`, `AiPlan`, `AiHelp`, `RecipeDetail(id)`, `CookingIntro(id)`,
+- `MainTab.RECIPES` pasa a `enabled = true` (`core/navigation/MainTabScaffold.kt`); `MainTab.SAVED` sigue gris (spec
+  §9). Rutas nuevas en `Routes.kt`: `Recipes`, `AiContext`, `AiPlan`, `AiHelp`, `RecipeDetail(id)`, `CookingIntro(id)`,
   `Cooking(id)`; registradas en `RecipesNavGraph.kt` dentro de `mainGraph`.
 - El flujo de la IA (contexto → cargando → plan / sin coincidencias) usa **un solo** `AiPlanViewModel` con
   `AiUiState` (`Context`, `Loading`, `Plan`, `NoPlan`) para no pasar el plan entre rutas. El cálculo corre en
@@ -153,9 +152,9 @@ valor de referencia de los ingredientes por vencer usados.
 ## 8. Estrategia de pruebas
 
 - **Unitarias:** las del agente (§3.4), `RecipeCatalogTest`, casos de uso (`FinishCookingUseCaseTest`,
-  `GetMonthlySavingsUseCaseTest`, `ToggleFavoriteUseCaseTest`) y un `…ViewModelTest` por pantalla (`AiPlanViewModel`
+  `GetMonthlySavingsUseCaseTest`) y un `…ViewModelTest` por pantalla (`AiPlanViewModel`
   con `Context → Loading → Plan/NoPlan`, cancelar, ajustar).
 - **Instrumentadas** (con `PantallaEnFlujo`): `RecipesDiscoverScreenTest`, `AiFlowScreenTest`,
-  `RecipeDetailScreenTest`, `CookingScreenTest`, `SavedRecipesScreenTest`; `MainNavigationTest` para las pestañas.
-- **Reglas:** `rules-test/firestore.test.js` para `favorites` y `cookings`.
+  `RecipeDetailScreenTest`, `CookingScreenTest`; `MainNavigationTest` para las pestañas.
+- **Reglas:** `rules-test/firestore.test.js` para `cookings`.
 - **Manual:** checklist de `tasks.md`, con el tiempo del plan medido en el teléfono (release).

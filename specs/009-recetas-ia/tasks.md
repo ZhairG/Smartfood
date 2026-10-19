@@ -11,7 +11,7 @@
 - [ ] T003 `assets/ingredientes.json` y `assets/recetas.json` (30 a 50 recetas) con fotos en `drawable-nodpi` y sus fuentes en `docs/licenses/fotos-recetas.md`; `RecipeCatalogTest` (RNF-RIA-05).
 - [ ] T004 `AssetsRecipeCatalog` con kotlinx.serialization y `RecipesDataModule`.
 - [ ] T005 `IngredientMatcher` con `IngredientMatcherTest` (RF-RIA-02).
-- [ ] T006 Pestañas Recetas y Guardadas habilitadas, rutas y `RecipesNavGraph` (CA-RIA-01-01).
+- [ ] T006 Pestaña Recetas habilitada (Guardadas sigue gris, §9), rutas y `RecipesNavGraph` (CA-RIA-01-01).
 - [ ] T007 Pantalla Descubrir: búsqueda, filtros y tarjetas; "Para ti" con la utilidad de un paso (CA-RIA-01-01 a 01-04).
 - [ ] T008 Detalle de receta con porciones, ingredientes agrupados y "En tu inventario" (CA-RIA-04-01, 04-02); pruebas de las dos pantallas.
 
@@ -29,17 +29,12 @@
 - [ ] T017 "Tu plan de 3 días" con "¿Por qué te conviene?" y "Ajustar"; "Sin coincidencias" con sugerencias (CA-RIA-02-03, 02-06 a 02-08).
 - [ ] T018 Ayuda y "Contactar soporte" (CA-RIA-03-01); `AiFlowScreenTest`.
 
-## Issue 4: Cocina guiada (intermedia) — puede ir en paralelo con el 5
+## Issue 4: Cocina guiada (intermedia)
 - [ ] T019 "Antes de empezar" (sin video) y cocina guiada con pasos, "Anterior", "Siguiente" y "Salir" (CA-RIA-04-03, 04-04).
 - [ ] T020 Temporizador con sonido y vibración (CA-RIA-04-04).
 - [ ] T021 `CookingHistoryRepository` (`cookings`), reglas y `rules-test`; `FinishCookingUseCase` que descuenta el inventario y registra lo rescatado (CA-RIA-04-05).
 - [ ] T022 `GetMonthlySavingsUseCase` y tarjeta "Ahorrados este mes" del Perfil (CA-RIA-04-06).
 - [ ] T023 `CookingScreenTest` y pruebas de los casos de uso.
-
-## Issue 5: Guardadas (inicial) — puede ir en paralelo con el 4
-- [ ] T024 `FavoritesRepository` (`favorites`), reglas y `rules-test`; `ToggleFavorite` y `ObserveFavorites` (CA-RIA-01-05).
-- [ ] T025 Pestaña Guardadas con búsqueda, "Favoritas", "Recientes" y aviso sin conexión (CA-RIA-05-01, 05-03).
-- [ ] T026 Tarjeta "Recetas guardadas" del Perfil (CA-RIA-05-02); `SavedRecipesScreenTest`.
 
 ## Cierre (en el mismo PR)
 - [ ] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
@@ -56,7 +51,6 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-01-02 | U `RankRecipesForMeUseCaseTest`, I `RecipesDiscoverScreenTest` |
 | CA-RIA-01-03 | U `DiscoverViewModelTest` |
 | CA-RIA-01-04 | U `SearchRecipesUseCaseTest` |
-| CA-RIA-01-05 | U `ToggleFavoriteUseCaseTest`, R |
 | CA-RIA-02-01 | I `AiFlowScreenTest` |
 | CA-RIA-02-02 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-03 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
@@ -73,9 +67,6 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-04-04 | U `CookingViewModelTest`, I `CookingScreenTest`, M |
 | CA-RIA-04-05 | U `FinishCookingUseCaseTest`, R |
 | CA-RIA-04-06 | U `GetMonthlySavingsUseCaseTest` |
-| CA-RIA-05-01 | I `SavedRecipesScreenTest` |
-| CA-RIA-05-02 | U `ProfileViewModelTest` |
-| CA-RIA-05-03 | M |
 | RNF-RIA-01 | U `MealPlannerTest` (mismo resultado dos veces) |
 | RNF-RIA-02 | U `MealPlannerPerformanceTest`, M |
 | RNF-RIA-03 | U `AgentEvaluationTest` |
@@ -83,10 +74,15 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | RNF-RIA-05 | U `RecipeCatalogTest` (cada foto tiene fuente), revisión del PR |
 
 ### Checklist de verificación manual
-1. Recetas: buscar, filtrar y marcar favoritas; "Para ti" pone primero lo que usa productos por vencer.
+1. Recetas: buscar y filtrar; "Para ti" pone primero lo que usa productos por vencer.
 2. IA con presupuesto alto: aparece el plan de 3 días con su explicación en ≤ 2 s (release).
 3. IA con COP $2.000: "Sin coincidencias" con el presupuesto sugerido; "Ajustar contexto" y "Ver recetas económicas".
 4. "Sin picante" y 30 minutos: ninguna receta del plan los incumple.
 5. Detalle: cambiar porciones; ingredientes "En tu inventario" y costos de lo que falta.
 6. Cocinar una receta completa con temporizador; al terminar, el inventario baja y "Ahorrados este mes" sube.
-7. Guardadas con y sin conexión; el Perfil cuenta las favoritas.
+
+## Próximo módulo (#117, no se implementa en la spec 009)
+Decisión de Zhair del 2026-10-19: el ♡, la pestaña Guardadas y el contador "Recetas guardadas" del Perfil van en el próximo módulo, con su propia spec. Tareas previstas, sin numeración definitiva:
+- `FavoritesRepository` (`favorites`), reglas y `rules-test`; `ToggleFavorite` y `ObserveFavorites`.
+- Pestaña Guardadas con búsqueda, "Favoritas", "Recientes" y aviso sin conexión; `SavedRecipesScreenTest`.
+- Tarjeta "Recetas guardadas" del Perfil.

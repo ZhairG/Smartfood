@@ -6,7 +6,7 @@
 | Estado | Borrador para aprobación |
 | Fecha | 2026-10-18 |
 | Depende de | 006-inventario, 008-perfil |
-| Afecta | Pestañas Recetas y Guardadas, inventario (descuento al cocinar), tarjetas del Perfil, reglas de Firestore |
+| Afecta | Pestaña Recetas, inventario (descuento al cocinar), tarjetas del Perfil, reglas de Firestore |
 | Entrega | Viernes 23 de octubre de 2026 |
 
 > Los códigos llevan el prefijo `RIA` (`HU-RIA-01`, `CA-RIA-01-01`). `REC` ya lo usa la spec 003.
@@ -40,11 +40,10 @@ por **nombre normalizado y sinónimos**.
 ### HU-RIA-01: Descubrir recetas
 | Código | Criterio |
 |---|---|
-| CA-RIA-01-01 | **Dado** la pestaña Recetas (Figma `557:3028`), **entonces** veo la búsqueda "Buscar receta o ingrediente...", la tarjeta "¿Qué cocinamos hoy?" con "Sugerirme recetas" y los filtros "Para ti", "≤ 30 min" y "Económicas" con las recetas en tarjetas (foto, nombre, tiempo, kcal, costo y ♡). |
+| CA-RIA-01-01 | **Dado** la pestaña Recetas (Figma `557:3028`), **entonces** veo la búsqueda "Buscar receta o ingrediente...", la tarjeta "¿Qué cocinamos hoy?" con "Sugerirme recetas" y los filtros "Para ti", "≤ 30 min" y "Económicas" con las recetas en tarjetas (foto, nombre, tiempo, kcal y costo; sin ♡, ver §9). |
 | CA-RIA-01-02 | **Dado** "Para ti", **entonces** las recetas se ordenan por la utilidad de cada una con mi inventario actual, y la que usa un ingrediente próximo a vencer muestra "Usa <ingrediente> próximo a vencer". |
 | CA-RIA-01-03 | **Dado** "≤ 30 min" o "Económicas", **entonces** solo veo recetas de 30 minutos o menos, o las de menor costo de compra. |
 | CA-RIA-01-04 | **Dado** que escribo en la búsqueda, **entonces** veo las recetas cuyo nombre o ingredientes contienen el texto, sin importar mayúsculas ni tildes. |
-| CA-RIA-01-05 | **Dado** el ♡ de una receta, **cuando** lo toco, **entonces** la receta se guarda o se quita de Guardadas. |
 
 ### HU-RIA-02: Pedirle un plan a la IA
 | Código | Criterio |
@@ -74,13 +73,6 @@ por **nombre normalizado y sinónimos**.
 | CA-RIA-04-05 | **Dado** el último paso, **cuando** toco "Terminar", **entonces** la app pregunta "¿Cocinaste esta receta?"; si confirmo, se descuentan del inventario las cantidades usadas (se borra el producto que queda en 0 o que no tenía cantidad) y se registra lo que se rescató. |
 | CA-RIA-04-06 | **Dado** que cociné una receta, **entonces** "Ahorrados este mes" del Perfil suma el valor de los ingredientes por vencer que usé este mes (CA-PER-01-02). |
 
-### HU-RIA-05: Mis recetas guardadas
-| Código | Criterio |
-|---|---|
-| CA-RIA-05-01 | **Dado** la pestaña Guardadas (Figma `633:2723`), **entonces** veo mis recetas favoritas con búsqueda y los filtros "Favoritas" y "Recientes" (cocinadas por última vez). |
-| CA-RIA-05-02 | **Dado** el Perfil, **entonces** "Recetas guardadas" muestra cuántas favoritas tengo (CA-PER-01-02). |
-| CA-RIA-05-03 | **Dado** que no tengo conexión, **entonces** Guardadas sigue mostrando mis recetas y el aviso "Sin conexión · Tus recetas guardadas siguen disponibles. Los cambios se sincronizarán después." |
-
 ## 4. Requisitos funcionales
 
 | Código | Requisito | Historias |
@@ -89,7 +81,7 @@ por **nombre normalizado y sinónimos**.
 | RF-RIA-02 | Emparejamiento inventario ↔ receta por nombre normalizado y sinónimos, con conversión de unidades. | HU-RIA-01, 02, 04 |
 | RF-RIA-03 | Agente CSP de plan de 3 días con la formulación de §2 y explicación del resultado. | HU-RIA-02, 03 |
 | RF-RIA-04 | Cocina guiada con temporizador y descuento del inventario al terminar. | HU-RIA-04 |
-| RF-RIA-05 | Favoritas e historial de cocinadas en Firestore; contadores del Perfil. | HU-RIA-04, 05 |
+| RF-RIA-05 | Historial de cocinadas en Firestore y "Ahorrados este mes" del Perfil. | HU-RIA-04 |
 
 ## 5. Requisitos no funcionales
 
@@ -98,7 +90,7 @@ por **nombre normalizado y sinónimos**.
 | RNF-RIA-01 | El agente vive en `domain` (Kotlin puro) y es determinista: el mismo inventario y contexto dan el mismo plan. |
 | RNF-RIA-02 | Rendimiento: ≤ 2 s con 50 recetas en el teléfono (CA-RIA-02-09). |
 | RNF-RIA-03 | Evaluación (métricas del Avance 2): en 30 inventarios sintéticos, el agente supera en aprovechamiento a las dos líneas base (ordenar solo por coincidencia de ingredientes y solo por vencimiento), y la receta del Día 1 usa ≥ 80 % de los ingredientes que vencen en ≤ 3 días cuando existe una receta que los use. |
-| RNF-RIA-04 | Seguridad: reglas de Firestore para `favorites` y `cookings` (solo el dueño, datos validados) probadas en `rules-test/`. |
+| RNF-RIA-04 | Seguridad: reglas de Firestore para `cookings` (solo el dueño, datos validados) probadas en `rules-test/`. |
 | RNF-RIA-05 | Las fotos del catálogo son propias o de licencia libre, con su fuente anotada en `docs/licenses/`. |
 | RNF-RIA-06 | Textos en `res/values/strings_recipes.xml`; accesibilidad como RNF-04. |
 
@@ -106,6 +98,7 @@ por **nombre normalizado y sinónimos**.
 
 - Videos reales de las recetas y "Omitir video".
 - "Creadas por mí" (recetas propias) y editar recetas.
+- **Recetas guardadas (favoritas): próximo módulo (#117).** El ♡ de las recetas, la pestaña Guardadas (Figma `633:2723`) con búsqueda, "Favoritas", "Recientes" y aviso sin conexión, y el contador "Recetas guardadas" del Perfil (antes CA-RIA-01-05 y HU-RIA-05, CA-RIA-05-01 a 05-03). Decisión de Zhair del 2026-10-19.
 - Restricciones de dieta en el agente (decisión del 2026-10-18; las preferencias del Perfil quedan guardadas).
 - Precios reales de supermercados (se usa la tabla de referencia del catálogo).
 - Aprendizaje de pesos con datos de uso.
@@ -131,7 +124,7 @@ Capturas en [`disenos-figma/Modulo 4 - Recetas + IA`](../../disenos-figma/README
 | Detalle de receta | `557:2856` |
 | Antes de empezar | `557:2819` |
 | Cocina guiada | `557:2781` |
-| Guardadas | `633:2723` |
+| Guardadas (próximo módulo, #117) | `633:2723` |
 
 **Interacciones del prototipo:** son instantáneas (las transiciones siguen la spec 007). "Analizando opciones" pasa
 solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
@@ -142,18 +135,19 @@ solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
 |---|---|
 | "2 opciones para ti" pasa a **"Tu plan de 3 días"** con Día 1, 2 y 3, con el mismo estilo de tarjetas. | Formulación del agente como plan de 3 días (decisión de Zhair). |
 | "Antes de empezar" sin video ni "Omitir video": muestra la foto de la receta. | No hay videos; quedan fuera de alcance. |
-| Guardadas sin "Creadas por mí". | Crear recetas queda fuera de alcance. |
+| Las tarjetas de recetas no muestran el ♡ y la pestaña Guardadas sigue gris (como en la spec 006). Aprobada el 2026-10-19. | Las recetas guardadas pasan al próximo módulo (#117). |
 | El cierre de la cocina guiada pregunta "¿Cocinaste esta receta?". | Necesario para descontar el inventario sin errores. |
 | "Carulla - Optimizado para tu zona" se muestra como "Precios de referencia". | No hay integración con supermercados. |
 
 ## 10. Plan de entrega
 
-Un PR para el módulo (`feature/009-recetas-ia` → `master`) con **5 Issues verticales** y **un commit por tarea** (`Tnnn`).
+Un PR para el módulo (`feature/009-recetas-ia` → `master`) con **4 Issues verticales** y **un commit por tarea** (`Tnnn`).
 
 | Issue | Contenido | Tareas | Dificultad | Puede ir en paralelo con |
 |---|---|---|---|---|
 | 1. Catálogo, Descubrir y Detalle | JSON, modelos, emparejamiento, pestaña Recetas, detalle con porciones | T002-T008 | intermedia | 2 |
 | 2. Agente CSP y evaluación | Solo `domain` y pruebas: formulación, búsqueda, explicación, evaluación del Avance 2 | T009-T013 | avanzada | 1 |
 | 3. Flujo de la IA | Contexto, cargando, plan, sin coincidencias, ayuda | T014-T018 | intermedia | — (después de 1 y 2) |
-| 4. Cocina guiada | Antes de empezar, pasos, temporizador, descuento e historial, ahorro en el Perfil | T019-T023 | intermedia | 5 |
-| 5. Guardadas | Favoritas, pestaña Guardadas, contador del Perfil, reglas | T024-T026 | inicial | 4 |
+| 4. Cocina guiada | Antes de empezar, pasos, temporizador, descuento e historial, ahorro en el Perfil | T019-T023 | intermedia | — |
+
+El antiguo Issue 5 (Guardadas, T024-T026, #117) pasa al próximo módulo (§6).
