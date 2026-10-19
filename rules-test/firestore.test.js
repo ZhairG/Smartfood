@@ -169,6 +169,54 @@ describe('inventario: marcas de tiempo', () => {
   });
 });
 
+describe('perfil: edición (spec 008, RNF-PER-01)', () => {
+  const perfil = (uid = 'u1') => doc(db(uid), 'users/u1');
+  const base = { fullName: 'Ana Pérez', email: 'ana@correo.com', termsVersion: '2026-10', termsAcceptedAt: Timestamp.now(),
+    createdAt: Timestamp.now() };
+  const sembrarPerfil = async () => env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'users/u1'), base);
+  });
+  const editar = (cambios, uid = 'u1') =>
+    setDoc(perfil(uid), { ...base, ...cambios, updatedAt: serverTimestamp() }, { merge: false });
+
+  test('CA-PER-02-04 el dueño edita nombre, teléfono, fecha y foto', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({
+      fullName: 'Ana María', phone: '3001234567', birthDate: '2000-05-17',
+      photoPath: 'users/u1/profile/a.jpg', photoUrl: 'https://foto',
+    }));
+  });
+
+  test('CA-PER-02-12 sincronizar el correo solo cambia el correo y updatedAt', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({ email: 'nuevo@correo.com' }));
+  });
+
+  test('RNF-PER-01 la constancia de términos y createdAt no se pueden cambiar', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ termsVersion: '2099-01' }));
+    await assertFails(editar({ createdAt: Timestamp.fromMillis(0) }));
+  });
+
+  test('CA-PER-02-05 CA-PER-02-06 nombre y teléfono inválidos se rechazan', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ fullName: 'A' }));
+    await assertFails(editar({ fullName: 'x'.repeat(51) }));
+    await assertFails(editar({ phone: '+57 300 123 4567' }));
+    await assertFails(editar({ phone: '2001234567' }));
+    await assertFails(editar({ birthDate: '17/05/2000' }));
+  });
+
+  test('RNF-PER-01 campos desconocidos, foto ajena, sin updatedAt del servidor u otro usuario se rechazan', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ admin: true }));
+    await assertFails(editar({ photoPath: 'users/u2/profile/a.jpg', photoUrl: 'https://foto' }));
+    await assertFails(editar({ photoPath: 'users/u1/profile/a.jpg' }));
+    await assertFails(setDoc(perfil(), { ...base, fullName: 'Ana María', updatedAt: Timestamp.fromMillis(0) }));
+    await assertFails(editar({ fullName: 'Intruso' }, 'u2'));
+  });
+});
+
 describe('perfil (regresión, spec 005)', () => {
   test('CA-LEG-02-02 el perfil sigue exigiendo la constancia legal', async () => {
     const perfil = doc(db('u1'), 'users/u1');

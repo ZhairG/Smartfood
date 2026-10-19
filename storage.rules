@@ -7,6 +7,14 @@ rules_version = '2';
 // Pruebas: rules-test/ (firebase emulators:exec --only firestore,storage "npm --prefix rules-test test").
 service firebase.storage {
   match /b/{bucket}/o {
+    // Foto de perfil (spec 008, RNF-PER-01): misma validación que las fotos de productos.
+    match /users/{uid}/profile/{file} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && resource == null
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType == 'image/jpeg';
+    }
     match /users/{uid}/inventory/{itemId}/{file} {
       allow read, delete: if request.auth != null && request.auth.uid == uid;
       allow create: if request.auth != null && request.auth.uid == uid

@@ -11,7 +11,23 @@ service cloud.firestore {
     }
 
     match /users/{uid} {
-      allow read, update, delete: if isOwner(uid);
+      // Edición del Perfil (spec 008, RNF-PER-01): solo campos conocidos y válidos; la constancia de términos y
+      // createdAt no se pueden cambiar porque no están en la lista de campos editables.
+      function validProfileUpdate() {
+        let d = request.resource.data;
+        return d.diff(resource.data).affectedKeys()
+            .hasOnly(['fullName', 'email', 'phone', 'birthDate', 'photoPath', 'photoUrl', 'updatedAt'])
+          && d.fullName is string && d.fullName.size() >= 2 && d.fullName.size() <= 50
+          && d.email is string
+          && (!('phone' in d) || (d.phone is string && d.phone.matches('^3[0-9]{9}$')))
+          && (!('birthDate' in d) || (d.birthDate is string && d.birthDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))
+          && ((!('photoPath' in d) && !('photoUrl' in d))
+              || (d.photoPath is string && d.photoUrl is string
+                  && d.photoPath.matches('^users/' + uid + '/profile/[^/]+$')))
+          && d.updatedAt == request.time;
+      }
+      allow read, delete: if isOwner(uid);
+      allow update: if isOwner(uid) && validProfileUpdate();
       // Al crear el perfil se exige la constancia de aceptación de los documentos legales, con la hora del servidor.
       allow create: if isOwner(uid)
         && request.resource.data.termsVersion is string
