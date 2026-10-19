@@ -12,7 +12,8 @@ App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, pa
 
 Antes de escribir código, leer **`specs/constitution.md`** (principios no negociables) y la spec de la feature.
 
-- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales` y `006-inventario` (implementada). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`).
+- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario` (implementada) y `008-perfil` (en especificación). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`).
+- Las capturas de referencia de cada módulo están en `disenos-figma/` (índice en su `README.md`); la fuente de verdad sigue siendo el Figma.
 - Cada feature vive en `specs/NNN-nombre/` con `spec.md` (QUÉ: historias, criterios Dado/Cuando/Entonces), `plan.md` (CÓMO: contratos, decisiones) y `tasks.md` (tareas + matriz CA → test).
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
 - Códigos de trazabilidad: `HU-NN`, `CA-NN-MM`, `RF-XXX-NN`, `RNF-NN`. Los nombres de los tests citan el CA que cubren.
@@ -170,6 +171,18 @@ Cada agente mantiene al día el checklist del Issue en el que trabaja, sin que n
 - **Nunca** se marca una casilla cuyo paso no se cumplió. Si un paso falla, la casilla queda vacía y el agente lo informa con la salida.
 - Al terminar, el agente dice qué casillas marcó, cuáles quedan pendientes y por qué.
 
+## Issues y planes para modelos más débiles
+
+Todos los integrantes, salvo Zhair, trabajan con **OpenCode y DeepSeek v4.1 flash (gratis)**. Las specs, los planes y los Issues se escriben para que ese modelo los siga sin adivinar:
+
+- **Archivos exactos:** cada tarea dice qué archivos crea o cambia, con su ruta completa, y cuáles **no** debe tocar.
+- **Pasos numerados y pequeños**, en el orden de las capas: `domain` → `data` → DI → navegación → `ui` → pruebas.
+- **Código que se reutiliza:** se nombra el componente o la clase existente que sirve de modelo (por ejemplo, "copiar el patrón de `ProductEditorViewModel`") en lugar de describirlo.
+- **Contratos escritos:** firmas de interfaces, modelos y casos de uso en el plan, para no inventarlas.
+- **Comandos de verificación** al final de cada Issue (unitarias, compilación, instrumentadas específicas) y qué resultado esperar.
+- **Criterios citados:** cada paso dice qué CA cumple; si algo no está en la spec, el agente se detiene y pregunta en el Issue.
+- Ante una duda de diseño o de alcance, el agente **no decide solo**: pregunta a Zhair de forma clara y breve.
+
 ## Recomendaciones de Zhair
 
 Zhair (planeador) da recomendaciones durante el trabajo. **Toda recomendación nueva se agrega a esta lista**, sin que nadie lo pida, y las specs nuevas las aplican.
@@ -181,6 +194,8 @@ Zhair (planeador) da recomendaciones durante el trabajo. **Toda recomendación n
 | 2026-10-18 | Commits por feature grande y pocos PR, porque el profesor ve demasiados cambios en GitHub. | Ver §2 Commits y §4 PR: un commit por feature completa y varios Issues por PR. |
 | 2026-10-18 | Asociar en un solo Issue el domain, data, estructura y ui de cada feature. | Issues por feature vertical (§0); así un Issue es un commit. |
 | 2026-10-18 | La app debe ser 100 % fiel al Figma: íconos, animaciones, colores y componentes. | Ver "Fidelidad total con Figma" y la constitución §1. |
+| 2026-10-18 | Escribir los Issues y planes para que los siga DeepSeek (OpenCode) del resto del equipo. | Ver "Issues y planes para modelos más débiles". |
+| 2026-10-18 | Guardar las capturas de Figma por módulo en la raíz del proyecto. | `disenos-figma/Modulo N - Nombre/`, con `README.md` de índice (pantalla, `node-id`). |
 | 2026-10-18 | Medir la fluidez de las animaciones en el build release. | En debug, Compose pierde ~300 ms al iniciar cada pantalla; las animaciones se juzgan con el APK release en el teléfono (medición del 18/10/2026). |
 
 ## Comandos
