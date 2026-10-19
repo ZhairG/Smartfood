@@ -19,4 +19,9 @@
     <string name="profile_option_preferences">Preferencias alimentarias</string>
     <string name="profile_option_notifications">Notificaciones</string>
     <string name="profile_option_password">Cambiar contraseña</string>
+
+    <!-- Errores del perfil (spec 008, AuthErrorText). -->
+    <string name="error_invalid_name">El nombre debe tener entre 2 y 50 caracteres</string>
+    <string name="error_invalid_phone">Escribe un celular colombiano de 10 dígitos que empiece por 3</string>
+    <string name="error_invalid_birth_date">La fecha de nacimiento no puede ser posterior a hoy</string>
 </resources>

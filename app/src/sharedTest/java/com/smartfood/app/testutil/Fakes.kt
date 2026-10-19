@@ -63,8 +63,28 @@ class FakeAuthRepository : AuthRepository {
         signedInUserId = null
     }
 
+    /** Correo de la cuenta con sesión (spec 008). */
+    var currentEmailValue: String? = DEFAULT_EMAIL
+    var reauthenticateResult: Result<Unit> = Result.success(Unit)
+    var requestEmailChangeResult: Result<Unit> = Result.success(Unit)
+    var lastReauthPassword: String? = null
+    var lastRequestedEmail: String? = null
+
+    override fun currentEmail(): String? = currentEmailValue
+
+    override suspend fun reauthenticate(currentPassword: String): Result<Unit> {
+        lastReauthPassword = currentPassword
+        return reauthenticateResult
+    }
+
+    override suspend fun requestEmailChange(newEmail: String): Result<Unit> {
+        lastRequestedEmail = newEmail
+        return requestEmailChangeResult
+    }
+
     companion object {
         const val DEFAULT_UID = "uid-123"
+        const val DEFAULT_EMAIL = "ana@correo.com"
     }
 }
 
