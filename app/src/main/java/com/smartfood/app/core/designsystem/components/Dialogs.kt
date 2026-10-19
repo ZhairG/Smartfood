@@ -423,7 +423,12 @@ fun SmartFoodContentDialog(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(dismissOnClickOutside = false)) {
+    // Casi todo el ancho de la pantalla, como el diálogo sin conexión: con el ancho estándar de Android no caben las
+    // 4 casillas del código ni "¿No recibiste el código? Reenviar código" en una línea a 360 dp.
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(dismissOnClickOutside = false, usePlatformDefaultWidth = false)
+    ) {
         BlurBehindDialog()
         val spacing = MaterialTheme.spacing
         val metrics = LocalFormMetrics.current
@@ -439,7 +444,7 @@ fun SmartFoodContentDialog(
                     offsetY = spacing.extraSmall
                 )
                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(spacing.panelRadius))
-                .padding(horizontal = metrics.formHorizontalPadding, vertical = metrics.sectionSpacing),
+                .padding(horizontal = spacing.large, vertical = metrics.sectionSpacing),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(spacing.medium)
         ) {
