@@ -1,8 +1,6 @@
-package com.smartfood.app.feature.profile
+package com.smartfood.app.feature.profile.ui
 
 import com.smartfood.app.feature.auth.domain.model.AuthError
-import com.smartfood.app.feature.auth.domain.model.User
-import com.smartfood.app.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.smartfood.app.feature.auth.domain.usecase.LogoutUseCase
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
 import com.smartfood.app.feature.inventory.domain.model.InventoryException
@@ -11,12 +9,15 @@ import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.HasPendingChangesUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
+import com.smartfood.app.feature.profile.domain.model.UserProfile
+import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
+import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakePhotoSync
-import com.smartfood.app.testutil.FakeUserRepository
+import com.smartfood.app.testutil.FakeProfileRepository
 import com.smartfood.app.testutil.MainDispatcherRule
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
@@ -44,18 +45,22 @@ class ProfileViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val authRepository = FakeAuthRepository()
-    private val userRepository = FakeUserRepository()
+    private val profileRepository = FakeProfileRepository()
 
     @Before
     fun prepararEntornoTest() {
         authRepository.signedInUserId = DEFAULT_UID
+        // La cuenta tiene el mismo correo que el perfil: no hay nada que sincronizar.
+        authRepository.currentEmailValue = "pepito@correo.com"
     }
 
+    private val pepito = UserProfile(DEFAULT_UID, "Pepito Perez", "pepito@correo.com")
     private val inventoryRepository = FakeInventoryRepository()
     private val photoSync = FakePhotoSync()
 
     private fun crearViewModel(repository: InventoryRepository = inventoryRepository) = ProfileViewModel(
-        getCurrentUser = GetCurrentUserUseCase(authRepository, userRepository),
+        observeProfile = ObserveProfileUseCase(profileRepository),
+        syncProfileEmail = SyncProfileEmailUseCase(authRepository, profileRepository),
         logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), photoSync),
         observeInventory = ObserveInventoryUseCase(
             repository,
@@ -67,7 +72,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `CA-05-01 saluda con el primer nombre del perfil`() {
-        userRepository.profiles[DEFAULT_UID] = User(DEFAULT_UID, "Pepito Perez", "pepito@correo.com")
+        profileRepository.profile.value = pepito
 
         val state = crearViewModel().uiState.value
 
@@ -77,7 +82,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `CA-05-02 si el perfil no se puede leer usa saludo generico`() {
-        userRepository.getProfileError = AuthError.Network
+        profileRepository.observeError = AuthError.Network
 
         val state = crearViewModel().uiState.value
 
@@ -98,7 +103,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `CA-INV-09-03 el encabezado muestra nombre completo correo e iniciales`() {
-        userRepository.profiles[DEFAULT_UID] = User(DEFAULT_UID, "Pepito Perez", "pepito@correo.com")
+        profileRepository.profile.value = pepito
 
         val state = crearViewModel().uiState.value
 

@@ -6,7 +6,7 @@
  * encabezado, las cifras, las opciones deshabilitadas y "Cerrar Sesión". No cierra la sesión real del dispositivo:
  * solo comprueba el evento.
  */
-package com.smartfood.app.feature.profile
+package com.smartfood.app.feature.profile.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled

@@ -26,5 +26,6 @@ enum class ScreenRoute(val routeName: String) {
     INVENTORY_SEARCH("inventory_search"),
     PRODUCT_EDITOR("product_editor"),
     PRODUCT_CAMERA("product_camera"),
-    PROFILE("profile")
+    PROFILE("profile"),
+    EDIT_PROFILE("edit_profile")
 }

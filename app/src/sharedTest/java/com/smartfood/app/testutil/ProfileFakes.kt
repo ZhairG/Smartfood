@@ -1,11 +1,14 @@
 package com.smartfood.app.testutil
 
+import com.smartfood.app.feature.auth.domain.model.AuthError
+import com.smartfood.app.feature.auth.domain.model.AuthException
 import com.smartfood.app.feature.profile.domain.model.UserProfile
 import com.smartfood.app.feature.profile.domain.repository.ProfilePhotoRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
 
 /**
  * Nombre: ProfileFakes.kt
@@ -24,7 +27,11 @@ class FakeProfileRepository(initial: UserProfile? = defaultProfile()) : ProfileR
     val updates = mutableListOf<UserProfile>()
     val syncedEmails = mutableListOf<String>()
 
-    override fun observeProfile(): Flow<UserProfile> = profile.filterNotNull()
+    /** Si no es `null`, [observeProfile] falla con este error (perfil ilegible, CA-05-02). */
+    var observeError: AuthError? = null
+
+    override fun observeProfile(): Flow<UserProfile> =
+        observeError?.let { error -> flow { throw AuthException(error) } } ?: profile.filterNotNull()
 
     override suspend fun updateProfile(profile: UserProfile): Result<Unit> {
         updateResult?.let { return it }

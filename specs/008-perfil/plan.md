@@ -153,8 +153,8 @@ Los avisos "¿Desea guardar los cambios?" y "Guardado" son los mismos componente
   ("Confirma tu contraseña"). `RequestEmailChangeUseCase` valida el correo (`ValidateEmailUseCase`), llama a
   `reauthenticate` y luego a `requestEmailChange`. El resto de datos se guarda igual. El perfil conserva el correo
   anterior hasta la confirmación.
-- **Sincronización:** `SyncProfileEmailUseCase` se llama en `SplashViewModel`/`LoginUseCase` después de iniciar
-  sesión: si `currentEmail()` difiere del correo del perfil, llama a `syncEmail`.
+- **Sincronización:** `ProfileViewModel` llama a `SyncProfileEmailUseCase` con la primera lectura del perfil en cada
+  sesión: si `currentEmail()` difiere del correo del perfil, llama a `syncEmail` (así no se tocan Splash ni Login).
 
 ## 6. Notificaciones y tema
 

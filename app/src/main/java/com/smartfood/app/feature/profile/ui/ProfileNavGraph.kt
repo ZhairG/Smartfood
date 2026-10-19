@@ -1,4 +1,4 @@
-package com.smartfood.app.feature.profile
+package com.smartfood.app.feature.profile.ui
 
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -13,13 +13,14 @@ import com.smartfood.app.core.navigation.ObserveEffects
 import com.smartfood.app.core.navigation.Route
 import com.smartfood.app.core.navigation.navigateToLoginClearingBackStack
 import com.smartfood.app.core.navigation.navigateToTab
+import com.smartfood.app.feature.profile.ui.edit.EditProfileRoute
 
 /**
  * Nombre: ProfileNavGraph.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Destino de la pestaña Perfil dentro de `MainGraph` (spec 006, CA-INV-09-02 y 09-03), con la barra
- * inferior. Cerrar sesión limpia toda la pila y vuelve al inicio de sesión (CA-05-03).
+ * Descripción: Destinos del Perfil dentro de `MainGraph` (spec 006, CA-INV-09-02 y 09-03; spec 008): la pestaña y
+ * "Editar información", ambas con la barra inferior. Cerrar sesión limpia toda la pila y vuelve al inicio de sesión (CA-05-03).
  *
  * @param navController Controlador de navegación de la app.
  */
@@ -36,11 +37,23 @@ fun NavGraphBuilder.profileDestination(navController: NavHostController) {
         ObserveEffects(viewModel.effects) { effect ->
             when (effect) {
                 ProfileEffect.NavigateToLogin -> navController.navigateToLoginClearingBackStack()
+                ProfileEffect.NavigateToEditProfile -> navController.navigate(Route.EditProfile)
             }
         }
 
         MainTabScaffold(currentTab = MainTab.PROFILE, onTabSelected = navController::navigateToTab) {
             ProfileScreen(state = state, onEvent = viewModel::onEvent)
+        }
+    }
+    // Pantallas internas del Perfil: empuje, con la barra inferior y "Perfil" resaltado (CA-PER-01-03). Volver a tocar
+    // "Perfil" regresa al Perfil (CA-PER-01-04).
+    composable<Route.EditProfile> {
+        MainTabScaffold(
+            currentTab = MainTab.PROFILE,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Profile>(inclusive = false) }
+        ) {
+            EditProfileRoute(onBack = { navController.popBackStack() })
         }
     }
 }

@@ -1,12 +1,13 @@
-package com.smartfood.app.feature.profile
+package com.smartfood.app.feature.profile.ui
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.smartfood.app.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.smartfood.app.feature.auth.domain.usecase.LogoutUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.HasPendingChangesUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
+import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
+import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -24,16 +25,18 @@ import javax.inject.Inject
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: ViewModel de la pestaña Perfil (spec 001 HU-05; spec 006 CA-INV-09-03; Figma `306:369`). Lee el perfil
- * del usuario (nombre, correo e iniciales), cuenta los productos del inventario y gestiona el cierre de sesión, que
- * es la única acción que funciona por ahora.
+ * del usuario en vivo (nombre, correo, foto o iniciales; spec 008 CA-PER-01-01), lo iguala al correo de la cuenta
+ * (CA-PER-02-12), cuenta los productos del inventario, abre "Editar información" y gestiona el cierre de sesión.
  *
- * @param getCurrentUser Caso de uso que obtiene el perfil del usuario actual.
+ * @param observeProfile Perfil del usuario con sesión, en vivo: refleja lo guardado en "Editar información".
+ * @param syncProfileEmail Iguala el correo del perfil al de la cuenta tras confirmar un correo nuevo.
  * @param logout Caso de uso de cierre de sesión.
  * @param observeInventory Inventario del usuario, para la tarjeta "Ingredientes en inventario".
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val getCurrentUser: GetCurrentUserUseCase,
+    private val observeProfile: ObserveProfileUseCase,
+    private val syncProfileEmail: SyncProfileEmailUseCase,
     private val logout: LogoutUseCase,
     private val observeInventory: ObserveInventoryUseCase,
     private val hasPendingChanges: HasPendingChangesUseCase,
@@ -52,17 +55,27 @@ class ProfileViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             // Si el perfil no se puede leer, se muestra un saludo genérico (CA-05-02).
-            val user = getCurrentUser().getOrNull()
-            val fullName = user?.fullName?.trim()?.ifBlank { null }
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    firstName = fullName?.substringBefore(' '),
-                    fullName = fullName,
-                    email = user?.email,
-                    initials = fullName?.let(::initialsOf)
-                )
-            }
+            var synced = false
+            observeProfile()
+                .catch { _uiState.update { it.copy(isLoading = false) } }
+                .collect { profile ->
+                    val fullName = profile.fullName.trim().ifBlank { null }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            firstName = fullName?.substringBefore(' '),
+                            fullName = fullName,
+                            email = profile.email,
+                            initials = fullName?.let(::initialsOf),
+                            photoUrl = profile.photoUrl
+                        )
+                    }
+                    // Una vez por sesión: si se confirmó un correo nuevo, el perfil lo toma (CA-PER-02-12).
+                    if (!synced) {
+                        synced = true
+                        syncProfileEmail(profile)
+                    }
+                }
         }
         viewModelScope.launch {
             // Si el inventario no se puede leer, la tarjeta queda en 0 sin cerrar la pantalla.
@@ -85,6 +98,7 @@ class ProfileViewModel @Inject constructor(
                 viewModelScope.launch { logoutAndLeave() }
             }
             ProfileEvent.DialogDismissed -> _uiState.update { it.copy(dialog = null) }
+            ProfileEvent.EditProfileClicked -> viewModelScope.launch { _effects.send(ProfileEffect.NavigateToEditProfile) }
         }
     }
 
@@ -109,6 +123,7 @@ class ProfileViewModel @Inject constructor(
  * @property fullName Nombre completo del encabezado.
  * @property email Correo del encabezado.
  * @property initials Iniciales del avatar.
+ * @property photoUrl Foto de perfil, o `null` para mostrar las iniciales (CA-PER-01-01).
  * @property inventoryCount Productos del inventario, para la tarjeta "Ingredientes en inventario".
  * @property dialog Aviso abierto sobre el Perfil, o `null`.
  */
@@ -119,6 +134,7 @@ data class ProfileUiState(
     val fullName: String? = null,
     val email: String? = null,
     val initials: String? = null,
+    val photoUrl: String? = null,
     val inventoryCount: Int = 0,
     val dialog: ProfileDialog? = null,
 )
@@ -137,8 +153,10 @@ sealed interface ProfileEvent {
     data object LogoutClicked : ProfileEvent
     data object LogoutConfirmed : ProfileEvent
     data object DialogDismissed : ProfileEvent
+    data object EditProfileClicked : ProfileEvent
 }
 
 sealed interface ProfileEffect {
     data object NavigateToLogin : ProfileEffect
+    data object NavigateToEditProfile : ProfileEffect
 }
