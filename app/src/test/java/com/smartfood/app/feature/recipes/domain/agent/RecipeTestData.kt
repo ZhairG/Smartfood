@@ -74,8 +74,17 @@ data class RandomScenario(
 fun randomScenario(seed: Int, recipeCount: Int): RandomScenario {
     val random = Random(seed)
     val ingredients = (1..12).map { i -> ingredient("ing$i", priceCop = 2_000L + random.nextLong(0, 20_000)) }
-        // Etiquetas fijas por número (no consumen la semilla): carne, gluten y lácteos en algunos ingredientes.
-        .map { it.copy(tags = RANDOM_TAGS[it.id.removePrefix("ing").toInt() % RANDOM_TAGS.size]) }
+        // Etiquetas, tiendas y básicos fijos por número (no consumen la semilla): carne, gluten y lácteos en algunos
+        // ingredientes; Éxito con otro precio y sin algunos productos; el ingrediente 12 es básico de despensa.
+        .map {
+            val n = it.id.removePrefix("ing").toInt()
+            val d1 = it.prices.getValue(Store.D1)
+            it.copy(
+                tags = RANDOM_TAGS[n % RANDOM_TAGS.size],
+                prices = if (n % 3 == 0) mapOf(Store.D1 to d1) else mapOf(Store.D1 to d1, Store.EXITO to d1 * (8 + n % 5) / 10),
+                pantryBasic = n == 12,
+            )
+        }
         .associateBy { it.id }
     val ids = ingredients.keys.toList()
     val recipes = (1..recipeCount).map { r ->

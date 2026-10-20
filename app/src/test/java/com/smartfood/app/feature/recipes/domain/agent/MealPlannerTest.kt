@@ -9,6 +9,7 @@ import com.smartfood.app.feature.recipes.domain.model.PlanResult
 import com.smartfood.app.feature.recipes.domain.model.PlanSuggestion
 import com.smartfood.app.feature.recipes.domain.model.PlannerWeights
 import com.smartfood.app.feature.recipes.domain.model.Recipe
+import com.smartfood.app.feature.recipes.domain.model.Store
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -94,10 +95,11 @@ class MealPlannerTest {
         repeat(40) { seed ->
             val s = randomScenario(seed, recipeCount = 6 + seed % 7)
             val context = PlanContext(
-                budgetCop = listOf(8_000L, 20_000L, 60_000L)[seed % 3],
+                budgetCop = listOf(25_000L, 60_000L, 150_000L)[seed % 3],
                 servings = listOf(2, 4, 6)[seed % 3],
                 maxMinutes = if (seed % 4 == 0) 45 else null,
                 noSpicy = seed % 5 == 0,
+                store = if (seed % 2 == 0) Store.EXITO else Store.D1,
                 diet = when (seed % 6) {
                     1 -> setOf(DietRule.VEGETARIAN)
                     4 -> setOf(DietRule.GLUTEN_FREE)
@@ -214,7 +216,7 @@ class MealPlannerTest {
                 if (context.noSpicy && r.spicy) continue
                 val forbidden = context.diet.flatMap { it.forbidden }
                 if (r.ingredients.any { ri -> scenario.ingredients.getValue(ri.ingredientId).tags.any { it in forbidden } }) continue
-                val e = evaluator.evaluate(r, context.servings, seq.size + 1, stock)
+                val e = evaluator.evaluate(r, context.servings, seq.size + 1, stock, context.store)
                 if (e.missingCount > context.maxMissing || spent + e.costCop > context.budgetCop) continue
                 go(seq + r, e.remaining, spent + e.costCop, partial + e.utility)
             }

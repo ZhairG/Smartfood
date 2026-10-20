@@ -19,7 +19,7 @@ class PlanExplainerTest {
     private val ingredients = listOf(
         ingredient("pollo", priceCop = 14_000),
         ingredient("arroz", priceCop = 6_000),
-        ingredient("cilantro", priceCop = 60_000),
+        ingredient("cilantro", priceCop = 1_200),
         ingredient("pasta", priceCop = 8_000),
         ingredient("tomate", priceCop = 4_000),
     ).associateBy { it.id }
@@ -50,7 +50,7 @@ class PlanExplainerTest {
         assertEquals(7, uso.total)
         assertEquals(6, uso.covered)
 
-        // Solo falta el cilantro: 20 g a 60.000/kg = 1.200.
+        // Solo falta el cilantro: se compra un empaque (1.200).
         assertEquals(listOf(Reason.NeedsToBuy("cilantro", 20.0, 1_200)), reasons.filterIsInstance<Reason.NeedsToBuy>())
         assertEquals(Reason.BudgetLeft(13_800), reasons.filterIsInstance<Reason.BudgetLeft>().single())
 

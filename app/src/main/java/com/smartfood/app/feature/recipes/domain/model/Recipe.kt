@@ -72,9 +72,6 @@ data class Ingredient(
      */
     fun priceAt(store: Store): StorePrice = prices[store]?.let { StorePrice(store, it) }
         ?: prices.entries.sortedWith(compareBy({ it.value }, { it.key.ordinal })).first().let { StorePrice(it.key, it.value) }
-
-    /** Precio de una unidad base en [store], en pesos (el del empaque repartido). */
-    fun pricePerUnitCop(store: Store = Store.D1): Double = priceAt(store).priceCop / pack
 }
 
 /**

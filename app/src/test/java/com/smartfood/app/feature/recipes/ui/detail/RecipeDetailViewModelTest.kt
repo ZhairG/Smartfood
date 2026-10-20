@@ -65,7 +65,7 @@ class RecipeDetailViewModelTest {
     private val ingredients = mapOf(
         "pollo" to ingredient("pollo", "Pollo", "Carnes", 14_500),
         "arroz" to ingredient("arroz", "Arroz", "Cereales", 4_000),
-        "tomate" to ingredient("tomate", "Tomate", "Verduras", 2_500),
+        "tomate" to ingredient("tomate", "Tomate", "Verduras", 250, pack = 100.0),
     )
 
     private val inventory = listOf(
@@ -82,7 +82,7 @@ class RecipeDetailViewModelTest {
         assertEquals("Tomate", tomate.name)
         assertEquals(200.0, tomate.quantity, 0.0)
         assertFalse(tomate.inInventory)
-        // 200 g de tomate a 2.500/kg.
+        // 200 g de tomate: 2 empaques de 100 g a 250.
         assertEquals(500L, tomate.costCop)
 
         val pollo = state.groups.first { it.section == "Carnes" }.lines.single()
@@ -102,7 +102,8 @@ class RecipeDetailViewModelTest {
         assertEquals(5, state.servings)
         val tomate = state.groups.first { it.section == "Verduras" }.lines.single()
         assertEquals(250.0, tomate.quantity, 0.0)
-        assertEquals(625L, tomate.costCop)
+        // 250 g: 3 empaques de 100 g.
+        assertEquals(750L, tomate.costCop)
         assertEquals(
             750.0,
             state.groups.first { it.section == "Carnes" }.lines.single().quantity,
@@ -137,7 +138,7 @@ class RecipeDetailViewModelTest {
             0.0
         )
         assertEquals(
-            125L,
+            250L,
             minima.groups.first { it.section == "Verduras" }.lines.single().costCop
         )
     }
@@ -181,12 +182,12 @@ class RecipeDetailViewModelTest {
         )
     }
 
-    private fun ingredient(id: String, name: String, section: String, priceCop: Long) = Ingredient(
+    private fun ingredient(id: String, name: String, section: String, priceCop: Long, pack: Double = 1_000.0) = Ingredient(
         id = id,
         name = name,
         section = section,
         unit = IngredientUnit.GRAM,
-        pack = 1_000.0,
+        pack = pack,
         prices = mapOf(Store.D1 to priceCop),
     )
 

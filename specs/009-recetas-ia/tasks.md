@@ -39,7 +39,7 @@
 
 ## Precios de mercado por tienda (Zhair, 2026-10-20)
 - [x] T030 Presentación de mercado, precios por tienda y básicos en `ingredientes.json`; `harina-maiz` para las arepas; `Store`, `Ingredient.pack`/`prices`/`pantryBasic`; `RecipeCatalogTest` y `AssetsRecipeCatalogTest` (RF-RIA-01).
-- [ ] T031 `RecipeEvaluator` por empaques completos, sobrante para los días siguientes y básicos sin costo; `PlanContext.store` (CA-RIA-02-05).
+- [x] T031 `RecipeEvaluator` por empaques completos, sobrante para los días siguientes y básicos sin costo; `PlanContext.store` (CA-RIA-02-05).
 - [ ] T032 "Mi supermercado" en Preferencias alimentarias, `firestore.rules` y `rules-test` (spec 008, CA-PER-03-05).
 - [ ] T033 Detalle y Descubrir con los precios del supermercado elegido (CA-RIA-04-01, 04-07).
 

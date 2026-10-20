@@ -18,8 +18,9 @@ import com.smartfood.app.feature.recipes.domain.model.Recipe
  * restricciones con optimización:
  * - **Variables:** `D1…Dn` (n = `PlanContext.days`), la receta de cada día.
  * - **Dominio:** las recetas que cumplen las restricciones de una sola receta (consistencia de nodo): tiempo máximo,
- *   picante, restricciones alimentarias (ningún ingrediente con una etiqueta que la dieta prohíbe) y como máximo
- *   `maxMissing` faltantes con el inventario completo.
+ *   picante, restricciones alimentarias (ningún ingrediente con una etiqueta que la dieta prohíbe) y un costo, sola y
+ *   con el inventario completo, que cabe en el presupuesto. Los faltantes se revisan cada día, porque el sobrante de
+ *   un empaque comprado antes puede cubrir un ingrediente.
  * - **Restricciones entre variables:** recetas distintas, inventario compartido (cada receta usa lo que dejaron las
  *   anteriores), presupuesto total y faltantes de cada receta con el inventario que le queda.
  * - **Objetivo:** maximizar la utilidad del plan ([RecipeEvaluator.planUtility]).
@@ -56,15 +57,14 @@ class MealPlanner(
     /** El plan de mayor utilidad que cumple todas las restricciones, o `null` si no existe. */
     fun search(recipes: List<Recipe>, pantry: List<PantryItem>, context: PlanContext): MealPlan? {
         val full = PantryStock.of(pantry)
-        // Consistencia de nodo: las restricciones de una sola receta. Los faltantes con el inventario completo el día 1
-        // son el mejor caso posible, así que una receta que ya los excede no cabe en ningún día.
+        // Consistencia de nodo: las restricciones de una sola receta. Lo que cuesta sola con el inventario completo es lo
+        // mínimo que el plan tiene que pagar por ella (los empaques se compran igual, en ese día o antes).
         val domain = recipes
             .filter { context.maxMinutes == null || it.totalMinutes <= context.maxMinutes }
             .filter { !(context.noSpicy && it.spicy) }
             .filter { fitsDiet(it, context) }
             .filter {
-                val e = evaluator.evaluate(it, context.servings, day = 1, stock = full)
-                e.missingCount <= context.maxMissing && e.costCop <= context.budgetCop
+                evaluator.evaluate(it, context.servings, day = 1, stock = full, store = context.store).costCop <= context.budgetCop
             }
             .sortedBy { it.id }
         if (domain.size < context.days) return null
@@ -106,23 +106,28 @@ class MealPlanner(
             }
             return
         }
-        // Forward checking: con el inventario y el presupuesto que quedan, solo sirven las recetas que todavía cumplen.
-        // Como el inventario solo disminuye, una receta que hoy no cabe no cabrá en ningún día siguiente.
+        // Forward checking: con el inventario, lo comprado y el presupuesto que quedan, solo sirven para este día las recetas
+        // que todavía cumplen.
         val usedIds = chosen.mapTo(HashSet()) { it.recipe.id }
         val candidates = domain.asSequence()
             .filter { it.id !in usedIds }
-            .map { Assigned(it, evaluator.evaluate(it, context.servings, day, stock)) }
+            .map { Assigned(it, evaluator.evaluate(it, context.servings, day, stock, context.store)) }
             .filter { it.evaluation.missingCount <= context.maxMissing && it.evaluation.costCop <= budgetLeft }
             .sortedWith(compareByDescending<Assigned> { it.evaluation.utility }.thenBy { it.recipe.id })
             .toList()
         val daysLeft = context.days - day + 1
         if (candidates.size < daysLeft) return
 
-        val utilities = candidates.map { it.evaluation.utility }
+        // Para los días que faltan, el rescate de hoy es el mejor caso (solo baja) y el costo puede bajar hasta 0 con lo que
+        // sobre de un empaque: la cota usa solo el rescate, que nunca subestima.
+        val optimistic = candidates.map { weights.rescue * it.evaluation.rescue }
+        val order = optimistic.indices.sortedByDescending { optimistic[it] }
+        val sortedOptimistic = order.map { optimistic[it] }
+        val position = IntArray(order.size).also { pos -> order.forEachIndexed { rank, i -> pos[i] = rank } }
         for ((index, candidate) in candidates.withIndex()) {
-            // Cota optimista: lo que lleva el plan, más esta receta, más las mejores utilidades del resto para los días
-            // que faltan (con el inventario actual, que es el mejor caso), sin descontar desperdicio.
-            val bound = partial + candidate.evaluation.utility + topSum(utilities, daysLeft - 1, skip = index)
+            // Cota optimista: lo que lleva el plan, más esta receta, más el mejor rescate posible del resto para los días
+            // que faltan, sin descontar costo ni desperdicio.
+            val bound = partial + candidate.evaluation.utility + topSum(sortedOptimistic, daysLeft - 1, skip = position[index])
             if (best.plan != null && bound < best.utility - EPSILON) continue
             assign(
                 day + 1,

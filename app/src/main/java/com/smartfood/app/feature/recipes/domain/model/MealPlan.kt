@@ -49,6 +49,7 @@ enum class DietRule(val forbidden: Set<FoodTag>) {
  * @property maxMissing Máximo de ingredientes por comprar en cada receta (spec §2: 3).
  * @property days Días del plan (spec §2: 3).
  * @property diet Restricciones alimentarias del Perfil; son duras y nunca se sugiere quitarlas (CA-RIA-02-09).
+ * @property store Supermercado de los precios ("Mi supermercado" del Perfil, CA-RIA-04-07); D1 por defecto.
  */
 data class PlanContext(
     val budgetCop: Long,
@@ -58,6 +59,7 @@ data class PlanContext(
     val maxMissing: Int = 3,
     val days: Int = 3,
     val diet: Set<DietRule> = emptySet(),
+    val store: Store = Store.D1,
 )
 
 /**
@@ -78,8 +80,12 @@ data class PlannerWeights(
  * @property fromPantry Cantidad que sale de cada producto del inventario, por `itemId` (`null` = el producto completo,
  *   cuando no tenía cantidad).
  * @property toBuy Cantidad que hay que comprar, en la unidad base.
- * @property buyCostCop Costo de [toBuy] con el precio de referencia, en pesos.
+ * @property buyCostCop Costo de los empaques completos que se compran, en pesos (spec §2).
  * @property rescuedItems Productos que vencen en ≤ 3 días y esta receta usa antes de que venzan.
+ * @property fromPurchase Cantidad que sale del sobrante de un empaque comprado otro día del plan, sin volver a pagarla.
+ * @property packs Empaques que se compran para esta receta.
+ * @property store Tienda del precio de esos empaques (la elegida o, si no lo tiene, la más barata); `null` si no se
+ *   compra nada.
  */
 data class IngredientUse(
     val ingredientId: String,
@@ -88,6 +94,9 @@ data class IngredientUse(
     val toBuy: Double,
     val buyCostCop: Long,
     val rescuedItems: List<String> = emptyList(),
+    val fromPurchase: Double = 0.0,
+    val packs: Int = 0,
+    val store: Store? = null,
 ) {
     /** `true` si hay que comprar algo de este ingrediente. */
     val isMissing: Boolean get() = toBuy > 0.0

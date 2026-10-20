@@ -66,8 +66,8 @@ class RankRecipesForMeUseCaseTest {
         // El pollo y el arroz están en el inventario: no hay nada que comprar.
         assertEquals(0L, ranked.first().costCop)
         assertNull(ranked.last().expiringIngredientName)
-        // La carne falta por completo: 500 g a 10.000/kg.
-        assertEquals(5_000L, ranked.last().costCop)
+        // La carne falta por completo: se compra el empaque de 1 kg (10.000).
+        assertEquals(10_000L, ranked.last().costCop)
     }
 
     @Test
@@ -80,7 +80,7 @@ class RankRecipesForMeUseCaseTest {
         val ranked = rank(listOf(carneAsada, polloGuisado), ingredients, inventory, RecipeFilter.ECONOMIC)
 
         assertEquals(listOf("pollo-guisado", "carne-asada"), ranked.map { it.recipe.id })
-        assertEquals(listOf(0L, 5_000L), ranked.map { it.costCop })
+        assertEquals(listOf(0L, 10_000L), ranked.map { it.costCop })
     }
 
     @Test
@@ -95,8 +95,8 @@ class RankRecipesForMeUseCaseTest {
         val ranked = rank(listOf(polloGuisado), ingredients, emptyList(), RecipeFilter.FOR_YOU)
 
         assertNull(ranked.single().expiringIngredientName)
-        // 500 g de pollo (7.250) + 200 g de arroz (800).
-        assertEquals(8_050L, ranked.single().costCop)
+        // Un empaque de pollo (14.500) y uno de arroz (4.000).
+        assertEquals(18_500L, ranked.single().costCop)
     }
 
     private fun ingredient(

@@ -5,19 +5,23 @@ import com.smartfood.app.feature.recipes.domain.model.IngredientUse
 import com.smartfood.app.feature.recipes.domain.model.PantryItem
 import com.smartfood.app.feature.recipes.domain.model.PlannerWeights
 import com.smartfood.app.feature.recipes.domain.model.Recipe
+import com.smartfood.app.feature.recipes.domain.model.Store
 import kotlin.math.ceil
 
 /**
  * Nombre: RecipeEvaluator.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Evalúa una receta contra lo que queda del inventario (spec 009 §2, plan §3.2, T010): qué sale del
- * inventario, qué falta comprar y cuánto cuesta, qué productos por vencer rescata y su aporte a la utilidad. También
+ * Descripción: Evalúa una receta contra lo que queda del inventario (spec 009 §2, plan §3.2, T010 y T031): qué sale
+ * del inventario, qué falta comprar y cuánto cuesta, qué productos por vencer rescata y su aporte a la utilidad. También
  * calcula el desperdicio y la utilidad de un plan completo.
  *
- * Propiedad que usa el agente (#114, T011): el inventario solo disminuye al asignar recetas, así que con un inventario
- * menor el costo y los faltantes de una receta **solo pueden subir** y su rescate **solo puede bajar**. Por eso el
- * forward checking y la cota optimista de [MealPlanner] nunca descartan un plan válido.
+ * Lo que falta se compra **por empaques completos** al precio de la tienda elegida, y el sobrante queda para los días
+ * siguientes del plan sin volver a pagarlo. Los básicos de despensa no se compran ni cuentan como faltantes.
+ *
+ * Propiedades que usa el agente (#114, T011): el rescate de una receta **solo puede bajar** a medida que se asignan días
+ * (los productos del inventario se gastan y los comprados no vencen), y el costo nunca es negativo. Como el sobrante de
+ * un empaque puede abaratar los días siguientes, [MealPlanner] acota esos días solo con el rescate.
  *
  * @param ingredients Ingredientes del catálogo por `id`.
  * @param weights Pesos de la función de utilidad.
@@ -49,20 +53,22 @@ class RecipeEvaluator(
     )
 
     /**
-     * Evalúa [recipe] escalada a [servings] porciones, cocinada el día [day] (1 = hoy) con el inventario [stock].
+     * Evalúa [recipe] escalada a [servings] porciones, cocinada el día [day] (1 = hoy) con el inventario [stock], con los
+     * precios de [store].
      */
-    fun evaluate(recipe: Recipe, servings: Int, day: Int, stock: PantryStock): Evaluation {
+    fun evaluate(recipe: Recipe, servings: Int, day: Int, stock: PantryStock, store: Store = Store.D1): Evaluation {
         val scale = servings.toDouble() / recipe.servings
         var remaining = stock
         val uses = recipe.ingredients.map { ri ->
             val needed = ri.quantity * scale
-            val (use, after) = take(ri.ingredientId, needed, day, remaining)
+            val (use, after) = take(ri.ingredientId, needed, day, remaining, store)
             remaining = after
             use
         }
         val rescue = uses.sumOf { use -> use.rescuedItems.sumOf { id -> rescueOf(id, use, stock) } }
         val cost = uses.sumOf { it.buyCostCop }
-        val covered = uses.count { !it.isMissing }
+        // Cubierto: no hay que comprar nada ni se usa lo comprado otro día (un básico se asume en casa).
+        val covered = uses.count { !it.isMissing && it.fromPurchase <= EPSILON }
         return Evaluation(
             uses = uses,
             costCop = cost,
@@ -88,9 +94,17 @@ class RecipeEvaluator(
 
     /**
      * Saca [needed] de [ingredientId] del inventario: primero de los productos que vencen antes, solo de los que siguen
-     * en buen estado el día [day]. Lo que falta se compra al precio de referencia.
+     * en buen estado el día [day]; después, del sobrante de empaques comprados otros días. Lo que todavía falta se compra
+     * en empaques completos en [store] (o en la tienda más barata que lo tenga) y el sobrante queda para después. Un
+     * básico de despensa no se compra.
      */
-    private fun take(ingredientId: String, needed: Double, day: Int, stock: PantryStock): Pair<IngredientUse, PantryStock> {
+    private fun take(
+        ingredientId: String,
+        needed: Double,
+        day: Int,
+        stock: PantryStock,
+        store: Store,
+    ): Pair<IngredientUse, PantryStock> {
         val ingredient = ingredients[ingredientId]
             ?: throw IllegalArgumentException("El ingrediente '$ingredientId' no está en el catálogo")
         var pending = needed
@@ -115,9 +129,22 @@ class RecipeEvaluator(
             current = current.consume(item.itemId, fromPantry.getValue(item.itemId))
             if (item.isExpiringSoon()) rescued += item.itemId
         }
-        val toBuy = if (pending <= EPSILON) 0.0 else pending
-        val cost = if (toBuy == 0.0) 0L else ceil(toBuy * ingredient.pricePerUnitCop()).toLong()
-        return IngredientUse(ingredientId, needed, fromPantry, toBuy, cost, rescued) to current
+        val fromPurchase = minOf(current.purchasedOf(ingredientId), pending.coerceAtLeast(0.0))
+        if (fromPurchase > EPSILON) {
+            current = current.withPurchased(ingredientId, current.purchasedOf(ingredientId) - fromPurchase)
+            pending -= fromPurchase
+        }
+        if (pending <= EPSILON || ingredient.pantryBasic) {
+            return IngredientUse(ingredientId, needed, fromPantry, 0.0, 0L, rescued, fromPurchase) to current
+        }
+        val packs = ceil(pending / ingredient.pack - EPSILON).toInt()
+        val price = ingredient.priceAt(store)
+        val leftover = packs * ingredient.pack - pending
+        current = current.withPurchased(ingredientId, current.purchasedOf(ingredientId) + leftover)
+        val use = IngredientUse(
+            ingredientId, needed, fromPantry, pending, packs * price.priceCop, rescued, fromPurchase, packs, price.store,
+        )
+        return use to current
     }
 
     /** Rescate de un producto en un uso: fracción usada de su cantidad original por la urgencia `1/(días + 1)`. */
@@ -155,11 +182,14 @@ internal fun PantryItem.isUsableOn(day: Int): Boolean = daysToExpire >= day - 1
  * @property items Productos del inventario emparejados con el catálogo.
  * @property remaining Cantidad que queda de cada producto con cantidad, por `itemId`.
  * @property usedWhole Productos sin cantidad que ya se usaron completos.
+ * @property purchased Sobrante de los empaques comprados en el plan, por `ingredientId` (no vence ni cuenta como
+ *   desperdicio).
  */
 class PantryStock private constructor(
     val items: List<PantryItem>,
     private val remaining: Map<String, Double>,
     private val usedWhole: Set<String>,
+    private val purchased: Map<String, Double> = emptyMap(),
 ) {
     private val byId = items.associateBy { it.itemId }
 
@@ -184,8 +214,20 @@ class PantryStock private constructor(
 
     /** Estado después de usar [amount] del producto (`null` = el producto completo). */
     fun consume(itemId: String, amount: Double?): PantryStock =
-        if (item(itemId).quantity == null || amount == null) PantryStock(items, remaining, usedWhole + itemId)
-        else PantryStock(items, remaining + (itemId to ((remaining[itemId] ?: 0.0) - amount).coerceAtLeast(0.0)), usedWhole)
+        if (item(itemId).quantity == null || amount == null) PantryStock(items, remaining, usedWhole + itemId, purchased)
+        else PantryStock(
+            items,
+            remaining + (itemId to ((remaining[itemId] ?: 0.0) - amount).coerceAtLeast(0.0)),
+            usedWhole,
+            purchased,
+        )
+
+    /** Lo que sobra de los empaques comprados de [ingredientId] en el plan. */
+    fun purchasedOf(ingredientId: String): Double = purchased[ingredientId] ?: 0.0
+
+    /** Estado con [amount] de sobrante comprado de [ingredientId]. */
+    fun withPurchased(ingredientId: String, amount: Double): PantryStock =
+        PantryStock(items, remaining, usedWhole, purchased + (ingredientId to amount.coerceAtLeast(0.0)))
 
     companion object {
         /** Inventario completo, sin nada usado. */
