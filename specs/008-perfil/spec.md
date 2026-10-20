@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Feature | `008-perfil` (Módulo 3) |
-| Estado | Borrador para aprobación |
+| Estado | Implementada (PR #119, fusionado el 2026-10-19) |
 | Fecha | 2026-10-18 |
 | Depende de | 001-autenticacion, 002-adaptabilidad-ui, 005-documentos-legales, 006-inventario |
 | Afecta | Pestaña Perfil, perfil del usuario en Firestore, reglas de Firestore y Storage, tema de la app y aviso diario |
