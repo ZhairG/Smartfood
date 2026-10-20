@@ -110,6 +110,8 @@ class ProfileViewModel @Inject constructor(
                 viewModelScope.launch { _effects.send(ProfileEffect.NavigateToFoodPreferences) }
             ProfileEvent.NotificationsClicked ->
                 viewModelScope.launch { _effects.send(ProfileEffect.NavigateToNotificationSettings) }
+            ProfileEvent.PasswordClicked ->
+                viewModelScope.launch { _effects.send(ProfileEffect.NavigateToChangePassword) }
             ProfileEvent.ThemeClicked -> _uiState.update { it.copy(isThemeSheetVisible = true) }
             is ProfileEvent.ThemeSelected -> {
                 _uiState.update { it.copy(isThemeSheetVisible = false, themeMode = event.mode) }
@@ -177,6 +179,7 @@ sealed interface ProfileEvent {
     data object EditProfileClicked : ProfileEvent
     data object PreferencesClicked : ProfileEvent
     data object NotificationsClicked : ProfileEvent
+    data object PasswordClicked : ProfileEvent
     data object ThemeClicked : ProfileEvent
     data class ThemeSelected(val mode: ThemeMode) : ProfileEvent
     data object ThemeSheetDismissed : ProfileEvent
@@ -187,4 +190,5 @@ sealed interface ProfileEffect {
     data object NavigateToEditProfile : ProfileEffect
     data object NavigateToFoodPreferences : ProfileEffect
     data object NavigateToNotificationSettings : ProfileEffect
+    data object NavigateToChangePassword : ProfileEffect
 }

@@ -127,4 +127,10 @@ sealed interface Route {
     data object NotificationSettings : Route {
         override val screenRoute: ScreenRoute = ScreenRoute.NOTIFICATION_SETTINGS
     }
+
+    /** "Cambiar contraseña" del Perfil (spec 008, HU-PER-05). */
+    @Serializable
+    data object ChangePassword : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.CHANGE_PASSWORD
+    }
 }

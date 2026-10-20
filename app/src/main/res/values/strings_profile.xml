@@ -92,4 +92,16 @@
     <string name="notification_permission_title">Notificaciones desactivadas</string>
     <string name="notification_permission_body">Activa las notificaciones en los ajustes del teléfono para recibir los avisos.</string>
     <string name="notification_permission_open_settings">Abrir ajustes</string>
+
+    <!-- Cambiar contraseña (spec 008, HU-PER-05, Figma 603:2358 y 603:2460) -->
+    <string name="change_password_title">Cambiar contraseña</string>
+    <string name="change_password_subtitle">Elige una contraseña segura para proteger tu cuenta.</string>
+    <string name="change_password_current_label">Contraseña actual</string>
+    <string name="change_password_new_label">Nueva Contraseña</string>
+    <string name="change_password_confirm_label">Confirmar Contraseña</string>
+    <string name="change_password_button">Actualizar contraseña</string>
+    <string name="change_password_button_loading">Actualizando</string>
+    <string name="change_password_saved">Guardado</string>
+    <string name="change_password_saved_body">Contraseña se actualizó</string>
+    <string name="error_invalid_current_password">La contraseña actual no es correcta</string>
 </resources>

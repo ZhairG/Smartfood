@@ -15,6 +15,7 @@ import com.smartfood.app.core.navigation.navigateToLoginClearingBackStack
 import com.smartfood.app.core.navigation.navigateToTab
 import com.smartfood.app.feature.profile.ui.edit.EditProfileRoute
 import com.smartfood.app.feature.profile.ui.notifications.NotificationSettingsRoute
+import com.smartfood.app.feature.profile.ui.password.ChangePasswordRoute
 import com.smartfood.app.feature.profile.ui.preferences.FoodPreferencesRoute
 
 /**
@@ -22,8 +23,8 @@ import com.smartfood.app.feature.profile.ui.preferences.FoodPreferencesRoute
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Destinos del Perfil dentro de `MainGraph` (spec 006, CA-INV-09-02 y 09-03; spec 008): la pestaña,
- * "Editar información", "Preferencias alimentarias" y "Notificaciones", todas con la barra inferior. Cerrar sesión
- * limpia toda la pila y vuelve al inicio de sesión (CA-05-03).
+ * "Editar información", "Preferencias alimentarias", "Notificaciones" y "Cambiar contraseña", todas con la barra inferior.
+ * Cerrar sesión limpia toda la pila y vuelve al inicio de sesión (CA-05-03).
  *
  * @param navController Controlador de navegación de la app.
  */
@@ -43,6 +44,7 @@ fun NavGraphBuilder.profileDestination(navController: NavHostController) {
                 ProfileEffect.NavigateToEditProfile -> navController.navigate(Route.EditProfile)
                 ProfileEffect.NavigateToFoodPreferences -> navController.navigate(Route.FoodPreferences)
                 ProfileEffect.NavigateToNotificationSettings -> navController.navigate(Route.NotificationSettings)
+                ProfileEffect.NavigateToChangePassword -> navController.navigate(Route.ChangePassword)
             }
         }
 
@@ -77,6 +79,15 @@ fun NavGraphBuilder.profileDestination(navController: NavHostController) {
             onCurrentTabReselected = { navController.popBackStack<Route.Profile>(inclusive = false) }
         ) {
             NotificationSettingsRoute(onBack = { navController.popBackStack() })
+        }
+    }
+    composable<Route.ChangePassword> {
+        MainTabScaffold(
+            currentTab = MainTab.PROFILE,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Profile>(inclusive = false) }
+        ) {
+            ChangePasswordRoute(onBack = { navController.popBackStack() })
         }
     }
 }

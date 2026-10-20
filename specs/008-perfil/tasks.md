@@ -36,8 +36,8 @@
 
 ## Issue 4: Cambiar contraseña (intermedia)
 - [x] T020 `AuthRepository.updatePassword` (+ fake) y `ChangePasswordUseCase` (reautentica y cambia) con pruebas (RF-PER-06).
-- [ ] T021 Pantalla `ChangePassword` con checklist, botón habilitado según reglas, carga, "Guardado" y vuelta al Perfil (CA-PER-05-01 a 05-06).
-- [ ] T022 Pruebas: `ChangePasswordViewModelTest` y `ChangePasswordScreenTest`.
+- [x] T021 Pantalla `ChangePassword` con checklist, botón habilitado según reglas, carga, "Guardado" y vuelta al Perfil (CA-PER-05-01 a 05-06).
+- [x] T022 Pruebas: `ChangePasswordViewModelTest` y `ChangePasswordScreenTest`.
 
 ## Cierre (en el mismo PR)
 - [ ] T023 Suite instrumentada completa y `rules-test` en verde.

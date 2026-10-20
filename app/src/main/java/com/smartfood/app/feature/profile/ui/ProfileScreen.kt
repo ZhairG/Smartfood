@@ -148,6 +148,7 @@ fun ProfileScreen(
                     onEditClick = { onEvent(ProfileEvent.EditProfileClicked) },
                     onPreferencesClick = { onEvent(ProfileEvent.PreferencesClicked) },
                     onNotificationsClick = { onEvent(ProfileEvent.NotificationsClicked) },
+                    onPasswordClick = { onEvent(ProfileEvent.PasswordClicked) },
                     onThemeClick = { onEvent(ProfileEvent.ThemeClicked) }
                 )
             }
@@ -321,6 +322,7 @@ private fun OptionsCard(
     onEditClick: () -> Unit,
     onPreferencesClick: () -> Unit,
     onNotificationsClick: () -> Unit,
+    onPasswordClick: () -> Unit,
     onThemeClick: () -> Unit,
 ) {
     val options = listOf(
@@ -344,6 +346,7 @@ private fun OptionsCard(
                     R.string.profile_option_edit -> onEditClick
                     R.string.profile_option_preferences -> onPreferencesClick
                     R.string.profile_option_notifications -> onNotificationsClick
+                    R.string.profile_option_password -> onPasswordClick
                     else -> null
                 }
             )
