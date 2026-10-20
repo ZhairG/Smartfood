@@ -75,4 +75,15 @@ class FirebaseErrorMapperTest {
         retryAfterSeconds: Long? = null,
         isNetworkFailure: Boolean = false
     ): AuthError = FirebaseErrorMapper.mapFunctionsError(code, reason, retryAfterSeconds, isNetworkFailure)
+
+    @Test
+    fun `CA-PER-02-11 los errores del cambio de correo se clasifican`() {
+        val code = Code.INVALID_ARGUMENT
+        assertEquals(AuthError.EmailAlreadyInUse, FirebaseErrorMapper.mapFunctionsError(code, "EMAIL_IN_USE", null, false))
+        assertEquals(AuthError.InvalidEmail, FirebaseErrorMapper.mapFunctionsError(code, "SAME_EMAIL", null, false))
+        assertEquals(
+            AuthError.InvalidCredentials,
+            FirebaseErrorMapper.mapFunctionsError(code, "REQUIRES_RECENT_LOGIN", null, false)
+        )
+    }
 }

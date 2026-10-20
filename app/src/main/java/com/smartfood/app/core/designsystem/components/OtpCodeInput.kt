@@ -4,6 +4,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -86,41 +87,47 @@ fun SmartFoodOtpCodeInput(
         interactionSource = interactionSource,
         modifier = modifier.focusRequester(focusRequester),
         decorationBox = {
-            // Casillas rectangulares centradas, con la proporción y separación de Figma (CA-UI-07-05).
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(metrics.otpSpacing, Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(length) { index ->
-                    val char = code.getOrNull(index)?.toString() ?: ""
-                    val isBoxFocused = isFocused && (index == code.length || (index == length - 1 && code.length == length))
+            // Casillas rectangulares centradas, con la proporción y separación de Figma (CA-UI-07-05). Si el ancho no
+            // alcanza (por ejemplo dentro de un aviso, spec 008), casillas y separación se reducen en la misma
+            // proporción para que ninguna quede cortada.
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val needed = metrics.otpBoxWidth * length + metrics.otpSpacing * (length - 1)
+                val scale = if (maxWidth < needed) maxWidth / needed else 1f
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(metrics.otpSpacing * scale, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(length) { index ->
+                        val char = code.getOrNull(index)?.toString() ?: ""
+                        val isBoxFocused = isFocused && (index == code.length || (index == length - 1 && code.length == length))
 
-                    val borderColor = when {
-                        isError -> MaterialTheme.colorScheme.error
-                        isBoxFocused -> MaterialTheme.colorScheme.primary
-                        else -> GreyNeutral
-                    }
-                    val borderWidth = if (isError) 2.dp else 1.dp
+                        val borderColor = when {
+                            isError -> MaterialTheme.colorScheme.error
+                            isBoxFocused -> MaterialTheme.colorScheme.primary
+                            else -> GreyNeutral
+                        }
+                        val borderWidth = if (isError) 2.dp else 1.dp
 
-                    Box(
-                        modifier = Modifier
-                            .size(width = metrics.otpBoxWidth, height = metrics.otpBoxHeight)
-                            .inputBorderAndBackground(
-                                shape = RoundedCornerShape(10.dp),
-                                borderWidth = borderWidth,
-                                borderColor = borderColor,
-                                backgroundColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = char,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            textAlign = TextAlign.Center
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(width = metrics.otpBoxWidth * scale, height = metrics.otpBoxHeight * scale)
+                                .inputBorderAndBackground(
+                                    shape = RoundedCornerShape(10.dp),
+                                    borderWidth = borderWidth,
+                                    borderColor = borderColor,
+                                    backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = char,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
             }

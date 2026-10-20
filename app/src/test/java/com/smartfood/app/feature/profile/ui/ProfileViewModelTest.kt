@@ -1,8 +1,6 @@
-package com.smartfood.app.feature.profile
+package com.smartfood.app.feature.profile.ui
 
 import com.smartfood.app.feature.auth.domain.model.AuthError
-import com.smartfood.app.feature.auth.domain.model.User
-import com.smartfood.app.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.smartfood.app.feature.auth.domain.usecase.LogoutUseCase
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
 import com.smartfood.app.feature.inventory.domain.model.InventoryException
@@ -11,12 +9,17 @@ import com.smartfood.app.feature.inventory.domain.repository.InventoryRepository
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.HasPendingChangesUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
+import com.smartfood.app.feature.profile.domain.model.UserProfile
+import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
+import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
+import com.smartfood.app.core.designsystem.theme.ThemeMode
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakePhotoSync
-import com.smartfood.app.testutil.FakeUserRepository
+import com.smartfood.app.testutil.FakeProfileRepository
+import com.smartfood.app.testutil.FakeThemePreferences
 import com.smartfood.app.testutil.MainDispatcherRule
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
@@ -27,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,30 +48,36 @@ class ProfileViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val authRepository = FakeAuthRepository()
-    private val userRepository = FakeUserRepository()
+    private val profileRepository = FakeProfileRepository()
 
     @Before
     fun prepararEntornoTest() {
         authRepository.signedInUserId = DEFAULT_UID
+        // La cuenta tiene el mismo correo que el perfil: no hay nada que sincronizar.
+        authRepository.currentEmailValue = "pepito@correo.com"
     }
 
+    private val pepito = UserProfile(DEFAULT_UID, "Pepito Perez", "pepito@correo.com")
     private val inventoryRepository = FakeInventoryRepository()
     private val photoSync = FakePhotoSync()
+    private val themePreferences = FakeThemePreferences()
 
     private fun crearViewModel(repository: InventoryRepository = inventoryRepository) = ProfileViewModel(
-        getCurrentUser = GetCurrentUserUseCase(authRepository, userRepository),
+        observeProfile = ObserveProfileUseCase(profileRepository),
+        syncProfileEmail = SyncProfileEmailUseCase(authRepository, profileRepository),
         logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), photoSync),
         observeInventory = ObserveInventoryUseCase(
             repository,
             FakePhotoSync(),
             ClassifyExpiryUseCase(fixedClock(LocalDate.of(2026, 9, 10)))
         ),
-        hasPendingChanges = HasPendingChangesUseCase(repository, photoSync)
+        hasPendingChanges = HasPendingChangesUseCase(repository, photoSync),
+        themePreferences = themePreferences
     )
 
     @Test
     fun `CA-05-01 saluda con el primer nombre del perfil`() {
-        userRepository.profiles[DEFAULT_UID] = User(DEFAULT_UID, "Pepito Perez", "pepito@correo.com")
+        profileRepository.profile.value = pepito
 
         val state = crearViewModel().uiState.value
 
@@ -77,7 +87,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `CA-05-02 si el perfil no se puede leer usa saludo generico`() {
-        userRepository.getProfileError = AuthError.Network
+        profileRepository.observeError = AuthError.Network
 
         val state = crearViewModel().uiState.value
 
@@ -98,7 +108,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `CA-INV-09-03 el encabezado muestra nombre completo correo e iniciales`() {
-        userRepository.profiles[DEFAULT_UID] = User(DEFAULT_UID, "Pepito Perez", "pepito@correo.com")
+        profileRepository.profile.value = pepito
 
         val state = crearViewModel().uiState.value
 
@@ -182,5 +192,90 @@ class ProfileViewModelTest {
         assertEquals(ProfileDialog.ConfirmLogout(hasPendingChanges = false), viewModel.uiState.value.dialog)
         assertEquals(DEFAULT_UID, authRepository.currentUserId())
     }
-}
 
+    // Spec 008: Perfil en vivo, foto y acceso a "Editar información".
+
+    @Test
+    fun `CA-PER-01-01 muestra la foto y se actualiza al guardar en Editar informacion`() {
+        profileRepository.profile.value = pepito
+        val viewModel = crearViewModel()
+        assertNull(viewModel.uiState.value.photoUrl)
+
+        profileRepository.profile.value = pepito.copy(fullName = "Pepito José", photoUrl = "https://foto")
+
+        assertEquals("https://foto", viewModel.uiState.value.photoUrl)
+        assertEquals("Pepito José", viewModel.uiState.value.fullName)
+    }
+
+    @Test
+    fun `CA-PER-01-03 Editar informacion personal abre su pantalla`() = runTest {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.EditProfileClicked)
+
+        assertEquals(ProfileEffect.NavigateToEditProfile, viewModel.effects.first())
+    }
+
+    @Test
+    fun `CA-PER-01-03 Preferencias alimentarias abre su pantalla`() = runTest {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.PreferencesClicked)
+
+        assertEquals(ProfileEffect.NavigateToFoodPreferences, viewModel.effects.first())
+    }
+
+    @Test
+    fun `CA-PER-04-01 Notificaciones abre su pantalla`() = runTest {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.NotificationsClicked)
+
+        assertEquals(ProfileEffect.NavigateToNotificationSettings, viewModel.effects.first())
+    }
+
+    @Test
+    fun `CA-PER-06-01 muestra el tema guardado en el telefono`() = runTest {
+        themePreferences.setThemeMode(ThemeMode.DARK)
+
+        val viewModel = crearViewModel()
+
+        assertEquals(ThemeMode.DARK, viewModel.uiState.value.themeMode)
+    }
+
+    @Test
+    fun `CA-PER-06-02 tocar la fila abre la hoja y elegir guarda el tema`() = runTest {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.ThemeClicked)
+        assertTrue(viewModel.uiState.value.isThemeSheetVisible)
+
+        viewModel.onEvent(ProfileEvent.ThemeSelected(ThemeMode.SYSTEM))
+
+        assertFalse(viewModel.uiState.value.isThemeSheetVisible)
+        assertEquals(listOf(ThemeMode.SYSTEM), themePreferences.saved)
+        assertEquals(ThemeMode.SYSTEM, viewModel.uiState.value.themeMode)
+    }
+
+    @Test
+    fun `CA-PER-06-02 cancelar la hoja no cambia el tema`() {
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(ProfileEvent.ThemeClicked)
+        viewModel.onEvent(ProfileEvent.ThemeSheetDismissed)
+
+        assertFalse(viewModel.uiState.value.isThemeSheetVisible)
+        assertTrue(themePreferences.saved.isEmpty())
+    }
+
+    @Test
+    fun `CA-PER-02-12 si la cuenta tiene un correo nuevo el perfil lo toma una sola vez`() {
+        profileRepository.profile.value = pepito
+        authRepository.currentEmailValue = "nuevo@correo.com"
+
+        val state = crearViewModel().uiState.value
+
+        assertEquals(listOf("nuevo@correo.com"), profileRepository.syncedEmails)
+        assertEquals("nuevo@correo.com", state.email)
+    }
+}

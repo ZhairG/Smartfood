@@ -2,8 +2,8 @@
  * Nombre: emailTemplates.ts
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Plantillas de los correos de SmartFood: código de recuperación (spec 003) y bienvenida con enlace de
- * verificación (spec 004, plan §6). Son funciones puras: no conocen nodemailer ni Firebase y se prueban sin red.
+ * Descripción: Plantillas de los correos de SmartFood: código de recuperación (spec 003), bienvenida con enlace de
+ * verificación (spec 004, plan §6) y código del cambio de correo (spec 008). Son funciones puras: no conocen nodemailer ni Firebase y se prueban sin red.
  */
 
 /** Contenido de un correo listo para enviar. */
@@ -35,6 +35,24 @@ export function recoveryEmail(code: string): EmailContent {
       <p style="margin:0 0 24px;font-size:36px;font-weight:bold;letter-spacing:12px">${code}</p>
       <p style="margin:0;font-size:13px;color:#5f6b5a">
         Vence en 10 minutos. Si no lo pediste, ignora este correo: tu contraseña no cambiará.
+      </p>`),
+  };
+}
+
+/** Correo con el código para confirmar el correo nuevo (spec 008, CA-PER-02-10). */
+export function emailChangeEmail(code: string): EmailContent {
+  return {
+    subject: `Confirma tu nuevo correo en SmartFood: ${code}`,
+    text:
+      `Tu código para confirmar este correo en SmartFood es ${code}.
+
+` +
+      "Escríbelo en la app para que este sea tu nuevo correo. Vence en 10 minutos. Si no lo pediste, ignora este correo.",
+    html: emailLayout(`
+      <p style="margin:0 0 24px;font-size:15px">Usa este código para confirmar tu nuevo correo:</p>
+      <p style="margin:0 0 24px;font-size:36px;font-weight:bold;letter-spacing:12px">${code}</p>
+      <p style="margin:0;font-size:13px;color:#5f6b5a">
+        Vence en 10 minutos. Si no lo pediste, ignora este correo: tu cuenta no cambiará.
       </p>`),
   };
 }

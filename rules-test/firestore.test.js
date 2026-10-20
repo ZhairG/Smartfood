@@ -169,6 +169,99 @@ describe('inventario: marcas de tiempo', () => {
   });
 });
 
+describe('perfil: edición (spec 008, RNF-PER-01)', () => {
+  const perfil = (uid = 'u1') => doc(db(uid), 'users/u1');
+  const base = { fullName: 'Ana Pérez', email: 'ana@correo.com', termsVersion: '2026-10', termsAcceptedAt: Timestamp.now(),
+    createdAt: Timestamp.now() };
+  const sembrarPerfil = async () => env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'users/u1'), base);
+  });
+  const editar = (cambios, uid = 'u1') =>
+    setDoc(perfil(uid), { ...base, ...cambios, updatedAt: serverTimestamp() }, { merge: false });
+
+  test('CA-PER-02-04 el dueño edita nombre, teléfono, fecha y foto', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({
+      fullName: 'Ana María', phone: '3001234567', birthDate: '2000-05-17',
+      photoPath: 'users/u1/profile/a.jpg', photoUrl: 'https://foto',
+    }));
+  });
+
+  test('CA-PER-02-12 sincronizar el correo solo cambia el correo y updatedAt', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({ email: 'nuevo@correo.com' }));
+  });
+
+  test('RNF-PER-01 la constancia de términos y createdAt no se pueden cambiar', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ termsVersion: '2099-01' }));
+    await assertFails(editar({ createdAt: Timestamp.fromMillis(0) }));
+  });
+
+  test('CA-PER-02-05 CA-PER-02-06 nombre y teléfono inválidos se rechazan', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ fullName: 'A' }));
+    await assertFails(editar({ fullName: 'x'.repeat(51) }));
+    await assertFails(editar({ phone: '+57 300 123 4567' }));
+    await assertFails(editar({ phone: '2001234567' }));
+    await assertFails(editar({ birthDate: '17/05/2000' }));
+  });
+
+  test('RNF-PER-01 campos desconocidos, foto ajena, sin updatedAt del servidor u otro usuario se rechazan', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ admin: true }));
+    await assertFails(editar({ photoPath: 'users/u2/profile/a.jpg', photoUrl: 'https://foto' }));
+    await assertFails(editar({ photoPath: 'users/u1/profile/a.jpg' }));
+    await assertFails(setDoc(perfil(), { ...base, fullName: 'Ana María', updatedAt: Timestamp.fromMillis(0) }));
+    await assertFails(editar({ fullName: 'Intruso' }, 'u2'));
+  });
+
+  test('CA-PER-03-04 el dueño guarda sus preferencias alimentarias', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({
+      preferences: {
+        restrictions: ['VEGETARIAN', 'GLUTEN_FREE'],
+        cuisines: ['COLOMBIAN', 'ITALIAN'],
+        spice: 'MEDIUM',
+        budget: 'MODERATE',
+      },
+    }));
+  });
+
+  test('CA-PER-03-04 se aceptan listas vacías y sin picante ni presupuesto, y quitarlos al reemplazar el mapa', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({ preferences: { restrictions: [], cuisines: [] } }));
+    await assertSucceeds(editar({ preferences: { restrictions: ['VEGAN'], cuisines: ['ASIAN'], spice: 'HOT' } }));
+    // Guardar de nuevo sin `spice` reemplaza el mapa y lo borra, como hace la app al quitar el chip.
+    await assertSucceeds(editar({ preferences: { restrictions: ['VEGAN'], cuisines: ['ASIAN'] } }));
+  });
+
+  test('CA-PER-03-04 valores, listas, claves y tipos fuera de la lista se rechazan', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ preferences: { restrictions: ['CARNIVORE'] } }));
+    await assertFails(editar({ preferences: { cuisines: ['FRENCH'] } }));
+    await assertFails(editar({ preferences: { spice: 'EXTREME' } }));
+    await assertFails(editar({ preferences: { budget: 'FREE' } }));
+    await assertFails(editar({ preferences: { restrictions: 'VEGAN' } }));
+    await assertFails(editar({ preferences: { other: [] } }));
+    await assertFails(editar({ preferences: 'ninguna' }));
+  });
+
+  test('RNF-PER-01 otro usuario no puede guardar preferencias ajenas', async () => {
+    await sembrarPerfil();
+    await assertFails(editar({ preferences: { restrictions: ['VEGAN'] } }, 'u2'));
+  });
+});
+
+describe('cambio de correo (spec 008, T010)', () => {
+  test('CA-PER-02-10 emailChanges es solo del servidor: ni el dueño lo lee ni lo escribe', async () => {
+    const registro = doc(db('u1'), 'emailChanges/u1');
+    await assertFails(getDoc(registro));
+    await assertFails(setDoc(registro, { newEmail: 'nuevo@correo.com', codeHash: 'x' }));
+    await assertFails(getDoc(doc(db(null), 'emailChanges/u1')));
+  });
+});
+
 describe('perfil (regresión, spec 005)', () => {
   test('CA-LEG-02-02 el perfil sigue exigiendo la constancia legal', async () => {
     const perfil = doc(db('u1'), 'users/u1');

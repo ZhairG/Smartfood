@@ -23,8 +23,8 @@ export interface ResetRecord {
  * Resultado de una modificación atómica: `next` es el nuevo registro (`undefined` = sin cambios,
  * `null` = borrarlo) y `result` lo que devuelve la operación.
  */
-export interface StoreUpdate<T> {
-  next?: ResetRecord | null;
+export interface StoreUpdate<T, R = ResetRecord> {
+  next?: R | null;
   result: T;
 }
 
@@ -76,4 +76,42 @@ export interface WelcomeLog {
 /** Envío del correo de bienvenida. `name` puede venir vacío: el saludo es genérico. */
 export interface WelcomeMailer {
   sendWelcome(email: string, name: string, verificationLink: string): Promise<void>;
+}
+
+/**
+ * Registro de `emailChanges/{uid}` (spec 008, T010): el correo nuevo pedido y su código. Las fechas son epoch en ms y
+ * los límites son los mismos de la recuperación.
+ */
+export interface EmailChangeRecord {
+  newEmail: string;
+  codeHash: string | null;
+  salt: string | null;
+  expiresAt: number;
+  attemptsLeft: number;
+  lastSentAt: number;
+  windowStart: number;
+  sentInWindow: number;
+}
+
+/** Almacén de cambios de correo por `uid`, con lectura-modificación-escritura atómica. */
+export interface EmailChangeStore {
+  update<T>(uid: string, change: (current: EmailChangeRecord | null) => StoreUpdate<T, EmailChangeRecord>): Promise<T>;
+  delete(uid: string): Promise<void>;
+}
+
+/** Correos de las cuentas y del perfil (Admin SDK y Firestore, spec 008). */
+export interface AccountEmails {
+  /** `uid` de la cuenta con ese correo, o `null` si no existe. */
+  findUidByEmail(email: string): Promise<string | null>;
+  /** Correo actual de la cuenta, o `null` si no tiene. */
+  currentEmail(uid: string): Promise<string | null>;
+  /** Cambia el correo de la cuenta y lo marca verificado; `false` si otra cuenta ya lo usa. */
+  updateEmail(uid: string, email: string): Promise<boolean>;
+  /** Iguala `users/{uid}.email` al correo nuevo. */
+  setProfileEmail(uid: string, email: string): Promise<void>;
+}
+
+/** Envío del código al correo nuevo (spec 008). */
+export interface EmailChangeMailer {
+  sendEmailChangeCode(email: string, code: string): Promise<void>;
 }

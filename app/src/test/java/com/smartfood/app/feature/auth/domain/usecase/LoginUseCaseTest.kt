@@ -4,6 +4,7 @@ import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthField
 import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.testutil.FakeAuthRepository
+import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeSessionPreferences
 import com.smartfood.app.testutil.authError
 import kotlinx.coroutines.test.runTest
@@ -17,19 +18,21 @@ import org.junit.Test
  * Nombre: LoginUseCaseTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pruebas unitarias de [LoginUseCase] (HU-02 y HU-03).
+ * Descripción: Pruebas unitarias de [LoginUseCase] (HU-02 y HU-03, y el aviso diario de la spec 006).
  */
 class LoginUseCaseTest {
 
     private lateinit var authRepository: FakeAuthRepository
     private lateinit var sessionPreferences: FakeSessionPreferences
+    private lateinit var reminderScheduler: FakeExpiryReminderScheduler
     private lateinit var login: LoginUseCase
 
     @Before
     fun prepararEntornoTest() {
         authRepository = FakeAuthRepository()
         sessionPreferences = FakeSessionPreferences()
-        login = LoginUseCase(authRepository, sessionPreferences, ValidateEmailUseCase())
+        reminderScheduler = FakeExpiryReminderScheduler()
+        login = LoginUseCase(authRepository, sessionPreferences, ValidateEmailUseCase(), reminderScheduler)
     }
 
     @Test
@@ -87,5 +90,21 @@ class LoginUseCaseTest {
         login("user@test.com", "Secreta#1", rememberMe = false)
 
         assertTrue(sessionPreferences.rememberMe)
+    }
+
+    @Test
+    fun `CA-INV-08-07 al iniciar sesion programa el aviso diario`() = runTest {
+        login("user@test.com", "Secreta#1", rememberMe = true)
+
+        assertEquals(1, reminderScheduler.scheduleCalls)
+    }
+
+    @Test
+    fun `CA-INV-08-07 si el inicio falla no programa el aviso`() = runTest {
+        authRepository.loginResult = authFailure(AuthError.InvalidCredentials)
+
+        login("user@test.com", "Secreta#1", rememberMe = true)
+
+        assertEquals(0, reminderScheduler.scheduleCalls)
     }
 }

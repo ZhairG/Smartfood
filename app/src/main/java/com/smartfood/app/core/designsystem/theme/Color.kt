@@ -39,6 +39,12 @@ val GreenCheck = Color(0xFF16A34A)
 /** Verde claro suave para fondos de tarjetas y contenedores claros. */
 val GreenLight = Color(0xFFF0FDF4)
 
+/**
+ * Verde del círculo de las iniciales en "Editar información" (Figma `362:727`, spec 008): se distingue del fondo
+ * [GreenLight] de la pantalla.
+ */
+val GreenSoft = Color(0xFFDCFCE7)
+
 /** Verde principal al 50% de opacidad. */
 val GreenMain50 = Color(0x8016A34A)
 
