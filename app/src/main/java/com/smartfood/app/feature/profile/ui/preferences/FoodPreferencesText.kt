@@ -5,6 +5,7 @@ import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.MealBudget
 import com.smartfood.app.feature.profile.domain.model.SpiceLevel
+import com.smartfood.app.feature.profile.domain.model.Supermarket
 
 /**
  * Nombre: FoodPreferencesText.kt
@@ -48,4 +49,13 @@ val MealBudget.titleRes: Int
         MealBudget.ECONOMIC -> R.string.preference_budget_economic
         MealBudget.MODERATE -> R.string.preference_budget_moderate
         MealBudget.UNLIMITED -> R.string.preference_budget_unlimited
+    }
+
+/** Nombre de cada supermercado (CA-PER-03-05). */
+val Supermarket.titleRes: Int
+    get() = when (this) {
+        Supermarket.EXITO -> R.string.preference_store_exito
+        Supermarket.CARULLA -> R.string.preference_store_carulla
+        Supermarket.OLIMPICA -> R.string.preference_store_olimpica
+        Supermarket.D1 -> R.string.preference_store_d1
     }

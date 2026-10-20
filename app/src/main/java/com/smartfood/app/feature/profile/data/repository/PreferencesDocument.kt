@@ -5,6 +5,7 @@ import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.MealBudget
 import com.smartfood.app.feature.profile.domain.model.SpiceLevel
+import com.smartfood.app.feature.profile.domain.model.Supermarket
 
 /**
  * Nombre: PreferencesDocument.kt
@@ -20,6 +21,7 @@ internal object PreferencesDocument {
     const val CUISINES = "cuisines"
     const val SPICE = "spice"
     const val BUDGET = "budget"
+    const val STORE = "store"
 }
 
 /** Lee el mapa `preferences` del documento; sin mapa o con otro tipo, devuelve preferencias vacías. */
@@ -34,11 +36,13 @@ internal fun preferencesFromDocument(data: Map<String, Any?>): FoodPreferences {
             ?.let { name -> SpiceLevel.entries.firstOrNull { it.name == name } },
         budget = (preferences[PreferencesDocument.BUDGET] as? String)
             ?.let { name -> MealBudget.entries.firstOrNull { it.name == name } },
+        store = (preferences[PreferencesDocument.STORE] as? String)
+            ?.let { name -> Supermarket.entries.firstOrNull { it.name == name } },
     )
 }
 
 /**
- * Mapa que reemplaza el campo `preferences` en Firestore. Las claves `spice` y `budget` solo se escriben si hay
+ * Mapa que reemplaza el campo `preferences` en Firestore. Las claves `spice`, `budget` y `store` solo se escriben si hay
  * elección: Firestore no acepta `null`, y al reemplazar el mapa completo quitarlas también las borra (CA-PER-03-04).
  */
 internal fun FoodPreferences.toDocumentFields(): Map<String, Any> = buildMap {
@@ -50,6 +54,7 @@ internal fun FoodPreferences.toDocumentFields(): Map<String, Any> = buildMap {
     put(PreferencesDocument.CUISINES, Cuisine.entries.filter { it in cuisines }.map { it.name })
     spice?.let { put(PreferencesDocument.SPICE, it.name) }
     budget?.let { put(PreferencesDocument.BUDGET, it.name) }
+    store?.let { put(PreferencesDocument.STORE, it.name) }
 }
 
 private fun Map<*, *>.stringList(key: String): List<String> =

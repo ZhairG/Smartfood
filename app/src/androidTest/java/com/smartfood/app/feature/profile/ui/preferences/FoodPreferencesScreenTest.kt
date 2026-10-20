@@ -8,12 +8,14 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.MealBudget
 import com.smartfood.app.feature.profile.domain.model.SpiceLevel
+import com.smartfood.app.feature.profile.domain.model.Supermarket
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -103,6 +105,21 @@ class FoodPreferencesScreenTest {
             ),
             eventos
         )
+    }
+
+    @Test
+    fun caPer0305_miSupermercadoMarcaD1SinElegirYTocarOtroLoElige() {
+        mostrar(estado(saved = FoodPreferences(), draft = FoodPreferences()))
+
+        composeTestRule.onNodeWithText("Mi supermercado").performScrollTo().assertIsDisplayed()
+        listOf("Éxito", "Carulla", "Olímpica").forEach {
+            composeTestRule.onNodeWithText(it).performScrollTo().assertIsNotSelected()
+        }
+        composeTestRule.onNodeWithText("D1").performScrollTo().assertIsSelected()
+
+        composeTestRule.onNodeWithText("Olímpica").performScrollTo().performClick()
+
+        assertEquals(listOf<FoodPreferencesEvent>(FoodPreferencesEvent.StoreSelected(Supermarket.OLIMPICA)), eventos)
     }
 
     @Test

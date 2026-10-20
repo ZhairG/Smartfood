@@ -247,6 +247,13 @@ describe('perfil: edición (spec 008, RNF-PER-01)', () => {
     await assertFails(editar({ preferences: 'ninguna' }));
   });
 
+  test('CA-PER-03-05 el dueño guarda su supermercado y una tienda desconocida se rechaza', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({ preferences: { restrictions: [], cuisines: [], store: 'OLIMPICA' } }));
+    await assertFails(editar({ preferences: { store: 'ARA' } }));
+    await assertFails(editar({ preferences: { store: 1 } }));
+  });
+
   test('RNF-PER-01 otro usuario no puede guardar preferencias ajenas', async () => {
     await sembrarPerfil();
     await assertFails(editar({ preferences: { restrictions: ['VEGAN'] } }, 'u2'));

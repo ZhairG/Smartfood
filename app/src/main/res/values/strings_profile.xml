@@ -74,6 +74,11 @@
     <string name="preference_budget_economic">Económico</string>
     <string name="preference_budget_moderate">Moderado</string>
     <string name="preference_budget_unlimited">Sin restricción</string>
+    <string name="preferences_store">Mi supermercado</string>
+    <string name="preference_store_exito">Éxito</string>
+    <string name="preference_store_carulla">Carulla</string>
+    <string name="preference_store_olimpica">Olímpica</string>
+    <string name="preference_store_d1">D1</string>
     <string name="preferences_save">Guardar Preferencias</string>
     <string name="preferences_confirm_save">¿Desea guardar los cambios?</string>
     <string name="preferences_saving">Guardando cambios…</string>

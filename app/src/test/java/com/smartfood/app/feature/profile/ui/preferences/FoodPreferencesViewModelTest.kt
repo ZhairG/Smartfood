@@ -7,6 +7,7 @@ import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.MealBudget
 import com.smartfood.app.feature.profile.domain.model.SpiceLevel
+import com.smartfood.app.feature.profile.domain.model.Supermarket
 import com.smartfood.app.feature.profile.domain.usecase.GetFoodPreferencesUseCase
 import com.smartfood.app.feature.profile.domain.usecase.SaveFoodPreferencesUseCase
 import com.smartfood.app.testutil.FakeProfileRepository
@@ -117,6 +118,19 @@ class FoodPreferencesViewModelTest {
 
         viewModel.onEvent(FoodPreferencesEvent.BudgetSelected(MealBudget.UNLIMITED))
         assertNull(viewModel.state.draft.budget)
+    }
+
+    @Test
+    fun `CA-PER-03-05 elegir supermercado reemplaza el anterior y siempre queda uno`() {
+        val viewModel = crearViewModel()
+        assertEquals("sin elegir, D1", Supermarket.D1, viewModel.state.draft.storeOrDefault)
+
+        viewModel.onEvent(FoodPreferencesEvent.StoreSelected(Supermarket.OLIMPICA))
+        assertEquals(Supermarket.OLIMPICA, viewModel.state.draft.store)
+        assertTrue("es un cambio que se puede guardar", viewModel.state.isSaveEnabled)
+
+        viewModel.onEvent(FoodPreferencesEvent.StoreSelected(Supermarket.OLIMPICA))
+        assertEquals("tocar el elegido no lo quita", Supermarket.OLIMPICA, viewModel.state.draft.store)
     }
 
     @Test

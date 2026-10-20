@@ -8,6 +8,7 @@ import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.MealBudget
 import com.smartfood.app.feature.profile.domain.model.SpiceLevel
+import com.smartfood.app.feature.profile.domain.model.Supermarket
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
@@ -84,12 +85,26 @@ class PreferencesDocumentTest {
     }
 
     @Test
+    fun `CA-PER-03-05 el supermercado se guarda y se lee, y uno desconocido se ignora`() {
+        val campos = FoodPreferences(store = Supermarket.OLIMPICA).toDocumentFields()
+        assertEquals("OLIMPICA", campos[PreferencesDocument.STORE])
+
+        val leidas = preferencesFromDocument(mapOf(PreferencesDocument.PREFERENCES to campos))
+        assertEquals(Supermarket.OLIMPICA, leidas.store)
+
+        val desconocida = preferencesFromDocument(mapOf(PreferencesDocument.PREFERENCES to mapOf("store" to "ARA")))
+        assertEquals(null, desconocida.store)
+        assertEquals("sin elegir, las recetas usan D1", Supermarket.D1, desconocida.storeOrDefault)
+    }
+
+    @Test
     fun `CA-PER-03-04 sin picante ni presupuesto no se escriben esas claves`() {
         val campos = FoodPreferences().toDocumentFields()
 
         assertEquals(setOf("restrictions", "cuisines"), campos.keys)
         assertFalse(PreferencesDocument.SPICE in campos)
         assertFalse(PreferencesDocument.BUDGET in campos)
+        assertFalse(PreferencesDocument.STORE in campos)
         assertEquals(emptyList<String>(), campos[PreferencesDocument.RESTRICTIONS])
         assertEquals(emptyList<String>(), campos[PreferencesDocument.CUISINES])
     }

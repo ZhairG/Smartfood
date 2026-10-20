@@ -15,13 +15,15 @@ service cloud.firestore {
       // pueden venir vacías y `spice`/`budget` se omiten cuando no hay elección (Firestore no acepta null).
       function validPreferences(p) {
         return p is map
-          && p.keys().hasOnly(['restrictions', 'cuisines', 'spice', 'budget'])
+          && p.keys().hasOnly(['restrictions', 'cuisines', 'spice', 'budget', 'store'])
           && (!('restrictions' in p) || (p.restrictions is list
               && p.restrictions.hasOnly(['VEGETARIAN', 'VEGAN', 'GLUTEN_FREE', 'LACTOSE_FREE', 'NUT_FREE'])))
           && (!('cuisines' in p) || (p.cuisines is list
               && p.cuisines.hasOnly(['COLOMBIAN', 'ITALIAN', 'ASIAN', 'MEXICAN', 'MEDITERRANEAN'])))
           && (!('spice' in p) || p.spice in ['MILD', 'MEDIUM', 'HOT'])
-          && (!('budget' in p) || p.budget in ['ECONOMIC', 'MODERATE', 'UNLIMITED']);
+          && (!('budget' in p) || p.budget in ['ECONOMIC', 'MODERATE', 'UNLIMITED'])
+          // "Mi supermercado" (spec 008, CA-PER-03-05): las tiendas de los precios de las recetas.
+          && (!('store' in p) || p.store in ['EXITO', 'CARULLA', 'OLIMPICA', 'D1']);
       }
 
       // Edición del Perfil (spec 008, RNF-PER-01): solo campos conocidos y válidos; la constancia de términos y
