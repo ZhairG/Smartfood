@@ -325,7 +325,7 @@
     "picante": false,
     "kcal": 380,
     "ingredientes": [
-      { "id": "maiz", "cantidad": 300 },
+      { "id": "harina-maiz", "cantidad": 300 },
       { "id": "queso", "cantidad": 200 },
       { "id": "aceite", "cantidad": 10 },
       { "id": "sal", "cantidad": 3 }
@@ -353,7 +353,7 @@
     "picante": false,
     "kcal": 450,
     "ingredientes": [
-      { "id": "maiz", "cantidad": 300 },
+      { "id": "harina-maiz", "cantidad": 300 },
       { "id": "carne", "cantidad": 300 },
       { "id": "queso", "cantidad": 150 },
       { "id": "cebolla", "cantidad": 80 },

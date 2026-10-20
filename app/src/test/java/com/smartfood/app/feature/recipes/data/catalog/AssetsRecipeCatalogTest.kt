@@ -2,9 +2,12 @@ package com.smartfood.app.feature.recipes.data.catalog
 
 import com.smartfood.app.feature.recipes.domain.model.FoodTag
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
+import com.smartfood.app.feature.recipes.domain.model.Store
+import com.smartfood.app.feature.recipes.domain.model.StorePrice
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -55,9 +58,10 @@ class AssetsRecipeCatalogTest {
         assertEquals(listOf("leche entera"), leche.synonyms)
         assertEquals("Lácteos", leche.section)
         assertEquals(IngredientUnit.MILLILITER, leche.unit)
-        assertEquals(4_500L, leche.priceCop)
-        assertEquals(1_000.0, leche.priceQuantity, 0.0)
-        assertEquals(4.5, leche.pricePerUnitCop, 0.0)
+        assertEquals(1_100.0, leche.pack, 0.0)
+        assertEquals("1,1 L", leche.packLabel)
+        assertEquals(mapOf(Store.EXITO to 3_770L, Store.D1 to 3_780L), leche.prices)
+        assertFalse(leche.pantryBasic)
         assertEquals(5, leche.shelfLifeDays)
         assertEquals(setOf(FoodTag.ANIMAL_PRODUCT, FoodTag.LACTOSE), leche.tags)
 
@@ -65,6 +69,29 @@ class AssetsRecipeCatalogTest {
         assertEquals(IngredientUnit.GRAM, pollo.unit)
         assertEquals(setOf(FoodTag.MEAT, FoodTag.ANIMAL_PRODUCT), pollo.tags)
         assertNull(pollo.shelfLifeDays)
+        assertTrue(pollo.pantryBasic)
+    }
+
+    @Test
+    fun `CA-RIA-04-07 el precio es el de la tienda elegida o el más barato de otra tienda`() = runTest {
+        val leche = catalog().ingredients().getValue("leche")
+
+        assertEquals(StorePrice(Store.D1, 3_780L), leche.priceAt(Store.D1))
+        // Carulla no la tiene en línea: se usa la tienda más barata y se dice cuál es.
+        assertEquals(StorePrice(Store.EXITO, 3_770L), leche.priceAt(Store.CARULLA))
+    }
+
+    @Test
+    fun `RF-RIA-01 una tienda desconocida falla con IllegalArgumentException`() = runTest {
+        val catalog = AssetsRecipeCatalog(
+            FakeRecipeAssetSource(ingredientes = INGREDIENTES.replace("\"d1\"", "\"ara\"")),
+            json,
+        )
+
+        val error = runCatching { catalog.ingredients() }.exceptionOrNull()
+
+        assertTrue("Se esperaba IllegalArgumentException y fue $error", error is IllegalArgumentException)
+        assertTrue(error!!.message!!.contains("ara"))
     }
 
     @Test
@@ -167,9 +194,10 @@ class AssetsRecipeCatalogTest {
                 "sinonimos": ["pechuga"],
                 "seccion": "Carnes",
                 "unidad": "g",
-                "precioCop": 14500,
-                "precioPor": 1000,
-                "etiquetas": ["carne", "origen_animal"]
+                "etiquetas": ["carne", "origen_animal"],
+                "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+                "precios": {"olimpica": 9590},
+                "basico": true
               },
               {
                 "id": "leche",
@@ -177,10 +205,10 @@ class AssetsRecipeCatalogTest {
                 "sinonimos": ["leche entera"],
                 "seccion": "Lácteos",
                 "unidad": "ml",
-                "precioCop": 4500,
-                "precioPor": 1000,
                 "vidaUtilDias": 5,
-                "etiquetas": ["origen_animal", "lactosa"]
+                "etiquetas": ["origen_animal", "lactosa"],
+                "empaque": {"cantidad": 1100, "etiqueta": "1,1 L"},
+                "precios": {"exito": 3770, "d1": 3780}
               }
             ]
         """.trimIndent()

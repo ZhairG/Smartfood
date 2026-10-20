@@ -6,6 +6,7 @@ import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.Recipe
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
 import com.smartfood.app.feature.recipes.domain.model.RecipeStep
+import com.smartfood.app.feature.recipes.domain.model.Store
 import kotlinx.serialization.Serializable
 
 /**
@@ -14,7 +15,8 @@ import kotlinx.serialization.Serializable
  * Fecha: Octubre 2026
  * Descripción: DTOs y mapeo de los JSON del catálogo (spec 009, plan §2 y §4.1, T004). Los nombres de las propiedades
  * son los del archivo (`nombre`, `seccion`, `etiquetas`…) y se traducen a los modelos de dominio de T002. Un valor
- * desconocido de `unidad` o `etiquetas` lanza [IllegalArgumentException] para que la prueba de contenido lo detecte.
+ * desconocido de `unidad`, `etiquetas` o de una tienda en `precios` lanza [IllegalArgumentException] para que la prueba de
+ * contenido lo detecte.
  */
 
 /** Ingrediente tal como viene en `ingredientes.json`. */
@@ -25,10 +27,18 @@ internal data class IngredienteDto(
     val sinonimos: List<String> = emptyList(),
     val seccion: String,
     val unidad: String,
-    val precioCop: Long,
-    val precioPor: Double,
     val vidaUtilDias: Int? = null,
     val etiquetas: List<String> = emptyList(),
+    val empaque: EmpaqueDto,
+    val precios: Map<String, Long>,
+    val basico: Boolean = false,
+)
+
+/** Presentación de mercado de un ingrediente: cantidad en la unidad base y cómo se muestra ("1 kg"). */
+@Serializable
+internal data class EmpaqueDto(
+    val cantidad: Double,
+    val etiqueta: String,
 )
 
 /** Ingrediente de una receta tal como viene en `recetas.json`. */
@@ -71,8 +81,10 @@ internal fun IngredienteDto.toDomain(): Ingredient = Ingredient(
     synonyms = sinonimos,
     section = seccion,
     unit = unidadAUnidad(unidad, id),
-    priceCop = precioCop,
-    priceQuantity = precioPor,
+    pack = empaque.cantidad,
+    packLabel = empaque.etiqueta,
+    prices = precios.entries.associate { (tienda, precio) -> tiendaAStore(tienda, id) to precio },
+    pantryBasic = basico,
     shelfLifeDays = vidaUtilDias,
     tags = etiquetas.map { etiquetaAFoodTag(it, id) }.toSet(),
 )
@@ -100,6 +112,15 @@ internal fun unidadAUnidad(unidad: String, ingredientId: String): IngredientUnit
     "ml" -> IngredientUnit.MILLILITER
     "und" -> IngredientUnit.UNIT
     else -> throw IllegalArgumentException("Unidad desconocida '$unidad' en el ingrediente '$ingredientId'")
+}
+
+/** Traduce las claves de `precios` del JSON a [Store] (plan §2). */
+internal fun tiendaAStore(tienda: String, ingredientId: String): Store = when (tienda) {
+    "exito" -> Store.EXITO
+    "carulla" -> Store.CARULLA
+    "olimpica" -> Store.OLIMPICA
+    "d1" -> Store.D1
+    else -> throw IllegalArgumentException("Tienda desconocida '$tienda' en el ingrediente '$ingredientId'")
 }
 
 /** Traduce las `etiquetas` del JSON a [FoodTag] (plan §2 y §4.1). */

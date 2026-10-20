@@ -10,6 +10,7 @@ import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.Recipe
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
+import com.smartfood.app.feature.recipes.domain.model.Store
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -109,8 +110,8 @@ class RankRecipesForMeUseCaseTest {
         synonyms = synonyms,
         section = "Otros",
         unit = IngredientUnit.GRAM,
-        priceCop = priceCop,
-        priceQuantity = 1_000.0,
+        pack = 1_000.0,
+        prices = mapOf(Store.D1 to priceCop),
     )
 
     private fun recipe(

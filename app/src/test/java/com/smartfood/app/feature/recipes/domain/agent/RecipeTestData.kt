@@ -7,6 +7,7 @@ import com.smartfood.app.feature.recipes.domain.model.PantryItem
 import com.smartfood.app.feature.recipes.domain.model.Recipe
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
 import com.smartfood.app.feature.recipes.domain.model.RecipeStep
+import com.smartfood.app.feature.recipes.domain.model.Store
 import kotlin.random.Random
 
 /**
@@ -28,8 +29,8 @@ fun ingredient(
     name = id.replaceFirstChar { it.uppercase() },
     section = "Otros",
     unit = unit,
-    priceCop = priceCop,
-    priceQuantity = if (unit == IngredientUnit.UNIT) 1.0 else 1000.0,
+    pack = if (unit == IngredientUnit.UNIT) 1.0 else 1000.0,
+    prices = mapOf(Store.D1 to priceCop),
     tags = tags.toSet(),
 )
 

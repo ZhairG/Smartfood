@@ -5,10 +5,10 @@
     "sinonimos": ["cebolla cabezona", "cebolla larga", "cebollin"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 3500,
-    "precioPor": 1000,
     "vidaUtilDias": 15,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 2150, "carulla": 2350, "olimpica": 1450, "d1": 2150}
   },
   {
     "id": "tomate",
@@ -16,10 +16,10 @@
     "sinonimos": ["tomate chonto", "jitomate"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 4200,
-    "precioPor": 1000,
     "vidaUtilDias": 7,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 1600, "carulla": 3740, "olimpica": 3330, "d1": 2950}
   },
   {
     "id": "zanahoria",
@@ -27,10 +27,10 @@
     "sinonimos": ["zanahorias"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 3200,
-    "precioPor": 1000,
     "vidaUtilDias": 20,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 960, "carulla": 1040, "d1": 1550}
   },
   {
     "id": "papa",
@@ -38,10 +38,10 @@
     "sinonimos": ["papas", "papa pastusa", "papa criolla"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 3600,
-    "precioPor": 1000,
     "vidaUtilDias": 20,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+    "precios": {"exito": 3540, "carulla": 5030, "olimpica": 4900, "d1": 6000}
   },
   {
     "id": "yuca",
@@ -49,10 +49,10 @@
     "sinonimos": ["yuca fresca"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 3800,
-    "precioPor": 1000,
     "vidaUtilDias": 8,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+    "precios": {"exito": 10720, "carulla": 10720, "olimpica": 2900}
   },
   {
     "id": "platano",
@@ -60,10 +60,10 @@
     "sinonimos": ["platano verde", "platano maduro"],
     "seccion": "Frutas",
     "unidad": "g",
-    "precioCop": 3200,
-    "precioPor": 1000,
     "vidaUtilDias": 8,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+    "precios": {"exito": 6300, "carulla": 4690, "olimpica": 3850, "d1": 4400}
   },
   {
     "id": "lechuga",
@@ -71,10 +71,10 @@
     "sinonimos": ["lechuga crespa", "lechuga romana"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 3000,
-    "precioPor": 500,
     "vidaUtilDias": 4,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 350, "etiqueta": "1 und"},
+    "precios": {"exito": 3610, "carulla": 7370, "olimpica": 2090, "d1": 5540}
   },
   {
     "id": "pepino",
@@ -82,10 +82,10 @@
     "sinonimos": ["pepino cohombro"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 2600,
-    "precioPor": 1000,
     "vidaUtilDias": 7,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 300, "etiqueta": "1 und"},
+    "precios": {"exito": 1390, "carulla": 1740, "olimpica": 1520, "d1": 1990}
   },
   {
     "id": "calabacin",
@@ -93,10 +93,10 @@
     "sinonimos": ["zucchini", "calabacin"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 4200,
-    "precioPor": 1000,
     "vidaUtilDias": 10,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 250, "etiqueta": "1 und"},
+    "precios": {"exito": 3510, "carulla": 1200, "olimpica": 1600}
   },
   {
     "id": "mazorca",
@@ -104,10 +104,10 @@
     "sinonimos": ["maiz tierno", "elote"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 3000,
-    "precioPor": 1000,
     "vidaUtilDias": 4,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "2 und"},
+    "precios": {"exito": 11160, "carulla": 8250, "olimpica": 5780, "d1": 7600}
   },
   {
     "id": "guascas",
@@ -115,10 +115,10 @@
     "sinonimos": ["guasca"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 2200,
-    "precioPor": 50,
     "vidaUtilDias": 30,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 15, "etiqueta": "15 g"},
+    "precios": {"exito": 5810, "carulla": 5840, "olimpica": 4130}
   },
   {
     "id": "albahaca",
@@ -126,10 +126,10 @@
     "sinonimos": ["albahaca fresca"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 1600,
-    "precioPor": 50,
     "vidaUtilDias": 7,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 50, "etiqueta": "50 g"},
+    "precios": {"exito": 1540, "carulla": 1750, "olimpica": 4300}
   },
   {
     "id": "aji",
@@ -137,10 +137,10 @@
     "sinonimos": ["aji picante", "chile"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 3200,
-    "precioPor": 250,
     "vidaUtilDias": 10,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 100, "etiqueta": "100 g"},
+    "precios": {"exito": 2410, "carulla": 3460}
   },
   {
     "id": "aguacate",
@@ -148,10 +148,10 @@
     "sinonimos": ["palta"],
     "seccion": "Frutas",
     "unidad": "g",
-    "precioCop": 6500,
-    "precioPor": 1000,
     "vidaUtilDias": 5,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 250, "etiqueta": "1 und"},
+    "precios": {"exito": 1190, "carulla": 3450, "olimpica": 3900, "d1": 1650}
   },
   {
     "id": "cilantro",
@@ -159,10 +159,10 @@
     "sinonimos": ["cilantro fresco"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 1500,
-    "precioPor": 100,
     "vidaUtilDias": 5,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 50, "etiqueta": "50 g"},
+    "precios": {"exito": 3680, "carulla": 3110, "olimpica": 2250, "d1": 1450}
   },
   {
     "id": "ajo",
@@ -170,10 +170,10 @@
     "sinonimos": ["dientes de ajo"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 2800,
-    "precioPor": 250,
     "vidaUtilDias": 30,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 150, "etiqueta": "3 cabezas"},
+    "precios": {"carulla": 2160, "olimpica": 2190, "d1": 1100}
   },
   {
     "id": "pimenton",
@@ -181,10 +181,10 @@
     "sinonimos": ["pimenton rojo", "pimiento"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 4000,
-    "precioPor": 1000,
     "vidaUtilDias": 10,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 250, "etiqueta": "1 und"},
+    "precios": {"carulla": 2820, "olimpica": 1580, "d1": 1250}
   },
   {
     "id": "cebolla-larga",
@@ -192,10 +192,10 @@
     "sinonimos": ["cebolla en rama", "cebollin"],
     "seccion": "Verduras",
     "unidad": "g",
-    "precioCop": 2500,
-    "precioPor": 250,
     "vidaUtilDias": 10,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 300, "etiqueta": "300 g"},
+    "precios": {"carulla": 4760, "olimpica": 3150, "d1": 1980}
   },
   {
     "id": "banano",
@@ -203,10 +203,10 @@
     "sinonimos": ["banana", "banano maduro"],
     "seccion": "Frutas",
     "unidad": "g",
-    "precioCop": 3000,
-    "precioPor": 1000,
     "vidaUtilDias": 5,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "6 und"},
+    "precios": {"exito": 2940, "carulla": 2940, "olimpica": 2900, "d1": 3300}
   },
   {
     "id": "fresa",
@@ -214,10 +214,10 @@
     "sinonimos": ["fresas"],
     "seccion": "Frutas",
     "unidad": "g",
-    "precioCop": 6500,
-    "precioPor": 1000,
     "vidaUtilDias": 3,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 7270, "carulla": 8220, "d1": 9980}
   },
   {
     "id": "limon",
@@ -225,10 +225,10 @@
     "sinonimos": ["limon tahiti"],
     "seccion": "Frutas",
     "unidad": "g",
-    "precioCop": 3500,
-    "precioPor": 1000,
     "vidaUtilDias": 15,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 2100, "carulla": 3230, "olimpica": 2700, "d1": 2780}
   },
   {
     "id": "arroz",
@@ -236,10 +236,10 @@
     "sinonimos": ["arroz blanco"],
     "seccion": "Cereales",
     "unidad": "g",
-    "precioCop": 4500,
-    "precioPor": 1000,
     "vidaUtilDias": 365,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+    "precios": {"exito": 4300, "carulla": 4480, "olimpica": 4200, "d1": 3790}
   },
   {
     "id": "pasta",
@@ -247,10 +247,10 @@
     "sinonimos": ["espagueti", "macarrones", "fideos"],
     "seccion": "Cereales",
     "unidad": "g",
-    "precioCop": 4200,
-    "precioPor": 500,
     "vidaUtilDias": 365,
-    "etiquetas": ["gluten"]
+    "etiquetas": ["gluten"],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 3140, "carulla": 2600, "olimpica": 3990, "d1": 3990}
   },
   {
     "id": "pan",
@@ -258,10 +258,10 @@
     "sinonimos": ["pan tajado", "pan de molde"],
     "seccion": "Cereales",
     "unidad": "g",
-    "precioCop": 5200,
-    "precioPor": 500,
     "vidaUtilDias": 5,
-    "etiquetas": ["gluten"]
+    "etiquetas": ["gluten"],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 4990, "carulla": 4990, "olimpica": 7140, "d1": 3320}
   },
   {
     "id": "tortilla",
@@ -269,10 +269,10 @@
     "sinonimos": ["tortilla", "wrap"],
     "seccion": "Cereales",
     "unidad": "g",
-    "precioCop": 7800,
-    "precioPor": 400,
     "vidaUtilDias": 15,
-    "etiquetas": ["gluten"]
+    "etiquetas": ["gluten"],
+    "empaque": {"cantidad": 250, "etiqueta": "10 und"},
+    "precios": {"exito": 6310, "carulla": 6500, "olimpica": 4880, "d1": 3720}
   },
   {
     "id": "avena",
@@ -280,21 +280,32 @@
     "sinonimos": ["avena en hojuelas"],
     "seccion": "Cereales",
     "unidad": "g",
-    "precioCop": 4800,
-    "precioPor": 500,
     "vidaUtilDias": 180,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 2300, "carulla": 2370, "olimpica": 2810, "d1": 2810}
   },
   {
     "id": "maiz",
-    "nombre": "Maíz",
-    "sinonimos": ["harina de maiz", "masa de maiz"],
+    "nombre": "Maíz tierno",
+    "sinonimos": ["maiz tierno", "maiz dulce", "maiz desgranado"],
     "seccion": "Cereales",
     "unidad": "g",
-    "precioCop": 3800,
-    "precioPor": 1000,
     "vidaUtilDias": 180,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 300, "etiqueta": "1 lata"},
+    "precios": {"exito": 6870, "carulla": 7290, "olimpica": 4400, "d1": 4630}
+  },
+  {
+    "id": "harina-maiz",
+    "nombre": "Harina de maíz",
+    "sinonimos": ["harina de maiz", "harina pan", "harina precocida", "masa de maiz"],
+    "seccion": "Cereales",
+    "unidad": "g",
+    "vidaUtilDias": 365,
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+    "precios": {"exito": 3270, "carulla": 3600, "olimpica": 2540, "d1": 2550}
   },
   {
     "id": "lentejas",
@@ -302,10 +313,10 @@
     "sinonimos": ["lenteja"],
     "seccion": "Cereales",
     "unidad": "g",
-    "precioCop": 5200,
-    "precioPor": 500,
     "vidaUtilDias": 365,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 1950, "carulla": 1950, "olimpica": 1950, "d1": 1590}
   },
   {
     "id": "frijoles",
@@ -313,10 +324,10 @@
     "sinonimos": ["frijol", "frijol rojo"],
     "seccion": "Cereales",
     "unidad": "g",
-    "precioCop": 6200,
-    "precioPor": 500,
     "vidaUtilDias": 365,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 6500, "carulla": 6500, "olimpica": 4250, "d1": 2990}
   },
   {
     "id": "garbanzos",
@@ -324,10 +335,10 @@
     "sinonimos": ["garbanzo"],
     "seccion": "Cereales",
     "unidad": "g",
-    "precioCop": 6000,
-    "precioPor": 500,
     "vidaUtilDias": 365,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 3200, "carulla": 3300, "olimpica": 2510, "d1": 2650}
   },
   {
     "id": "pollo",
@@ -335,10 +346,10 @@
     "sinonimos": ["pechuga", "muslo", "pollo entero"],
     "seccion": "Carnes",
     "unidad": "g",
-    "precioCop": 14500,
-    "precioPor": 1000,
     "vidaUtilDias": 2,
-    "etiquetas": ["carne", "origen_animal"]
+    "etiquetas": ["carne", "origen_animal"],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+    "precios": {"exito": 22250, "carulla": 24900, "olimpica": 9590, "d1": 14500}
   },
   {
     "id": "carne",
@@ -346,10 +357,10 @@
     "sinonimos": ["carne", "lomo", "bistec", "carne molida"],
     "seccion": "Carnes",
     "unidad": "g",
-    "precioCop": 28000,
-    "precioPor": 1000,
     "vidaUtilDias": 3,
-    "etiquetas": ["carne", "origen_animal"]
+    "etiquetas": ["carne", "origen_animal"],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 15170, "carulla": 15170, "olimpica": 19800, "d1": 15700}
   },
   {
     "id": "pescado",
@@ -357,10 +368,10 @@
     "sinonimos": ["filete de pescado", "tilapia", "bagre"],
     "seccion": "Carnes",
     "unidad": "g",
-    "precioCop": 18000,
-    "precioPor": 1000,
     "vidaUtilDias": 2,
-    "etiquetas": ["marisco", "origen_animal"]
+    "etiquetas": ["marisco", "origen_animal"],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 15310, "carulla": 15310, "olimpica": 24530, "d1": 17440}
   },
   {
     "id": "atun",
@@ -368,10 +379,10 @@
     "sinonimos": ["atun en lata", "atun en agua"],
     "seccion": "Carnes",
     "unidad": "g",
-    "precioCop": 7200,
-    "precioPor": 170,
     "vidaUtilDias": 365,
-    "etiquetas": ["marisco", "origen_animal"]
+    "etiquetas": ["marisco", "origen_animal"],
+    "empaque": {"cantidad": 170, "etiqueta": "1 lata"},
+    "precios": {"exito": 13960, "carulla": 14100, "olimpica": 5590, "d1": 4450}
   },
   {
     "id": "huevo",
@@ -379,10 +390,10 @@
     "sinonimos": ["huevos"],
     "seccion": "Otros",
     "unidad": "und",
-    "precioCop": 15000,
-    "precioPor": 30,
     "vidaUtilDias": 14,
-    "etiquetas": ["origen_animal"]
+    "etiquetas": ["origen_animal"],
+    "empaque": {"cantidad": 30, "etiqueta": "30 und"},
+    "precios": {"exito": 17100, "carulla": 17500, "olimpica": 11920, "d1": 12490}
   },
   {
     "id": "queso",
@@ -390,10 +401,10 @@
     "sinonimos": ["queso campesino", "queso costeno"],
     "seccion": "Lácteos",
     "unidad": "g",
-    "precioCop": 12500,
-    "precioPor": 500,
     "vidaUtilDias": 10,
-    "etiquetas": ["origen_animal", "lactosa"]
+    "etiquetas": ["origen_animal", "lactosa"],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 16850, "carulla": 16330, "olimpica": 15600, "d1": 13560}
   },
   {
     "id": "leche",
@@ -401,10 +412,10 @@
     "sinonimos": ["leche entera", "leche deslactosada"],
     "seccion": "Lácteos",
     "unidad": "ml",
-    "precioCop": 4500,
-    "precioPor": 1000,
     "vidaUtilDias": 5,
-    "etiquetas": ["origen_animal", "lactosa"]
+    "etiquetas": ["origen_animal", "lactosa"],
+    "empaque": {"cantidad": 1100, "etiqueta": "1,1 L"},
+    "precios": {"exito": 3770, "carulla": 3770, "olimpica": 4060, "d1": 3780}
   },
   {
     "id": "mantequilla",
@@ -412,10 +423,10 @@
     "sinonimos": ["mantequilla con sal"],
     "seccion": "Lácteos",
     "unidad": "g",
-    "precioCop": 6200,
-    "precioPor": 250,
     "vidaUtilDias": 30,
-    "etiquetas": ["origen_animal", "lactosa"]
+    "etiquetas": ["origen_animal", "lactosa"],
+    "empaque": {"cantidad": 250, "etiqueta": "250 g"},
+    "precios": {"exito": 14250, "carulla": 15800, "olimpica": 15600, "d1": 12490}
   },
   {
     "id": "aceite",
@@ -423,10 +434,11 @@
     "sinonimos": ["aceite vegetal"],
     "seccion": "Otros",
     "unidad": "ml",
-    "precioCop": 12500,
-    "precioPor": 1000,
     "vidaUtilDias": 365,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 L"},
+    "precios": {"exito": 7720, "carulla": 7500, "olimpica": 7210, "d1": 7720},
+    "basico": true
   },
   {
     "id": "sal",
@@ -434,10 +446,11 @@
     "sinonimos": ["sal fina"],
     "seccion": "Otros",
     "unidad": "g",
-    "precioCop": 2200,
-    "precioPor": 1000,
     "vidaUtilDias": 730,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+    "precios": {"exito": 2950, "carulla": 3400, "olimpica": 2580, "d1": 2900},
+    "basico": true
   },
   {
     "id": "comino",
@@ -445,10 +458,11 @@
     "sinonimos": ["comino molido"],
     "seccion": "Otros",
     "unidad": "g",
-    "precioCop": 2600,
-    "precioPor": 50,
     "vidaUtilDias": 365,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 50, "etiqueta": "50 g"},
+    "precios": {"exito": 2850, "carulla": 3080, "olimpica": 2830, "d1": 3550},
+    "basico": true
   },
   {
     "id": "pimienta",
@@ -456,10 +470,11 @@
     "sinonimos": ["pimienta negra"],
     "seccion": "Otros",
     "unidad": "g",
-    "precioCop": 3200,
-    "precioPor": 50,
     "vidaUtilDias": 365,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 50, "etiqueta": "50 g"},
+    "precios": {"exito": 7990, "carulla": 3110, "olimpica": 1740, "d1": 3120},
+    "basico": true
   },
   {
     "id": "azucar",
@@ -467,10 +482,11 @@
     "sinonimos": ["azucar blanca"],
     "seccion": "Otros",
     "unidad": "g",
-    "precioCop": 4500,
-    "precioPor": 1000,
     "vidaUtilDias": 730,
-    "etiquetas": []
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+    "precios": {"exito": 4430, "carulla": 4450, "olimpica": 4500, "d1": 3100},
+    "basico": true
   },
   {
     "id": "almendras",
@@ -478,10 +494,10 @@
     "sinonimos": ["almendra", "almendras tostadas"],
     "seccion": "Otros",
     "unidad": "g",
-    "precioCop": 8500,
-    "precioPor": 250,
     "vidaUtilDias": 180,
-    "etiquetas": ["frutos_secos"]
+    "etiquetas": ["frutos_secos"],
+    "empaque": {"cantidad": 250, "etiqueta": "250 g"},
+    "precios": {"exito": 22750, "carulla": 23500, "olimpica": 18990, "d1": 14830}
   },
   {
     "id": "miel",
@@ -489,9 +505,9 @@
     "sinonimos": ["miel de abejas"],
     "seccion": "Otros",
     "unidad": "g",
-    "precioCop": 12000,
-    "precioPor": 500,
     "vidaUtilDias": 365,
-    "etiquetas": ["origen_animal"]
+    "etiquetas": ["origen_animal"],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 8980, "carulla": 9900, "olimpica": 15460, "d1": 12710}
   }
 ]

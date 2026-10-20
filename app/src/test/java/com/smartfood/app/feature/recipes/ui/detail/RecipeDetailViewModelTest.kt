@@ -12,6 +12,7 @@ import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.Recipe
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
+import com.smartfood.app.feature.recipes.domain.model.Store
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import com.smartfood.app.feature.recipes.domain.usecase.BuildRecipeIngredientsUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipeDetailUseCase
@@ -185,8 +186,8 @@ class RecipeDetailViewModelTest {
         name = name,
         section = section,
         unit = IngredientUnit.GRAM,
-        priceCop = priceCop,
-        priceQuantity = 1_000.0,
+        pack = 1_000.0,
+        prices = mapOf(Store.D1 to priceCop),
     )
 
     private fun item(id: String, name: String, category: FoodCategory, grams: Double) = InventoryItem(

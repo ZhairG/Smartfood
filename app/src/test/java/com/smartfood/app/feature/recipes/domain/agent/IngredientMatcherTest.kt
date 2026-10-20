@@ -7,6 +7,7 @@ import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
 import com.smartfood.app.feature.recipes.domain.model.FoodTag
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
+import com.smartfood.app.feature.recipes.domain.model.Store
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -187,8 +188,8 @@ class IngredientMatcherTest {
         synonyms = synonyms,
         section = "Carnes",
         unit = unit,
-        priceCop = 10_000,
-        priceQuantity = 1_000.0,
+        pack = 1_000.0,
+        prices = mapOf(Store.D1 to 10_000L),
         tags = setOf(FoodTag.MEAT),
     )
 

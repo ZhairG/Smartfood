@@ -4,6 +4,7 @@ import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.Recipe
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
+import com.smartfood.app.feature.recipes.domain.model.Store
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -81,8 +82,8 @@ class SearchRecipesUseCaseTest {
         synonyms = synonyms,
         section = "Otros",
         unit = IngredientUnit.GRAM,
-        priceCop = 10_000,
-        priceQuantity = 1_000.0,
+        pack = 1_000.0,
+        prices = mapOf(Store.D1 to 10_000L),
     )
 
     private fun recipe(id: String, name: String, vararg ingredientIds: String) = Recipe(

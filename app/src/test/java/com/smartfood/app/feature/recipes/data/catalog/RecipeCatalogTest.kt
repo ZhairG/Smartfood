@@ -40,6 +40,8 @@ class RecipeCatalogTest {
     private val sectionNames = setOf("Verduras", "Frutas", "Cereales", "Carnes", "Lácteos", "Otros")
     private val unitNames = setOf("g", "ml", "und")
     private val tagNames = setOf("carne", "marisco", "origen_animal", "gluten", "lactosa", "frutos_secos")
+    private val storeNames = setOf("exito", "carulla", "olimpica", "d1")
+    private val pantryBasics = setOf("aceite", "sal", "comino", "pimienta", "azucar")
     private val difficulties = setOf("Fácil", "Media", "Difícil")
 
     @Test
@@ -112,8 +114,15 @@ class RecipeCatalogTest {
             val id = ingredient.text("id")
             assertTrue("$id: unidad inválida", ingredient.text("unidad") in unitNames)
             assertTrue("$id: sección inválida", ingredient.text("seccion") in sectionNames)
-            assertTrue("$id: precioCop debe ser mayor que 0", ingredient.long("precioCop") > 0)
-            assertTrue("$id: precioPor debe ser mayor que 0", ingredient.number("precioPor") > 0)
+            val pack = ingredient.getValue("empaque").jsonObject
+            assertTrue("$id: el empaque debe ser mayor que 0", pack.number("cantidad") > 0)
+            assertTrue("$id: el empaque necesita su etiqueta", pack.text("etiqueta").isNotBlank())
+            val prices = ingredient.getValue("precios").jsonObject
+            assertTrue("$id: necesita al menos un precio", prices.isNotEmpty())
+            prices.forEach { (store, price) ->
+                assertTrue("$id: tienda '$store' desconocida", store in storeNames)
+                assertTrue("$id: el precio en $store debe ser mayor que 0", price.jsonPrimitive.content.toLong() > 0)
+            }
             assertTrue("$id: vidaUtilDias debe ser mayor que 0", ingredient.optionalInt("vidaUtilDias") > 0)
             ingredient.array("etiquetas").forEach { tag ->
                 val name = tag.jsonPrimitive.content
@@ -136,6 +145,13 @@ class RecipeCatalogTest {
             assertTrue("$id: falta ${file.path}", file.isFile)
             assertTrue("$id: ${file.name} supera los 150 KB", file.length() <= 150 * 1024)
         }
+    }
+
+    @Test
+    fun `RF-RIA-01 los básicos de despensa son aceite, sal, comino, pimienta y azúcar`() {
+        val basics = ingredients.filter { it["basico"]?.jsonPrimitive?.content == "true" }.map { it.text("id") }.toSet()
+
+        assertEquals(pantryBasics, basics)
     }
 
     @Test

@@ -116,7 +116,7 @@ class RecipeEvaluator(
             if (item.isExpiringSoon()) rescued += item.itemId
         }
         val toBuy = if (pending <= EPSILON) 0.0 else pending
-        val cost = if (toBuy == 0.0) 0L else ceil(toBuy * ingredient.pricePerUnitCop).toLong()
+        val cost = if (toBuy == 0.0) 0L else ceil(toBuy * ingredient.pricePerUnitCop()).toLong()
         return IngredientUse(ingredientId, needed, fromPantry, toBuy, cost, rescued) to current
     }
 

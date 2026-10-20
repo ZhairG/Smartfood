@@ -19,6 +19,21 @@ enum class FoodTag { MEAT, SEAFOOD, ANIMAL_PRODUCT, GLUTEN, LACTOSE, NUTS }
 enum class IngredientUnit { GRAM, MILLILITER, UNIT }
 
 /**
+ * Supermercado de referencia de los precios (spec 009, CA-RIA-04-07). La persona elige el suyo en Preferencias
+ * alimentarias (spec 008, CA-PER-03-05); por defecto, [D1]. Los precios son de una consulta puntual de octubre de 2026
+ * (`docs/precios/precios-octubre-2026.md`).
+ */
+enum class Store { EXITO, CARULLA, OLIMPICA, D1 }
+
+/**
+ * Precio de un empaque en una tienda.
+ *
+ * @property store Tienda del precio; puede no ser la elegida si esa no tiene el producto en línea.
+ * @property priceCop Precio del empaque completo, en pesos.
+ */
+data class StorePrice(val store: Store, val priceCop: Long)
+
+/**
  * Ingrediente del catálogo.
  *
  * @property id Identificador estable (por ejemplo, `pollo`).
@@ -26,8 +41,10 @@ enum class IngredientUnit { GRAM, MILLILITER, UNIT }
  * @property synonyms Otros nombres con los que puede aparecer en el inventario (RF-RIA-02).
  * @property section Sección del detalle de receta ("Verduras", "Carnes"…).
  * @property unit Unidad base de las cantidades.
- * @property priceCop Precio de referencia en pesos de [priceQuantity] unidades base.
- * @property priceQuantity Cantidad, en la unidad base, que cuesta [priceCop] (por ejemplo, 1000 g).
+ * @property pack Cantidad del empaque de mercado, en la unidad base (por ejemplo, 1000 g para "Arroz 1 kg").
+ * @property packLabel Cómo se ve el empaque en la app ("1 kg", "30 und", "1 lata").
+ * @property prices Precio del empaque en cada tienda que lo tiene en línea (RF-RIA-01).
+ * @property pantryBasic `true` para los básicos de despensa (aceite, sal…), que no se cobran (spec §7).
  * @property shelfLifeDays Vida útil típica en días, para los productos frescos sin fecha; `null` si no aplica.
  * @property tags Lo que contiene y algunas dietas excluyen ([FoodTag]).
  */
@@ -37,13 +54,27 @@ data class Ingredient(
     val synonyms: List<String> = emptyList(),
     val section: String,
     val unit: IngredientUnit,
-    val priceCop: Long,
-    val priceQuantity: Double,
+    val pack: Double,
+    val packLabel: String = "",
+    val prices: Map<Store, Long>,
+    val pantryBasic: Boolean = false,
     val shelfLifeDays: Int? = null,
     val tags: Set<FoodTag> = emptySet(),
 ) {
-    /** Precio de referencia de una unidad base, en pesos. */
-    val pricePerUnitCop: Double get() = priceCop / priceQuantity
+    init {
+        require(pack > 0.0) { "El empaque de '$id' debe ser mayor que 0" }
+        require(prices.isNotEmpty()) { "El ingrediente '$id' no tiene precios" }
+    }
+
+    /**
+     * Precio del empaque en [store]; si esa tienda no lo tiene en línea, el más barato de las demás, con su tienda
+     * (CA-RIA-04-07). Ante precios iguales gana el orden de [Store].
+     */
+    fun priceAt(store: Store): StorePrice = prices[store]?.let { StorePrice(store, it) }
+        ?: prices.entries.sortedWith(compareBy({ it.value }, { it.key.ordinal })).first().let { StorePrice(it.key, it.value) }
+
+    /** Precio de una unidad base en [store], en pesos (el del empaque repartido). */
+    fun pricePerUnitCop(store: Store = Store.D1): Double = priceAt(store).priceCop / pack
 }
 
 /**
