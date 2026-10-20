@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.spacing
 
 /**
  * Nombre: TopBar.kt
@@ -36,6 +37,10 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
  * Descripción: Barra superior de las pantallas internas del inventario (spec 006, CA-INV-09-04): fondo verde oscuro,
  * flecha atrás y título centrado, como en los frames "Añadir Producto" y "Foto_Producto" del Figma (`476:5960`). Tiene
  * un hueco opcional a la derecha para una acción como "Guardar" (editor, #40).
+ *
+ * El título ocupa lo mismo que en el Figma (x = 80 a 355 en un frame de 412, nodo `376:1273`): empieza después de la
+ * flecha y, sin acción, llega casi al borde derecho, así que se centra en ese espacio y no en la pantalla. Así cabe
+ * "Preferencias alimentarias" en un teléfono de 360 dp (spec 008, CA-PER-03-01); con acción, reserva su lado.
  */
 
 /**
@@ -76,7 +81,11 @@ fun SmartFoodTopBar(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(horizontal = TitleSidePadding)
+                .fillMaxWidth()
+                .padding(
+                    start = TitleStartPadding,
+                    end = if (action != null) TitleActionPadding else MaterialTheme.spacing.medium
+                )
                 .semantics { heading() }
         )
         if (action != null) {
@@ -89,7 +98,9 @@ fun SmartFoodTopBar(
 // de una barra superior (56 dp). No son medidas de formulario, por eso no van en FormMetrics.
 private val TopBarHeight = 56.dp
 private val TopBarSidePadding = 12.dp
-private val TitleSidePadding = 64.dp
+// El título empieza donde termina la flecha: su margen más el área táctil mínima del IconButton (48 dp).
+private val TitleStartPadding = TopBarSidePadding + 48.dp
+private val TitleActionPadding = 64.dp
 private val TopBarIconSize = 20.dp
 
 @Preview(showBackground = true)
