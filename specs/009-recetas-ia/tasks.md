@@ -8,7 +8,7 @@
 
 ## Issue 1: Catálogo, Descubrir y Detalle (intermedia)
 - [x] T002 Modelos `Recipe`, `RecipeIngredient`, `RecipeStep`, `Ingredient` y contrato `RecipeCatalog` (RF-RIA-01). *Hecha en el #114, porque el agente los necesita; el #113 los reutiliza.*
-- [ ] T003 `assets/ingredientes.json` (con `"etiquetas"`, plan §2) y `assets/recetas.json` (30 a 50 recetas) con fotos en `drawable-nodpi` y sus fuentes en `docs/licenses/fotos-recetas.md`; `RecipeCatalogTest` (RNF-RIA-05).
+- [x] T003 `assets/ingredientes.json` (con `"etiquetas"`, plan §2) y `assets/recetas.json` (30 a 50 recetas) con fotos en `drawable-nodpi` y sus fuentes en `docs/licenses/fotos-recetas.md`; `RecipeCatalogTest` (RNF-RIA-05).
 - [ ] T004 `AssetsRecipeCatalog` con kotlinx.serialization y `RecipesDataModule`.
 - [ ] T005 `IngredientMatcher` con `IngredientMatcherTest` (RF-RIA-02).
 - [ ] T006 Pestaña Recetas habilitada (Guardadas sigue gris, §9), rutas y `RecipesNavGraph` (CA-RIA-01-01).
