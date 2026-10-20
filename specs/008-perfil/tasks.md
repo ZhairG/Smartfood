@@ -40,7 +40,7 @@
 - [x] T022 Pruebas: `ChangePasswordViewModelTest` y `ChangePasswordScreenTest`.
 
 ## Cierre (en el mismo PR)
-- [ ] T023 Suite instrumentada completa y `rules-test` en verde.
+- [x] T023 Suite instrumentada completa y `rules-test` en verde. 34 clases y 146 pruebas en el teléfono (Android 16) el 2026-10-19; `rules-test` 34/34 y `functions` 48/48.
 - [ ] T024 Despliegue de `firestore.rules` y `storage.rules` (con confirmación de Zhair).
 - [ ] T025 Checklist manual en el teléfono (abajo) y capturas Figma vs app en el PR.
 - [ ] T026 Matriz al día, `README.md` y `AGENTS.md` (arquitectura del Perfil).
