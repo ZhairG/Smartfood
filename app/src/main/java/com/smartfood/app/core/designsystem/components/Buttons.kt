@@ -29,9 +29,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreyDark
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.White
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
 /**
@@ -57,6 +59,8 @@ import com.smartfood.app.core.designsystem.util.figmaShadow
  * `476:5726`, spec 006 T026). El color naranja habilitado y gris deshabilitado ya es el del Figma de inventario.
  * @param destructive Variante destructiva: fondo `error` y contenido `onError`, para el botón de confirmar de
  * `SmartFoodConfirmDialog` (Figma `476:3815`, CA-INV-04-01). Por defecto es el naranja del tema.
+ * @param green Variante verde del Figma de "Preferencias alimentarias" (`376:1260`, spec 008 T012): fondo `GreenCheck`
+ * y texto blanco. Por defecto es el naranja del tema.
  */
 @Composable
 fun SmartFoodPrimaryButton(
@@ -67,15 +71,22 @@ fun SmartFoodPrimaryButton(
     isLoading: Boolean = false,
     loadingText: String = text,
     leadingIcon: ImageVector? = null,
-    destructive: Boolean = false
+    destructive: Boolean = false,
+    green: Boolean = false
 ) {
     val buttonShape = RoundedCornerShape(10.dp)
 
     // Colores cerrados: nadie pasa colores sueltos al botón (plan §8, #80).
-    val containerColor =
-        if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-    val contentColor =
-        if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onSecondary
+    val containerColor = when {
+        destructive -> MaterialTheme.colorScheme.error
+        green -> GreenCheck
+        else -> MaterialTheme.colorScheme.secondary
+    }
+    val contentColor = when {
+        destructive -> MaterialTheme.colorScheme.onError
+        green -> White
+        else -> MaterialTheme.colorScheme.onSecondary
+    }
     
     // La animación de los puntos solo existe mientras carga: en reposo el botón no recompone cada frame.
     val displayText = if (isLoading) {

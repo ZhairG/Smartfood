@@ -109,4 +109,28 @@ sealed interface Route {
     data object Profile : Route {
         override val screenRoute: ScreenRoute = ScreenRoute.PROFILE
     }
+
+    /** "Editar información" del Perfil (spec 008, HU-PER-02). */
+    @Serializable
+    data object EditProfile : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.EDIT_PROFILE
+    }
+
+    /** "Preferencias alimentarias" del Perfil (spec 008, HU-PER-03). */
+    @Serializable
+    data object FoodPreferences : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.FOOD_PREFERENCES
+    }
+
+    /** "Notificaciones" del Perfil (spec 008, HU-PER-04). */
+    @Serializable
+    data object NotificationSettings : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.NOTIFICATION_SETTINGS
+    }
+
+    /** "Cambiar contraseña" del Perfil (spec 008, HU-PER-05). */
+    @Serializable
+    data object ChangePassword : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.CHANGE_PASSWORD
+    }
 }

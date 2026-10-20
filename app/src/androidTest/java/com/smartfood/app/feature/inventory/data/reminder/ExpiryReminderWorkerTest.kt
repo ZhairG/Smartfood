@@ -21,8 +21,10 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.GetExpiringItemsUseCase
+import com.smartfood.app.feature.profile.domain.model.NotificationSettings
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeInventoryRepository
+import com.smartfood.app.testutil.FakeNotificationSettingsRepository
 import com.smartfood.app.testutil.inventoryItem
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -41,9 +43,11 @@ import java.time.ZoneId
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas instrumentadas de [ExpiryReminderWorker] con `WorkManagerTestInitHelper` (HU-INV-08, T037 y
- * T038). El trabajador se construye con los fakes compartidos de `sharedTest` para no tocar Firebase (#105). Comprueba que publica el
- * aviso con el producto más próximo (CA-INV-08-01, 08-02), que no publica si no hay productos por vencer
- * (CA-INV-08-03), que la notificación abre la app (CA-INV-08-04) y que sin sesión no publica (CA-INV-08-06).
+ * T038; ajustes de la spec 008, T016). El trabajador se construye con los fakes compartidos de `sharedTest` para no
+ * tocar Firebase (#105). Comprueba que publica el aviso con el producto más próximo (CA-INV-08-01, 08-02), que no
+ * publica si no hay productos por vencer (CA-INV-08-03), que la notificación abre la app (CA-INV-08-04), que sin
+ * sesión no publica (CA-INV-08-06), que respeta "Productos por vencer" (CA-PER-04-03) y que publica "Inventario vacío"
+ * cuando corresponde (CA-PER-04-04).
  */
 @RunWith(AndroidJUnit4::class)
 class ExpiryReminderWorkerTest {
@@ -57,6 +61,7 @@ class ExpiryReminderWorkerTest {
 
     private var auth: FakeAuthRepository = sesion("uid-con-sesion")
     private var inventory: FakeInventoryRepository = inventario(emptyList())
+    private var settings: FakeNotificationSettingsRepository = FakeNotificationSettingsRepository()
 
     private lateinit var workManager: WorkManager
 
@@ -78,6 +83,7 @@ class ExpiryReminderWorkerTest {
                         auth,
                         inventory,
                         GetExpiringItemsUseCase(ClassifyExpiryUseCase(clock)),
+                        settings,
                         ExpiryNotifier(appContext)
                     )
                     else -> null
@@ -149,6 +155,48 @@ class ExpiryReminderWorkerTest {
     fun ca_inv_08_06_sinSesionActivaNoPublicaNada() {
         auth = sesion(null)
         inventory = inventario(listOf(item("Leche Entera", 1)))
+
+        ejecutarWorker()
+
+        assertEquals(0, notificacionesActivas().size)
+    }
+
+    @Test
+    fun ca_per_04_03_conProductosPorVencerApagadoNoPublicaElAvisoDiario() {
+        settings = FakeNotificationSettingsRepository(
+            NotificationSettings(expiringProducts = false, suggestedRecipes = true, emptyInventory = true)
+        )
+        inventory = inventario(listOf(item("Leche Entera", 1)))
+
+        ejecutarWorker()
+
+        assertEquals(0, notificacionesActivas().size)
+    }
+
+    @Test
+    fun ca_per_04_04_conInventarioVacioPublicaElAvisoYLoAbreEnLaApp() {
+        settings = FakeNotificationSettingsRepository(NotificationSettings(emptyInventory = true))
+        inventory = inventario(emptyList())
+
+        ejecutarWorker()
+
+        val notificacion = notificacionesActivas().single().notification
+        assertEquals(
+            context.getString(com.smartfood.app.R.string.notification_empty_inventory_title),
+            notificacion.extras.getString(Notification.EXTRA_TITLE)
+        )
+        assertEquals(
+            context.getString(com.smartfood.app.R.string.notification_empty_inventory_body),
+            notificacion.extras.getString(Notification.EXTRA_TEXT)
+        )
+        assertNotNull(notificacion.contentIntent)
+        assertEquals(context.packageName, notificacion.contentIntent.creatorPackage)
+    }
+
+    @Test
+    fun ca_per_04_04_conInventarioVacioApagadoNoPublicaNada() {
+        settings = FakeNotificationSettingsRepository(NotificationSettings(emptyInventory = false))
+        inventory = inventario(emptyList())
 
         ejecutarWorker()
 

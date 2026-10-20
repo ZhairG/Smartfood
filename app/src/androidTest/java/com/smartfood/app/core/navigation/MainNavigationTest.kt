@@ -2,6 +2,8 @@ package com.smartfood.app.core.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -128,6 +130,38 @@ class MainNavigationTest {
         // Pasa por el descarte de "atrás" y llega a la lista, no a la búsqueda de la que vino.
         assertTrue(navController.currentDestination?.hasRoute<Route.Inventory>() == true)
         composeTestRule.onNodeWithText("Mi Inventario").assertIsDisplayed()
+    }
+
+    @Test
+    fun caPer0103_caPer0104_editarInformacionSeAbreConLaBarra_yPerfilVuelve() {
+        composeTestRule.onNodeWithText("Perfil").performClick()
+        composeTestRule.onNode(hasText("Editar información personal") and hasClickAction()).performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.EditProfile>() == true)
+        composeTestRule.onNodeWithText("Editar información").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Perfil").assertIsSelected()
+
+        // Volver a tocar "Perfil" regresa al Perfil (CA-PER-01-04).
+        composeTestRule.onNodeWithText("Perfil").performClick()
+        composeTestRule.waitForIdle()
+        assertTrue(navController.currentDestination?.hasRoute<Route.Profile>() == true)
+    }
+
+    @Test
+    fun caPer0103_caPer0104_preferenciasSeAbreConLaBarra_yPerfilVuelve() {
+        composeTestRule.onNodeWithText("Perfil").performClick()
+        composeTestRule.onNode(hasText("Preferencias alimentarias") and hasClickAction()).performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.FoodPreferences>() == true)
+        composeTestRule.onNodeWithText("Preferencias alimentarias").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Perfil").assertIsSelected()
+
+        // Volver a tocar "Perfil" regresa al Perfil (CA-PER-01-04).
+        composeTestRule.onNodeWithText("Perfil").performClick()
+        composeTestRule.waitForIdle()
+        assertTrue(navController.currentDestination?.hasRoute<Route.Profile>() == true)
     }
 
     @Test

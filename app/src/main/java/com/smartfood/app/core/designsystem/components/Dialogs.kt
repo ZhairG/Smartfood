@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -46,6 +47,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.ShadowColorModal
@@ -367,17 +369,111 @@ fun SmartFoodWarningDialog(
     }
 }
 
+/**
+ * Pregunta si se guardan los cambios de un formulario: advertencia naranja, la pregunta en grande y los botones
+ * "Guardar" (verde) y "Cancelar" (naranja) lado a lado, sin explicación.
+ *
+ * Figma: "Editar información Guardado Pregunta" `369:1195` y "Preferencias alimentarias" `593:1976` (spec 008,
+ * CA-PER-02-03). No se cierra tocando fuera; atrás equivale a cancelar.
+ *
+ * @param question Pregunta, como "¿Desea guardar los cambios?".
+ * @param confirmText Texto del botón verde.
+ * @param dismissText Texto del botón naranja.
+ * @param onConfirm Acción al confirmar.
+ * @param onDismiss Acción al cancelar o al usar atrás.
+ * @param modifier Modificador opcional para el contenido del diálogo.
+ */
+@Composable
+fun SmartFoodSaveChangesDialog(
+    question: String,
+    confirmText: String,
+    dismissText: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(dismissOnClickOutside = false)) {
+        BlurBehindDialog()
+        SmartFoodWarningDialogContent(
+            title = question,
+            body = null,
+            confirmText = confirmText,
+            dismissText = dismissText,
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+            modifier = modifier,
+            style = WarningDialogStyle.SAVE
+        )
+    }
+}
+
+/**
+ * Tarjeta de diálogo con contenido libre, con el mismo fondo, radio, sombra y desenfoque de los demás avisos. Sirve
+ * para pasos que el Figma no define, como escribir el código del correo nuevo (spec 008, CA-PER-02-10).
+ *
+ * @param title Título en verde oscuro, Bold de 20 sp.
+ * @param onDismissRequest Acción con atrás; tocar fuera no cierra.
+ * @param modifier Modificador opcional para la tarjeta.
+ * @param content Contenido debajo del título.
+ */
+@Composable
+fun SmartFoodContentDialog(
+    title: String,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    // Casi todo el ancho de la pantalla, como el diálogo sin conexión: con el ancho estándar de Android no caben las
+    // 4 casillas del código ni "¿No recibiste el código? Reenviar código" en una línea a 360 dp.
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(dismissOnClickOutside = false, usePlatformDefaultWidth = false)
+    ) {
+        BlurBehindDialog()
+        val spacing = MaterialTheme.spacing
+        val metrics = LocalFormMetrics.current
+        Column(
+            modifier = modifier
+                .widthIn(max = 480.dp)
+                .fillMaxWidth()
+                .padding(horizontal = spacing.extraSmall, vertical = spacing.small)
+                .figmaShadow(
+                    color = ShadowColorModal,
+                    borderRadius = spacing.panelRadius,
+                    blurRadius = spacing.extraSmall,
+                    offsetY = spacing.extraSmall
+                )
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(spacing.panelRadius))
+                .padding(horizontal = spacing.large, vertical = metrics.sectionSpacing),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(spacing.medium)
+        ) {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                textAlign = TextAlign.Center
+            )
+            content()
+        }
+    }
+}
+
+/** Variantes del aviso: la de [SmartFoodWarningDialog] y la de [SmartFoodSaveChangesDialog]. */
+private enum class WarningDialogStyle { WARNING, SAVE }
+
 /** Muestra el contenido de [SmartFoodWarningDialog] para reutilizarlo en vistas previas. */
 @Composable
 private fun SmartFoodWarningDialogContent(
     title: String,
-    body: String,
+    body: String?,
     confirmText: String,
     dismissText: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    destructive: Boolean = false
+    destructive: Boolean = false,
+    style: WarningDialogStyle = WarningDialogStyle.WARNING
 ) {
     val spacing = MaterialTheme.spacing
     val metrics = LocalFormMetrics.current
@@ -420,35 +516,43 @@ private fun SmartFoodWarningDialogContent(
         Text(
             text = title,
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+            // Figma 369:1252: la pregunta de guardar va en 25 sp; la del aviso, en 20 sp.
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontSize = if (style == WarningDialogStyle.SAVE) 25.sp else 20.sp,
+                fontWeight = FontWeight.Bold
+            ),
             textAlign = TextAlign.Center
         )
 
         // Figma 604:2752: Poppins Regular de 13 px en gris.
-        Text(
-            text = body,
-            color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-            // bodyLarge es el estilo del tema con Poppins; bodyMedium usa la fuente del sistema.
-            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.Normal),
-            textAlign = TextAlign.Center
-        )
+        if (body != null) {
+            Text(
+                text = body,
+                color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                // bodyLarge es el estilo del tema con Poppins; bodyMedium usa la fuente del sistema.
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.Normal),
+                textAlign = TextAlign.Center
+            )
+        }
 
         // Figma 604:2745 y 604:2748: confirmar en naranja y cancelar en gris, lado a lado.
         Row(
             horizontalArrangement = Arrangement.spacedBy(spacing.small),
             modifier = Modifier.fillMaxWidth().padding(top = spacing.small)
         ) {
+            // Figma 369:1253 y 369:1256: al guardar, "Guardar" en verde y "Cancelar" en naranja.
+            val isSave = style == WarningDialogStyle.SAVE
             WarningDialogButton(
                 text = confirmText,
-                containerColor = accent,
+                containerColor = if (isSave) GreenCheck else accent,
                 contentColor = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onSecondary,
                 onClick = onConfirm,
                 modifier = Modifier.weight(1f)
             )
             WarningDialogButton(
                 text = dismissText,
-                containerColor = GreyDivider,
-                contentColor = Color.Black,
+                containerColor = if (isSave) MaterialTheme.colorScheme.secondary else GreyDivider,
+                contentColor = if (isSave) MaterialTheme.colorScheme.onSecondary else Color.Black,
                 onClick = onDismiss,
                 modifier = Modifier.weight(1f)
             )

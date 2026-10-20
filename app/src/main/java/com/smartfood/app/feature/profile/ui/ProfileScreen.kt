@@ -1,4 +1,4 @@
-package com.smartfood.app.feature.profile
+package com.smartfood.app.feature.profile.ui
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
@@ -31,9 +31,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import coil3.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -50,18 +54,24 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodWarningDialog
 import com.smartfood.app.core.designsystem.theme.GreenCheck
+import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.ThemeMode
+import com.smartfood.app.core.designsystem.theme.formMetricsFor
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
+import com.smartfood.app.feature.inventory.ui.components.OptionSheet
 
 /**
  * Nombre: ProfileScreen.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pestaña Perfil (spec 001 HU-05; spec 006 CA-INV-09-03; Figma "Perfil" `306:369`). Encabezado verde
- * con el avatar de iniciales, el nombre y el correo; tres tarjetas de cifras; las opciones de la cuenta y "Cerrar
- * Sesión". Por ahora solo "Cerrar Sesión" funciona: las opciones y la cámara del avatar se ven deshabilitadas, y de
- * las cifras solo "Ingredientes en inventario" es real (spec 006 §8).
+ * con la foto o las iniciales, el nombre y el correo; tres tarjetas de cifras; las opciones de la cuenta y "Cerrar
+ * Sesión". "Editar información personal" y la cámara del avatar abren "Editar información" (spec 008, CA-PER-01-03);
+ * "Preferencias alimentarias" abre su pantalla (spec 008, HU-PER-03); "Notificaciones" también abre la suya (spec 008,
+ * HU-PER-04); "Cambiar contraseña" se ve deshabilitada hasta tener su pantalla, y de las cifras solo "Ingredientes en
+ * inventario" es real (CA-PER-01-02).
  *
  * Adaptable (spec 002): las medidas del Figma (412 dp de ancho) se escalan al ancho real, el encabezado se compacta
  * en pantallas bajas y "Cerrar Sesión" queda siempre visible abajo; las tarjetas y opciones se desplazan si no caben.
@@ -103,7 +113,7 @@ fun ProfileScreen(
         val dimens = profileDimens(maxWidth, maxHeight)
 
         Column(modifier = Modifier.fillMaxSize()) {
-            ProfileHeader(state = state, dimens = dimens)
+            ProfileHeader(state = state, dimens = dimens, onEditClick = { onEvent(ProfileEvent.EditProfileClicked) })
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(dimens.gap),
@@ -132,7 +142,15 @@ fun ProfileScreen(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                OptionsCard(dimens = dimens)
+                OptionsCard(
+                    dimens = dimens,
+                    themeMode = state.themeMode,
+                    onEditClick = { onEvent(ProfileEvent.EditProfileClicked) },
+                    onPreferencesClick = { onEvent(ProfileEvent.PreferencesClicked) },
+                    onNotificationsClick = { onEvent(ProfileEvent.NotificationsClicked) },
+                    onPasswordClick = { onEvent(ProfileEvent.PasswordClicked) },
+                    onThemeClick = { onEvent(ProfileEvent.ThemeClicked) }
+                )
             }
 
             // "Cerrar Sesión" queda fijo abajo, siempre visible, como en el Figma (CA-05-03).
@@ -162,12 +180,25 @@ fun ProfileScreen(
                 )
             }
         }
+
+        if (state.isThemeSheetVisible) {
+            CompositionLocalProvider(LocalFormMetrics provides formMetricsFor(maxHeight)) {
+                OptionSheet(
+                    title = stringResource(id = R.string.profile_option_theme),
+                    options = ThemeMode.entries,
+                    selected = state.themeMode,
+                    label = { stringResource(id = it.titleRes) },
+                    onConfirm = { mode -> onEvent(ProfileEvent.ThemeSelected(mode)) },
+                    onDismiss = { onEvent(ProfileEvent.ThemeSheetDismissed) }
+                )
+            }
+        }
     }
 }
 
 /** Encabezado verde con el avatar, el nombre y el correo. */
 @Composable
-private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens) {
+private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens, onEditClick: () -> Unit) {
     val name = state.fullName ?: stringResource(id = R.string.profile_name_generic)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -182,19 +213,30 @@ private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(dimens.avatar)
-                    .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
                     .semantics { contentDescription = name }
             ) {
-                Text(
-                    text = state.initials.orEmpty(),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontSize = dimens.initialsText,
-                        fontWeight = FontWeight.Bold
+                // La foto de perfil, si hay; si no, las iniciales (CA-PER-01-01).
+                if (state.photoUrl != null) {
+                    AsyncImage(
+                        model = state.photoUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(dimens.avatar)
                     )
-                )
+                } else {
+                    Text(
+                        text = state.initials.orEmpty(),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontSize = dimens.initialsText,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
             }
-            // Cambiar la foto todavía no existe: el botón se ve, pero está deshabilitado.
+            // La foto se cambia en "Editar información" (CA-PER-02-08).
             val changePhoto = stringResource(id = R.string.cd_profile_change_photo)
             Box(
                 contentAlignment = Alignment.Center,
@@ -203,7 +245,7 @@ private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens) {
                     .size(dimens.cameraBadge)
                     .background(MaterialTheme.colorScheme.secondary, CircleShape)
                     .border(CameraBadgeBorder, MaterialTheme.colorScheme.primaryContainer, CircleShape)
-                    .clickable(enabled = false, role = Role.Button) {}
+                    .clickable(role = Role.Button, onClick = onEditClick)
                     .semantics { contentDescription = changePhoto }
             ) {
                 Icon(
@@ -268,9 +310,21 @@ private fun StatCard(value: String, label: String, dimens: ProfileDimens, modifi
     }
 }
 
-/** Opciones de la cuenta, separadas por líneas. Todavía no tienen pantalla: se ven deshabilitadas. */
+/**
+ * Opciones de la cuenta, separadas por líneas. "Editar información personal", "Preferencias alimentarias",
+ * "Notificaciones" y "Tema de la app" abren su pantalla o su hoja; "Cambiar contraseña" se ve deshabilitada hasta
+ * tener la suya.
+ */
 @Composable
-private fun OptionsCard(dimens: ProfileDimens) {
+private fun OptionsCard(
+    dimens: ProfileDimens,
+    themeMode: ThemeMode,
+    onEditClick: () -> Unit,
+    onPreferencesClick: () -> Unit,
+    onNotificationsClick: () -> Unit,
+    onPasswordClick: () -> Unit,
+    onThemeClick: () -> Unit,
+) {
     val options = listOf(
         R.drawable.ic_figma_profile_edit to R.string.profile_option_edit,
         R.drawable.ic_figma_profile_preferences to R.string.profile_option_preferences,
@@ -284,20 +338,46 @@ private fun OptionsCard(dimens: ProfileDimens) {
             .border(CardBorder, MaterialTheme.colorScheme.outline, RoundedCornerShape(dimens.cardRadius))
     ) {
         options.forEachIndexed { index, (icon, textRes) ->
-            OptionRow(icon = icon, text = stringResource(id = textRes), dimens = dimens)
+            OptionRow(
+                icon = icon,
+                text = stringResource(id = textRes),
+                dimens = dimens,
+                onClick = when (textRes) {
+                    R.string.profile_option_edit -> onEditClick
+                    R.string.profile_option_preferences -> onPreferencesClick
+                    R.string.profile_option_notifications -> onNotificationsClick
+                    R.string.profile_option_password -> onPasswordClick
+                    else -> null
+                }
+            )
             if (index < options.lastIndex) HorizontalDivider(color = MaterialTheme.colorScheme.outline)
         }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+        // Desviación aprobada (spec 008 §9): fila que no está en el Figma, con el valor actual a la derecha.
+        OptionRow(
+            icon = R.drawable.ic_profile_theme,
+            text = stringResource(id = R.string.profile_option_theme),
+            trailingText = stringResource(id = themeMode.titleRes),
+            dimens = dimens,
+            onClick = onThemeClick
+        )
     }
 }
 
 @Composable
-private fun OptionRow(@DrawableRes icon: Int, text: String, dimens: ProfileDimens) {
+private fun OptionRow(
+    @DrawableRes icon: Int,
+    text: String,
+    dimens: ProfileDimens,
+    onClick: (() -> Unit)?,
+    trailingText: String? = null
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = dimens.optionHeight)
-            .clickable(enabled = false, role = Role.Button) {}
+            .clickable(enabled = onClick != null, role = Role.Button) { onClick?.invoke() }
             .padding(horizontal = dimens.optionSide)
     ) {
         Box(
@@ -322,6 +402,15 @@ private fun OptionRow(@DrawableRes icon: Int, text: String, dimens: ProfileDimen
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
+        if (trailingText != null) {
+            Text(
+                text = trailingText,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                modifier = Modifier.padding(start = MaterialTheme.spacing.small)
+            )
+        }
         Icon(
             painter = painterResource(id = R.drawable.ic_figma_chevron_right),
             contentDescription = null,

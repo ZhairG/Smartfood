@@ -3,13 +3,12 @@
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas instrumentadas de [ProfileScreen] sin estado (spec 006, CA-INV-09-03; Figma `306:369`): el
- * encabezado, las cifras, las opciones deshabilitadas y "Cerrar Sesión". No cierra la sesión real del dispositivo:
+ * encabezado, las cifras, las opciones (spec 008, CA-PER-01-03) y "Cerrar Sesión". No cierra la sesión real del dispositivo:
  * solo comprueba el evento.
  */
-package com.smartfood.app.feature.profile
+package com.smartfood.app.feature.profile.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -17,6 +16,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.ThemeMode
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +28,11 @@ class ProfileScreenTest {
 
     private val eventos = mutableListOf<ProfileEvent>()
 
-    private fun mostrar(dialog: ProfileDialog? = null) {
+    private fun mostrar(
+        dialog: ProfileDialog? = null,
+        themeMode: ThemeMode = ThemeMode.Default,
+        isThemeSheetVisible: Boolean = false,
+    ) {
         composeTestRule.setContent {
             SmartfoodTheme {
                 ProfileScreen(
@@ -39,6 +43,8 @@ class ProfileScreenTest {
                         email = "pepito@correo.com",
                         initials = "PP",
                         inventoryCount = 34,
+                        themeMode = themeMode,
+                        isThemeSheetVisible = isThemeSheetVisible,
                         dialog = dialog
                     ),
                     onEvent = { eventos += it }
@@ -67,12 +73,60 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun caInv0903_lasOpcionesSinPantallaEstanDeshabilitadas() {
+    fun caPer0103_editarInformacionYLaCamaraAbrenLaPantalla() {
         mostrar()
 
-        composeTestRule.onNode(hasText("Editar información personal") and hasClickAction()).assertIsNotEnabled()
-        composeTestRule.onNode(hasText("Cambiar contraseña") and hasClickAction()).assertIsNotEnabled()
-        composeTestRule.onNodeWithContentDescription("Cambiar foto de perfil").assertIsNotEnabled()
+        composeTestRule.onNode(hasText("Editar información personal") and hasClickAction()).performClick()
+        composeTestRule.onNodeWithContentDescription("Cambiar foto de perfil").performClick()
+
+        assertEquals(listOf(ProfileEvent.EditProfileClicked, ProfileEvent.EditProfileClicked), eventos)
+    }
+
+    @Test
+    fun caPer0501_laFilaCambiarContrasenaAbreSuPantalla() {
+        mostrar()
+
+        composeTestRule.onNode(hasText("Cambiar contraseña") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.PasswordClicked), eventos)
+    }
+
+    @Test
+    fun caPer0401_laFilaDeNotificacionesAbreSuPantalla() {
+        mostrar()
+
+        composeTestRule.onNode(hasText("Notificaciones") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.NotificationsClicked), eventos)
+    }
+
+    @Test
+    fun caPer0601_laFilaDeTemaMuestraElValorActualYAbreLaHoja() {
+        mostrar(themeMode = ThemeMode.DARK)
+
+        composeTestRule.onNodeWithText("Oscuro").assertIsDisplayed()
+        composeTestRule.onNode(hasText("Tema de la app") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.ThemeClicked), eventos)
+    }
+
+    @Test
+    fun caPer0602_laHojaEligeElTemaYConfirmaOCancela() {
+        mostrar(isThemeSheetVisible = true)
+
+        composeTestRule.onNodeWithText("Oscuro").performClick()
+        composeTestRule.onNode(hasText("Guardar") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.ThemeSelected(ThemeMode.DARK)), eventos)
+    }
+
+    @Test
+    fun caPer0602_cancelarLaHojaNoCambiaElTema() {
+        mostrar(isThemeSheetVisible = true)
+
+        composeTestRule.onNode(hasText("Cancelar") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.ThemeSheetDismissed), eventos)
     }
 
     @Test

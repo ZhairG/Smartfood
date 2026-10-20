@@ -11,7 +11,37 @@ service cloud.firestore {
     }
 
     match /users/{uid} {
-      allow read, update, delete: if isOwner(uid);
+      // Preferencias alimentarias (spec 008, CA-PER-03-04): solo las claves del plan y valores permitidos. Las listas
+      // pueden venir vacías y `spice`/`budget` se omiten cuando no hay elección (Firestore no acepta null).
+      function validPreferences(p) {
+        return p is map
+          && p.keys().hasOnly(['restrictions', 'cuisines', 'spice', 'budget'])
+          && (!('restrictions' in p) || (p.restrictions is list
+              && p.restrictions.hasOnly(['VEGETARIAN', 'VEGAN', 'GLUTEN_FREE', 'LACTOSE_FREE', 'NUT_FREE'])))
+          && (!('cuisines' in p) || (p.cuisines is list
+              && p.cuisines.hasOnly(['COLOMBIAN', 'ITALIAN', 'ASIAN', 'MEXICAN', 'MEDITERRANEAN'])))
+          && (!('spice' in p) || p.spice in ['MILD', 'MEDIUM', 'HOT'])
+          && (!('budget' in p) || p.budget in ['ECONOMIC', 'MODERATE', 'UNLIMITED']);
+      }
+
+      // Edición del Perfil (spec 008, RNF-PER-01): solo campos conocidos y válidos; la constancia de términos y
+      // createdAt no se pueden cambiar porque no están en la lista de campos editables.
+      function validProfileUpdate() {
+        let d = request.resource.data;
+        return d.diff(resource.data).affectedKeys()
+            .hasOnly(['fullName', 'email', 'phone', 'birthDate', 'photoPath', 'photoUrl', 'preferences', 'updatedAt'])
+          && d.fullName is string && d.fullName.size() >= 2 && d.fullName.size() <= 50
+          && d.email is string
+          && (!('phone' in d) || (d.phone is string && d.phone.matches('^3[0-9]{9}$')))
+          && (!('birthDate' in d) || (d.birthDate is string && d.birthDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))
+          && ((!('photoPath' in d) && !('photoUrl' in d))
+              || (d.photoPath is string && d.photoUrl is string
+                  && d.photoPath.matches('^users/' + uid + '/profile/[^/]+$')))
+          && (!('preferences' in d) || validPreferences(d.preferences))
+          && d.updatedAt == request.time;
+      }
+      allow read, delete: if isOwner(uid);
+      allow update: if isOwner(uid) && validProfileUpdate();
       // Al crear el perfil se exige la constancia de aceptación de los documentos legales, con la hora del servidor.
       allow create: if isOwner(uid)
         && request.resource.data.termsVersion is string
@@ -62,6 +92,11 @@ service cloud.firestore {
 
     // Bienvenidas enviadas: solo las usa la función sendWelcomeEmail (spec 004).
     match /welcomeEmails/{id} {
+      allow read, write: if false;
+    }
+
+    // Cambios de correo con código: solo los usan las funciones requestEmailChangeCode y confirmEmailChange (spec 008).
+    match /emailChanges/{uid} {
       allow read, write: if false;
     }
   }

@@ -44,6 +44,24 @@ const storage = (uid) => (uid ? env.authenticatedContext(uid) : env.unauthentica
 const bytes = (kb) => new Uint8Array(kb * 1024);
 const jpeg = { contentType: 'image/jpeg' };
 
+describe('foto de perfil (spec 008, RNF-PER-01)', () => {
+  const rutaPerfil = () => `users/u1/profile/foto${n}.jpg`;
+
+  test('CA-PER-02-09 el dueño sube, lee y borra su foto en JPEG', async () => {
+    await assertSucceeds(uploadBytes(ref(storage('u1'), rutaPerfil()), bytes(100), jpeg));
+    await assertSucceeds(getBytes(ref(storage('u1'), rutaPerfil())));
+    await assertSucceeds(deleteObject(ref(storage('u1'), rutaPerfil())));
+  });
+
+  test('RNF-PER-01 otro usuario, otro formato, 2 MB o reemplazar se rechazan', async () => {
+    await assertFails(uploadBytes(ref(storage('u2'), rutaPerfil()), bytes(100), jpeg));
+    await assertFails(uploadBytes(ref(storage('u1'), rutaPerfil()), bytes(100), { contentType: 'image/png' }));
+    await assertFails(uploadBytes(ref(storage('u1'), rutaPerfil()), bytes(2048), jpeg));
+    await assertSucceeds(uploadBytes(ref(storage('u1'), rutaPerfil()), bytes(100), jpeg));
+    await assertFails(uploadBytes(ref(storage('u1'), rutaPerfil()), bytes(100), jpeg));
+  });
+});
+
 describe('fotos de productos (RNF-INV-01, RNF-INV-02)', () => {
   test('RNF-INV-01 el dueño sube, lee y borra un JPEG', async () => {
     await assertSucceeds(uploadBytes(ref(storage('u1'), ruta), bytes(100), jpeg));

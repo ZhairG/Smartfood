@@ -69,6 +69,10 @@ object FirebaseErrorMapper {
         "CODE_EXPIRED" -> AuthError.OtpCodeExpired
         "TOO_MANY_ATTEMPTS" -> AuthError.TooManyAttempts
         "TOO_MANY_REQUESTS" -> AuthError.TooManyRequests((retryAfterSeconds ?: DEFAULT_RETRY_AFTER_SECONDS).seconds)
+        // Cambio de correo con código (spec 008, CA-PER-02-11).
+        "EMAIL_IN_USE" -> AuthError.EmailAlreadyInUse
+        "SAME_EMAIL" -> AuthError.InvalidEmail
+        "REQUIRES_RECENT_LOGIN" -> AuthError.InvalidCredentials
         else -> when {
             isNetworkFailure -> AuthError.Network
             code == FirebaseFunctionsException.Code.UNAVAILABLE ||
