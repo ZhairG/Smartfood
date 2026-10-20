@@ -7,6 +7,8 @@ import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCas
 import com.smartfood.app.feature.recipes.domain.model.RecipeDetail
 import com.smartfood.app.feature.recipes.domain.usecase.BuildRecipeIngredientsUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipeDetailUseCase
+import com.smartfood.app.feature.recipes.domain.model.Store
+import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,6 +33,7 @@ import kotlinx.coroutines.launch
  * @param getDetail Lectura de la receta.
  * @param buildIngredients Escalado, agrupación y costo.
  * @param observeInventory Inventario actual para "En tu inventario".
+ * @param getPreferredStore "Mi supermercado" del Perfil para los precios (CA-RIA-04-07).
  */
 @HiltViewModel
 class RecipeDetailViewModel @Inject constructor(
@@ -37,6 +41,7 @@ class RecipeDetailViewModel @Inject constructor(
     private val getDetail: GetRecipeDetailUseCase,
     private val buildIngredients: BuildRecipeIngredientsUseCase,
     observeInventory: ObserveInventoryUseCase,
+    getPreferredStore: GetPreferredStoreUseCase,
 ) : ViewModel() {
 
     private val recipeId: String = checkNotNull(savedStateHandle.get<String>(RECIPE_ID_KEY)) {
@@ -63,7 +68,9 @@ class RecipeDetailViewModel @Inject constructor(
         detail,
         observeInventory().catch { emit(emptyList()) },
         servingsOverride,
-    ) { state, sections, override ->
+        // D1 mientras se lee el Perfil; se vuelve a leer cada vez que la pantalla se observa de nuevo.
+        flow { emit(Store.D1); emit(getPreferredStore()) },
+    ) { state, sections, override, store ->
         when (state) {
             DetailState.Loading -> RecipeDetailUiState(isLoading = true, recipeId = recipeId)
             DetailState.Error -> RecipeDetailUiState(
@@ -79,6 +86,7 @@ class RecipeDetailViewModel @Inject constructor(
                     detail = state.detail,
                     inventory = sections.flatMap { section -> section.items },
                     servings = servings,
+                    store = store,
                 )
                 RecipeDetailUiState(
                     isLoading = false,
@@ -91,6 +99,7 @@ class RecipeDetailViewModel @Inject constructor(
                     difficulty = recipe.difficulty,
                     servings = servings,
                     groups = built.groups,
+                    store = store,
                 )
             }
         }

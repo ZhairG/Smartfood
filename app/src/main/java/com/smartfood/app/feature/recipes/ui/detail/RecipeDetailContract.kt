@@ -1,6 +1,7 @@
 package com.smartfood.app.feature.recipes.ui.detail
 
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientGroup
+import com.smartfood.app.feature.recipes.domain.model.Store
 
 /**
  * Nombre: RecipeDetailContract.kt
@@ -24,6 +25,7 @@ import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientGroup
  * @property difficulty "Fácil", "Media" o "Alta".
  * @property servings Porciones elegidas.
  * @property groups Ingredientes agrupados por sección, ya escalados.
+ * @property store Supermercado de los precios ("Mi supermercado", CA-RIA-04-07).
  */
 data class RecipeDetailUiState(
     val isLoading: Boolean = true,
@@ -37,6 +39,7 @@ data class RecipeDetailUiState(
     val difficulty: String = "",
     val servings: Int = 1,
     val groups: List<RecipeIngredientGroup> = emptyList(),
+    val store: Store = Store.D1,
 )
 
 /** Acciones de la persona en el detalle. */

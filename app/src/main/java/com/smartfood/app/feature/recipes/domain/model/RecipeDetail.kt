@@ -23,7 +23,11 @@ data class RecipeDetail(
  * @property quantity Cantidad escalada, en la unidad base del ingrediente.
  * @property unit Unidad base.
  * @property inInventory `true` si el inventario cubre toda la cantidad ("En tu inventario").
- * @property costCop Costo de lo que falta comprar de este ingrediente.
+ * @property costCop Costo de los empaques que hay que comprar de este ingrediente (spec §2).
+ * @property pantryBasic `true` si es un básico de despensa que no se compra ("Básico de despensa").
+ * @property packs Empaques que hay que comprar.
+ * @property packLabel Presentación de mercado ("1 kg", "30 und").
+ * @property store Tienda del precio de esos empaques, o `null` si no se compra nada (CA-RIA-04-07).
  */
 data class RecipeIngredientLine(
     val ingredientId: String,
@@ -33,6 +37,10 @@ data class RecipeIngredientLine(
     val unit: IngredientUnit,
     val inInventory: Boolean,
     val costCop: Long,
+    val pantryBasic: Boolean = false,
+    val packs: Int = 0,
+    val packLabel: String = "",
+    val store: Store? = null,
 )
 
 /** Ingredientes de una sección (Verduras, Cereales, Carnes...). */

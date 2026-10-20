@@ -9,6 +9,8 @@ import com.smartfood.app.feature.recipes.domain.usecase.GetRecipesUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.RankRecipesForMeUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.RecipeCatalogData
 import com.smartfood.app.feature.recipes.domain.usecase.SearchRecipesUseCase
+import com.smartfood.app.feature.recipes.domain.model.Store
+import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -33,6 +36,7 @@ import kotlinx.coroutines.launch
  * @param searchRecipes Búsqueda por nombre o ingrediente (CA-RIA-01-04).
  * @param rankRecipes Orden y filtros (CA-RIA-01-02 y 01-03).
  * @param observeInventory Inventario actual para calcular costo y rescate.
+ * @param getPreferredStore "Mi supermercado" del Perfil para los precios (CA-RIA-04-07).
  */
 @HiltViewModel
 class RecipesDiscoverViewModel @Inject constructor(
@@ -40,6 +44,7 @@ class RecipesDiscoverViewModel @Inject constructor(
     private val searchRecipes: SearchRecipesUseCase,
     private val rankRecipes: RankRecipesForMeUseCase,
     observeInventory: ObserveInventoryUseCase,
+    getPreferredStore: GetPreferredStoreUseCase,
 ) : ViewModel() {
 
     private val catalog = MutableStateFlow<CatalogState>(CatalogState.Loading)
@@ -69,7 +74,9 @@ class RecipesDiscoverViewModel @Inject constructor(
         observeInventory().catch { emit(emptyList()) },
         query,
         filter,
-    ) { catalogState, sections, text, selectedFilter ->
+        // D1 mientras se lee el Perfil; se vuelve a leer cada vez que la pantalla se observa de nuevo.
+        flow { emit(Store.D1); emit(getPreferredStore()) },
+    ) { catalogState, sections, text, selectedFilter, store ->
         when (catalogState) {
             CatalogState.Loading -> RecipesDiscoverUiState(isLoading = true, query = text, filter = selectedFilter)
             CatalogState.Error -> RecipesDiscoverUiState(
@@ -82,7 +89,7 @@ class RecipesDiscoverViewModel @Inject constructor(
             is CatalogState.Ready -> {
                 val inventory = sections.flatMap { section -> section.items }
                 val found = searchRecipes(catalogState.data.recipes, catalogState.data.ingredients, text)
-                val suggestions = rankRecipes(found, catalogState.data.ingredients, inventory, selectedFilter)
+                val suggestions = rankRecipes(found, catalogState.data.ingredients, inventory, selectedFilter, store)
                 RecipesDiscoverUiState(
                     isLoading = false,
                     query = text,

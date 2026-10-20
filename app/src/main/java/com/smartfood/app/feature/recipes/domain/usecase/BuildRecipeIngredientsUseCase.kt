@@ -8,6 +8,7 @@ import com.smartfood.app.feature.recipes.domain.model.RecipeDetail
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientGroup
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientLine
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredients
+import com.smartfood.app.feature.recipes.domain.model.Store
 import javax.inject.Inject
 
 /**
@@ -28,17 +29,19 @@ class BuildRecipeIngredientsUseCase @Inject constructor(
      * @param detail Receta y catálogo.
      * @param inventory Productos del inventario con sesión.
      * @param servings Porciones elegidas.
+     * @param store Supermercado de los precios (CA-RIA-04-07).
      */
     operator fun invoke(
         detail: RecipeDetail,
         inventory: List<InventoryItem>,
         servings: Int,
+        store: Store = Store.D1,
     ): RecipeIngredients {
         val recipe = detail.recipe
         val scale = servings.toDouble() / recipe.servings
         val evaluator = RecipeEvaluator(detail.ingredients)
         val stock = PantryStock.of(matcher.match(inventory, detail.ingredients))
-        val evaluation = evaluator.evaluate(recipe, servings, day = 1, stock = stock)
+        val evaluation = evaluator.evaluate(recipe, servings, day = 1, stock = stock, store = store)
         val uses = evaluation.uses.associateBy { it.ingredientId }
 
         val lines = recipe.ingredients.map { used ->
@@ -53,6 +56,10 @@ class BuildRecipeIngredientsUseCase @Inject constructor(
                 // "En tu inventario" solo si alcanza para toda la cantidad (CA-RIA-04-01).
                 inInventory = use.toBuy <= 0.0 && use.fromPantry.isNotEmpty(),
                 costCop = use.buyCostCop,
+                pantryBasic = ingredient.pantryBasic,
+                packs = use.packs,
+                packLabel = ingredient.packLabel,
+                store = use.store,
             )
         }
 

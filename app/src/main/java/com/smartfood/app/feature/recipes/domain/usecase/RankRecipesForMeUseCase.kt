@@ -8,6 +8,7 @@ import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.Recipe
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
 import com.smartfood.app.feature.recipes.domain.model.RecipeSuggestion
+import com.smartfood.app.feature.recipes.domain.model.Store
 import javax.inject.Inject
 
 /**
@@ -30,18 +31,20 @@ class RankRecipesForMeUseCase @Inject constructor(
      * @param ingredients Ingredientes del catálogo por `id`.
      * @param inventory Productos del inventario con sesión.
      * @param filter Filtro elegido en la pantalla.
+     * @param store Supermercado de los precios (CA-RIA-04-07).
      */
     operator fun invoke(
         recipes: List<Recipe>,
         ingredients: Map<String, Ingredient>,
         inventory: List<InventoryItem>,
         filter: RecipeFilter,
+        store: Store = Store.D1,
     ): List<RecipeSuggestion> {
         if (recipes.isEmpty()) return emptyList()
         val evaluator = RecipeEvaluator(ingredients)
         val stock = PantryStock.of(matcher.match(inventory, ingredients))
         val suggestions = recipes.map { recipe ->
-            val evaluation = evaluator.evaluate(recipe, recipe.servings, day = 1, stock = stock)
+            val evaluation = evaluator.evaluate(recipe, recipe.servings, day = 1, stock = stock, store = store)
             val rescued = evaluation.uses.firstOrNull { it.rescuedItems.isNotEmpty() }
             RecipeSuggestion(
                 recipe = recipe,

@@ -7,6 +7,9 @@ import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
+import com.smartfood.app.feature.profile.domain.model.FoodPreferences
+import com.smartfood.app.feature.profile.domain.model.Supermarket
+import com.smartfood.app.feature.profile.domain.usecase.GetFoodPreferencesUseCase
 import com.smartfood.app.feature.recipes.domain.agent.IngredientMatcher
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
@@ -15,9 +18,11 @@ import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
 import com.smartfood.app.feature.recipes.domain.model.Store
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import com.smartfood.app.feature.recipes.domain.usecase.BuildRecipeIngredientsUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipeDetailUseCase
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakePhotoSync
+import com.smartfood.app.testutil.FakeProfileRepository
 import com.smartfood.app.testutil.MainDispatcherRule
 import com.smartfood.app.testutil.fixedClock
 import java.time.LocalDate
@@ -160,12 +165,27 @@ class RecipeDetailViewModelTest {
     }
 
     @Test
+    fun `CA-RIA-04-07 usa Mi supermercado del Perfil y D1 si no se eligió`() = runTest {
+        assertEquals(Store.D1, viewModel().uiState.first { !it.isLoading }.store)
+
+        profile.preferences = FoodPreferences(store = Supermarket.OLIMPICA)
+        val state = viewModel().uiState.first { !it.isLoading && it.store == Store.OLIMPICA }
+
+        val tomate = state.groups.first { it.section == "Verduras" }.lines.single()
+        // La prueba solo tiene precio de D1: Olímpica no lo tiene y la fila dice que el precio es de D1.
+        assertEquals(Store.D1, tomate.store)
+        assertEquals(2, tomate.packs)
+    }
+
+    @Test
     fun `CA-RIA-04-01 si la receta no existe muestra el error`() = runTest {
         val state = viewModel(recipeId = "no-existe").uiState.first { !it.isLoading }
 
         assertTrue(state.hasError)
         assertTrue(state.groups.isEmpty())
     }
+
+    private val profile = FakeProfileRepository()
 
     private fun viewModel(recipeId: String = recipe.id): RecipeDetailViewModel {
         val repository = FakeInventoryRepository().apply { items.value = inventory }
@@ -179,6 +199,7 @@ class RecipeDetailViewModelTest {
             getDetail = GetRecipeDetailUseCase(FakeRecipeCatalog()),
             buildIngredients = BuildRecipeIngredientsUseCase(IngredientMatcher(clock)),
             observeInventory = observeInventory,
+            getPreferredStore = GetPreferredStoreUseCase(GetFoodPreferencesUseCase(profile)),
         )
     }
 

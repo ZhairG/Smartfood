@@ -18,6 +18,7 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientGroup
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientLine
+import com.smartfood.app.feature.recipes.domain.model.Store
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -28,7 +29,8 @@ import org.junit.Test
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas instrumentadas del detalle sin estado (spec 009, CA-RIA-04-01 y 04-02, T008; Figma
- * `557:2856`): barra con el nombre, tiempos y dificultad, "Precios de referencia", grupos con cantidades y costos,
+ * `557:2856`): barra con el nombre, tiempos y dificultad, "<Tienda> · precios de octubre 2026" (CA-RIA-04-07), grupos
+ * con cantidades, el empaque que falta con su tienda y precio y "Básico de despensa",
  * "En tu inventario", selector de porciones con sus límites, "Empezar a cocinar" deshabilitado hasta la cocina guiada
  * (#115), estados de carga/error y la flecha atrás.
  */
@@ -68,7 +70,7 @@ class RecipeDetailScreenTest {
         composeTestRule.onNodeWithText("0 min").assertIsDisplayed()
         composeTestRule.onNodeWithText("Dificultad").assertIsDisplayed()
         composeTestRule.onNodeWithText("Media").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Precios de referencia").assertIsDisplayed()
+        composeTestRule.onNodeWithText("D1 · precios de octubre 2026").assertIsDisplayed()
     }
 
     @Test
@@ -80,7 +82,8 @@ class RecipeDetailScreenTest {
         composeTestRule.onNodeWithText("Cereales").assertIsDisplayed()
         composeTestRule.onNodeWithText("Carnes").assertIsDisplayed()
         composeTestRule.onNodeWithText("Tomate 200 g").assertIsDisplayed()
-        composeTestRule.onNodeWithText("COP $500").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Tomate 1 kg").assertIsDisplayed()
+        composeTestRule.onNodeWithText("D1 · COP $4.200").assertIsDisplayed()
         composeTestRule.onNodeWithText("Arroz 300 g").assertIsDisplayed()
         composeTestRule.onNodeWithText("Pollo 600 g").assertIsDisplayed()
     }
@@ -148,6 +151,36 @@ class RecipeDetailScreenTest {
     }
 
     @Test
+    fun caRia0407_laTarjetaDiceMiSupermercadoYLaFilaLaTiendaDeSuPrecio() {
+        val tomate = detalle().groups.first().lines.single()
+            .copy(store = Store.EXITO, packs = 2, packLabel = "500 g", costCop = 3_200)
+        mostrar(detalle().copy(store = Store.OLIMPICA, groups = listOf(RecipeIngredientGroup("Verduras", listOf(tomate)))))
+
+        composeTestRule.onNodeWithText("Olímpica · precios de octubre 2026").assertIsDisplayed()
+        // Olímpica no lo tiene en línea: la fila dice de qué tienda es el precio y cuántos empaques.
+        composeTestRule.onNodeWithText("2 × Tomate 500 g").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Éxito · COP $3.200").assertIsDisplayed()
+    }
+
+    @Test
+    fun caRia0401_unBasicoDeDespensaNoMuestraPrecio() {
+        val aceite = RecipeIngredientLine(
+            ingredientId = "aceite",
+            name = "Aceite",
+            section = "Otros",
+            quantity = 15.0,
+            unit = IngredientUnit.MILLILITER,
+            inInventory = false,
+            costCop = 0,
+            pantryBasic = true
+        )
+        mostrar(detalle().copy(groups = listOf(RecipeIngredientGroup("Otros", listOf(aceite)))))
+
+        composeTestRule.onNodeWithText("Aceite 15 ml").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Básico de despensa").assertIsDisplayed()
+    }
+
+    @Test
     fun caRia0401_siLaRecetaNoSeLeeMuestraElError() {
         mostrar(RecipeDetailUiState(isLoading = false, hasError = true))
 
@@ -191,7 +224,10 @@ class RecipeDetailScreenTest {
                         quantity = 200.0,
                         unit = IngredientUnit.GRAM,
                         inInventory = false,
-                        costCop = 500
+                        costCop = 4_200,
+                        packs = 1,
+                        packLabel = "1 kg",
+                        store = Store.D1
                     )
                 )
             ),

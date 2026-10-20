@@ -58,6 +58,8 @@ import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 import com.smartfood.app.feature.recipes.ui.components.formatCop
 import com.smartfood.app.feature.recipes.ui.components.formatQuantity
+import com.smartfood.app.feature.recipes.domain.model.Store
+import com.smartfood.app.feature.recipes.ui.components.titleRes
 
 /**
  * Nombre: RecipeDetailScreen.kt
@@ -149,7 +151,7 @@ fun RecipeDetailScreen(
                         )
                     }
                     item(key = "precios") {
-                        ReferencePrices()
+                        ReferencePrices(store = state.store)
                     }
                     item(key = "grupos") {
                         IngredientGroups(groups = state.groups)
@@ -374,7 +376,7 @@ private fun PortionButton(
 
 /** Desviación aprobada (spec §9): el Figma dice "Carulla - Optimizado para tu zona". */
 @Composable
-private fun ReferencePrices() {
+private fun ReferencePrices(store: Store) {
     Box(
         modifier = Modifier
             .padding(horizontal = ContentPadding, vertical = ReferenceVerticalPadding)
@@ -383,7 +385,7 @@ private fun ReferencePrices() {
             .padding(horizontal = ReferenceSidePadding, vertical = ReferenceBarPadding)
     ) {
         Text(
-            text = stringResource(id = R.string.recipes_reference_prices),
+            text = stringResource(id = R.string.recipes_store_prices, stringResource(id = store.titleRes)),
             color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.labelLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold),
             maxLines = 1
@@ -412,7 +414,10 @@ private fun IngredientGroups(groups: List<RecipeIngredientGroup>) {
     }
 }
 
-/** Fila blanca del ingrediente con su cantidad y "En tu inventario" o el costo de lo que falta. */
+/**
+ * Fila blanca del ingrediente con su cantidad y, a la derecha, "En tu inventario", "Básico de despensa" o el empaque
+ * que hay que comprar con su tienda y precio en dos líneas (CA-RIA-04-01, 04-07; desviación §9).
+ */
 @Composable
 private fun IngredientRow(line: RecipeIngredientLine) {
     Row(
@@ -445,13 +450,36 @@ private fun IngredientRow(line: RecipeIngredientLine) {
                 style = MaterialTheme.typography.labelLarge.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
                 maxLines = 1
             )
-        } else {
+        } else if (line.pantryBasic && line.packs == 0) {
             Text(
-                text = stringResource(id = R.string.recipes_cost, formatCop(line.costCop)),
+                text = stringResource(id = R.string.recipes_pantry_basic),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 12.sp),
+                style = MaterialTheme.typography.labelLarge.copy(fontSize = 11.sp, lineHeight = 16.5.sp, fontWeight = FontWeight.SemiBold),
                 maxLines = 1
             )
+        } else if (line.store != null) {
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = if (line.packs > 1) {
+                        stringResource(id = R.string.recipes_packs, line.packs, line.name, line.packLabel)
+                    } else {
+                        stringResource(id = R.string.recipes_pack, line.name, line.packLabel)
+                    },
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 12.sp, lineHeight = 18.sp),
+                    maxLines = 1
+                )
+                Text(
+                    text = stringResource(
+                        id = R.string.recipes_pack_price,
+                        stringResource(id = line.store.titleRes),
+                        formatCop(line.costCop)
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 12.sp, lineHeight = 18.sp),
+                    maxLines = 1
+                )
+            }
         }
     }
 }
