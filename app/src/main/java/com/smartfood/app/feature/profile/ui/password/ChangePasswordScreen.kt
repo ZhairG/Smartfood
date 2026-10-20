@@ -220,7 +220,8 @@ private fun ChangePasswordForm(
         SmartFoodPrimaryButton(
             text = stringResource(id = R.string.change_password_button),
             onClick = remember(onEvent) { { onEvent(ChangePasswordEvent.SubmitClicked) } },
-            enabled = state.canSubmit
+            enabled = state.canSubmit,
+            green = true
         )
     }
 }

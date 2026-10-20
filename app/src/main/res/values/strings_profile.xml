@@ -95,7 +95,7 @@
 
     <!-- Cambiar contraseña (spec 008, HU-PER-05, Figma 603:2358 y 603:2460) -->
     <string name="change_password_title">Cambiar contraseña</string>
-    <string name="change_password_subtitle">Elige una contraseña segura para proteger tu cuenta.</string>
+    <string name="change_password_subtitle">Crea una contraseña segura de al menos 8 caracteres, combinando letras y números.</string>
     <string name="change_password_current_label">Contraseña actual</string>
     <string name="change_password_new_label">Nueva Contraseña</string>
     <string name="change_password_confirm_label">Confirmar Contraseña</string>
