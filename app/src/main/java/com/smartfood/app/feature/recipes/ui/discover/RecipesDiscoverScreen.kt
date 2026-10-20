@@ -47,11 +47,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
+import com.smartfood.app.core.designsystem.theme.GreenSoft
 import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.SurfaceLight
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
+import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 import com.smartfood.app.feature.recipes.ui.components.RecipesHeader
 import com.smartfood.app.feature.recipes.ui.components.formatCop
@@ -152,13 +153,15 @@ private fun SuggestCard(onSuggestRecipes: (() -> Unit)?) {
         )
         Text(
             text = stringResource(id = R.string.recipes_hero_body),
-            color = MaterialTheme.colorScheme.primaryContainer,
+            // Figma: #DCFCE7, el token GreenSoft.
+            color = GreenSoft,
             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp)
         )
-        SmartFoodPrimaryButton(
+        RecipeActionButton(
             text = stringResource(id = R.string.recipes_suggest),
             onClick = { onSuggestRecipes?.invoke() },
-            enabled = onSuggestRecipes != null
+            enabled = onSuggestRecipes != null,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -312,7 +315,7 @@ private fun RecipeCard(
                 Text(
                     text = stringResource(id = R.string.recipes_expiring_badge, card.expiringIngredient.lowercase()),
                     color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 10.sp, lineHeight = 15.sp, fontWeight = FontWeight.Bold),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -323,7 +326,7 @@ private fun RecipeCard(
             Text(
                 text = card.name,
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleMedium.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp, lineHeight = 22.5.sp, fontWeight = FontWeight.Bold),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )

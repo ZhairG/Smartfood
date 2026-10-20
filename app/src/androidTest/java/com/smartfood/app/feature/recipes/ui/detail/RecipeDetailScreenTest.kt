@@ -4,11 +4,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientGroup
@@ -126,6 +131,20 @@ class RecipeDetailScreenTest {
         mostrar()
 
         composeTestRule.onNodeWithText("Empezar a cocinar").assertIsNotEnabled()
+    }
+
+    @Test
+    fun caRia0401_empezarACocinarFlotaALaDerechaSinTaparElUltimoIngrediente() {
+        mostrar()
+        repeat(4) { composeTestRule.onNode(hasScrollAction()).performTouchInput { swipeUp() } }
+
+        val raiz = composeTestRule.onRoot().getUnclippedBoundsInRoot()
+        val boton = composeTestRule.onNodeWithText("Empezar a cocinar").getUnclippedBoundsInRoot()
+        val ultimo = composeTestRule.onNodeWithText("Pollo 600 g").getUnclippedBoundsInRoot()
+
+        // Figma 557:2884: botón de 181 dp a la derecha, no una barra de todo el ancho.
+        assertTrue("el botón va a la derecha", boton.left > raiz.left + (raiz.right - raiz.left) / 3)
+        assertTrue("la última fila queda por encima del botón", ultimo.bottom <= boton.top)
     }
 
     @Test

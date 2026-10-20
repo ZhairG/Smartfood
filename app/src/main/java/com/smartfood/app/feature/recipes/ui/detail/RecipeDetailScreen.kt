@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,13 +48,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientGroup
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientLine
+import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 import com.smartfood.app.feature.recipes.ui.components.formatCop
 import com.smartfood.app.feature.recipes.ui.components.formatQuantity
@@ -116,9 +117,10 @@ fun RecipeDetailScreen(
                 )
             }
 
-            else -> {
+            // "Empezar a cocinar" flota abajo a la derecha sobre la lista, como en el Figma (557:2884).
+            else -> Box(modifier = Modifier.weight(1f)) {
                 LazyColumn(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = ListBottomPadding)
                 ) {
                     item(key = "foto") {
@@ -153,11 +155,15 @@ fun RecipeDetailScreen(
                         IngredientGroups(groups = state.groups)
                     }
                 }
-                SmartFoodPrimaryButton(
+                RecipeActionButton(
                     text = stringResource(id = R.string.recipes_start_cooking),
                     onClick = { onStartCooking?.invoke() },
                     enabled = onStartCooking != null,
-                    modifier = Modifier.padding(horizontal = ContentPadding, vertical = ButtonVerticalPadding)
+                    trailingIcon = R.drawable.ic_figma_play,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = CtaEndPadding, bottom = CtaBottomPadding)
+                        .width(CtaWidth)
                 )
             }
         }
@@ -258,7 +264,7 @@ private fun TimeCard(
                     Text(
                         text = value,
                         color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.titleSmall.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 14.sp, lineHeight = 21.sp, fontWeight = FontWeight.Bold),
                         maxLines = 1
                     )
                 }
@@ -267,7 +273,7 @@ private fun TimeCard(
             Text(
                 text = label,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                style = MaterialTheme.typography.labelLarge.copy(fontSize = 10.sp, lineHeight = 15.sp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -361,7 +367,7 @@ private fun PortionButton(
         Text(
             text = text,
             color = if (filled) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleMedium.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp, lineHeight = 22.5.sp, fontWeight = FontWeight.Bold)
         )
     }
 }
@@ -396,7 +402,7 @@ private fun IngredientGroups(groups: List<RecipeIngredientGroup>) {
             Text(
                 text = group.section,
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleMedium.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp, lineHeight = 22.5.sp, fontWeight = FontWeight.Bold),
                 modifier = Modifier
                     .padding(top = SectionTopPadding)
                     .semantics { heading() }
@@ -491,8 +497,12 @@ private val IngredientSidePadding = 14.dp
 private val IngredientVerticalPadding = 10.dp
 private val InInventoryIconSize = 14.dp
 private val InInventoryIconGap = 3.dp
-private val ListBottomPadding = 8.dp
-private val ButtonVerticalPadding = 12.dp
+// El botón flotante (Figma 557:2884: 181 × 48, a 12 del borde y 38 sobre la barra inferior); la lista deja ese espacio
+// al final para que la última fila no quede debajo.
+private val CtaWidth = 181.dp
+private val CtaEndPadding = 12.dp
+private val CtaBottomPadding = 38.dp
+private val ListBottomPadding = 96.dp
 
 @Preview(showBackground = true, heightDp = 900)
 @Composable
