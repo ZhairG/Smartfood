@@ -78,7 +78,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **F** = 
 | CA-PER-04-04 | I `ExpiryReminderWorkerTest`, M |
 | CA-PER-04-05 | U `NotificationSettingsViewModelTest`, I `NotificationSettingsScreenTest` |
 | CA-PER-04-06 | I `NotificationSettingsScreenTest`, M |
-| CA-PER-05-01 | I `ChangePasswordScreenTest` |
+| CA-PER-05-01 | I `ChangePasswordScreenTest`, I `ProfileScreenTest` (la fila abre la pantalla) |
 | CA-PER-05-02 | I `ChangePasswordScreenTest` |
 | CA-PER-05-03 | U `ChangePasswordViewModelTest` |
 | CA-PER-05-04 | U `ChangePasswordUseCaseTest`, U `ChangePasswordViewModelTest`, M |

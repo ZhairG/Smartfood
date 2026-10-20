@@ -9,7 +9,6 @@
 package com.smartfood.app.feature.profile.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -74,14 +73,22 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun caPer0103_editarInformacionYLaCamaraAbrenLaPantallaYLasDemasSiguenDeshabilitadas() {
+    fun caPer0103_editarInformacionYLaCamaraAbrenLaPantalla() {
         mostrar()
 
         composeTestRule.onNode(hasText("Editar información personal") and hasClickAction()).performClick()
         composeTestRule.onNodeWithContentDescription("Cambiar foto de perfil").performClick()
-        composeTestRule.onNode(hasText("Cambiar contraseña") and hasClickAction()).assertIsNotEnabled()
 
         assertEquals(listOf(ProfileEvent.EditProfileClicked, ProfileEvent.EditProfileClicked), eventos)
+    }
+
+    @Test
+    fun caPer0501_laFilaCambiarContrasenaAbreSuPantalla() {
+        mostrar()
+
+        composeTestRule.onNode(hasText("Cambiar contraseña") and hasClickAction()).performClick()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.PasswordClicked), eventos)
     }
 
     @Test
