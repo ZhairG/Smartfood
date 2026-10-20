@@ -35,7 +35,7 @@
 - [x] T019a `LoginUseCase` vuelve a programar el aviso diario al iniciar sesión, porque `LogoutUseCase` lo cancela (spec 006, CA-INV-08-07); `LoginUseCaseTest` actualizado.
 
 ## Issue 4: Cambiar contraseña (intermedia)
-- [ ] T020 `AuthRepository.updatePassword` (+ fake) y `ChangePasswordUseCase` (reautentica y cambia) con pruebas (RF-PER-06).
+- [x] T020 `AuthRepository.updatePassword` (+ fake) y `ChangePasswordUseCase` (reautentica y cambia) con pruebas (RF-PER-06).
 - [ ] T021 Pantalla `ChangePassword` con checklist, botón habilitado según reglas, carga, "Guardado" y vuelta al Perfil (CA-PER-05-01 a 05-06).
 - [ ] T022 Pruebas: `ChangePasswordViewModelTest` y `ChangePasswordScreenTest`.
 

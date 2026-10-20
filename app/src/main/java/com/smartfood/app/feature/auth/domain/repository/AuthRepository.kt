@@ -43,4 +43,9 @@ interface AuthRepository {
      * y, si la sesión quedó invalidada, vuelve a iniciarla con [email] y [password], sin que la persona lo note.
      */
     suspend fun refreshSession(email: String, password: String): Result<Unit>
+
+    /**
+     * Actualiza la contraseña de la cuenta con sesión activa (spec 008, HU-PER-05, CA-PER-05-04).
+     */
+    suspend fun updatePassword(newPassword: String): Result<Unit>
 }

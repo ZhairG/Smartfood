@@ -67,8 +67,10 @@ class FakeAuthRepository : AuthRepository {
     var currentEmailValue: String? = DEFAULT_EMAIL
     var reauthenticateResult: Result<Unit> = Result.success(Unit)
     var refreshSessionResult: Result<Unit> = Result.success(Unit)
+    var updatePasswordResult: Result<Unit> = Result.success(Unit)
     var lastReauthPassword: String? = null
     var lastRefreshedEmail: String? = null
+    var lastUpdatedPassword: String? = null
 
     override fun currentEmail(): String? = currentEmailValue
 
@@ -80,6 +82,11 @@ class FakeAuthRepository : AuthRepository {
     override suspend fun refreshSession(email: String, password: String): Result<Unit> {
         lastRefreshedEmail = email
         return refreshSessionResult.onSuccess { currentEmailValue = email }
+    }
+
+    override suspend fun updatePassword(newPassword: String): Result<Unit> {
+        lastUpdatedPassword = newPassword
+        return updatePasswordResult
     }
 
     companion object {

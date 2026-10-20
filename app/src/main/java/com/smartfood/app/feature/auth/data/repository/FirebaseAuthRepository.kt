@@ -66,4 +66,10 @@ class FirebaseAuthRepository @Inject constructor(
         if (!refreshed) firebaseAuth.signInWithEmailAndPassword(email, password).await()
         Unit
     }.mapFirebaseError()
+
+    override suspend fun updatePassword(newPassword: String): Result<Unit> = safeRunCatching {
+        val user = firebaseAuth.currentUser ?: throw AuthException(AuthError.AccountNotFound)
+        user.updatePassword(newPassword).await()
+        Unit
+    }.mapFirebaseError()
 }
