@@ -47,7 +47,7 @@
 - [x] T034 Herramienta de precios en `tools/precios/` (`consultar.py`, `aplicar.py`, `busquedas.json`, README); `docs/precios/precios.json` como fuente de verdad.
 - [x] T035 Revisión de calidad del catálogo (tiempos, kcal, cantidades por porción, pasos, sinónimos y fotos): se corrige lo claro y se lista lo dudoso.
 - [x] T036 20 recetas nuevas (30 → 50; 7 veganas, 7 vegetarianas, 6 para todos) y 4 ingredientes (ahuyama, arveja, habichuela, champiñones) con precio y foto de licencia libre.
-- [ ] T037 Variedad con el catálogo real: ≥ 20 vegetarianas y ≥ 12 veganas en `RecipeCatalogTest`; `MealPlannerCatalogTest` arma un plan con cada restricción (CA-RIA-02-09).
+- [x] T037 Variedad con el catálogo real: ≥ 20 vegetarianas y ≥ 12 veganas en `RecipeCatalogTest`; `MealPlannerCatalogTest` arma un plan con cada restricción (CA-RIA-02-09).
 
 ## Cierre (en el mismo PR)
 - [ ] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
@@ -90,7 +90,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 
 ### Checklist de verificación manual
 1. Recetas: buscar y filtrar; "Para ti" pone primero lo que usa productos por vencer.
-2. IA con presupuesto alto: aparece el plan de 3 días con su explicación en ≤ 2 s (release); también con "Vegano" en Preferencias.
+2. IA con presupuesto alto: aparece el plan de 3 días con su explicación en ≤ 2 s (release); también con "Vegano" en Preferencias y algunos básicos en el inventario (arroz, papa, cebolla, tomate): con el inventario vacío ninguna receta vegana cumple el máximo de 3 faltantes.
 3. IA con COP $2.000: "Sin coincidencias" con el presupuesto sugerido; "Ajustar contexto" y "Ver recetas económicas".
 4. "Sin picante" y 30 minutos: ninguna receta del plan los incumple.
 5. Detalle: cambiar porciones; ingredientes "En tu inventario", "Básico de despensa" y el empaque con su precio; cambiar "Mi supermercado" en el Perfil y ver otros precios.

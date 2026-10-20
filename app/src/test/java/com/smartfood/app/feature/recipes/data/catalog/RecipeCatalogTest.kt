@@ -17,7 +17,8 @@ import org.junit.Test
  * Fecha: Octubre 2026
  * Descripción: Pruebas de contenido del catálogo de recetas (spec 009, T003, RNF-RIA-05, RF-RIA-01). Lee los JSON de
  * `src/main/assets` y comprueba ids únicos, ingredientes existentes, cantidades, pasos, foto de cada receta y su fuente
- * en `docs/licenses/fotos-recetas.md`. No necesita Android: corre en la JVM leyendo los archivos del repositorio.
+ * en `docs/licenses/fotos-recetas.md`, y la variedad para las dietas (T037). No necesita Android: corre en la JVM leyendo
+ * los archivos del repositorio.
  */
 class RecipeCatalogTest {
 
@@ -45,8 +46,8 @@ class RecipeCatalogTest {
     private val difficulties = setOf("Fácil", "Media", "Difícil")
 
     @Test
-    fun `RNF-RIA-05 el catálogo tiene entre 30 y 50 recetas con ids únicos`() {
-        assertTrue("Se esperaban al menos 30 recetas y hay ${recipes.size}", recipes.size in 30..50)
+    fun `RNF-RIA-05 el catálogo tiene 50 recetas con ids únicos`() {
+        assertEquals("El catálogo debe tener 50 recetas", 50, recipes.size)
         assertEquals("Los ids de receta no pueden repetirse", recipes.size, recipes.map { it.text("id") }.toSet().size)
         assertEquals("Los ids de ingrediente no pueden repetirse", ingredients.size, ingredientIds.toSet().size)
     }
@@ -68,6 +69,21 @@ class RecipeCatalogTest {
         }
         val unused = ingredientIds.filterNot { it in used }
         assertTrue("Ingredientes sin uso en el catálogo: $unused", unused.isEmpty())
+    }
+
+    @Test
+    fun `CA-RIA-02-09 hay al menos 20 recetas vegetarianas y 12 veganas`() {
+        val tagsById = ingredients.associate { ingredient ->
+            ingredient.text("id") to ingredient.array("etiquetas").map { it.jsonPrimitive.content }.toSet()
+        }
+        val tagsOfRecipe = recipes.map { recipe ->
+            recipe.array("ingredientes").flatMap { tagsById.getValue(it.jsonObject.text("id")) }.toSet()
+        }
+        val vegetarian = tagsOfRecipe.count { "carne" !in it && "marisco" !in it }
+        val vegan = tagsOfRecipe.count { "carne" !in it && "marisco" !in it && "origen_animal" !in it }
+
+        assertTrue("Se esperaban al menos 20 vegetarianas y hay $vegetarian", vegetarian >= 20)
+        assertTrue("Se esperaban al menos 12 veganas y hay $vegan", vegan >= 12)
     }
 
     @Test
