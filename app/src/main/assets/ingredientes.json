@@ -101,7 +101,7 @@
   {
     "id": "mazorca",
     "nombre": "Mazorca",
-    "sinonimos": ["maiz tierno", "elote"],
+    "sinonimos": ["choclo", "elote", "mazorca tierna"],
     "seccion": "Verduras",
     "unidad": "g",
     "vidaUtilDias": 4,
@@ -354,7 +354,7 @@
   {
     "id": "carne",
     "nombre": "Carne de res",
-    "sinonimos": ["carne", "lomo", "bistec", "carne molida"],
+    "sinonimos": ["carne", "res", "lomo de res", "bistec", "carne molida", "sobrebarriga", "posta"],
     "seccion": "Carnes",
     "unidad": "g",
     "vidaUtilDias": 3,
@@ -365,7 +365,7 @@
   {
     "id": "pescado",
     "nombre": "Pescado",
-    "sinonimos": ["filete de pescado", "tilapia", "bagre"],
+    "sinonimos": ["filete de pescado", "tilapia", "bagre", "mojarra", "merluza", "basa"],
     "seccion": "Carnes",
     "unidad": "g",
     "vidaUtilDias": 2,

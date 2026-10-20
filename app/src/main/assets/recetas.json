@@ -222,7 +222,7 @@
     ],
     "pasos": [
       { "titulo": "Cuece los garbanzos", "texto": "Escurre los garbanzos y cuécelos en agua con una pizca de sal.", "minutos": 20 },
-      { "titulo": "Haz el sofrito", "texto": "Sofríe la cebolla, el ajo y el comino; agrega el tomate y cocina hasta espesar.", "minutos": 7 },
+      { "titulo": "Haz el sofrito", "texto": "Sofríe en el aceite la cebolla, el ajo y el comino; agrega el tomate y cocina hasta espesar.", "minutos": 7 },
       { "titulo": "Mezcla", "texto": "Incorpora los garbanzos con la zanahoria y un poco de su caldo.", "minutos": 8 },
       { "titulo": "Termina", "texto": "Ajusta la sal y sirve con arroz blanco.", "minutos": 2 }
     ]
@@ -368,7 +368,7 @@
       "Pica la cebolla, el tomate y el ajo"
     ],
     "pasos": [
-      { "titulo": "Haz el relleno", "texto": "Sofríe la cebolla, el ajo y el tomate; agrega la carne picada con sal y comino.", "minutos": 10 },
+      { "titulo": "Haz el relleno", "texto": "Sofríe en el aceite la cebolla, el ajo y el tomate; agrega la carne picada con sal y comino.", "minutos": 10 },
       { "titulo": "Forma las arepas", "texto": "Haz discos gruesos con la masa y ásalos en el sartén.", "minutos": 8 },
       { "titulo": "Rellena", "texto": "Abre cada arepa, rellena con la carne y el queso rallado.", "minutos": 4 },
       { "titulo": "Gratina", "texto": "Lleva las arepas al sartén tapado o al horno hasta que el queso se derrita.", "minutos": 3 }
@@ -465,7 +465,7 @@
     ],
     "pasos": [
       { "titulo": "Cocina la pasta", "texto": "Hierve la pasta hasta que quede al dente y escúrrela guardando un poco del agua.", "minutos": 10 },
-      { "titulo": "Prepara la salsa", "texto": "Sofríe la cebolla y el ajo, agrega el tomate y cocina a fuego medio.", "minutos": 7 },
+      { "titulo": "Prepara la salsa", "texto": "Sofríe la cebolla y el ajo en el aceite, agrega el tomate y cocina a fuego medio.", "minutos": 7 },
       { "titulo": "Agrega la carne", "texto": "Incorpora la carne, sal y pimienta; cocina hasta que esté lista.", "minutos": 8 },
       { "titulo": "Integra", "texto": "Mezcla la pasta con la salsa y un poco del agua de cocción.", "minutos": 2 }
     ]
@@ -766,12 +766,12 @@
     ],
     "antesDeEmpezar": [
       "Sazona la pechuga con sal",
-      "Lava y corta las verduras"
+      "Lava y corta la lechuga, el tomate y la zanahoria"
     ],
     "pasos": [
       { "titulo": "Cocina el pollo", "texto": "Asa la pechuga en una plancha caliente hasta que esté cocida.", "minutos": 10 },
       { "titulo": "Corta el pollo", "texto": "Deja reposar la pechuga y córtala en tiras.", "minutos": 3 },
-      { "titulo": "Arma y aliña", "texto": "Mezcla las verduras con el pollo y aliña con limón, aceite y sal.", "minutos": 2 }
+      { "titulo": "Arma y aliña", "texto": "Mezcla la lechuga, el tomate y la zanahoria con el pollo y aliña con limón, aceite y sal.", "minutos": 2 }
     ]
   },
   {
