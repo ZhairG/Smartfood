@@ -67,6 +67,7 @@ mi cuenta tenga mis datos reales.
 | CA-PER-03-02 | **Dado** los dos primeros grupos, **entonces** puedo elegir varios chips o ninguno; **dado** los dos últimos, elijo como máximo uno, y tocar el elegido lo quita. |
 | CA-PER-03-03 | **Dado** que toco "Guardar Preferencias", **entonces** aparece "¿Desea guardar los cambios?" (Figma `593:1976`) y, al confirmar, el diálogo de carga y "Guardado · Preferencias se actualizó" (Figma `593:1898`), que se cierra solo. "Guardar Preferencias" está deshabilitado si no cambié nada. |
 | CA-PER-03-04 | **Dado** que guardé mis preferencias, **cuando** vuelvo a la pantalla (o en otro teléfono con la misma cuenta), **entonces** veo las mismas elecciones. |
+| CA-PER-03-05 | **Dado** el grupo "Mi supermercado" (Éxito, Carulla, Olímpica, D1), **entonces** elijo uno (D1 si no he elegido) y se guarda con las demás preferencias; las recetas muestran sus precios (spec 009, CA-RIA-04-07). |
 
 ### HU-PER-04: Mis notificaciones
 **Como** usuario **quiero** elegir qué avisos recibo **para** que la app no me moleste de más.
@@ -163,6 +164,7 @@ misma pantalla, y en Cambiar contraseña al Perfil.
 | Desviación | Motivo |
 |---|---|
 | Fila "Tema de la app" y su hoja (HU-PER-06), que no están en el Figma. | Pedido de Zhair; reutiliza el esquema oscuro de la spec 002. |
+| Grupo "Mi supermercado" en Preferencias alimentarias (CA-PER-03-05), que no está en el Figma; mismos chips de selección única que "Nivel de Picante". Aprobada el 2026-10-20. | Los precios de las recetas dependen del supermercado (spec 009, CA-RIA-04-07). |
 | La foto de perfil se toma con la **cámara del sistema** y no con un visor propio. | Pedido de Zhair: la cámara del Figma se mejorará más adelante. |
 | El correo es editable **con un código** y pide la contraseña actual en un **campo** "Contraseña actual" que aparece debajo del correo solo si cambió; el código se escribe en el aviso "Revisa tu correo" (casillas de `OtpCodeInput` de la recuperación). El Figma no tiene ninguno de los dos. | Firebase exige confirmar la identidad y el correo nuevo. Un campo es más claro que un segundo aviso (decisión de Zhair en el #109). |
 | Mientras se guarda se ve el diálogo de carga "Guardando cambios…", y los errores se muestran en rojo bajo los campos. | El Figma no define los estados de carga ni de error (como el inventario, CA-INV-02-12). |

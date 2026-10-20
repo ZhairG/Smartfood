@@ -37,6 +37,12 @@
 - [ ] T022 `GetMonthlySavingsUseCase` y tarjeta "Ahorrados este mes" del Perfil (CA-RIA-04-06).
 - [ ] T023 `CookingScreenTest` y pruebas de los casos de uso.
 
+## Precios de mercado por tienda (Zhair, 2026-10-20)
+- [ ] T030 Presentación de mercado, precios por tienda y básicos en `ingredientes.json`; `harina-maiz` para las arepas; `Store`, `Ingredient.pack`/`prices`/`pantryBasic`; `RecipeCatalogTest` y `AssetsRecipeCatalogTest` (RF-RIA-01).
+- [ ] T031 `RecipeEvaluator` por empaques completos, sobrante para los días siguientes y básicos sin costo; `PlanContext.store` (CA-RIA-02-05).
+- [ ] T032 "Mi supermercado" en Preferencias alimentarias, `firestore.rules` y `rules-test` (spec 008, CA-PER-03-05).
+- [ ] T033 Detalle y Descubrir con los precios del supermercado elegido (CA-RIA-04-01, 04-07).
+
 ## Cierre (en el mismo PR)
 - [ ] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
 - [ ] T028 Medición del tiempo del plan en el teléfono (release) y checklist manual; capturas Figma vs app en el PR.
@@ -69,6 +75,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-04-04 | U `CookingViewModelTest`, I `CookingScreenTest`, M |
 | CA-RIA-04-05 | U `FinishCookingUseCaseTest`, R |
 | CA-RIA-04-06 | U `GetMonthlySavingsUseCaseTest` |
+| CA-RIA-04-07 | U `RecipeDetailViewModelTest`, I `RecipeDetailScreenTest` |
 | RNF-RIA-01 | U `MealPlannerTest` (mismo resultado dos veces) |
 | RNF-RIA-02 | U `MealPlannerPerformanceTest`, M |
 | RNF-RIA-03 | U `AgentEvaluationTest` |
@@ -80,7 +87,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 2. IA con presupuesto alto: aparece el plan de 3 días con su explicación en ≤ 2 s (release).
 3. IA con COP $2.000: "Sin coincidencias" con el presupuesto sugerido; "Ajustar contexto" y "Ver recetas económicas".
 4. "Sin picante" y 30 minutos: ninguna receta del plan los incumple.
-5. Detalle: cambiar porciones; ingredientes "En tu inventario" y costos de lo que falta.
+5. Detalle: cambiar porciones; ingredientes "En tu inventario", "Básico de despensa" y el empaque con su precio; cambiar "Mi supermercado" en el Perfil y ver otros precios.
 6. Cocinar una receta completa con temporizador; al terminar, el inventario baja y "Ahorrados este mes" sube.
 
 ## Próximo módulo (#117, no se implementa en la spec 009)

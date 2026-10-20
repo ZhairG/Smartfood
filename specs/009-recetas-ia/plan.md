@@ -40,7 +40,9 @@ Modelos a copiar: estructura de `feature/inventory` (contratos `XContract.kt`, `
 ```jsonc
 // ingredientes.json
 [{ "id": "pollo", "nombre": "Pollo", "sinonimos": ["pechuga", "muslo", "pollo entero"],
-   "seccion": "Carnes", "unidad": "g", "precioCop": 14500, "precioPor": 1000, "vidaUtilDias": 2,
+   "seccion": "Carnes", "unidad": "g", "vidaUtilDias": 2,
+   "empaque": { "cantidad": 1000, "etiqueta": "1 kg" },
+   "precios": { "exito": 22250, "carulla": 24900, "olimpica": 9590, "d1": 14500 },
    "etiquetas": ["carne", "origen_animal"] }]
 // recetas.json
 [{ "id": "pollo-guisado", "nombre": "Pollo guisado con arroz", "foto": "receta_pollo_guisado",
@@ -54,7 +56,9 @@ Modelos a copiar: estructura de `feature/inventory` (contratos `XContract.kt`, `
 - `etiquetas` (opcional) ⊆ `carne`, `marisco`, `origen_animal`, `gluten`, `lactosa`, `frutos_secos` (`FoodTag`): el
   huevo, la leche, el queso y la miel llevan `origen_animal`; los lácteos, además, `lactosa`. Con ellas el agente sabe
   qué recetas admite cada restricción alimentaria (§3.3).
-- `unidad` ∈ `g`, `ml`, `und`. `precioCop` es el precio de `precioPor` unidades (p. ej. 1000 g).
+- `unidad` ∈ `g`, `ml`, `und`. `empaque` es la presentación de mercado (`cantidad` en la unidad base) y `precios`, su
+  precio en cada tienda (`exito`, `carulla`, `olimpica`, `d1`; una tienda puede faltar). `"basico": true` marca los
+  básicos de despensa. Fuente: `docs/precios/precios-octubre-2026.md`.
 - Las fotos van en `res/drawable-nodpi/receta_*.webp` (≤ 150 KB cada una); su fuente, en `docs/licenses/fotos-recetas.md`.
 - Contenido: 30 a 50 recetas de cocina colombiana cotidiana. El catálogo se valida con una prueba unitaria
   (`RecipeCatalogTest`): ids únicos, cada ingrediente existe, cantidades > 0, al menos un paso.
@@ -71,7 +75,10 @@ Modelos a copiar: estructura de `feature/inventory` (contratos `XContract.kt`, `
 
 ### 3.2 Evaluación (`RecipeEvaluator`)
 Para una receta escalada a `porciones`, con el inventario **restante**:
-- `usado[i]` = mín(necesario, disponible); `faltante[i]` = necesario − usado; `costo` = Σ faltante·precio.
+- `usado[i]` = mín(necesario, disponible); `faltante[i]` = necesario − usado.
+- `empaques[i]` = ⌈faltante / empaque⌉ y `costo` = Σ empaques·precio en la tienda de `PlanContext.store` (o la más
+  barata si esa tienda no lo tiene). El sobrante del empaque entra al inventario del plan como producto comprado (no
+  vence, no rescata ni se desperdicia) y lo usan los días siguientes. Los básicos no se compran ni cuentan como faltantes.
 - `aprovechamiento` = ingredientes cubiertos por el inventario / ingredientes de la receta.
 - `rescate(día d)` = Σ sobre productos que vencen en ≤ 3 días y `d ≤ díasParaVencer`: `usado · 1/(días+1)`, en
   unidades normalizadas (cada producto aporta su fracción usada, entre 0 y 1, para no favorecer las unidades grandes).

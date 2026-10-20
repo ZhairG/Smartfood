@@ -31,8 +31,8 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 | **Variables** | `D1`, `D2`, `D3`: la receta que se cocina cada día. |
 | **Dominio** | Las recetas del catálogo que pasan las restricciones de una sola receta (consistencia de nodo). |
 | **Restricciones de una receta** | tiempo total ≤ tiempo máximo elegido; sin picante si se eligió "Sin picante"; ningún ingrediente excluido por mis restricciones alimentarias (vegetariano, vegano, sin gluten, sin lactosa, sin frutos secos), según las etiquetas de cada ingrediente; como máximo `M` ingredientes por comprar (`M` = 3). |
-| **Restricciones entre recetas** | (1) `D1`, `D2` y `D3` distintas; (2) **inventario compartido**: lo que usan las tres no supera lo disponible (lo que falta se compra); (3) **presupuesto total**: lo que hay que comprar para las tres, escalado a las porciones, no supera el presupuesto máximo. |
-| **Objetivo** | Maximizar `U = w₁·rescate − w₂·costo − w₃·desperdicio`: *rescate* = cantidad de ingredientes que vencen en ≤ 3 días y se usan **antes** de vencer, ponderada por urgencia `1/(días + 1)`; *costo* = compras del plan en COP; *desperdicio* = lo que vence dentro de los 3 días y el plan no usa. Pesos iniciales `w₁ = 1`, `w₂ = 0,3`, `w₃ = 0,5` (heurísticos, se justifican con prueba de sensibilidad). |
+| **Restricciones entre recetas** | (1) `D1`, `D2` y `D3` distintas; (2) **inventario compartido**: lo que usan las tres no supera lo disponible (lo que falta se compra); (3) **presupuesto total**: lo que hay que comprar para las tres no supera el presupuesto máximo. Se compra **por empaques completos** en el supermercado elegido ("Arroz 1 kg"), y lo que sobra de un empaque queda para los días siguientes sin volver a pagarlo; los básicos de despensa no se cobran. |
+| **Objetivo** | Maximizar `U = w₁·rescate − w₂·costo − w₃·desperdicio`: *rescate* = cantidad de ingredientes que vencen en ≤ 3 días y se usan **antes** de vencer, ponderada por urgencia `1/(días + 1)`; *costo* = compras del plan en COP, por empaques completos; *desperdicio* = lo que vence dentro de los 3 días y el plan no usa. Pesos iniciales `w₁ = 1`, `w₂ = 0,3`, `w₃ = 0,5` (heurísticos, se justifican con prueba de sensibilidad). |
 | **Búsqueda** | Backtracking que asigna `D1`, `D2`, `D3` en orden; **forward checking** quita del dominio de los días pendientes las recetas que ya no caben en el inventario o el presupuesto restante; **ramificación y poda** descarta un plan parcial cuya utilidad máxima posible no supera la del mejor plan encontrado. |
 | **Por qué no es un filtro** | Las recetas compiten por el mismo inventario y presupuesto: las tres mejores recetas por separado no forman el mejor plan. Con 50 recetas hay ~118.000 planes (50·49·48). |
 
@@ -68,8 +68,9 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 ### HU-RIA-04: Ver una receta y cocinarla
 | Código | Criterio |
 |---|---|
-| CA-RIA-04-01 | **Dado** una receta (Figma `557:2856`), **entonces** veo su foto, preparación, cocción, reposo y dificultad, y los ingredientes agrupados (Verduras, Cereales, Carnes…) con la cantidad para las porciones elegidas y el costo de lo que me falta; los que tengo en el inventario se marcan como "En tu inventario". |
+| CA-RIA-04-01 | **Dado** una receta (Figma `557:2856`), **entonces** veo su foto, preparación, cocción, reposo y dificultad, y los ingredientes agrupados (Verduras, Cereales, Carnes…) con la cantidad para las porciones elegidas y, para lo que me falta, el producto como se compra y su precio en mi supermercado ("Tomate 1 kg · D1 $4.200"); los que tengo en el inventario se marcan como "En tu inventario" y los básicos (aceite, sal, comino, pimienta y azúcar) como "Básico de despensa". |
 | CA-RIA-04-02 | **Dado** el selector de porciones (− 4 porciones +), **cuando** lo cambio, **entonces** las cantidades y costos se recalculan. |
+| CA-RIA-04-07 | **Dado** el detalle, **entonces** la tarjeta verde dice mi supermercado y la fecha de los precios ("D1 · precios de octubre 2026"); si mi supermercado no tiene un producto en línea, la fila muestra el precio más bajo de otra tienda y su nombre. |
 | CA-RIA-04-03 | **Dado** "Empezar a cocinar", **entonces** veo "Antes de empezar" (Figma `557:2819`, sin video, §9) con "Prepara antes de iniciar" y "Comenzar guía". |
 | CA-RIA-04-04 | **Dado** la cocina guiada (Figma `557:2781`), **entonces** veo "Cocinando · paso N de T", el paso con su texto, "Anterior", "Siguiente" y "Salir"; si el paso tiene tiempo, un temporizador que puedo iniciar, pausar y reiniciar, y que avisa con sonido y vibración al llegar a 0. |
 | CA-RIA-04-05 | **Dado** el último paso, **cuando** toco "Terminar", **entonces** la app pregunta "¿Cocinaste esta receta?"; si confirmo, se descuentan del inventario las cantidades usadas (se borra el producto que queda en 0 o que no tenía cantidad) y se registra lo que se rescató. |
@@ -79,7 +80,7 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 
 | Código | Requisito | Historias |
 |---|---|---|
-| RF-RIA-01 | Catálogo de 30 a 50 recetas colombianas y tabla de ingredientes (sinónimos, categoría, precio de referencia COP, vida útil) dentro de la app. | HU-RIA-01, 04 |
+| RF-RIA-01 | Catálogo de 30 a 50 recetas colombianas y tabla de ingredientes (sinónimos, categoría, presentación de mercado y su precio en Éxito, Carulla, Olímpica y D1, básicos de despensa, vida útil) dentro de la app. | HU-RIA-01, 04 |
 | RF-RIA-02 | Emparejamiento inventario ↔ receta por nombre normalizado y sinónimos, con conversión de unidades. | HU-RIA-01, 02, 04 |
 | RF-RIA-03 | Agente CSP de plan de 3 días con la formulación de §2 y explicación del resultado. | HU-RIA-02, 03 |
 | RF-RIA-04 | Cocina guiada con temporizador y descuento del inventario al terminar. | HU-RIA-04 |
@@ -109,7 +110,8 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 
 - Un producto del inventario sin cantidad cuenta como "suficiente para una receta" y se usa completo.
 - Las cantidades se convierten entre g/kg/lb y ml/l; las unidades ("und") no se convierten a peso.
-- El precio de lo que falta se calcula con la tabla del catálogo, escalado a la cantidad necesaria.
+- Lo que falta se compra en empaques completos de la presentación de mercado del catálogo, al precio del supermercado elegido (D1 por defecto). Los precios son de una consulta puntual de octubre de 2026 en las páginas públicas de cada tienda (`docs/precios/precios-octubre-2026.md`); no se actualizan solos.
+- Aceite, sal, comino, pimienta y azúcar son básicos de despensa: se asume que están en casa y no suman al costo.
 
 ## 8. Fidelidad con Figma
 
@@ -139,7 +141,8 @@ solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
 | "Antes de empezar" sin video ni "Omitir video": muestra la foto de la receta. | No hay videos; quedan fuera de alcance. |
 | Las tarjetas de recetas no muestran el ♡ y la pestaña Guardadas sigue gris (como en la spec 006). Aprobada el 2026-10-19. | Las recetas guardadas pasan al próximo módulo (#117). |
 | El cierre de la cocina guiada pregunta "¿Cocinaste esta receta?". | Necesario para descontar el inventario sin errores. |
-| "Carulla - Optimizado para tu zona" se muestra como "Precios de referencia". | No hay integración con supermercados. |
+| "Carulla - Optimizado para tu zona" se muestra como "<Mi supermercado> · precios de octubre 2026" (aprobada el 2026-10-20). | Los precios son una referencia por tienda, sin integración en vivo con los supermercados. |
+| Las filas de ingredientes que faltan muestran el empaque y el precio en dos líneas ("Tomate 1 kg" / "D1 · $4.200"). | El Figma solo muestra un precio; el mercado se hace por empaques (decisión de Zhair del 2026-10-20). |
 | El contexto de la IA muestra "Según tus preferencias: <restricciones>" (aprobada el 2026-10-19). | El Figma no tiene restricciones alimentarias; sin la línea, el usuario no sabe por qué faltan recetas. |
 
 ## 10. Plan de entrega

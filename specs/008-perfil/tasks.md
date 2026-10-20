@@ -71,6 +71,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **F** = 
 | CA-PER-03-01 | I `FoodPreferencesScreenTest` |
 | CA-PER-03-02 | U `FoodPreferencesViewModelTest` |
 | CA-PER-03-03 | U `FoodPreferencesViewModelTest`, I `FoodPreferencesScreenTest` |
+| CA-PER-03-05 | U `PreferencesDocumentTest`, U `FoodPreferencesViewModelTest`, I `FoodPreferencesScreenTest`, R |
 | CA-PER-03-04 | U `PreferencesDocumentTest`, U `FoodPreferencesUseCasesTest`, U `FoodPreferencesViewModelTest`, R, M |
 | CA-PER-04-01 | U `DataStoreNotificationSettingsTest`, I `NotificationSettingsScreenTest` |
 | CA-PER-04-02 | U `DataStoreNotificationSettingsTest`, U `NotificationSettingsViewModelTest` |
