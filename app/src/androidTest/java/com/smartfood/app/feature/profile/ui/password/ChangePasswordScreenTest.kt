@@ -39,7 +39,7 @@ class ChangePasswordScreenTest {
     }
 
     @Test
-    fun test_01_campos_y_boton_se_muestran() {
+    fun caPer0501_muestraLosTresCamposYElBoton() {
         setContent(ChangePasswordUiState())
 
         composeTestRule.onNodeWithText("Cambiar contraseña").assertIsDisplayed()
@@ -50,7 +50,15 @@ class ChangePasswordScreenTest {
     }
 
     @Test
-    fun test_03_boton_se_habilita_cuando_los_campos_son_validos() {
+    fun caPer0502_focoEnNuevaContrasenaMuestraChecklist() {
+        setContent(ChangePasswordUiState(newPassword = "pass"))
+
+        composeTestRule.onNodeWithText("Nueva Contraseña").performClick()
+        composeTestRule.onNodeWithText("Mínimo 8 caracteres").assertIsDisplayed()
+    }
+
+    @Test
+    fun caPer0503_botonHabilitadoConCamposValidos() {
         setContent(
             ChangePasswordUiState(
                 currentPassword = "Pass123!",
@@ -71,7 +79,7 @@ class ChangePasswordScreenTest {
     }
 
     @Test
-    fun test_04_dialogo_de_exito_muestra_mensaje() {
+    fun caPer0504_dialogoDeExitoMuestraMensaje() {
         setContent(
             ChangePasswordUiState(isSavedSuccess = true)
         )
@@ -81,7 +89,7 @@ class ChangePasswordScreenTest {
     }
 
     @Test
-    fun test_05_contrasenas_no_coinciden_muestra_mensaje_error() {
+    fun caPer0503_contrasenasNoCoincidenMuestraError() {
         setContent(
             ChangePasswordUiState(
                 currentPassword = "Pass123!",
@@ -99,7 +107,7 @@ class ChangePasswordScreenTest {
     }
 
     @Test
-    fun test_06_contrasena_actual_incorrecta_muestra_mensaje_error() {
+    fun caPer0505_contrasenaActualIncorrectaMuestraError() {
         setContent(
             ChangePasswordUiState(
                 currentPasswordError = AuthError.InvalidCredentials

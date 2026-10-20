@@ -6,6 +6,7 @@ import com.smartfood.app.feature.auth.domain.usecase.ValidatePasswordUseCase
 import com.smartfood.app.feature.profile.domain.usecase.ChangePasswordUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -72,6 +73,7 @@ class ChangePasswordViewModelTest {
         assertEquals(ChangePasswordEffect.NavigateBack, effect)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `CA-PER-05-05 contraseña actual incorrecta marca error en contraseña actual`() = runTest {
         authRepository.reauthenticateResult = authFailure(AuthError.InvalidCredentials)
@@ -86,5 +88,27 @@ class ChangePasswordViewModelTest {
         assertEquals(AuthError.InvalidCredentials, viewModel.uiState.value.currentPasswordError)
         assertNull(viewModel.uiState.value.generalError)
         assertFalse(viewModel.uiState.value.isSavedSuccess)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `CA-PER-05-06 error de red muestra generalError y permite reintentar`() = runTest {
+        authRepository.reauthenticateResult = authFailure(AuthError.Network)
+
+        viewModel.onEvent(ChangePasswordEvent.CurrentPasswordChanged("Pass123!"))
+        viewModel.onEvent(ChangePasswordEvent.NewPasswordChanged("NewPass123!"))
+        viewModel.onEvent(ChangePasswordEvent.ConfirmPasswordChanged("NewPass123!"))
+
+        viewModel.onEvent(ChangePasswordEvent.SubmitClicked)
+        runCurrent()
+
+        assertEquals(AuthError.Network, viewModel.uiState.value.generalError)
+        assertFalse(viewModel.uiState.value.isSavedSuccess)
+
+        authRepository.reauthenticateResult = Result.success(Unit)
+        viewModel.onEvent(ChangePasswordEvent.SubmitClicked)
+        runCurrent()
+
+        assertTrue(viewModel.uiState.value.isSavedSuccess)
     }
 }
