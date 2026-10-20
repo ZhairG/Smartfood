@@ -390,7 +390,8 @@ private val ContentGap = 16.dp
 private val CardGap = 12.dp
 private val CardRadius = 20.dp
 private val CardElevation = 3.dp
-private val PhotoAspectRatio = 173f / 145f
+// La foto de la tarjeta se ve de 173 × 111 en el Figma (557:3028).
+private val PhotoAspectRatio = 173f / 111f
 private val CardTextSidePadding = 10.dp
 private val CardTextVerticalPadding = 8.dp
 private val CardTextGap = 5.dp
