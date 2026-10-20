@@ -1,5 +1,8 @@
 package com.smartfood.app.feature.recipes.ui
 
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -9,12 +12,13 @@ import com.smartfood.app.core.navigation.NavTransitions
 import com.smartfood.app.core.navigation.Route
 import com.smartfood.app.core.navigation.navigateToTab
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverScreen
+import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverViewModel
 
 /**
  * Nombre: RecipesNavGraph.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Destinos de recetas dentro de `MainGraph` (spec 009, plan §5, T006). La pestaña Recetas muestra
+ * Descripción: Destinos de recetas dentro de `MainGraph` (spec 009, plan §5, T006 y T007). La pestaña Recetas muestra
  * Descubrir con la barra inferior; las pantallas internas (detalle, flujo de la IA y cocina) se agregan en sus tareas
  * y no llevan barra.
  *
@@ -31,7 +35,9 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
             currentTab = MainTab.RECIPES,
             onTabSelected = navController::navigateToTab
         ) {
-            RecipesDiscoverScreen()
+            val viewModel: RecipesDiscoverViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            RecipesDiscoverScreen(state = state, onEvent = viewModel::onEvent)
         }
     }
 }

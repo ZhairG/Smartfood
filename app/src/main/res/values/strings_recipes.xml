@@ -1,3 +1,18 @@
 <resources>
     <string name="recipes_title">Recetas</string>
+
+    <!-- Descubrir (spec 009, T007) -->
+    <string name="recipes_search_placeholder">Buscar receta o ingrediente...</string>
+    <string name="cd_recipes_clear_search">Limpiar búsqueda</string>
+    <string name="recipes_hero_title">¿Qué cocinamos hoy?</string>
+    <string name="recipes_hero_body">La IA prioriza lo que está por vencer y cuida tu presupuesto.</string>
+    <string name="recipes_suggest">Sugerirme recetas</string>
+    <string name="recipes_filter_for_you">Para ti</string>
+    <string name="recipes_filter_under_30">≤ 30 min</string>
+    <string name="recipes_filter_economic">Económicas</string>
+    <string name="recipes_expiring_badge">Usa %1$s próximo a vencer</string>
+    <string name="recipes_card_meta">%1$d min · %2$d kcal · COP $%3$s</string>
+    <string name="recipes_empty">No hay recetas que coincidan</string>
+    <string name="recipes_load_error">No pudimos cargar las recetas.</string>
+    <string name="cd_recipes_loading">Cargando recetas</string>
 </resources>
