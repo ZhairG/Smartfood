@@ -28,4 +28,24 @@ interface AuthRepository {
 
     /** Cierra la sesión activa. */
     fun logout()
+
+    /** Correo de la cuenta con sesión, o `null` si no hay sesión (spec 008, CA-PER-02-12). */
+    fun currentEmail(): String?
+
+    /**
+     * Confirma la identidad con la contraseña actual, como exige Firebase antes de cambiar el correo o la contraseña
+     * (spec 008, CA-PER-02-10 y HU-PER-05). Una contraseña incorrecta falla con `InvalidCredentials`.
+     */
+    suspend fun reauthenticate(currentPassword: String): Result<Unit>
+
+    /**
+     * Pone al día la sesión después de que el servidor cambió el correo (spec 008, CA-PER-02-12): recarga el usuario
+     * y, si la sesión quedó invalidada, vuelve a iniciarla con [email] y [password], sin que la persona lo note.
+     */
+    suspend fun refreshSession(email: String, password: String): Result<Unit>
+
+    /**
+     * Actualiza la contraseña de la cuenta con sesión activa (spec 008, HU-PER-05, CA-PER-05-04).
+     */
+    suspend fun updatePassword(newPassword: String): Result<Unit>
 }

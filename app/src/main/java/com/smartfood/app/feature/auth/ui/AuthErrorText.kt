@@ -30,6 +30,9 @@ fun AuthError.messageRes(): Int = when (this) {
     is AuthError.TooManyRequests -> R.string.error_too_many_requests
     AuthError.Network -> R.string.offline_dialog_title
     AuthError.ServiceUnavailable -> R.string.error_firebase_config_not_found
+    AuthError.InvalidName -> R.string.error_invalid_name
+    AuthError.InvalidPhone -> R.string.error_invalid_phone
+    AuthError.InvalidBirthDate -> R.string.error_invalid_birth_date
     is AuthError.Unknown -> R.string.error_unknown
 }
 

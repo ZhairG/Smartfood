@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigation
 import com.smartfood.app.feature.inventory.ui.inventoryDestinations
-import com.smartfood.app.feature.profile.profileDestination
+import com.smartfood.app.feature.profile.ui.profileDestination
 import com.smartfood.app.feature.recipes.ui.recipesDestinations
 
 /**

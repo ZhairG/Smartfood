@@ -62,6 +62,15 @@ sealed interface AuthError {
     /** El servicio de autenticación no está configurado en Firebase. */
     data object ServiceUnavailable : AuthError
 
+    /** El nombre del perfil no tiene de 2 a 50 caracteres (spec 008, CA-PER-02-05). */
+    data object InvalidName : AuthError
+
+    /** El teléfono no es un celular colombiano de 10 dígitos que empieza por 3 (spec 008, CA-PER-02-06). */
+    data object InvalidPhone : AuthError
+
+    /** La fecha de nacimiento es posterior a hoy (spec 008, CA-PER-02-07). */
+    data object InvalidBirthDate : AuthError
+
     /** Error no clasificado. */
     data class Unknown(val cause: String?) : AuthError
 }

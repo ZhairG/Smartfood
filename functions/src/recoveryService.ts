@@ -47,8 +47,8 @@ export const RecoveryLimits = {
 } as const;
 
 /** Mismo formato que `ValidateEmailUseCase` de la app. */
-const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const CODE_REGEX = new RegExp(`^\\d{${RecoveryLimits.CODE_LENGTH}}$`);
+export const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+export const CODE_REGEX = new RegExp(`^\\d{${RecoveryLimits.CODE_LENGTH}}$`);
 
 /** Clave del registro: hash del correo normalizado, para no guardarlo en claro como id. */
 export function recordKey(email: string): string {
@@ -177,7 +177,7 @@ type CodeRequest = CodeWritten | { retryAfterMs: number };
  * Milisegundos que faltan para poder enviar otro código: el mayor entre el fin de la espera de 60 s y, si la
  * ventana de 1 h ya tiene el máximo de envíos, el fin de esa ventana (plan §5).
  */
-function waitBeforeNextCode(record: ResetRecord | null, now: number): number {
+export function waitBeforeNextCode(record: SendHistory | null, now: number): number {
   if (!record) return 0;
   const cooldownEnd = record.lastSentAt + RecoveryLimits.RESEND_COOLDOWN_MS;
   const windowFull =
@@ -186,23 +186,26 @@ function waitBeforeNextCode(record: ResetRecord | null, now: number): number {
   return Math.max(0, cooldownEnd - now, windowEnd - now);
 }
 
-function toSeconds(ms: number): number {
+/** Lo que cuenta para los límites de envío: el último envío y la ventana de 1 h. También lo usa el cambio de correo. */
+export type SendHistory = Pick<ResetRecord, "lastSentAt" | "windowStart" | "sentInWindow">;
+
+export function toSeconds(ms: number): number {
   return Math.ceil(ms / 1000);
 }
 
 /** Resultado de comprobar un código: el `uid` de la cuenta o la razón del rechazo. */
 type CodeCheck = { uid: string } | { error: RecoveryErrorReason };
 
-function normalizeEmail(email: string): string {
+export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
 /** Código aleatorio de 4 dígitos con un generador criptográfico (RF-REC-01). */
-function randomCode(): string {
+export function randomCode(): string {
   return randomInt(0, 10 ** RecoveryLimits.CODE_LENGTH).toString().padStart(RecoveryLimits.CODE_LENGTH, "0");
 }
 
-function hashCode(salt: string, code: string): string {
+export function hashCode(salt: string, code: string): string {
   return sha256Hex(salt + code);
 }
 
@@ -211,7 +214,7 @@ function sha256Hex(value: string): string {
 }
 
 /** Comparación en tiempo constante, para no filtrar información por el tiempo de respuesta. */
-function sameHash(expected: string, actual: string): boolean {
+export function sameHash(expected: string, actual: string): boolean {
   const a = Buffer.from(expected, "hex");
   const b = Buffer.from(actual, "hex");
   return a.length === b.length && timingSafeEqual(a, b);

@@ -6,6 +6,7 @@ import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.feature.auth.domain.usecase.LoginUseCase
 import com.smartfood.app.feature.auth.domain.usecase.ValidateEmailUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
+import com.smartfood.app.testutil.FakeExpiryReminderScheduler
 import com.smartfood.app.testutil.FakeSessionPreferences
 import com.smartfood.app.testutil.MainDispatcherRule
 import kotlinx.coroutines.flow.first
@@ -36,7 +37,12 @@ class LoginViewModelTest {
     @Before
     fun prepararEntornoTest() {
         authRepository = FakeAuthRepository()
-        viewModel = LoginViewModel(LoginUseCase(authRepository, FakeSessionPreferences(), ValidateEmailUseCase()))
+        viewModel = LoginViewModel(LoginUseCase(
+            authRepository,
+            FakeSessionPreferences(),
+            ValidateEmailUseCase(),
+            FakeExpiryReminderScheduler()
+        ))
     }
 
     private fun escribirCredenciales(email: String = "pepito@correo.com", password: String = "Secreta#1") {
