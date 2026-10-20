@@ -112,6 +112,7 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 - Las cantidades se convierten entre g/kg/lb y ml/l; las unidades ("und") no se convierten a peso.
 - Lo que falta se compra en empaques completos de la presentación de mercado del catálogo, al precio del supermercado elegido (D1 por defecto). Los precios son de una consulta puntual de octubre de 2026 en las páginas públicas de cada tienda (`docs/precios/precios-octubre-2026.md`); no se actualizan solos.
 - Aceite, sal, comino, pimienta y azúcar son básicos de despensa: se asume que están en casa y no suman al costo.
+- Los precios se actualizan con `tools/precios/` (consulta puntual en los sitios de las tiendas, **revisión a mano** y aplicación al catálogo); no hay integración en vivo.
 
 ## 8. Fidelidad con Figma
 

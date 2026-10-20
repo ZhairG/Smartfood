@@ -1,8 +1,8 @@
 # Precios de referencia de mercado (octubre 2026)
 
-Consulta puntual del **2026-10-20** en los buscadores públicos de cada tienda (www.exito.com, www.carulla.com, www.olimpica.com y www.d1.com.co). Ara no publica su catálogo con precios en línea y no se incluye. Spec 009, T028.
+Consulta puntual del **2026-10-20** en los buscadores públicos de cada tienda (www.exito.com, www.carulla.com, www.olimpica.com y www.d1.com.co). Ara no publica su catálogo con precios en línea y no se incluye. Spec 009, T030 y T034. **Generado por `tools/precios/aplicar.py` desde `docs/precios/precios.json`; no editar a mano.**
 
-- **Presentación:** la que se compra en el mercado. Si la tienda vende otro tamaño, el precio se lleva a la presentación de referencia y se anota el producto real con su precio entre paréntesis. Las verduras y frutas sueltas se venden por kilo; las que se venden por unidad (aguacate, banano, pepino, calabacín, pimentón, mazorca) usan un peso aproximado por unidad.
+- **Presentación:** la que se compra en el mercado. Si la tienda vende otro tamaño, el precio se lleva a la presentación de referencia y se anota el producto real con su precio entre paréntesis. Las verduras y frutas sueltas se venden por kilo; las que se venden por unidad usan un peso aproximado por unidad.
 - **Vacío:** la tienda no lo tiene en línea; la app usa la tienda más barata y la nombra.
 - **Básico de despensa:** no suma al costo de la receta ni al presupuesto del agente.
 

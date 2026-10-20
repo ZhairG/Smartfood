@@ -58,7 +58,8 @@ Modelos a copiar: estructura de `feature/inventory` (contratos `XContract.kt`, `
   qué recetas admite cada restricción alimentaria (§3.3).
 - `unidad` ∈ `g`, `ml`, `und`. `empaque` es la presentación de mercado (`cantidad` en la unidad base) y `precios`, su
   precio en cada tienda (`exito`, `carulla`, `olimpica`, `d1`; una tienda puede faltar). `"basico": true` marca los
-  básicos de despensa. Fuente: `docs/precios/precios-octubre-2026.md`.
+  básicos de despensa. Fuente de verdad: `docs/precios/precios.json`, que `tools/precios/aplicar.py` aplica a este
+  archivo (ver `tools/precios/README.md`); la tabla legible es `docs/precios/precios-<mes>-<año>.md`.
 - Las fotos van en `res/drawable-nodpi/receta_*.webp` (≤ 150 KB cada una); su fuente, en `docs/licenses/fotos-recetas.md`.
 - Contenido: 30 a 50 recetas de cocina colombiana cotidiana. El catálogo se valida con una prueba unitaria
   (`RecipeCatalogTest`): ids únicos, cada ingrediente existe, cantidades > 0, al menos un paso.

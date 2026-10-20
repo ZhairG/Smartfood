@@ -43,6 +43,12 @@
 - [x] T032 "Mi supermercado" en Preferencias alimentarias, `firestore.rules` y `rules-test` (spec 008, CA-PER-03-05).
 - [x] T033 Detalle y Descubrir con los precios del supermercado elegido (CA-RIA-04-01, 04-07).
 
+## Mejoras del catálogo propio (Zhair, 2026-10-20)
+- [x] T034 Herramienta de precios en `tools/precios/` (`consultar.py`, `aplicar.py`, `busquedas.json`, README); `docs/precios/precios.json` como fuente de verdad.
+- [ ] T035 Revisión de calidad del catálogo (tiempos, kcal, cantidades por porción, pasos, sinónimos y fotos): se corrige lo claro y se lista lo dudoso.
+- [ ] T036 20 recetas nuevas (30 → 50; 7 veganas, 7 vegetarianas, 6 para todos) y 4 ingredientes (ahuyama, arveja, habichuela, champiñones) con precio y foto de licencia libre.
+- [ ] T037 Variedad con el catálogo real: ≥ 20 vegetarianas y ≥ 12 veganas en `RecipeCatalogTest`; `MealPlannerCatalogTest` arma un plan con cada restricción (CA-RIA-02-09).
+
 ## Cierre (en el mismo PR)
 - [ ] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
 - [ ] T028 Medición del tiempo del plan en el teléfono (release) y checklist manual; capturas Figma vs app en el PR.
@@ -66,7 +72,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-06 | U `PlanExplainerTest` |
 | CA-RIA-02-07 | U `MealPlannerTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-08 | U `AiPlanViewModelTest` |
-| CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `GeneratePlanUseCaseTest` |
+| CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `MealPlannerCatalogTest`, U `GeneratePlanUseCaseTest` |
 | CA-RIA-02-10 | U `MealPlannerPerformanceTest`, M (release) |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |
@@ -84,7 +90,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 
 ### Checklist de verificación manual
 1. Recetas: buscar y filtrar; "Para ti" pone primero lo que usa productos por vencer.
-2. IA con presupuesto alto: aparece el plan de 3 días con su explicación en ≤ 2 s (release).
+2. IA con presupuesto alto: aparece el plan de 3 días con su explicación en ≤ 2 s (release); también con "Vegano" en Preferencias.
 3. IA con COP $2.000: "Sin coincidencias" con el presupuesto sugerido; "Ajustar contexto" y "Ver recetas económicas".
 4. "Sin picante" y 30 minutos: ninguna receta del plan los incumple.
 5. Detalle: cambiar porciones; ingredientes "En tu inventario", "Básico de despensa" y el empaque con su precio; cambiar "Mi supermercado" en el Perfil y ver otros precios.

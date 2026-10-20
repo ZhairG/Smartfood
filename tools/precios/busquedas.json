@@ -1,0 +1,721 @@
+{
+ "cebolla": {
+  "busqueda": "cebolla cabezona",
+  "debe_empezar_con": [
+   "cebolla"
+  ],
+  "excluir": [
+   "larga",
+   "polvo",
+   "encurtid",
+   "salsa",
+   "deshidrat",
+   "frita"
+  ]
+ },
+ "tomate": {
+  "busqueda": "tomate chonto",
+  "debe_empezar_con": [
+   "tomate"
+  ],
+  "excluir": [
+   "salsa",
+   "pasta",
+   "pure",
+   "cherry",
+   "lata",
+   "frito",
+   "seco",
+   "jugo"
+  ]
+ },
+ "zanahoria": {
+  "busqueda": "zanahoria",
+  "debe_empezar_con": [
+   "zanahoria"
+  ],
+  "excluir": [
+   "jugo",
+   "rallada",
+   "baby",
+   "compota"
+  ]
+ },
+ "papa": {
+  "busqueda": "papa pastusa",
+  "debe_empezar_con": [
+   "papa"
+  ],
+  "excluir": [
+   "frita",
+   "chips",
+   "francesa",
+   "criolla",
+   "congelad",
+   "pure",
+   "paquete"
+  ]
+ },
+ "yuca": {
+  "busqueda": "yuca",
+  "debe_empezar_con": [
+   "yuca"
+  ],
+  "excluir": [
+   "frita",
+   "congelad",
+   "harina",
+   "almidon",
+   "croqueta"
+  ]
+ },
+ "platano": {
+  "busqueda": "platano verde",
+  "debe_empezar_con": [
+   "platano"
+  ],
+  "excluir": [
+   "chips",
+   "frito",
+   "maduro",
+   "patacon",
+   "harina",
+   "tostado",
+   "maduritos"
+  ]
+ },
+ "lechuga": {
+  "busqueda": "lechuga",
+  "debe_empezar_con": [
+   "lechuga"
+  ],
+  "excluir": [
+   "mix",
+   "ensalada"
+  ]
+ },
+ "pepino": {
+  "busqueda": "pepino cohombro",
+  "debe_empezar_con": [
+   "pepino"
+  ],
+  "excluir": [
+   "encurt",
+   "dulce"
+  ]
+ },
+ "calabacin": {
+  "busqueda": "calabacin",
+  "debe_empezar_con": [
+   "calabac"
+  ],
+  "excluir": []
+ },
+ "mazorca": {
+  "busqueda": "mazorca",
+  "debe_empezar_con": [
+   "mazorca"
+  ],
+  "excluir": [
+   "desgranad",
+   "lata",
+   "congel",
+   "tierna enlatad"
+  ]
+ },
+ "guascas": {
+  "busqueda": "guascas",
+  "debe_empezar_con": [
+   "guasca"
+  ],
+  "excluir": []
+ },
+ "albahaca": {
+  "busqueda": "albahaca",
+  "debe_empezar_con": [
+   "albahaca"
+  ],
+  "excluir": [
+   "pesto",
+   "seca",
+   "salsa"
+  ]
+ },
+ "aji": {
+  "busqueda": "aji",
+  "debe_empezar_con": [
+   "aji"
+  ],
+  "excluir": [
+   "salsa",
+   "molido",
+   "polvo",
+   "seco",
+   "picante embot"
+  ]
+ },
+ "aguacate": {
+  "busqueda": "aguacate",
+  "debe_empezar_con": [
+   "aguacate"
+  ],
+  "excluir": [
+   "guacamole",
+   "pulpa",
+   "aceite",
+   "hass x"
+  ]
+ },
+ "cilantro": {
+  "busqueda": "cilantro",
+  "debe_empezar_con": [
+   "cilantro"
+  ],
+  "excluir": [
+   "seco",
+   "salsa",
+   "deshidrat"
+  ]
+ },
+ "ajo": {
+  "busqueda": "ajo",
+  "debe_empezar_con": [
+   "ajo"
+  ],
+  "excluir": [
+   "polvo",
+   "sal",
+   "salsa",
+   "pasta",
+   "molido",
+   "aceite",
+   "negro",
+   "puerro"
+  ]
+ },
+ "pimenton": {
+  "busqueda": "pimenton rojo",
+  "debe_empezar_con": [
+   "pimenton"
+  ],
+  "excluir": [
+   "polvo",
+   "dulce molido",
+   "salsa",
+   "asado",
+   "encurt"
+  ]
+ },
+ "cebolla-larga": {
+  "busqueda": "cebolla larga",
+  "debe_empezar_con": [
+   "cebolla larga"
+  ],
+  "excluir": [
+   "deshidrat"
+  ]
+ },
+ "banano": {
+  "busqueda": "banano",
+  "debe_empezar_con": [
+   "banano"
+  ],
+  "excluir": [
+   "chips",
+   "deshidrat",
+   "bocadillo",
+   "pure",
+   "compota",
+   "bebida",
+   "yogur"
+  ]
+ },
+ "fresa": {
+  "busqueda": "fresa",
+  "debe_empezar_con": [
+   "fresa"
+  ],
+  "excluir": [
+   "yogur",
+   "mermelada",
+   "bebida",
+   "jugo",
+   "gelatina",
+   "galleta",
+   "helado",
+   "deshidrat",
+   "congel",
+   "pulpa",
+   "sabor",
+   "crema",
+   "leche",
+   "kumis",
+   "avena",
+   "cereal"
+  ]
+ },
+ "limon": {
+  "busqueda": "limon tahiti",
+  "debe_empezar_con": [
+   "limon"
+  ],
+  "excluir": [
+   "jugo",
+   "te ",
+   "bebida",
+   "galleta",
+   "sabor",
+   "zumo",
+   "agua",
+   "gaseosa",
+   "jabon",
+   "lavaloza",
+   "detergente"
+  ]
+ },
+ "arroz": {
+  "busqueda": "arroz blanco",
+  "debe_empezar_con": [
+   "arroz"
+  ],
+  "excluir": [
+   "integral",
+   "chino",
+   "precocido",
+   "harina",
+   "galleta",
+   "bebida",
+   "leche",
+   "pudin",
+   "con ",
+   "sushi",
+   "basmati",
+   "jazmin",
+   "parbo"
+  ]
+ },
+ "pasta": {
+  "busqueda": "pasta spaghetti",
+  "debe_empezar_con": [
+   "spaguetti",
+   "spaghetti",
+   "espagueti",
+   "pasta"
+  ],
+  "excluir": [
+   "salsa",
+   "sopa",
+   "instant",
+   "integral",
+   "lasagna",
+   "lasaña"
+  ]
+ },
+ "pan": {
+  "busqueda": "pan tajado blanco",
+  "debe_empezar_con": [
+   "pan"
+  ],
+  "excluir": [
+   "rallado",
+   "hamburguesa",
+   "perro",
+   "integral",
+   "galleta",
+   "pita",
+   "arabe",
+   "mantequilla",
+   "panela",
+   "ajo",
+   "bebida",
+   "pandebono",
+   "queso"
+  ]
+ },
+ "tortilla": {
+  "busqueda": "tortilla de trigo",
+  "debe_empezar_con": [
+   "tortilla"
+  ],
+  "excluir": [
+   "maiz",
+   "chips",
+   "nacho",
+   "papa",
+   "integral"
+  ]
+ },
+ "avena": {
+  "busqueda": "avena en hojuelas",
+  "debe_empezar_con": [
+   "avena"
+  ],
+  "excluir": [
+   "bebida",
+   "galleta",
+   "barra",
+   "liquida",
+   "polvo",
+   "kumis",
+   "yogur",
+   "jabon",
+   "crema",
+   "leche",
+   "alpinito",
+   "instantanea sabor"
+  ]
+ },
+ "maiz": {
+  "busqueda": "maiz tierno lata",
+  "debe_empezar_con": [
+   "maiz"
+  ],
+  "excluir": [
+   "harina",
+   "aceite",
+   "pira",
+   "pop",
+   "cereal",
+   "arepa",
+   "mazorca",
+   "chips",
+   "fecula",
+   "almidon",
+   "crispeta",
+   "pollo",
+   "galleta"
+  ]
+ },
+ "lentejas": {
+  "busqueda": "lenteja",
+  "debe_empezar_con": [
+   "lenteja"
+  ],
+  "excluir": [
+   "sopa",
+   "preparad",
+   "lista",
+   "pasta"
+  ]
+ },
+ "frijoles": {
+  "busqueda": "frijol rojo",
+  "debe_empezar_con": [
+   "frijol"
+  ],
+  "excluir": [
+   "lata",
+   "preparad",
+   "listo",
+   "sopa",
+   "refrito",
+   "verde"
+  ]
+ },
+ "garbanzos": {
+  "busqueda": "garbanzo",
+  "debe_empezar_con": [
+   "garbanzo"
+  ],
+  "excluir": [
+   "lata",
+   "preparad",
+   "listo",
+   "hummus",
+   "harina",
+   "pasta"
+  ]
+ },
+ "pollo": {
+  "busqueda": "pechuga de pollo",
+  "debe_empezar_con": [
+   "pollo"
+  ],
+  "excluir": [
+   "salchicha",
+   "nugget",
+   "apanad",
+   "caldo",
+   "sopa",
+   "jamon",
+   "chorizo",
+   "gato",
+   "perro",
+   "mortadela",
+   "concentrado",
+   "salsa",
+   "consome",
+   "alimento",
+   "croqueta",
+   "hamburguesa",
+   "pasta",
+   "ala ",
+   "alas",
+   "deditos"
+  ]
+ },
+ "carne": {
+  "busqueda": "carne de res molida",
+  "debe_empezar_con": [
+   "res"
+  ],
+  "excluir": [
+   "salchicha",
+   "chorizo",
+   "hamburguesa",
+   "caldo",
+   "consome",
+   "perro",
+   "gato",
+   "alimento",
+   "pasta",
+   "sopa",
+   "albondiga"
+  ]
+ },
+ "pescado": {
+  "busqueda": "filete de tilapia",
+  "debe_empezar_con": [
+   "tilapia",
+   "pescado",
+   "merluza",
+   "basa"
+  ],
+  "excluir": [
+   "lata",
+   "apanad",
+   "nugget",
+   "perro",
+   "gato",
+   "alimento",
+   "deditos"
+  ]
+ },
+ "atun": {
+  "busqueda": "atun en agua",
+  "debe_empezar_con": [
+   "atun"
+  ],
+  "excluir": [
+   "perro",
+   "gato",
+   "alimento",
+   "galleta"
+  ]
+ },
+ "huevo": {
+  "busqueda": "huevos aa x 30",
+  "debe_empezar_con": [
+   "huevo"
+  ],
+  "excluir": [
+   "codorniz",
+   "chocolate",
+   "pascua",
+   "galleta",
+   "liquido",
+   "pasta",
+   "pastas"
+  ]
+ },
+ "queso": {
+  "busqueda": "queso campesino",
+  "debe_empezar_con": [
+   "queso"
+  ],
+  "excluir": [
+   "crema",
+   "parmesano",
+   "mozzarella tajado",
+   "galleta",
+   "pasabocas",
+   "salsa",
+   "untable",
+   "rallado",
+   "doble crema tajado",
+   "arepa",
+   "pan"
+  ]
+ },
+ "leche": {
+  "busqueda": "leche entera bolsa 1100",
+  "debe_empezar_con": [
+   "leche"
+  ],
+  "excluir": [
+   "polvo",
+   "condensada",
+   "deslactos",
+   "almendra",
+   "soya",
+   "coco",
+   "chocolate",
+   "fresa",
+   "avena",
+   "kumis",
+   "arroz",
+   "saborizada",
+   "evaporada",
+   "descremada",
+   "semidescremada",
+   "galleta",
+   "dulce",
+   "crema"
+  ]
+ },
+ "mantequilla": {
+  "busqueda": "mantequilla con sal",
+  "debe_empezar_con": [
+   "mantequilla"
+  ],
+  "excluir": [
+   "galleta",
+   "mani",
+   "pan",
+   "arepa",
+   "palomitas",
+   "crispeta",
+   "sabor"
+  ]
+ },
+ "aceite": {
+  "busqueda": "aceite vegetal",
+  "debe_empezar_con": [
+   "aceite"
+  ],
+  "excluir": [
+   "oliva",
+   "coco",
+   "motor",
+   "bebe",
+   "corporal",
+   "spray",
+   "aguacate",
+   "almendra",
+   "ricino",
+   "cabello",
+   "ajonjoli",
+   "sesamo"
+  ]
+ },
+ "sal": {
+  "busqueda": "sal refisal",
+  "debe_empezar_con": [
+   "sal"
+  ],
+  "excluir": [
+   "salsa",
+   "salchich",
+   "galleta",
+   "ajo",
+   "cebolla",
+   "condimento",
+   "marina gruesa",
+   "mani",
+   "papa",
+   "rosada",
+   "parrilla",
+   "baja",
+   "liquida",
+   "pimienta"
+  ]
+ },
+ "comino": {
+  "busqueda": "comino molido",
+  "debe_empezar_con": [
+   "comino"
+  ],
+  "excluir": []
+ },
+ "pimienta": {
+  "busqueda": "pimienta negra molida",
+  "debe_empezar_con": [
+   "pimienta"
+  ],
+  "excluir": [
+   "sal ",
+   "salsa",
+   "galleta",
+   "condimento"
+  ]
+ },
+ "azucar": {
+  "busqueda": "azucar blanca",
+  "debe_empezar_con": [
+   "azucar"
+  ],
+  "excluir": [
+   "morena",
+   "glass",
+   "pulverizada",
+   "dietetica",
+   "light",
+   "sustituto",
+   "endulzante",
+   "galleta",
+   "dulce",
+   "stevia",
+   "sin azucar",
+   "caramelo",
+   "chupeta",
+   "bebida",
+   "jugo",
+   "cereal"
+  ]
+ },
+ "almendras": {
+  "busqueda": "almendras",
+  "debe_empezar_con": [
+   "almendra"
+  ],
+  "excluir": [
+   "leche",
+   "bebida",
+   "chocolate",
+   "galleta",
+   "crema",
+   "aceite",
+   "barra",
+   "cereal",
+   "harina",
+   "granola",
+   "mantequilla",
+   "yogur"
+  ]
+ },
+ "miel": {
+  "busqueda": "miel de abejas",
+  "debe_empezar_con": [
+   "miel"
+  ],
+  "excluir": [
+   "galleta",
+   "cereal",
+   "shampoo",
+   "jabon",
+   "crema",
+   "mostaza",
+   "salsa",
+   "maple",
+   "panela",
+   "jarabe",
+   "bebida",
+   "yogur",
+   "caramelo",
+   "dulce",
+   "pollo"
+  ]
+ },
+ "harina-maiz": {
+  "busqueda": "harina de maiz precocida",
+  "debe_empezar_con": [
+   "harina"
+  ],
+  "excluir": [
+   "trigo",
+   "arroz",
+   "almendra",
+   "avena"
+  ]
+ }
+}
