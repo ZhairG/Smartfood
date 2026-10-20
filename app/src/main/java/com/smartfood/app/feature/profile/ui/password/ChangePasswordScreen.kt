@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartfood.app.R
@@ -44,7 +45,6 @@ import com.smartfood.app.core.designsystem.util.clearFocusOnTap
 import com.smartfood.app.core.navigation.ObserveEffects
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.usecase.PasswordValidationResult
-import com.smartfood.app.feature.auth.ui.components.FlexibleGap
 import com.smartfood.app.feature.auth.ui.components.PasswordFieldWithChecklist
 import com.smartfood.app.feature.auth.ui.messageRes
 
@@ -131,22 +131,26 @@ private fun ChangePasswordForm(
 ) {
     val focusManager = LocalFocusManager.current
     val metrics = LocalFormMetrics.current
+    val spacing = MaterialTheme.spacing
+    // Separaciones del Figma 603:2358 en el perfil Regular (barra→texto 43, texto→campo 30, entre campos 37-41,
+    // campo→botón 53); salen de LocalFormMetrics para encogerse en Medium y Compact.
+    val fieldGap = metrics.sectionSpacing + metrics.fieldSpacing
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = metrics.formHorizontalPadding, vertical = metrics.sectionSpacing)
+            .padding(horizontal = metrics.formHorizontalPadding)
+            .padding(top = metrics.sectionSpacing + spacing.medium, bottom = metrics.sectionSpacing)
     ) {
+        // Figma 603:2414: Poppins Regular de 13 sp en gris.
         Text(
             text = stringResource(id = R.string.change_password_subtitle),
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = metrics.labelFontSize,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp)
         )
 
-        Spacer(modifier = Modifier.height(metrics.sectionSpacing))
+        Spacer(modifier = Modifier.height(metrics.sectionSpacing + spacing.small))
 
         SmartFoodPasswordField(
             label = stringResource(id = R.string.change_password_current_label),
@@ -166,7 +170,7 @@ private fun ChangePasswordForm(
             )
         }
 
-        Spacer(modifier = Modifier.height(metrics.fieldSpacing))
+        Spacer(modifier = Modifier.height(fieldGap))
 
         PasswordFieldWithChecklist(
             label = stringResource(id = R.string.change_password_new_label),
@@ -179,7 +183,7 @@ private fun ChangePasswordForm(
             imeAction = ImeAction.Next
         )
 
-        Spacer(modifier = Modifier.height(metrics.fieldSpacing))
+        Spacer(modifier = Modifier.height(fieldGap))
 
         val showPasswordsDontMatchError = (state.confirmPassword.isNotEmpty() && !state.passwordsMatch) ||
                 state.generalError == AuthError.PasswordsDontMatch
@@ -215,7 +219,8 @@ private fun ChangePasswordForm(
             )
         }
 
-        FlexibleGap(minHeight = metrics.sectionSpacing)
+        // El botón va justo después del último campo, como en el Figma (no al fondo de la pantalla).
+        Spacer(modifier = Modifier.height(metrics.sectionSpacing * 2))
 
         SmartFoodPrimaryButton(
             text = stringResource(id = R.string.change_password_button),
