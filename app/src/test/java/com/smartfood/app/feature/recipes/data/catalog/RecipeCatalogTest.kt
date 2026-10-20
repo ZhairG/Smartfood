@@ -139,6 +139,16 @@ class RecipeCatalogTest {
     }
 
     @Test
+    fun `RNF-RIA-05 ninguna receta repite la foto de otra`() {
+        // Compara el contenido de los archivos, no solo el nombre: dos recetas no pueden mostrar la misma imagen.
+        val porContenido = recipes.map { it.text("foto") }
+            .groupBy { photoDir.resolve("$it.webp").readBytes().contentHashCode() }
+            .values
+            .filter { it.size > 1 }
+        assertTrue("Fotos repetidas: $porContenido", porContenido.isEmpty())
+    }
+
+    @Test
     fun `RNF-RIA-05 cada foto está documentada con su fuente y licencia`() {
         recipes.forEach { recipe ->
             val photo = recipe.text("foto")
