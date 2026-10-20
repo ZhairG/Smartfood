@@ -1,6 +1,5 @@
 package com.smartfood.app.feature.recipes.ui.discover
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,14 +30,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -56,9 +52,9 @@ import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.SurfaceLight
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
+import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 import com.smartfood.app.feature.recipes.ui.components.RecipesHeader
-import java.text.NumberFormat
-import java.util.Locale
+import com.smartfood.app.feature.recipes.ui.components.formatCop
 
 /**
  * Nombre: RecipesDiscoverScreen.kt
@@ -302,7 +298,12 @@ private fun RecipeCard(
             )
             .clickable(role = Role.Button, onClick = onClick)
     ) {
-        RecipePhoto(photo = card.photo)
+        RecipePhoto(
+            photo = card.photo,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(PhotoAspectRatio)
+        )
         Column(
             verticalArrangement = Arrangement.spacedBy(CardTextGap),
             modifier = Modifier.padding(horizontal = CardTextSidePadding, vertical = CardTextVerticalPadding)
@@ -338,32 +339,6 @@ private fun RecipeCard(
                 maxLines = 2
             )
         }
-    }
-}
-
-/** Foto de la receta desde `drawable-nodpi`; si no existe, un fondo verde claro. */
-@Composable
-private fun RecipePhoto(photo: String?) {
-    val context = LocalContext.current
-    val resourceId = remember(photo) {
-        photo?.let { name -> context.resources.getIdentifier(name, "drawable", context.packageName) } ?: 0
-    }
-    if (resourceId != 0) {
-        Image(
-            painter = painterResource(id = resourceId),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(PhotoAspectRatio)
-        )
-    } else {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(PhotoAspectRatio)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-        )
     }
 }
 
@@ -404,10 +379,6 @@ private fun RecipeFilter.label(): String = stringResource(
         RecipeFilter.ECONOMIC -> R.string.recipes_filter_economic
     }
 )
-
-/** Precio en pesos con puntos de miles, como "8.400". */
-private fun formatCop(value: Long): String =
-    NumberFormat.getIntegerInstance(Locale.forLanguageTag("es-CO")).format(value)
 
 // Medidas del Figma 557:3028. No son de formulario, así que no van en FormMetrics.
 private const val CardColumns = 2

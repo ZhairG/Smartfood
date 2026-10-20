@@ -15,4 +15,26 @@
     <string name="recipes_empty">No hay recetas que coincidan</string>
     <string name="recipes_load_error">No pudimos cargar las recetas.</string>
     <string name="cd_recipes_loading">Cargando recetas</string>
+
+    <!-- Detalle (spec 009, T008) -->
+    <string name="recipes_prep">Preparación</string>
+    <string name="recipes_cook">Cocción</string>
+    <string name="recipes_rest">Reposo</string>
+    <string name="recipes_difficulty">Dificultad</string>
+    <string name="recipes_minutes">%1$d min</string>
+    <string name="recipes_ingredients">Ingredientes</string>
+    <string name="recipes_reference_prices">Precios de referencia</string>
+    <string name="recipes_in_inventory">En tu inventario</string>
+    <string name="recipes_start_cooking">Empezar a cocinar</string>
+    <string name="recipes_remove_portion">Quitar una porción</string>
+    <string name="recipes_add_portion">Agregar una porción</string>
+    <string name="recipes_cost">COP $%1$s</string>
+    <string name="recipes_unit_grams">%1$s g</string>
+    <string name="recipes_unit_milliliters">%1$s ml</string>
+    <string name="recipes_unit_units">%1$s und</string>
+    <string name="recipes_detail_error">No pudimos cargar la receta.</string>
+    <plurals name="recipes_servings">
+        <item quantity="one">%1$d porción</item>
+        <item quantity="other">%1$d porciones</item>
+    </plurals>
 </resources>

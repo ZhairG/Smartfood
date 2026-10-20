@@ -13,7 +13,7 @@
 - [x] T005 `IngredientMatcher` con `IngredientMatcherTest` (RF-RIA-02).
 - [x] T006 Pestaña Recetas habilitada (Guardadas sigue gris, §9), rutas y `RecipesNavGraph` (CA-RIA-01-01).
 - [x] T007 Pantalla Descubrir: búsqueda, filtros y tarjetas; "Para ti" con la utilidad de un paso (CA-RIA-01-01 a 01-04).
-- [ ] T008 Detalle de receta con porciones, ingredientes agrupados y "En tu inventario" (CA-RIA-04-01, 04-02); pruebas de las dos pantallas.
+- [x] T008 Detalle de receta con porciones, ingredientes agrupados y "En tu inventario" (CA-RIA-04-01, 04-02); pruebas de las dos pantallas.
 
 ## Issue 2: Agente CSP y evaluación (avanzada) — solo `domain` y pruebas
 - [x] T009 `PlanContext`, `MealPlan`, `PlannedDay`, `IngredientUse`, `PlanResult` y `PlannerWeights`.
@@ -50,7 +50,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 |---|---|
 | CA-RIA-01-01 | I `RecipesDiscoverScreenTest`, I `MainNavigationTest` |
 | CA-RIA-01-02 | U `RankRecipesForMeUseCaseTest`, I `RecipesDiscoverScreenTest` |
-| CA-RIA-01-03 | U `DiscoverViewModelTest` |
+| CA-RIA-01-03 | U `RankRecipesForMeUseCaseTest`, I `RecipesDiscoverScreenTest` |
 | CA-RIA-01-04 | U `SearchRecipesUseCaseTest` |
 | CA-RIA-02-01 | I `AiFlowScreenTest` |
 | CA-RIA-02-02 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
