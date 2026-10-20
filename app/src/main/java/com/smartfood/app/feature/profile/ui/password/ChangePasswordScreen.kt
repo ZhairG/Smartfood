@@ -46,6 +46,7 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import com.smartfood.app.core.navigation.ObserveEffects
+import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.usecase.PasswordValidationResult
 import com.smartfood.app.feature.auth.ui.components.FlexibleGap
 import com.smartfood.app.feature.auth.ui.components.PasswordFieldWithChecklist
@@ -194,12 +195,15 @@ fun ChangePasswordScreen(
 
                 Spacer(modifier = Modifier.height(metrics.fieldSpacing))
 
+                val showPasswordsDontMatchError = (state.confirmPassword.isNotEmpty() && !state.passwordsMatch) ||
+                        state.generalError == AuthError.PasswordsDontMatch
+
                 SmartFoodPasswordField(
                     label = stringResource(id = R.string.change_password_confirm_label),
                     value = state.confirmPassword,
                     onValueChange = remember(onEvent) { { pass -> onEvent(ChangePasswordEvent.ConfirmPasswordChanged(pass)) } },
                     enabled = !state.isLoading,
-                    isError = state.generalError != null,
+                    isError = showPasswordsDontMatchError || state.generalError != null,
                     imeAction = ImeAction.Done,
                     keyboardActions = KeyboardActions(
                         onDone = {
@@ -209,10 +213,18 @@ fun ChangePasswordScreen(
                     )
                 )
 
-                state.generalError?.let { error ->
+                if (showPasswordsDontMatchError) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = stringResource(id = error.messageRes()),
+                        text = stringResource(id = R.string.error_passwords_dont_match),
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                } else if (state.generalError != null && state.generalError != AuthError.PasswordsDontMatch) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(id = state.generalError.messageRes()),
                         color = MaterialTheme.colorScheme.error,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium

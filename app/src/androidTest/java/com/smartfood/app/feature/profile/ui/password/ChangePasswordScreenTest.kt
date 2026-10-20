@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.usecase.PasswordValidationResult
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -77,5 +78,34 @@ class ChangePasswordScreenTest {
 
         composeTestRule.onNodeWithText("Guardado").assertIsDisplayed()
         composeTestRule.onNodeWithText("Contraseña se actualizó").assertIsDisplayed()
+    }
+
+    @Test
+    fun test_05_contrasenas_no_coinciden_muestra_mensaje_error() {
+        setContent(
+            ChangePasswordUiState(
+                currentPassword = "Pass123!",
+                newPassword = "NewPass123!",
+                confirmPassword = "Diferente123!",
+                passwordValidation = PasswordValidationResult(
+                    hasMinimumLength = true,
+                    hasUppercase = true,
+                    hasSpecialCharacter = true
+                )
+            )
+        )
+
+        composeTestRule.onNodeWithText("Las contraseñas no coinciden").assertIsDisplayed()
+    }
+
+    @Test
+    fun test_06_contrasena_actual_incorrecta_muestra_mensaje_error() {
+        setContent(
+            ChangePasswordUiState(
+                currentPasswordError = AuthError.InvalidCredentials
+            )
+        )
+
+        composeTestRule.onNodeWithText("La contraseña actual no es correcta").assertIsDisplayed()
     }
 }

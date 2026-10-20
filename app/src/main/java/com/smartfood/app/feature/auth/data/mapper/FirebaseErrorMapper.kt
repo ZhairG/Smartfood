@@ -32,6 +32,12 @@ object FirebaseErrorMapper {
         throwable is FirebaseAuthInvalidUserException -> AuthError.AccountNotFound
         throwable is FirebaseAuthUserCollisionException -> AuthError.EmailAlreadyInUse
         throwable is FirebaseAuthInvalidCredentialsException -> AuthError.InvalidCredentials
+        throwable.message.orEmpty().let { msg ->
+            msg.contains("INVALID_LOGIN_CREDENTIALS", ignoreCase = true) ||
+            msg.contains("WRONG_PASSWORD", ignoreCase = true) ||
+            msg.contains("invalid-credential", ignoreCase = true) ||
+            msg.contains("INVALID_CREDENTIALS", ignoreCase = true)
+        } -> AuthError.InvalidCredentials
         throwable is FirebaseFirestoreException &&
             throwable.code == FirebaseFirestoreException.Code.UNAVAILABLE -> AuthError.Network
         // Va antes que FirebaseException, de la que hereda.
