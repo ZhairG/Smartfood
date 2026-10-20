@@ -72,4 +72,5 @@ object NavTransitions {
 }
 
 /** Si el destino es una de las pestañas de la barra inferior. */
-private fun NavDestination.isTab(): Boolean = hasRoute<Route.Inventory>() || hasRoute<Route.Profile>()
+private fun NavDestination.isTab(): Boolean =
+    hasRoute<Route.Inventory>() || hasRoute<Route.Recipes>() || hasRoute<Route.Profile>()

@@ -22,17 +22,17 @@ import com.smartfood.app.core.designsystem.components.SmartFoodTab
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pestañas de la navegación principal y su barra inferior (spec 006, CA-INV-09-02). Solo las pantallas
- * de pestaña (Inventario y Perfil) usan [MainTabScaffold]; las pantallas internas y las de autenticación no lo usan,
- * así que no muestran la barra (CA-INV-09-04) y sus márgenes de teclado y de barras del sistema no cambian
- * (spec 002). Los íconos son de Material hasta que el #37 exporte los del Figma.
+ * de pestaña (Inventario, Recetas y Perfil) usan [MainTabScaffold]; las pantallas internas y las de autenticación no lo
+ * usan, así que no muestran la barra (CA-INV-09-04) y sus márgenes de teclado y de barras del sistema no cambian
+ * (spec 002). Los íconos son los del Figma.
  */
 
 /** Pestañas de la barra inferior, en orden. */
 /**
- * Pestañas de la barra inferior del Figma (`476:4176`), en orden. Recetas y Guardadas todavía no existen: se ven
- * deshabilitadas (spec 006, CA-INV-09-02, T055).
+ * Pestañas de la barra inferior del Figma (`476:4176`), en orden. Guardadas todavía no existe: se ve deshabilitada
+ * (spec 009 §9 y spec 006, CA-INV-09-02, T055).
  */
-enum class MainTab(val enabled: Boolean = true) { INVENTORY, RECIPES(enabled = false), SAVED(enabled = false), PROFILE }
+enum class MainTab(val enabled: Boolean = true) { INVENTORY, RECIPES, SAVED(enabled = false), PROFILE }
 
 /**
  * Pantalla de pestaña con la barra inferior.
@@ -101,9 +101,10 @@ private val MainTab.icon
 fun NavHostController.navigateToTab(tab: MainTab) {
     val route: Route = when (tab) {
         MainTab.INVENTORY -> Route.Inventory
+        MainTab.RECIPES -> Route.Recipes
         MainTab.PROFILE -> Route.Profile
-        // Todavía no tienen pantalla: la pestaña está deshabilitada y nunca llega aquí.
-        MainTab.RECIPES, MainTab.SAVED -> return
+        // Todavía no tiene pantalla: la pestaña está deshabilitada y nunca llega aquí.
+        MainTab.SAVED -> return
     }
     navigate(route) {
         popUpTo<Route.Inventory> { saveState = true }

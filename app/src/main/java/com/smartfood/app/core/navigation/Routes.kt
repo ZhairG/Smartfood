@@ -109,4 +109,20 @@ sealed interface Route {
     data object Profile : Route {
         override val screenRoute: ScreenRoute = ScreenRoute.PROFILE
     }
+
+    /** Pestaña Recetas: Descubrir (spec 009, CA-RIA-01-01). */
+    @Serializable
+    data object Recipes : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.RECIPES
+    }
+
+    /**
+     * Detalle de una receta del catálogo (spec 009, CA-RIA-04-01).
+     *
+     * @property recipeId Identificador de la receta.
+     */
+    @Serializable
+    data class RecipeDetail(val recipeId: String) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.RECIPE_DETAIL
+    }
 }

@@ -41,6 +41,8 @@ class RouteSerializationTest {
             Route.ProductEditor(itemId = "abc123"),
             Route.ProductCamera,
             Route.Profile,
+            Route.Recipes,
+            Route.RecipeDetail(recipeId = "pollo-guisado"),
         )
 
         routes.forEach { route ->

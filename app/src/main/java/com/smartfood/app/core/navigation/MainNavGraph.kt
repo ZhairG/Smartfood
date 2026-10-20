@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigation
 import com.smartfood.app.feature.inventory.ui.inventoryDestinations
 import com.smartfood.app.feature.profile.profileDestination
+import com.smartfood.app.feature.recipes.ui.recipesDestinations
 
 /**
  * Nombre: MainNavGraph.kt
@@ -12,13 +13,14 @@ import com.smartfood.app.feature.profile.profileDestination
  * Fecha: Octubre 2026
  * Descripción: Grafo principal de la app (usuario con sesión). Arranca en "Mi Inventario" (spec 006, CA-INV-09-01):
  * como `navigateToMainGraph()` limpia toda la pila, "atrás" en esa pestaña cierra la app (CA-INV-09-05). Cada feature
- * aporta sus destinos: inventario (pestaña y pantallas internas) y perfil.
+ * aporta sus destinos: inventario (pestaña y pantallas internas), recetas (spec 009) y perfil.
  *
  * @param navController Controlador de navegación de la app.
  */
 fun NavGraphBuilder.mainGraph(navController: NavHostController) {
     navigation<Route.MainGraph>(startDestination = Route.Inventory) {
         inventoryDestinations(navController)
+        recipesDestinations(navController)
         profileDestination(navController)
     }
 }

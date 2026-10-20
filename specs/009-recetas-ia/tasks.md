@@ -11,7 +11,7 @@
 - [x] T003 `assets/ingredientes.json` (con `"etiquetas"`, plan §2) y `assets/recetas.json` (30 a 50 recetas) con fotos en `drawable-nodpi` y sus fuentes en `docs/licenses/fotos-recetas.md`; `RecipeCatalogTest` (RNF-RIA-05).
 - [x] T004 `AssetsRecipeCatalog` con kotlinx.serialization y `RecipesDataModule`.
 - [x] T005 `IngredientMatcher` con `IngredientMatcherTest` (RF-RIA-02).
-- [ ] T006 Pestaña Recetas habilitada (Guardadas sigue gris, §9), rutas y `RecipesNavGraph` (CA-RIA-01-01).
+- [x] T006 Pestaña Recetas habilitada (Guardadas sigue gris, §9), rutas y `RecipesNavGraph` (CA-RIA-01-01).
 - [ ] T007 Pantalla Descubrir: búsqueda, filtros y tarjetas; "Para ti" con la utilidad de un paso (CA-RIA-01-01 a 01-04).
 - [ ] T008 Detalle de receta con porciones, ingredientes agrupados y "En tu inventario" (CA-RIA-04-01, 04-02); pruebas de las dos pantallas.
 
