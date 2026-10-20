@@ -61,7 +61,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-07 | U `MealPlannerTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-08 | U `AiPlanViewModelTest` |
 | CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `GeneratePlanUseCaseTest` |
-| CA-RIA-02-09 | U `MealPlannerPerformanceTest`, M (release) |
+| CA-RIA-02-10 | U `MealPlannerPerformanceTest`, M (release) |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |
 | CA-RIA-04-02 | U `RecipeDetailViewModelTest` |

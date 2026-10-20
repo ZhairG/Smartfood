@@ -58,7 +58,7 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 | CA-RIA-02-07 | **Dado** que ningún plan cumple las restricciones, **entonces** veo "Sin coincidencias" (Figma `557:2515`) con el presupuesto que usé y sugerencias calculadas (por ejemplo, el presupuesto mínimo con el que sí habría plan; nunca quitar mis restricciones alimentarias), "Ajustar contexto" (vuelve al contexto) y "Ver recetas económicas" (Descubrir con el filtro "Económicas"). |
 | CA-RIA-02-08 | **Dado** "Ajustar" en el plan, **entonces** vuelvo al contexto con los mismos datos para cambiarlos. |
 | CA-RIA-02-09 | **Dado** que tengo restricciones en Preferencias alimentarias (CA-PER-03-01), **entonces** ninguna receta del plan contiene un ingrediente que esas restricciones excluyen. |
-| CA-RIA-02-09 | **Dado** 50 recetas en el catálogo, **entonces** el plan se calcula en 2 segundos o menos en el teléfono (meta del Avance 2). |
+| CA-RIA-02-10 | **Dado** 50 recetas en el catálogo, **entonces** el plan se calcula en 2 segundos o menos en el teléfono (meta del Avance 2). |
 
 ### HU-RIA-03: Entender cómo decide la IA
 | Código | Criterio |
@@ -90,7 +90,7 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 | Código | Requisito |
 |---|---|
 | RNF-RIA-01 | El agente vive en `domain` (Kotlin puro) y es determinista: el mismo inventario y contexto dan el mismo plan. |
-| RNF-RIA-02 | Rendimiento: ≤ 2 s con 50 recetas en el teléfono (CA-RIA-02-09). |
+| RNF-RIA-02 | Rendimiento: ≤ 2 s con 50 recetas en el teléfono (CA-RIA-02-10). |
 | RNF-RIA-03 | Evaluación (métricas del Avance 2): en 30 inventarios sintéticos, el agente supera en aprovechamiento a las dos líneas base (ordenar solo por coincidencia de ingredientes y solo por vencimiento), y la receta del Día 1 usa ≥ 80 % de los ingredientes que vencen en ≤ 3 días cuando existe una receta que los use. |
 | RNF-RIA-04 | Seguridad: reglas de Firestore para `cookings` (solo el dueño, datos validados) probadas en `rules-test/`. |
 | RNF-RIA-05 | Las fotos del catálogo son propias o de licencia libre, con su fuente anotada en `docs/licenses/`. |
