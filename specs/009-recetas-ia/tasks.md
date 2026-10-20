@@ -21,7 +21,7 @@
 - [x] T011 `MealPlanner` (backtracking + forward checking + ramificación y poda, sugerencias si no hay plan) con `MealPlannerTest` contra fuerza bruta (CA-RIA-02-04, 02-05, 02-07).
 - [x] T012 `PlanExplainer` con `PlanExplainerTest` (CA-RIA-02-06).
 - [x] T012a Restricciones alimentarias en el agente: `FoodTag`, `Ingredient.tags`, `DietRule` y `PlanContext.diet`; filtro del dominio en `MealPlanner` y casos en `MealPlannerTest`, incluida la fuerza bruta (CA-RIA-02-09).
-- [ ] T013 `AgentEvaluationTest` (30 inventarios, líneas base, métricas) y `MealPlannerPerformanceTest` (RNF-RIA-02, RNF-RIA-03). *Se corre con el catálogo real (`recetas.json` del #113), decisión de Zhair.*
+- [x] T013 `AgentEvaluationTest` (30 inventarios, líneas base, métricas) y `MealPlannerPerformanceTest` (RNF-RIA-02, RNF-RIA-03). *Se corre con el catálogo real (`recetas.json` del #113), decisión de Zhair.*
 
 ## Issue 3: Flujo de la IA (intermedia) — después de los Issues 1 y 2
 - [ ] T014 `GeneratePlanUseCase` (con las restricciones del Perfil como `PlanContext.diet`, CA-RIA-02-09) y `AiPlanViewModel` (`Context`, `Loading`, `Plan`, `NoPlan`, cancelar, ajustar) con pruebas.

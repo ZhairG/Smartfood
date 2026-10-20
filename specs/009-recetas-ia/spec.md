@@ -92,7 +92,7 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 |---|---|
 | RNF-RIA-01 | El agente vive en `domain` (Kotlin puro) y es determinista: el mismo inventario y contexto dan el mismo plan. |
 | RNF-RIA-02 | Rendimiento: ≤ 2 s con 50 recetas en el teléfono (CA-RIA-02-10). |
-| RNF-RIA-03 | Evaluación (métricas del Avance 2): en 30 inventarios sintéticos, el agente supera en aprovechamiento a las dos líneas base (ordenar solo por coincidencia de ingredientes y solo por vencimiento), y la receta del Día 1 usa ≥ 80 % de los ingredientes que vencen en ≤ 3 días cuando existe una receta que los use. |
+| RNF-RIA-03 | Evaluación (métricas del Avance 2): en 30 inventarios sintéticos, el agente supera en aprovechamiento a las dos líneas base (ordenar solo por coincidencia de ingredientes y solo por vencimiento), y el plan de 3 días usa antes de que venzan ≥ 80 % de los ingredientes que vencen en ≤ 3 días y alguna receta usa. El Avance 2 medía la receta del Día 1 porque recomendaba una sola receta; con el plan, lo que vence en 2 o 3 días puede cocinarse el Día 2 o el 3 sin perderse, así que el Día 1 se reporta sin meta (decisión de Zhair del 2026-10-20). |
 | RNF-RIA-04 | Seguridad: reglas de Firestore para `cookings` (solo el dueño, datos validados) probadas en `rules-test/`. |
 | RNF-RIA-05 | Las fotos del catálogo son propias o de licencia libre, con su fuente anotada en `docs/licenses/`. |
 | RNF-RIA-06 | Textos en `res/values/strings_recipes.xml`; accesibilidad como RNF-04. |
