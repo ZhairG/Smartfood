@@ -717,5 +717,62 @@
    "almendra",
    "avena"
   ]
+ },
+ "ahuyama": {
+  "busqueda": "ahuyama",
+  "debe_empezar_con": [
+   "ahuyama",
+   "zapallo"
+  ],
+  "excluir": [
+   "crema",
+   "sopa",
+   "pure",
+   "semilla",
+   "torta"
+  ]
+ },
+ "arveja": {
+  "busqueda": "arveja verde",
+  "debe_empezar_con": [
+   "arveja"
+  ],
+  "excluir": [
+   "lata",
+   "seca",
+   "harina",
+   "congelad",
+   "sopa",
+   "con zanahoria"
+  ]
+ },
+ "habichuela": {
+  "busqueda": "habichuela",
+  "debe_empezar_con": [
+   "habichuela"
+  ],
+  "excluir": [
+   "lata",
+   "congelad",
+   "sopa"
+  ]
+ },
+ "champinones": {
+  "busqueda": "champiñones",
+  "debe_empezar_con": [
+   "champinon",
+   "champiñon",
+   "champinones",
+   "champiñones"
+  ],
+  "excluir": [
+   "crema",
+   "sopa",
+   "salsa",
+   "lata",
+   "encurt",
+   "deshidrat",
+   "pizza"
+  ]
  }
 }

@@ -54,6 +54,10 @@ Consulta puntual del **2026-10-20** en los buscadores públicos de cada tienda (
 | almendras | 250 g |  | $22.750 | $23.500 | $18.990 | $14.830 |
 | harina-maiz | 1 kg |  | $3.270 | $3.600 | $2.540 | $2.550 |
 | miel | 500 g |  | $8.980 | $9.900 | $15.460 | $12.710 |
+| ahuyama | 1 kg |  | $2.560 | $2.650 | $4.900 | — |
+| arveja | 500 g |  | $1.850 | $1.850 | $1.700 | — |
+| habichuela | 500 g |  | $3.510 | — | — | — |
+| champinones | 250 g |  | $6.220 | — | $9.900 | $7.900 |
 
 ## Productos usados
 
@@ -103,3 +107,7 @@ Consulta puntual del **2026-10-20** en los buscadores públicos de cada tienda (
 - **almendras** (250 g): Éxito: Almendras Vitad 200 g ($18.200); Carulla: Almendras Vitad 200 g ($18.800); Olímpica: Almendras enteras Kari 250 g; D1: Almendra Nuthos 150 g ($8.900)
 - **harina-maiz** (1 kg): Éxito: Harina de maíz precocida blanca La Nieve 1000 g; Carulla: Harina de maíz precocida blanca Megarepa 1000 g; Olímpica: Harina de maíz precocida blanca Medalla de Oro 1 kg; D1: Harina de maíz blanco Quicksy 1 kg
 - **miel** (500 g): Éxito: Miel de abejas Hapicampo 500 g; Carulla: Miel de abejas Hapicampo 500 g; Olímpica: Miel de abeja Olímpica 614 g ($18.980); D1: Miel de abejas Meel 350 g ($8.900)
+- **ahuyama** (1 kg): Éxito: Ahuyama, kg; Carulla: Ahuyama, kg; Olímpica: Ahuyama zapallo porcionado, kg
+- **arveja** (500 g): Éxito: Arveja verde Frescampo 500 g; Carulla: Arveja verde Frescampo 500 g; Olímpica: Arveja verde Olímpica 500 g
+- **habichuela** (500 g): Éxito: Habichuela Ekono 500 g
+- **champinones** (250 g): Éxito: Champiñones frescos 1000 g ($24.864); Olímpica: Champiñón tajado La Giralda 250 g; D1: Champiñón 250 g

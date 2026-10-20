@@ -46,7 +46,7 @@
 ## Mejoras del catálogo propio (Zhair, 2026-10-20)
 - [x] T034 Herramienta de precios en `tools/precios/` (`consultar.py`, `aplicar.py`, `busquedas.json`, README); `docs/precios/precios.json` como fuente de verdad.
 - [x] T035 Revisión de calidad del catálogo (tiempos, kcal, cantidades por porción, pasos, sinónimos y fotos): se corrige lo claro y se lista lo dudoso.
-- [ ] T036 20 recetas nuevas (30 → 50; 7 veganas, 7 vegetarianas, 6 para todos) y 4 ingredientes (ahuyama, arveja, habichuela, champiñones) con precio y foto de licencia libre.
+- [x] T036 20 recetas nuevas (30 → 50; 7 veganas, 7 vegetarianas, 6 para todos) y 4 ingredientes (ahuyama, arveja, habichuela, champiñones) con precio y foto de licencia libre.
 - [ ] T037 Variedad con el catálogo real: ≥ 20 vegetarianas y ≥ 12 veganas en `RecipeCatalogTest`; `MealPlannerCatalogTest` arma un plan con cada restricción (CA-RIA-02-09).
 
 ## Cierre (en el mismo PR)

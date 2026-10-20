@@ -1107,6 +1107,82 @@
      "producto": "Miel de abejas Meel 350 g ($8.900)"
     }
    }
+  },
+  "ahuyama": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 2560,
+     "producto": "Ahuyama, kg"
+    },
+    "carulla": {
+     "precio": 2650,
+     "producto": "Ahuyama, kg"
+    },
+    "olimpica": {
+     "precio": 4900,
+     "producto": "Ahuyama zapallo porcionado, kg"
+    }
+   }
+  },
+  "arveja": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 1850,
+     "producto": "Arveja verde Frescampo 500 g"
+    },
+    "carulla": {
+     "precio": 1850,
+     "producto": "Arveja verde Frescampo 500 g"
+    },
+    "olimpica": {
+     "precio": 1700,
+     "producto": "Arveja verde Olímpica 500 g"
+    }
+   }
+  },
+  "habichuela": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3510,
+     "producto": "Habichuela Ekono 500 g"
+    }
+   }
+  },
+  "champinones": {
+   "empaque": {
+    "cantidad": 250,
+    "etiqueta": "250 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 6220,
+     "producto": "Champiñones frescos 1000 g ($24.864)"
+    },
+    "olimpica": {
+     "precio": 9900,
+     "producto": "Champiñón tajado La Giralda 250 g"
+    },
+    "d1": {
+     "precio": 7900,
+     "producto": "Champiñón 250 g"
+    }
+   }
   }
  }
 }

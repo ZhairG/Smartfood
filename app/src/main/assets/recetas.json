@@ -922,5 +922,613 @@
       { "titulo": "Agrega el tomate", "texto": "Incorpora el tomate y cocina hasta que se forme una salsa espesa.", "minutos": 8 },
       { "titulo": "Sirve con arroz", "texto": "Ajusta la sal y sirve sobre el arroz blanco.", "minutos": 5 }
     ]
+  },
+  {
+    "id": "arepas-con-hogao",
+    "nombre": "Arepas con hogao",
+    "foto": "receta_arepas_con_hogao",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 20,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 330,
+    "ingredientes": [
+      { "id": "harina-maiz", "cantidad": 300 },
+      { "id": "tomate", "cantidad": 300 },
+      { "id": "cebolla-larga", "cantidad": 60 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite", "cantidad": 20 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Amasa la harina de maíz con agua tibia y sal",
+      "Pica el tomate, la cebolla larga y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Forma las arepas", "texto": "Haz bolitas con la masa de harina de maíz, aplánalas y ásalas en un sartén caliente por ambos lados.", "minutos": 10 },
+      { "titulo": "Haz el hogao", "texto": "En el aceite, sofríe la cebolla larga y el ajo; agrega el tomate y cocina a fuego bajo hasta que espese.", "minutos": 10 },
+      { "titulo": "Sirve", "texto": "Abre las arepas o sírvelas enteras con el hogao encima.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "patacones-con-hogao",
+    "nombre": "Patacones con hogao",
+    "foto": "receta_patacones_con_hogao",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 25,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 380,
+    "ingredientes": [
+      { "id": "platano", "cantidad": 750 },
+      { "id": "tomate", "cantidad": 300 },
+      { "id": "cebolla-larga", "cantidad": 60 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite", "cantidad": 60 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Pela el plátano verde y córtalo en trozos de 4 cm",
+      "Pica el tomate, la cebolla larga y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Fríe una vez", "texto": "Fríe los trozos de plátano en el aceite caliente hasta que estén blandos, sin dorar.", "minutos": 8 },
+      { "titulo": "Aplana", "texto": "Aplasta cada trozo con un plato o una tabla hasta dejarlo delgado.", "minutos": 3 },
+      { "titulo": "Fríe otra vez", "texto": "Vuelve a freír los patacones hasta que estén dorados y crocantes; sala al sacarlos.", "minutos": 6 },
+      { "titulo": "Haz el hogao", "texto": "En un poco del aceite, sofríe la cebolla larga y el ajo, agrega el tomate y cocina hasta espesar. Sirve encima.", "minutos": 8 }
+    ]
+  },
+  {
+    "id": "crema-de-ahuyama",
+    "nombre": "Crema de ahuyama",
+    "foto": "receta_crema_de_ahuyama",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 25,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 180,
+    "ingredientes": [
+      { "id": "ahuyama", "cantidad": 800 },
+      { "id": "papa", "cantidad": 200 },
+      { "id": "cebolla", "cantidad": 100 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 5 },
+      { "id": "pimienta", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Pela la ahuyama y la papa y córtalas en cubos",
+      "Pica la cebolla y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Sofríe", "texto": "Calienta el aceite y sofríe la cebolla y el ajo hasta que estén transparentes.", "minutos": 5 },
+      { "titulo": "Cocina", "texto": "Agrega la ahuyama y la papa, cubre con agua y cocina hasta que estén muy blandas.", "minutos": 18 },
+      { "titulo": "Licúa", "texto": "Licúa todo hasta que quede una crema lisa, ajusta la sal y la pimienta y sirve caliente.", "minutos": 4 }
+    ]
+  },
+  {
+    "id": "arroz-con-verduras",
+    "nombre": "Arroz con verduras",
+    "foto": "receta_arroz_con_verduras",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 25,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 350,
+    "ingredientes": [
+      { "id": "arroz", "cantidad": 300 },
+      { "id": "zanahoria", "cantidad": 100 },
+      { "id": "arveja", "cantidad": 100 },
+      { "id": "habichuela", "cantidad": 100 },
+      { "id": "pimenton", "cantidad": 80 },
+      { "id": "cebolla", "cantidad": 80 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Deja la arveja en remojo desde la noche anterior",
+      "Corta la zanahoria, la habichuela, el pimentón y la cebolla en trozos pequeños"
+    ],
+    "pasos": [
+      { "titulo": "Cocina la arveja", "texto": "Cocina la arveja escurrida en agua con sal hasta que esté blanda.", "minutos": 10 },
+      { "titulo": "Saltea las verduras", "texto": "En el aceite, saltea la cebolla, el ajo, el pimentón, la zanahoria y la habichuela por 5 minutos.", "minutos": 5 },
+      { "titulo": "Cocina el arroz", "texto": "Agrega el arroz y la arveja, suma dos tazas de agua y sal, y cocina tapado a fuego bajo.", "minutos": 18 }
+    ]
+  },
+  {
+    "id": "ensalada-de-aguacate",
+    "nombre": "Ensalada de aguacate y tomate",
+    "foto": "receta_ensalada_de_aguacate",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 0,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 210,
+    "ingredientes": [
+      { "id": "aguacate", "cantidad": 500 },
+      { "id": "tomate", "cantidad": 300 },
+      { "id": "cebolla", "cantidad": 80 },
+      { "id": "limon", "cantidad": 30 },
+      { "id": "cilantro", "cantidad": 15 },
+      { "id": "aceite", "cantidad": 10 },
+      { "id": "sal", "cantidad": 3 }
+    ],
+    "antesDeEmpezar": [
+      "Lava el tomate y el cilantro",
+      "Exprime el limón"
+    ],
+    "pasos": [
+      { "titulo": "Corta", "texto": "Corta el aguacate y el tomate en cubos y la cebolla en plumas delgadas.", "minutos": 8 },
+      { "titulo": "Aliña", "texto": "Mezcla con el cilantro picado, el jugo de limón, el aceite y la sal.", "minutos": 3 },
+      { "titulo": "Sirve", "texto": "Sirve de inmediato para que el aguacate no se oscurezca.", "minutos": 1 }
+    ]
+  },
+  {
+    "id": "champinones-con-arroz",
+    "nombre": "Champiñones salteados con arroz",
+    "foto": "receta_champinones_con_arroz",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 25,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 340,
+    "ingredientes": [
+      { "id": "champinones", "cantidad": 400 },
+      { "id": "arroz", "cantidad": 300 },
+      { "id": "cebolla", "cantidad": 80 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite", "cantidad": 20 },
+      { "id": "sal", "cantidad": 5 },
+      { "id": "pimienta", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Limpia los champiñones con un paño y córtalos en láminas",
+      "Pica la cebolla y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Cocina el arroz", "texto": "Cocina el arroz con dos tazas de agua y sal, tapado a fuego bajo.", "minutos": 18 },
+      { "titulo": "Saltea", "texto": "En el aceite caliente, saltea la cebolla, el ajo y los champiñones hasta que doren.", "minutos": 7 },
+      { "titulo": "Sirve", "texto": "Ajusta la sal y la pimienta y sirve los champiñones sobre el arroz.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "sopa-de-arveja",
+    "nombre": "Sopa de arveja",
+    "foto": "receta_sopa_de_arveja",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 35,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 280,
+    "ingredientes": [
+      { "id": "arveja", "cantidad": 300 },
+      { "id": "papa", "cantidad": 300 },
+      { "id": "zanahoria", "cantidad": 100 },
+      { "id": "cebolla-larga", "cantidad": 40 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "cilantro", "cantidad": 15 },
+      { "id": "sal", "cantidad": 6 },
+      { "id": "comino", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Deja la arveja en remojo desde la noche anterior",
+      "Pela la papa y córtala en cubos"
+    ],
+    "pasos": [
+      { "titulo": "Cocina la arveja", "texto": "Pon la arveja escurrida en una olla con agua, la cebolla larga, el ajo, el comino y sal.", "minutos": 20 },
+      { "titulo": "Agrega las verduras", "texto": "Incorpora la papa y la zanahoria y cocina hasta que estén blandas.", "minutos": 15 },
+      { "titulo": "Termina", "texto": "Ajusta la sal y sirve con cilantro picado.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "calentado-con-huevo",
+    "nombre": "Calentado con huevo",
+    "foto": "receta_calentado_con_huevo",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 15,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 450,
+    "ingredientes": [
+      { "id": "arroz", "cantidad": 300 },
+      { "id": "frijoles", "cantidad": 200 },
+      { "id": "huevo", "cantidad": 4 },
+      { "id": "cebolla-larga", "cantidad": 40 },
+      { "id": "tomate", "cantidad": 150 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Ten listos el arroz y los fríjoles cocidos del día anterior",
+      "Pica la cebolla larga y el tomate"
+    ],
+    "pasos": [
+      { "titulo": "Haz el hogao", "texto": "En el aceite, sofríe la cebolla larga y el tomate.", "minutos": 4 },
+      { "titulo": "Calienta", "texto": "Agrega el arroz y los fríjoles cocidos, mezcla y calienta revolviendo.", "minutos": 6 },
+      { "titulo": "Fríe los huevos", "texto": "Fríe los huevos aparte con sal y sírvelos encima del calentado.", "minutos": 5 }
+    ]
+  },
+  {
+    "id": "arepa-de-choclo",
+    "nombre": "Arepas de choclo con queso",
+    "foto": "receta_arepa_de_choclo",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 15,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 420,
+    "ingredientes": [
+      { "id": "mazorca", "cantidad": 600 },
+      { "id": "harina-maiz", "cantidad": 100 },
+      { "id": "queso", "cantidad": 200 },
+      { "id": "mantequilla", "cantidad": 40 },
+      { "id": "azucar", "cantidad": 20 },
+      { "id": "sal", "cantidad": 3 }
+    ],
+    "antesDeEmpezar": [
+      "Desgrana la mazorca",
+      "Ralla o tajea el queso"
+    ],
+    "pasos": [
+      { "titulo": "Haz la masa", "texto": "Licúa los granos de la mazorca con la azúcar y la sal; mezcla con la harina de maíz hasta formar una masa espesa.", "minutos": 5 },
+      { "titulo": "Asa", "texto": "Engrasa un sartén con mantequilla y asa porciones de masa por ambos lados hasta dorar.", "minutos": 10 },
+      { "titulo": "Sirve", "texto": "Sirve cada arepa caliente con el queso encima y un poco de mantequilla.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "huevos-rancheros",
+    "nombre": "Huevos rancheros",
+    "foto": "receta_huevos_rancheros",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 15,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": true,
+    "kcal": 430,
+    "ingredientes": [
+      { "id": "huevo", "cantidad": 8 },
+      { "id": "tortilla", "cantidad": 200 },
+      { "id": "frijoles", "cantidad": 200 },
+      { "id": "tomate", "cantidad": 300 },
+      { "id": "cebolla", "cantidad": 80 },
+      { "id": "aji", "cantidad": 20 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 4 }
+    ],
+    "antesDeEmpezar": [
+      "Ten los fríjoles cocidos",
+      "Pica el tomate, la cebolla y el ají"
+    ],
+    "pasos": [
+      { "titulo": "Haz la salsa", "texto": "En el aceite, sofríe la cebolla y el ají; agrega el tomate y cocina hasta que espese.", "minutos": 7 },
+      { "titulo": "Calienta", "texto": "Calienta las tortillas en un sartén y los fríjoles aparte.", "minutos": 3 },
+      { "titulo": "Fríe los huevos", "texto": "Fríe los huevos con sal y sirve cada tortilla con fríjoles, huevos y la salsa encima.", "minutos": 5 }
+    ]
+  },
+  {
+    "id": "tortilla-de-papa",
+    "nombre": "Tortilla de papa",
+    "foto": "receta_tortilla_de_papa",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 25,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 360,
+    "ingredientes": [
+      { "id": "huevo", "cantidad": 6 },
+      { "id": "papa", "cantidad": 500 },
+      { "id": "cebolla", "cantidad": 100 },
+      { "id": "aceite", "cantidad": 30 },
+      { "id": "sal", "cantidad": 4 }
+    ],
+    "antesDeEmpezar": [
+      "Pela la papa y córtala en láminas delgadas",
+      "Corta la cebolla en plumas"
+    ],
+    "pasos": [
+      { "titulo": "Cocina la papa", "texto": "En el aceite a fuego medio, cocina la papa y la cebolla hasta que estén blandas.", "minutos": 15 },
+      { "titulo": "Mezcla", "texto": "Bate los huevos con sal y mézclalos con la papa y la cebolla escurridas.", "minutos": 2 },
+      { "titulo": "Cuaja", "texto": "Vierte en el sartén, cuaja a fuego bajo, voltéala con un plato y dora el otro lado.", "minutos": 10 }
+    ]
+  },
+  {
+    "id": "changua",
+    "nombre": "Changua",
+    "foto": "receta_changua",
+    "porciones": 4,
+    "prepMin": 5,
+    "coccionMin": 15,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 300,
+    "ingredientes": [
+      { "id": "leche", "cantidad": 1000 },
+      { "id": "huevo", "cantidad": 4 },
+      { "id": "cebolla-larga", "cantidad": 40 },
+      { "id": "cilantro", "cantidad": 15 },
+      { "id": "pan", "cantidad": 200 },
+      { "id": "sal", "cantidad": 4 }
+    ],
+    "antesDeEmpezar": [
+      "Pica la cebolla larga y el cilantro",
+      "Corta el pan en cuadros"
+    ],
+    "pasos": [
+      { "titulo": "Calienta la leche", "texto": "Pon la leche con un poco de agua, la cebolla larga y sal a fuego medio hasta que hierva.", "minutos": 8 },
+      { "titulo": "Escalfa los huevos", "texto": "Baja el fuego, rompe los huevos dentro de la leche y deja que se cocinen sin revolver.", "minutos": 5 },
+      { "titulo": "Sirve", "texto": "Sirve cada plato con un huevo, el pan y el cilantro encima.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "pasta-con-champinones",
+    "nombre": "Pasta con champiñones y queso",
+    "foto": "receta_pasta_con_champinones",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 15,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 520,
+    "ingredientes": [
+      { "id": "pasta", "cantidad": 400 },
+      { "id": "champinones", "cantidad": 300 },
+      { "id": "queso", "cantidad": 150 },
+      { "id": "leche", "cantidad": 200 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "mantequilla", "cantidad": 40 },
+      { "id": "sal", "cantidad": 5 },
+      { "id": "pimienta", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Pon agua a hervir con sal",
+      "Limpia y tajea los champiñones; ralla el queso"
+    ],
+    "pasos": [
+      { "titulo": "Cocina la pasta", "texto": "Hierve la pasta hasta que quede al dente y escúrrela.", "minutos": 10 },
+      { "titulo": "Haz la salsa", "texto": "En la mantequilla, saltea el ajo y los champiñones; agrega la leche y el queso y revuelve hasta que espese.", "minutos": 7 },
+      { "titulo": "Mezcla", "texto": "Mezcla la pasta con la salsa y ajusta la sal y la pimienta.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "arroz-con-queso-y-maduro",
+    "nombre": "Arroz con queso y maduro",
+    "foto": "receta_arroz_con_queso_y_maduro",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 25,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 540,
+    "ingredientes": [
+      { "id": "arroz", "cantidad": 300 },
+      { "id": "queso", "cantidad": 200 },
+      { "id": "platano", "cantidad": 500 },
+      { "id": "mantequilla", "cantidad": 30 },
+      { "id": "cebolla-larga", "cantidad": 40 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Pela el plátano maduro y córtalo en tajadas",
+      "Pica la cebolla larga y corta el queso en cubos"
+    ],
+    "pasos": [
+      { "titulo": "Cocina el arroz", "texto": "Sofríe la cebolla larga en la mitad de la mantequilla, agrega el arroz, dos tazas de agua y sal, y cocina tapado.", "minutos": 18 },
+      { "titulo": "Dora el maduro", "texto": "Dora las tajadas de plátano en la mantequilla restante.", "minutos": 8 },
+      { "titulo": "Mezcla", "texto": "Incorpora el queso al arroz caliente para que se derrita y sirve con el maduro.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "albondigas-en-salsa",
+    "nombre": "Albóndigas en salsa",
+    "foto": "receta_albondigas_en_salsa",
+    "porciones": 4,
+    "prepMin": 20,
+    "coccionMin": 25,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 480,
+    "ingredientes": [
+      { "id": "carne", "cantidad": 500 },
+      { "id": "huevo", "cantidad": 1 },
+      { "id": "pan", "cantidad": 60 },
+      { "id": "tomate", "cantidad": 400 },
+      { "id": "cebolla", "cantidad": 100 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite", "cantidad": 20 },
+      { "id": "sal", "cantidad": 5 },
+      { "id": "comino", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Remoja el pan en un poco de agua",
+      "Pica la cebolla, el ajo y el tomate"
+    ],
+    "pasos": [
+      { "titulo": "Forma las albóndigas", "texto": "Mezcla la carne con el huevo, el pan escurrido, la mitad de la cebolla, sal y comino, y forma bolitas.", "minutos": 10 },
+      { "titulo": "Dóralas", "texto": "Dora las albóndigas en el aceite caliente por todos lados.", "minutos": 8 },
+      { "titulo": "Haz la salsa", "texto": "En la misma olla sofríe el resto de la cebolla y el ajo, agrega el tomate y las albóndigas y cocina tapado.", "minutos": 15 }
+    ]
+  },
+  {
+    "id": "pollo-al-horno-con-papas",
+    "nombre": "Pollo al horno con papas",
+    "foto": "receta_pollo_al_horno_con_papas",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 50,
+    "reposoMin": 5,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 560,
+    "ingredientes": [
+      { "id": "pollo", "cantidad": 800 },
+      { "id": "papa", "cantidad": 800 },
+      { "id": "ajo", "cantidad": 12 },
+      { "id": "limon", "cantidad": 30 },
+      { "id": "aceite", "cantidad": 30 },
+      { "id": "sal", "cantidad": 6 },
+      { "id": "pimienta", "cantidad": 2 },
+      { "id": "comino", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Precalienta el horno a 200 °C",
+      "Lava las papas y córtalas en cascos"
+    ],
+    "pasos": [
+      { "titulo": "Adoba", "texto": "Unta el pollo con el ajo machacado, el jugo de limón, el aceite, sal, pimienta y comino.", "minutos": 8 },
+      { "titulo": "Hornea", "texto": "Pon el pollo y las papas en una bandeja y hornea, volteando una vez, hasta que estén dorados.", "minutos": 45 },
+      { "titulo": "Sirve", "texto": "Deja reposar unos minutos y sirve el pollo con las papas.", "minutos": 5 }
+    ]
+  },
+  {
+    "id": "carne-desmechada",
+    "nombre": "Carne desmechada",
+    "foto": "receta_carne_desmechada",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 60,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 430,
+    "ingredientes": [
+      { "id": "carne", "cantidad": 600 },
+      { "id": "tomate", "cantidad": 300 },
+      { "id": "cebolla", "cantidad": 100 },
+      { "id": "cebolla-larga", "cantidad": 40 },
+      { "id": "pimenton", "cantidad": 80 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 5 },
+      { "id": "comino", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Corta la carne en trozos grandes",
+      "Pica el tomate, la cebolla, la cebolla larga, el pimentón y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Cocina la carne", "texto": "Cocina la carne en agua con sal y la cebolla larga hasta que esté muy blanda.", "minutos": 45 },
+      { "titulo": "Desmecha", "texto": "Deja enfriar un poco la carne y desméchala con dos tenedores.", "minutos": 5 },
+      { "titulo": "Haz el guiso", "texto": "En el aceite, sofríe la cebolla, el pimentón, el ajo y el tomate con comino; agrega la carne y un poco del caldo.", "minutos": 12 }
+    ]
+  },
+  {
+    "id": "pescado-al-ajillo",
+    "nombre": "Pescado al ajillo",
+    "foto": "receta_pescado_al_ajillo",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 15,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 320,
+    "ingredientes": [
+      { "id": "pescado", "cantidad": 600 },
+      { "id": "ajo", "cantidad": 16 },
+      { "id": "limon", "cantidad": 30 },
+      { "id": "mantequilla", "cantidad": 40 },
+      { "id": "cilantro", "cantidad": 15 },
+      { "id": "sal", "cantidad": 4 },
+      { "id": "pimienta", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Seca los filetes de pescado con papel",
+      "Pica el ajo y el cilantro"
+    ],
+    "pasos": [
+      { "titulo": "Sazona", "texto": "Sazona el pescado con sal, pimienta y un poco de jugo de limón.", "minutos": 3 },
+      { "titulo": "Dora el ajo", "texto": "Derrite la mantequilla a fuego bajo y dora el ajo sin quemarlo.", "minutos": 4 },
+      { "titulo": "Cocina el pescado", "texto": "Pon el pescado en el sartén y cocínalo por ambos lados bañándolo con la mantequilla; termina con cilantro.", "minutos": 8 }
+    ]
+  },
+  {
+    "id": "arroz-atollado",
+    "nombre": "Arroz atollado de pollo",
+    "foto": "receta_arroz_atollado",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 35,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 560,
+    "ingredientes": [
+      { "id": "pollo", "cantidad": 500 },
+      { "id": "arroz", "cantidad": 300 },
+      { "id": "papa", "cantidad": 300 },
+      { "id": "pimenton", "cantidad": 80 },
+      { "id": "cebolla", "cantidad": 80 },
+      { "id": "tomate", "cantidad": 150 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 6 },
+      { "id": "comino", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Corta el pollo en trozos pequeños y la papa en cubos",
+      "Pica el pimentón, la cebolla, el tomate y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Dora el pollo", "texto": "En el aceite, dora el pollo con sal y comino.", "minutos": 8 },
+      { "titulo": "Haz el guiso", "texto": "Agrega la cebolla, el pimentón, el ajo y el tomate y cocina hasta ablandar.", "minutos": 5 },
+      { "titulo": "Cocina", "texto": "Incorpora el arroz y la papa con tres tazas de agua y cocina a fuego bajo, revolviendo, hasta que quede cremoso.", "minutos": 22 }
+    ]
+  },
+  {
+    "id": "sopa-de-pasta-con-pollo",
+    "nombre": "Sopa de pasta con pollo",
+    "foto": "receta_sopa_de_pasta_con_pollo",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 30,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 330,
+    "ingredientes": [
+      { "id": "pollo", "cantidad": 400 },
+      { "id": "pasta", "cantidad": 200 },
+      { "id": "papa", "cantidad": 200 },
+      { "id": "zanahoria", "cantidad": 100 },
+      { "id": "cebolla-larga", "cantidad": 40 },
+      { "id": "cilantro", "cantidad": 15 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "sal", "cantidad": 6 }
+    ],
+    "antesDeEmpezar": [
+      "Pela la papa y la zanahoria y córtalas en cubos",
+      "Pica la cebolla larga y el cilantro"
+    ],
+    "pasos": [
+      { "titulo": "Haz el caldo", "texto": "Cocina el pollo en agua con la cebolla larga, el ajo y sal.", "minutos": 15 },
+      { "titulo": "Agrega las verduras", "texto": "Saca el pollo, desmenúzalo y agrega al caldo la papa y la zanahoria.", "minutos": 8 },
+      { "titulo": "Agrega la pasta", "texto": "Incorpora la pasta y el pollo y cocina hasta que la pasta esté blanda; termina con cilantro.", "minutos": 8 }
+    ]
   }
 ]

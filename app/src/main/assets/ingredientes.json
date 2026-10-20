@@ -198,6 +198,50 @@
     "precios": {"carulla": 4760, "olimpica": 3150, "d1": 1980}
   },
   {
+    "id": "ahuyama",
+    "nombre": "Ahuyama",
+    "sinonimos": ["zapallo", "calabaza"],
+    "seccion": "Verduras",
+    "unidad": "g",
+    "vidaUtilDias": 30,
+    "etiquetas": [],
+    "empaque": {"cantidad": 1000, "etiqueta": "1 kg"},
+    "precios": {"exito": 2560, "carulla": 2650, "olimpica": 4900}
+  },
+  {
+    "id": "arveja",
+    "nombre": "Arveja",
+    "sinonimos": ["arveja verde", "arvejas", "guisantes"],
+    "seccion": "Verduras",
+    "unidad": "g",
+    "vidaUtilDias": 180,
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 1850, "carulla": 1850, "olimpica": 1700}
+  },
+  {
+    "id": "habichuela",
+    "nombre": "Habichuela",
+    "sinonimos": ["habichuelas", "judia verde", "ejote"],
+    "seccion": "Verduras",
+    "unidad": "g",
+    "vidaUtilDias": 7,
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 3510}
+  },
+  {
+    "id": "champinones",
+    "nombre": "Champiñones",
+    "sinonimos": ["champinon", "champiñon", "hongos", "setas"],
+    "seccion": "Verduras",
+    "unidad": "g",
+    "vidaUtilDias": 5,
+    "etiquetas": [],
+    "empaque": {"cantidad": 250, "etiqueta": "250 g"},
+    "precios": {"exito": 6220, "olimpica": 9900, "d1": 7900}
+  },
+  {
     "id": "banano",
     "nombre": "Banano",
     "sinonimos": ["banana", "banano maduro"],
