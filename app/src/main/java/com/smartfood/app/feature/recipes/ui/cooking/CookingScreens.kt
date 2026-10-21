@@ -1,11 +1,5 @@
 package com.smartfood.app.feature.recipes.ui.cooking
 
-import android.content.Context
-import android.media.RingtoneManager
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -394,27 +388,6 @@ private fun ResultIcon(icon: ImageVector, tint: Color) {
     )
 }
 
-/** Reproduce el sonido de notificación y vibra cuando el temporizador llega a cero (spec 009, T020). */
-fun playTimerFinishedAlert(context: Context) {
-    runCatching {
-        RingtoneManager.getRingtone(context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))?.play()
-    }
-    runCatching {
-        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            (context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator?.vibrate(VibrationEffect.createOneShot(VibrationMillis, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            @Suppress("DEPRECATION")
-            vibrator?.vibrate(VibrationMillis)
-        }
-    }
-}
-
 @Composable
 private fun Loading(modifier: Modifier) = Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxWidth()) {
     CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
@@ -466,7 +439,6 @@ private val ButtonHeight = 48.dp
 private val ButtonRadius = 10.dp
 private val ButtonBorder = 1.dp
 private const val GlyphFraction = 0.4f
-private const val VibrationMillis = 500L
 
 @Preview(showBackground = true, heightDp = 900)
 @Composable

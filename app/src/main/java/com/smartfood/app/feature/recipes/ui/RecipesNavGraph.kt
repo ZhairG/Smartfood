@@ -1,6 +1,8 @@
 package com.smartfood.app.feature.recipes.ui
 
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,7 +22,7 @@ import com.smartfood.app.feature.recipes.ui.cooking.CookingEffect
 import com.smartfood.app.feature.recipes.ui.cooking.CookingIntroScreen
 import com.smartfood.app.feature.recipes.ui.cooking.CookingScreen
 import com.smartfood.app.feature.recipes.ui.cooking.CookingViewModel
-import com.smartfood.app.feature.recipes.ui.cooking.playTimerFinishedAlert
+import com.smartfood.app.feature.recipes.ui.cooking.TimerAlarm
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverEffect
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverScreen
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverViewModel
@@ -107,11 +109,14 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
             val viewModel: CookingViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
             val context = LocalContext.current
+            // La alarma vive mientras la guía está en pantalla y se corta al salir (CA-RIA-04-04).
+            val alarm = remember { TimerAlarm(context.applicationContext) }
+            DisposableEffect(alarm) { onDispose { alarm.stop() } }
             ObserveEffects(viewModel.effects) { effect ->
                 when (effect) {
                     // "Salir" y el cierre vuelven al detalle (Figma 557:2786), sin pasar por "Antes de empezar".
                     CookingEffect.ExitToDetail -> navController.popBackStack<Route.RecipeDetail>(inclusive = false)
-                    CookingEffect.PlayTimerFinishedAlert -> playTimerFinishedAlert(context)
+                    CookingEffect.PlayTimerFinishedAlert -> alarm.play()
                     CookingEffect.OpenGuide -> Unit
                 }
             }
