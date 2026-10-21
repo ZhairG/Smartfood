@@ -3,6 +3,8 @@ package com.smartfood.app.feature.recipes.ui.cooking
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
+import com.smartfood.app.feature.recipes.domain.usecase.FinishCookingUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipeDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -21,16 +23,18 @@ import javax.inject.Inject
  * Nombre: CookingViewModel.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: ViewModel de la cocina guiada (spec 009, HU-RIA-04, T019, T020). Carga la receta por ID con [GetRecipeDetailUseCase]
- * y gestiona el avance de pasos y el temporizador.
+ * Descripción: ViewModel de la cocina guiada (spec 009, HU-RIA-04, T019, T020, T021). Carga la receta por ID con [GetRecipeDetailUseCase],
+ * gestiona el avance de pasos, el temporizador y el finalizado de cocción con [FinishCookingUseCase].
  *
  * @param savedStateHandle Contiene `recipeId` y `servings` de `Route.CookingIntro` o `Route.Cooking`.
  * @param getRecipeDetail Lectura de la receta del catálogo.
+ * @param finishCookingUseCase Descuenta el inventario y guarda el registro de cocción.
  */
 @HiltViewModel
 class CookingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getRecipeDetail: GetRecipeDetailUseCase,
+    private val finishCookingUseCase: FinishCookingUseCase,
 ) : ViewModel() {
 
     val recipeId: String = checkNotNull(savedStateHandle.get<String>(RECIPE_ID_KEY)) {
@@ -88,15 +92,39 @@ class CookingViewModel @Inject constructor(
             CookingEvent.DismissFinishDialog -> {
                 _uiState.update { it.copy(isFinishConfirmVisible = false) }
             }
-            CookingEvent.ConfirmFinishClicked -> {
-                _uiState.update { it.copy(isFinishConfirmVisible = false) }
-            }
+            CookingEvent.ConfirmFinishClicked -> confirmFinish()
             CookingEvent.StartTimerClicked -> startTimer()
             CookingEvent.PauseTimerClicked -> pauseTimer()
             CookingEvent.ResetTimerClicked -> resetTimer()
             CookingEvent.ResultDialogDismissed -> {
                 viewModelScope.launch { _effects.send(CookingEffect.NavigateBack) }
             }
+        }
+    }
+
+    private fun confirmFinish() {
+        _uiState.update { it.copy(isFinishConfirmVisible = false, isSaving = true) }
+        viewModelScope.launch {
+            val result = finishCookingUseCase(recipeId, servings)
+            result.fold(
+                onSuccess = { outcome ->
+                    _uiState.update {
+                        it.copy(
+                            isSaving = false,
+                            isSavedSuccess = true,
+                            isSavedOnPhone = outcome == WriteOutcome.PENDING
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isSaving = false,
+                            errorMessage = error.message
+                        )
+                    }
+                }
+            )
         }
     }
 

@@ -278,3 +278,29 @@ describe('perfil (regresión, spec 005)', () => {
     }));
   });
 });
+
+describe('historial de cocción (spec 009, CA-RIA-04-05)', () => {
+  const cooking = (uid, id = 'c1') => doc(db(uid), `users/${uid ?? 'u1'}/cookings/${id}`);
+  const validCooking = (cambios = {}) => ({
+    recipeId: 'arepas_hogao',
+    servings: 2,
+    rescuedValueCop: 3500,
+    cookedAt: serverTimestamp(),
+    ...cambios,
+  });
+
+  test('CA-RIA-04-05 el dueño crea y lee su registro de cocción', async () => {
+    await assertSucceeds(setDoc(cooking('u1'), validCooking()));
+    await assertSucceeds(getDoc(cooking('u1')));
+  });
+
+  test('CA-RIA-04-05 otro usuario o anónimo no puede crear ni leer', async () => {
+    await assertFails(setDoc(doc(db('u2'), 'users/u1/cookings/c1'), validCooking()));
+    await assertFails(getDoc(doc(db('u2'), 'users/u1/cookings/c1')));
+  });
+
+  test('CA-RIA-04-05 no se permite la edición de un registro ya creado', async () => {
+    await assertSucceeds(setDoc(cooking('u1'), validCooking()));
+    await assertFails(setDoc(cooking('u1'), validCooking({ rescuedValueCop: 5000 })));
+  });
+});

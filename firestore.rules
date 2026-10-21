@@ -101,5 +101,19 @@ service cloud.firestore {
     match /emailChanges/{uid} {
       allow read, write: if false;
     }
+
+    // Historial de cocción (spec 009, CA-RIA-04-05 y 04-06)
+    match /users/{uid}/cookings/{cookingId} {
+      function validCooking(d) {
+        return d.keys().hasOnly(['recipeId', 'servings', 'rescuedValueCop', 'cookedAt'])
+          && d.recipeId is string && d.recipeId.size() > 0
+          && d.servings is int && d.servings > 0
+          && d.rescuedValueCop is int && d.rescuedValueCop >= 0
+          && d.cookedAt == request.time;
+      }
+      allow read, delete: if isOwner(uid);
+      allow create: if isOwner(uid) && validCooking(request.resource.data);
+      allow update: if false;
+    }
   }
 }

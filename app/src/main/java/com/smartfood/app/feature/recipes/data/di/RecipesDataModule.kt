@@ -3,6 +3,8 @@ package com.smartfood.app.feature.recipes.data.di
 import com.smartfood.app.feature.recipes.data.catalog.AndroidRecipeAssetSource
 import com.smartfood.app.feature.recipes.data.catalog.AssetsRecipeCatalog
 import com.smartfood.app.feature.recipes.data.catalog.RecipeAssetSource
+import com.smartfood.app.feature.recipes.data.repository.FirestoreCookingHistoryRepository
+import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import dagger.Binds
 import dagger.Module
@@ -33,6 +35,13 @@ abstract class RecipesDataModule {
     @Binds
     @Singleton
     abstract fun bindRecipeAssetSource(impl: AndroidRecipeAssetSource): RecipeAssetSource
+
+    /** Historial de cocción guardado en Firestore (`users/{uid}/cookings`, T021). */
+    @Binds
+    @Singleton
+    abstract fun bindCookingHistoryRepository(
+        impl: FirestoreCookingHistoryRepository
+    ): CookingHistoryRepository
 
     companion object {
 
