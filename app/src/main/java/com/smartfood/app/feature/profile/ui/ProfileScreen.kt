@@ -61,8 +61,7 @@ import com.smartfood.app.core.designsystem.theme.formMetricsFor
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import com.smartfood.app.feature.inventory.ui.components.OptionSheet
-import java.text.NumberFormat
-import java.util.Locale
+import com.smartfood.app.feature.recipes.ui.components.formatCop
 
 /**
  * Nombre: ProfileScreen.kt
@@ -137,13 +136,9 @@ fun ProfileScreen(
                         dimens = dimens,
                         modifier = Modifier.weight(1f)
                     )
-                    val savingsDisplay = if (state.monthlySavingsCop > 0) {
-                        "$" + NumberFormat.getIntegerInstance().format(state.monthlySavingsCop)
-                    } else {
-                        "$0"
-                    }
+                    // "Ahorrados este mes" (CA-RIA-04-06): pesos con punto de miles, "$0" sin cocinadas.
                     StatCard(
-                        value = savingsDisplay,
+                        value = "$" + formatCop(state.monthlySavingsCop.toLong()),
                         label = stringResource(id = R.string.profile_stat_savings),
                         dimens = dimens,
                         modifier = Modifier.weight(1f)

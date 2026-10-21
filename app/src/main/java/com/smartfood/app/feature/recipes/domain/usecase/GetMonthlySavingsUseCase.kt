@@ -7,7 +7,6 @@ import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.ZoneId
 import javax.inject.Inject
 
 /**
@@ -29,11 +28,11 @@ class GetMonthlySavingsUseCase @Inject constructor(
     operator fun invoke(): Flow<Int> {
         val today = LocalDate.now(clock)
         val currentYearMonth = YearMonth.from(today)
-        val zone = ZoneId.systemDefault()
+        val zone = clock.zone
 
         return cookingHistoryRepository.observeHistory().map { records ->
             records.filter { record ->
-                val recordDate = LocalDate.ofInstant(Instant.ofEpochMilli(record.cookedAt), zone)
+                val recordDate = Instant.ofEpochMilli(record.cookedAt).atZone(zone).toLocalDate()
                 YearMonth.from(recordDate) == currentYearMonth
             }.sumOf { it.rescuedValueCop }
         }
