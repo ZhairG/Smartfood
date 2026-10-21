@@ -29,6 +29,8 @@ enum class ScreenRoute(val routeName: String) {
     PROFILE("profile"),
     RECIPES("recipes"),
     RECIPE_DETAIL("recipe_detail"),
+    COOKING_INTRO("cooking_intro"),
+    COOKING("cooking"),
     EDIT_PROFILE("edit_profile"),
     FOOD_PREFERENCES("food_preferences"),
     NOTIFICATION_SETTINGS("notification_settings"),

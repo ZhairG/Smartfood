@@ -13,7 +13,12 @@ import com.smartfood.app.core.navigation.ObserveEffects
 import com.smartfood.app.core.navigation.Route
 import com.smartfood.app.core.navigation.navigateToTab
 import com.smartfood.app.feature.recipes.ui.detail.RecipeDetailScreen
+import com.smartfood.app.feature.recipes.ui.detail.RecipeDetailEffect
 import com.smartfood.app.feature.recipes.ui.detail.RecipeDetailViewModel
+import com.smartfood.app.feature.recipes.ui.cooking.CookingEffect
+import com.smartfood.app.feature.recipes.ui.cooking.CookingIntroScreen
+import com.smartfood.app.feature.recipes.ui.cooking.CookingScreen
+import com.smartfood.app.feature.recipes.ui.cooking.CookingViewModel
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverEffect
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverScreen
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverViewModel
@@ -58,11 +63,52 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
         ) {
             val viewModel: RecipeDetailViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveEffects(viewModel.effects) { effect ->
+                when (effect) {
+                    is RecipeDetailEffect.OpenCookingIntro -> navController.navigate(
+                        Route.CookingIntro(effect.recipeId, effect.servings)
+                    )
+                }
+            }
             RecipeDetailScreen(
                 state = state,
                 onEvent = viewModel::onEvent,
                 onBack = { navController.popBackStack() }
             )
+        }
+    }
+    composable<Route.CookingIntro> {
+        MainTabScaffold(
+            currentTab = MainTab.RECIPES,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Recipes>(inclusive = false) },
+        ) {
+            val viewModel: CookingViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveEffects(viewModel.effects) { effect ->
+                when (effect) {
+                    CookingEffect.OpenGuide -> navController.navigate(
+                        Route.Cooking(state.recipeId, state.servings)
+                    )
+                    CookingEffect.NavigateBack -> navController.popBackStack()
+                    CookingEffect.PlayTimerFinishedAlert -> {}
+                }
+            }
+            CookingIntroScreen(state = state, onEvent = viewModel::onEvent, onBack = navController::popBackStack)
+        }
+    }
+    composable<Route.Cooking> {
+        MainTabScaffold(
+            currentTab = MainTab.RECIPES,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Recipes>(inclusive = false) },
+        ) {
+            val viewModel: CookingViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveEffects(viewModel.effects) { effect ->
+                if (effect == CookingEffect.NavigateBack) navController.popBackStack()
+            }
+            CookingScreen(state = state, onEvent = viewModel::onEvent, onBack = navController::popBackStack)
         }
     }
 }

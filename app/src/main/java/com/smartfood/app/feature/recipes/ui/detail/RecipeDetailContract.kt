@@ -45,9 +45,18 @@ data class RecipeDetailUiState(
 /** Acciones de la persona en el detalle. */
 sealed interface RecipeDetailEvent {
 
+    /** Abre la preparación previa de la receta. */
+    data object StartCooking : RecipeDetailEvent
+
     /** Quitó una porción (mínimo 1). */
     data object DecreaseServings : RecipeDetailEvent
 
     /** Agregó una porción (máximo 12). */
     data object IncreaseServings : RecipeDetailEvent
+}
+
+/** Efectos de navegación del detalle. */
+sealed interface RecipeDetailEffect {
+    /** Abre "Antes de empezar" para la receta elegida con las porciones seleccionadas. */
+    data class OpenCookingIntro(val recipeId: String, val servings: Int) : RecipeDetailEffect
 }

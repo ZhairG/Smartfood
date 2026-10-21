@@ -12,6 +12,7 @@ import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -50,6 +52,10 @@ class RecipeDetailViewModel @Inject constructor(
 
     private val detail = MutableStateFlow<DetailState>(DetailState.Loading)
     private val servingsOverride = MutableStateFlow<Int?>(null)
+    private val _effects = Channel<RecipeDetailEffect>(Channel.BUFFERED)
+
+    /** Efectos de un solo uso, recolectados por el grafo de recetas. */
+    val effects = _effects.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -111,6 +117,9 @@ class RecipeDetailViewModel @Inject constructor(
 
     fun onEvent(event: RecipeDetailEvent) {
         when (event) {
+            RecipeDetailEvent.StartCooking -> viewModelScope.launch {
+                _effects.send(RecipeDetailEffect.OpenCookingIntro(recipeId, uiState.value.servings))
+            }
             RecipeDetailEvent.DecreaseServings -> changeServings(delta = -1)
             RecipeDetailEvent.IncreaseServings -> changeServings(delta = 1)
         }

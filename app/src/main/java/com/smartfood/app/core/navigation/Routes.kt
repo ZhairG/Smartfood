@@ -126,6 +126,18 @@ sealed interface Route {
         override val screenRoute: ScreenRoute get() = ScreenRoute.RECIPE_DETAIL
     }
 
+    /** Preparación previa de una receta (spec 009, CA-RIA-04-03). */
+    @Serializable
+    data class CookingIntro(val recipeId: String, val servings: Int = 2) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.COOKING_INTRO
+    }
+
+    /** Pasos de cocina guiada de una receta (spec 009, CA-RIA-04-04). */
+    @Serializable
+    data class Cooking(val recipeId: String, val servings: Int = 2) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.COOKING
+    }
+
     /** "Editar información" del Perfil (spec 008, HU-PER-02). */
     @Serializable
     data object EditProfile : Route {

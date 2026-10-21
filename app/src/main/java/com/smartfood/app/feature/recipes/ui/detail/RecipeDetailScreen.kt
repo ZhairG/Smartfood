@@ -74,8 +74,6 @@ import com.smartfood.app.feature.recipes.ui.components.titleRes
  * @param onEvent Acciones de la persona.
  * @param onBack Vuelve a Descubrir.
  * @param modifier Modificador opcional.
- * @param onStartCooking Abre "Antes de empezar"; `null` hasta que exista la cocina guiada (#115) y el botón queda
- *   deshabilitado.
  */
 @Composable
 fun RecipeDetailScreen(
@@ -83,7 +81,6 @@ fun RecipeDetailScreen(
     onEvent: (RecipeDetailEvent) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    onStartCooking: (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -159,8 +156,7 @@ fun RecipeDetailScreen(
                 }
                 RecipeActionButton(
                     text = stringResource(id = R.string.recipes_start_cooking),
-                    onClick = { onStartCooking?.invoke() },
-                    enabled = onStartCooking != null,
+                    onClick = { onEvent(RecipeDetailEvent.StartCooking) },
                     trailingIcon = R.drawable.ic_figma_play,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
