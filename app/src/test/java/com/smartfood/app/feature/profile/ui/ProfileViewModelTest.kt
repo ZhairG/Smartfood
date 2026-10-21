@@ -13,6 +13,9 @@ import com.smartfood.app.feature.profile.domain.model.UserProfile
 import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
 import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
 import com.smartfood.app.core.designsystem.theme.ThemeMode
+import com.smartfood.app.feature.recipes.domain.model.CookingRecord
+import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
+import com.smartfood.app.feature.recipes.domain.usecase.GetMonthlySavingsUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
@@ -26,6 +29,7 @@ import com.smartfood.app.testutil.inventoryItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -62,6 +66,12 @@ class ProfileViewModelTest {
     private val photoSync = FakePhotoSync()
     private val themePreferences = FakeThemePreferences()
 
+    private class FakeHistoryRepo : CookingHistoryRepository {
+        override fun observeHistory(): Flow<List<CookingRecord>> = flowOf(emptyList())
+        override fun newRecordId(): String = "id"
+        override suspend fun saveRecord(record: CookingRecord): Result<Unit> = Result.success(Unit)
+    }
+
     private fun crearViewModel(repository: InventoryRepository = inventoryRepository) = ProfileViewModel(
         observeProfile = ObserveProfileUseCase(profileRepository),
         syncProfileEmail = SyncProfileEmailUseCase(authRepository, profileRepository),
@@ -72,7 +82,8 @@ class ProfileViewModelTest {
             ClassifyExpiryUseCase(fixedClock(LocalDate.of(2026, 9, 10)))
         ),
         hasPendingChanges = HasPendingChangesUseCase(repository, photoSync),
-        themePreferences = themePreferences
+        themePreferences = themePreferences,
+        getMonthlySavings = GetMonthlySavingsUseCase(FakeHistoryRepo(), fixedClock(LocalDate.of(2026, 10, 20)))
     )
 
     @Test

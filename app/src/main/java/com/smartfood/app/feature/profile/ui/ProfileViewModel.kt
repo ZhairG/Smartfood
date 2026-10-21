@@ -10,6 +10,7 @@ import com.smartfood.app.feature.inventory.domain.usecase.HasPendingChangesUseCa
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
 import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.GetMonthlySavingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +45,7 @@ class ProfileViewModel @Inject constructor(
     private val observeInventory: ObserveInventoryUseCase,
     private val hasPendingChanges: HasPendingChangesUseCase,
     private val themePreferences: ThemePreferences,
+    private val getMonthlySavings: GetMonthlySavingsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -86,6 +88,11 @@ class ProfileViewModel @Inject constructor(
             observeInventory()
                 .catch { emit(emptyList()) }
                 .collect { sections -> _uiState.update { it.copy(inventoryCount = sections.sumOf { s -> s.items.size }) } }
+        }
+        viewModelScope.launch {
+            getMonthlySavings()
+                .catch { emit(0) }
+                .collect { savings -> _uiState.update { it.copy(monthlySavingsCop = savings) } }
         }
         viewModelScope.launch {
             themePreferences.themeMode.collect { mode -> _uiState.update { it.copy(themeMode = mode) } }
@@ -157,6 +164,7 @@ data class ProfileUiState(
     val initials: String? = null,
     val photoUrl: String? = null,
     val inventoryCount: Int = 0,
+    val monthlySavingsCop: Int = 0,
     val themeMode: ThemeMode = ThemeMode.Default,
     val isThemeSheetVisible: Boolean = false,
     val dialog: ProfileDialog? = null,

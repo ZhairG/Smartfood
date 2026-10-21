@@ -61,6 +61,8 @@ import com.smartfood.app.core.designsystem.theme.formMetricsFor
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import com.smartfood.app.feature.inventory.ui.components.OptionSheet
+import java.text.NumberFormat
+import java.util.Locale
 
 /**
  * Nombre: ProfileScreen.kt
@@ -135,8 +137,13 @@ fun ProfileScreen(
                         dimens = dimens,
                         modifier = Modifier.weight(1f)
                     )
+                    val savingsDisplay = if (state.monthlySavingsCop > 0) {
+                        "$" + NumberFormat.getIntegerInstance().format(state.monthlySavingsCop)
+                    } else {
+                        "$0"
+                    }
                     StatCard(
-                        value = stringResource(id = R.string.profile_stat_unavailable),
+                        value = savingsDisplay,
                         label = stringResource(id = R.string.profile_stat_savings),
                         dimens = dimens,
                         modifier = Modifier.weight(1f)

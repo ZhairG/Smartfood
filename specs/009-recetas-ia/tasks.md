@@ -33,8 +33,8 @@
 ## Issue 4: Cocina guiada (intermedia)
 - [x] T019 "Antes de empezar" (sin video) y cocina guiada con pasos, "Anterior", "Siguiente" y "Salir" (CA-RIA-04-03, 04-04).
 - [x] T020 Temporizador con sonido y vibración (CA-RIA-04-04).
-- [ ] T021 `CookingHistoryRepository` (`cookings`), reglas y `rules-test`; `FinishCookingUseCase` que descuenta el inventario y registra lo rescatado (CA-RIA-04-05).
-- [ ] T022 `GetMonthlySavingsUseCase` y tarjeta "Ahorrados este mes" del Perfil (CA-RIA-04-06).
+- [x] T021 `CookingHistoryRepository` (`cookings`), reglas y `rules-test`; `FinishCookingUseCase` que descuenta el inventario y registra lo rescatado (CA-RIA-04-05).
+- [x] T022 `GetMonthlySavingsUseCase` y tarjeta "Ahorrados este mes" del Perfil (CA-RIA-04-06).
 - [ ] T023 `CookingScreenTest` y pruebas de los casos de uso.
 
 ## Precios de mercado por tienda (Zhair, 2026-10-20)
