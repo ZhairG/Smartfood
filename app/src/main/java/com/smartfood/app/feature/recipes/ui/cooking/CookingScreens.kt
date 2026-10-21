@@ -13,13 +13,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -37,10 +37,12 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,7 +57,6 @@ import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.components.SmartFoodWarningDialog
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
-import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.formMetricsFor
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.auth.ui.components.FlexibleGap
@@ -70,7 +71,7 @@ import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 
 private const val GlyphFraction = 0.55f
 
-/** Pantalla "Antes de empezar" (Figma 557:2819). Foto de la receta, título y tarjeta de preparación inicial. */
+/** Pantalla "Antes de empezar" (Figma 557:2819). Foto de la receta con botón play, título, tarjeta de preparación y botones de guía. */
 @Composable
 fun CookingIntroScreen(
     state: CookingUiState,
@@ -100,16 +101,32 @@ fun CookingIntroScreen(
                             .padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        RecipePhoto(
-                            photo = state.photo,
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(220.dp)
-                                .background(
-                                    MaterialTheme.colorScheme.primaryContainer,
-                                    RoundedCornerShape(16.dp)
+                                .height(210.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            RecipePhoto(
+                                photo = state.photo,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .background(MaterialTheme.colorScheme.secondary, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.PlayArrow,
+                                    contentDescription = "Reproducir video",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(32.dp)
                                 )
-                        )
+                            }
+                        }
 
                         Text(
                             text = "${state.name}, paso a paso",
@@ -117,6 +134,14 @@ fun CookingIntroScreen(
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+
+                        Text(
+                            text = stringResource(id = R.string.recipes_cooking_intro_video_text),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
 
@@ -169,10 +194,25 @@ fun CookingIntroScreen(
 
                         FlexibleGap(minHeight = 16.dp)
 
+                        OutlinedButton(
+                            onClick = { onEvent(CookingEvent.StartGuideClicked) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(LocalFormMetrics.current.buttonHeight)
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.recipes_skip_video),
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+
                         SmartFoodPrimaryButton(
                             text = stringResource(id = R.string.recipes_start_guide),
                             onClick = { onEvent(CookingEvent.StartGuideClicked) },
-                            green = true
+                            green = false
                         )
                     }
                 }
@@ -227,8 +267,21 @@ fun CookingScreen(
             .background(MaterialTheme.colorScheme.surface)
     ) {
         SmartFoodTopBar(
-            title = stringResource(id = R.string.recipes_cooking_title),
-            onBack = { onEvent(CookingEvent.ExitClicked) }
+            title = stringResource(
+                id = R.string.recipes_cooking_progress,
+                state.currentStepIndex + 1,
+                state.steps.size
+            ),
+            onBack = { onEvent(CookingEvent.ExitClicked) },
+            action = {
+                TextButton(onClick = { onEvent(CookingEvent.ExitClicked) }) {
+                    Text(
+                        text = stringResource(id = R.string.recipes_exit),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
+            }
         )
 
         BoxWithConstraints(modifier = Modifier.weight(1f)) {
@@ -266,6 +319,7 @@ fun CookingScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(180.dp)
+                                    .clip(RoundedCornerShape(16.dp))
                                     .background(
                                         MaterialTheme.colorScheme.primaryContainer,
                                         RoundedCornerShape(16.dp)
@@ -293,57 +347,70 @@ fun CookingScreen(
                                 val seconds = state.timerSecondsRemaining % 60
                                 Card(
                                     colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4)),
-                                    shape = RoundedCornerShape(12.dp),
+                                    shape = RoundedCornerShape(16.dp),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)
+                                    Column(
+                                        modifier = Modifier.padding(16.dp),
+                                        verticalArrangement = Arrangement.spacedBy(6.dp)
                                     ) {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            modifier = Modifier.fillMaxWidth()
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Outlined.Timer,
-                                                contentDescription = null,
-                                                tint = Color(0xFFF57F17),
-                                                modifier = Modifier.size(24.dp)
-                                            )
-                                            Text(
-                                                text = stringResource(id = R.string.recipes_timer_label, minutes, seconds),
-                                                style = MaterialTheme.typography.titleMedium.copy(
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = Color(0xFFF57F17)
-                                                )
-                                            )
-                                        }
-
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            IconButton(
-                                                onClick = {
-                                                    if (state.isTimerRunning) {
-                                                        onEvent(CookingEvent.PauseTimerClicked)
-                                                    } else {
-                                                        onEvent(CookingEvent.StartTimerClicked)
-                                                    }
-                                                }
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
                                                 Icon(
-                                                    imageVector = if (state.isTimerRunning) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                                    contentDescription = if (state.isTimerRunning) "Pausar" else "Iniciar",
-                                                    tint = Color(0xFFF57F17)
+                                                    imageVector = Icons.Outlined.Timer,
+                                                    contentDescription = null,
+                                                    tint = Color(0xFF3E2723),
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                                Text(
+                                                    text = stringResource(id = R.string.recipes_timer_label, minutes, seconds),
+                                                    style = MaterialTheme.typography.titleMedium.copy(
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = Color(0xFF3E2723)
+                                                    )
                                                 )
                                             }
-                                            IconButton(onClick = { onEvent(CookingEvent.ResetTimerClicked) }) {
-                                                Icon(
-                                                    imageVector = Icons.Filled.Refresh,
-                                                    contentDescription = "Reiniciar",
-                                                    tint = Color(0xFFF57F17)
-                                                )
+
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                IconButton(
+                                                    onClick = {
+                                                        if (state.isTimerRunning) {
+                                                            onEvent(CookingEvent.PauseTimerClicked)
+                                                        } else {
+                                                            onEvent(CookingEvent.StartTimerClicked)
+                                                        }
+                                                    }
+                                                ) {
+                                                    Icon(
+                                                        imageVector = if (state.isTimerRunning) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                                        contentDescription = if (state.isTimerRunning) "Pausar" else "Iniciar",
+                                                        tint = Color(0xFF3E2723)
+                                                    )
+                                                }
+                                                IconButton(onClick = { onEvent(CookingEvent.ResetTimerClicked) }) {
+                                                    Icon(
+                                                        imageVector = Icons.Filled.Refresh,
+                                                        contentDescription = "Reiniciar",
+                                                        tint = Color(0xFF3E2723)
+                                                    )
+                                                }
                                             }
                                         }
+
+                                        Text(
+                                            text = stringResource(id = R.string.recipes_timer_subtitle),
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                fontSize = 12.sp,
+                                                color = Color(0xFF5D4037)
+                                            )
+                                        )
                                     }
                                 }
                             }
@@ -373,17 +440,21 @@ fun CookingScreen(
                                     SmartFoodPrimaryButton(
                                         text = stringResource(id = R.string.recipes_next),
                                         onClick = { onEvent(CookingEvent.NextStepClicked) },
+                                        green = false,
                                         modifier = Modifier.weight(1f)
                                     )
                                 }
                             }
 
-                            OutlinedButton(
-                                onClick = { onEvent(CookingEvent.ExitClicked) },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(text = stringResource(id = R.string.recipes_exit))
-                            }
+                            Text(
+                                text = stringResource(id = R.string.recipes_cooking_help_prompt),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = 13.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                ),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                            )
                         }
                     }
                 }

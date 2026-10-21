@@ -41,7 +41,9 @@
     <string name="recipes_unit_units">%1$s und</string>
     <string name="recipes_detail_error">No pudimos cargar la receta.</string>
     <string name="recipes_cooking_intro_title">Antes de empezar</string>
+    <string name="recipes_cooking_intro_video_text">Video de 2:14 · Puedes pausarlo o saltarlo. La guía seguirá disponible durante la cocción.</string>
     <string name="recipes_prepare_before">Prepara antes de iniciar</string>
+    <string name="recipes_skip_video">Omitir video</string>
     <string name="recipes_start_guide">Comenzar guía</string>
     <string name="recipes_cooking_title">Cocinando</string>
     <string name="recipes_cooking_progress">Cocinando · paso %1$d de %2$d</string>
@@ -51,6 +53,8 @@
     <string name="recipes_finish">Terminar</string>
     <string name="recipes_step_label">PASO %1$d</string>
     <string name="recipes_timer_label">Temporizador · %1$02d:%2$02d</string>
+    <string name="recipes_timer_subtitle">Puedes pausar, reiniciar o continuar sin esperar.</string>
+    <string name="recipes_cooking_help_prompt">¿Necesitas ayuda? Ver técnica de sofrito</string>
     <string name="recipes_confirm_finish_title">¿Cocinaste esta receta?</string>
     <string name="recipes_cooking_saved">Guardado</string>
     <string name="recipes_cooking_saved_phone">Guardado en tu teléfono</string>

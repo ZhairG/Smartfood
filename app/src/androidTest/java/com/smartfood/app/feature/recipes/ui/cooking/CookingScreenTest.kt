@@ -44,6 +44,7 @@ class CookingScreenTest {
         composeTestRule.onNodeWithText("Arepas con hogao, paso a paso").assertIsDisplayed()
         composeTestRule.onNodeWithText("Prepara antes de iniciar").assertIsDisplayed()
         composeTestRule.onNodeWithText("Ten listas las arepas").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Omitir video").assertIsDisplayed()
         composeTestRule.onNodeWithText("Comenzar guía").assertIsDisplayed()
         composeTestRule.onNodeWithText("Comenzar guía").performClick()
 
@@ -77,6 +78,7 @@ class CookingScreenTest {
         composeTestRule.onNodeWithText("Calentar arepas").assertIsDisplayed()
         composeTestRule.onNodeWithText("Anterior").assertIsNotEnabled()
         composeTestRule.onNodeWithText("Siguiente").assertIsEnabled()
+        composeTestRule.onNodeWithText("¿Necesitas ayuda? Ver técnica de sofrito").assertIsDisplayed()
 
         composeTestRule.onNodeWithText("Siguiente").performClick()
         assertTrue(events.contains(CookingEvent.NextStepClicked))
