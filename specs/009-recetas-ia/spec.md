@@ -142,6 +142,8 @@ solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
 | "Antes de empezar" sin video ni "Omitir video": muestra la foto de la receta. | No hay videos; quedan fuera de alcance. |
 | Las tarjetas de recetas no muestran el ♡ y la pestaña Guardadas sigue gris (como en la spec 006). Aprobada el 2026-10-19. | Las recetas guardadas pasan al próximo módulo (#117). |
 | El cierre de la cocina guiada pregunta "¿Cocinaste esta receta?". | Necesario para descontar el inventario sin errores. |
+| La cocina guiada no tiene el enlace "¿Necesitas ayuda? Ver técnica de sofrito" (aprobada por Zhair el 2026-10-21). | El catálogo no tiene técnicas; quedan fuera de alcance, como el video. |
+| Cada paso de la cocina guiada muestra la foto de la receta (aprobada por Zhair el 2026-10-21). | El catálogo tiene una foto por receta, no por paso. |
 | "Carulla - Optimizado para tu zona" se muestra como "<Mi supermercado> · precios de octubre 2026" (aprobada el 2026-10-20). | Los precios son una referencia por tienda, sin integración en vivo con los supermercados. |
 | Las filas de ingredientes que faltan muestran el empaque y el precio en dos líneas ("Tomate 1 kg" / "D1 · $4.200"). | El Figma solo muestra un precio; el mercado se hace por empaques (decisión de Zhair del 2026-10-20). |
 | El contexto de la IA muestra "Según tus preferencias: <restricciones>" (aprobada el 2026-10-19). | El Figma no tiene restricciones alimentarias; sin la línea, el usuario no sabe por qué faltan recetas. |
