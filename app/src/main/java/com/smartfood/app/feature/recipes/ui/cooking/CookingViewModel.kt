@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipeDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,6 +45,8 @@ class CookingViewModel @Inject constructor(
     private val _effects = Channel<CookingEffect>(Channel.BUFFERED)
     val effects: Flow<CookingEffect> = _effects.receiveAsFlow()
 
+    private var timerJob: Job? = null
+
     init {
         viewModelScope.launch {
             getRecipeDetail(recipeId).fold(
@@ -75,6 +79,7 @@ class CookingViewModel @Inject constructor(
             CookingEvent.NextStepClicked -> changeStep(delta = 1)
             CookingEvent.PreviousStepClicked -> changeStep(delta = -1)
             CookingEvent.ExitClicked -> {
+                pauseTimer()
                 viewModelScope.launch { _effects.send(CookingEffect.NavigateBack) }
             }
             CookingEvent.FinishClicked -> {
@@ -86,16 +91,51 @@ class CookingViewModel @Inject constructor(
             CookingEvent.ConfirmFinishClicked -> {
                 _uiState.update { it.copy(isFinishConfirmVisible = false) }
             }
-            CookingEvent.StartTimerClicked -> {}
-            CookingEvent.PauseTimerClicked -> {}
-            CookingEvent.ResetTimerClicked -> {}
+            CookingEvent.StartTimerClicked -> startTimer()
+            CookingEvent.PauseTimerClicked -> pauseTimer()
+            CookingEvent.ResetTimerClicked -> resetTimer()
             CookingEvent.ResultDialogDismissed -> {
                 viewModelScope.launch { _effects.send(CookingEffect.NavigateBack) }
             }
         }
     }
 
+    private fun startTimer() {
+        if (_uiState.value.isTimerRunning || _uiState.value.timerSecondsRemaining <= 0) return
+        _uiState.update { it.copy(isTimerRunning = true) }
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (_uiState.value.timerSecondsRemaining > 0 && _uiState.value.isTimerRunning) {
+                delay(1000L)
+                _uiState.update { current ->
+                    val newTime = current.timerSecondsRemaining - 1
+                    if (newTime <= 0) {
+                        current.copy(timerSecondsRemaining = 0, isTimerRunning = false)
+                    } else {
+                        current.copy(timerSecondsRemaining = newTime)
+                    }
+                }
+            }
+            if (_uiState.value.timerSecondsRemaining == 0) {
+                _effects.send(CookingEffect.PlayTimerFinishedAlert)
+            }
+        }
+    }
+
+    private fun pauseTimer() {
+        timerJob?.cancel()
+        timerJob = null
+        _uiState.update { it.copy(isTimerRunning = false) }
+    }
+
+    private fun resetTimer() {
+        pauseTimer()
+        val step = _uiState.value.currentStep
+        _uiState.update { it.copy(timerSecondsRemaining = (step?.minutes ?: 0) * 60) }
+    }
+
     private fun changeStep(delta: Int) {
+        pauseTimer()
         val state = _uiState.value
         val newIndex = (state.currentStepIndex + delta).coerceIn(0, state.steps.lastIndex.coerceAtLeast(0))
         val step = state.steps.getOrNull(newIndex)
@@ -106,6 +146,11 @@ class CookingViewModel @Inject constructor(
                 isTimerRunning = false
             )
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        pauseTimer()
     }
 
     companion object {

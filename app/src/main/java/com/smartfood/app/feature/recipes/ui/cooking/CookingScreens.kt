@@ -1,5 +1,11 @@
 package com.smartfood.app.feature.recipes.ui.cooking
 
+import android.content.Context
+import android.media.RingtoneManager
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +23,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -45,11 +55,9 @@ import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.components.SmartFoodWarningDialog
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.formMetricsFor
 import com.smartfood.app.core.designsystem.theme.spacing
-import com.smartfood.app.core.navigation.ObserveEffects
-import com.smartfood.app.feature.auth.domain.model.AuthError
-import com.smartfood.app.feature.auth.domain.usecase.PasswordValidationResult
 import com.smartfood.app.feature.auth.ui.components.FlexibleGap
 import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 
@@ -284,28 +292,58 @@ fun CookingScreen(
                                 val minutes = state.timerSecondsRemaining / 60
                                 val seconds = state.timerSecondsRemaining % 60
                                 Card(
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4)), // Amarillo pálido Figma
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4)),
                                     shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                        modifier = Modifier.padding(16.dp)
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.Timer,
-                                            contentDescription = null,
-                                            tint = Color(0xFFF57F17),
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                        Text(
-                                            text = stringResource(id = R.string.recipes_timer_label, minutes, seconds),
-                                            style = MaterialTheme.typography.titleMedium.copy(
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color(0xFFF57F17)
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.Timer,
+                                                contentDescription = null,
+                                                tint = Color(0xFFF57F17),
+                                                modifier = Modifier.size(24.dp)
                                             )
-                                        )
+                                            Text(
+                                                text = stringResource(id = R.string.recipes_timer_label, minutes, seconds),
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = Color(0xFFF57F17)
+                                                )
+                                            )
+                                        }
+
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            IconButton(
+                                                onClick = {
+                                                    if (state.isTimerRunning) {
+                                                        onEvent(CookingEvent.PauseTimerClicked)
+                                                    } else {
+                                                        onEvent(CookingEvent.StartTimerClicked)
+                                                    }
+                                                }
+                                            ) {
+                                                Icon(
+                                                    imageVector = if (state.isTimerRunning) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                                    contentDescription = if (state.isTimerRunning) "Pausar" else "Iniciar",
+                                                    tint = Color(0xFFF57F17)
+                                                )
+                                            }
+                                            IconButton(onClick = { onEvent(CookingEvent.ResetTimerClicked) }) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Refresh,
+                                                    contentDescription = "Reiniciar",
+                                                    tint = Color(0xFFF57F17)
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -352,6 +390,31 @@ fun CookingScreen(
             }
         }
     }
+}
+
+/** Reproduce sonido de notificación y vibración cuando el temporizador llega a cero (spec 009, T020). */
+fun playTimerFinishedAlert(context: Context) {
+    try {
+        val notificationUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val ringtone = RingtoneManager.getRingtone(context, notificationUri)
+        ringtone?.play()
+    } catch (_: Exception) {}
+
+    try {
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
+            vibratorManager?.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator?.vibrate(VibrationEffect.createOneShot(500L, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator?.vibrate(500L)
+        }
+    } catch (_: Exception) {}
 }
 
 @Composable

@@ -1,6 +1,7 @@
 package com.smartfood.app.feature.recipes.ui
 
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -19,6 +20,7 @@ import com.smartfood.app.feature.recipes.ui.cooking.CookingEffect
 import com.smartfood.app.feature.recipes.ui.cooking.CookingIntroScreen
 import com.smartfood.app.feature.recipes.ui.cooking.CookingScreen
 import com.smartfood.app.feature.recipes.ui.cooking.CookingViewModel
+import com.smartfood.app.feature.recipes.ui.cooking.playTimerFinishedAlert
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverEffect
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverScreen
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverViewModel
@@ -105,8 +107,13 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
         ) {
             val viewModel: CookingViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
+            val context = LocalContext.current
             ObserveEffects(viewModel.effects) { effect ->
-                if (effect == CookingEffect.NavigateBack) navController.popBackStack()
+                when (effect) {
+                    CookingEffect.NavigateBack -> navController.popBackStack()
+                    CookingEffect.PlayTimerFinishedAlert -> playTimerFinishedAlert(context)
+                    else -> {}
+                }
             }
             CookingScreen(state = state, onEvent = viewModel::onEvent, onBack = navController::popBackStack)
         }

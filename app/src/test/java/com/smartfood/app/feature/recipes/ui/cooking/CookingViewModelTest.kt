@@ -115,4 +115,24 @@ class CookingViewModelTest {
 
         assertEquals(CookingEffect.OpenGuide, effect)
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `iniciar pausar y reiniciar temporizador funciona correctamente`() = runTest {
+        val handle = SavedStateHandle(mapOf("recipeId" to "arepas_hogao", "servings" to 2))
+        val viewModel = CookingViewModel(handle, getRecipeDetailUseCase)
+        runCurrent()
+
+        assertEquals(300, viewModel.uiState.value.timerSecondsRemaining)
+        assertFalse(viewModel.uiState.value.isTimerRunning)
+
+        viewModel.onEvent(CookingEvent.StartTimerClicked)
+        assertTrue(viewModel.uiState.value.isTimerRunning)
+
+        viewModel.onEvent(CookingEvent.PauseTimerClicked)
+        assertFalse(viewModel.uiState.value.isTimerRunning)
+
+        viewModel.onEvent(CookingEvent.ResetTimerClicked)
+        assertEquals(300, viewModel.uiState.value.timerSecondsRemaining)
+    }
 }
