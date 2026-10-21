@@ -28,6 +28,9 @@ import javax.inject.Inject
  * 3. Llama a [DeleteItemUseCase] si la cantidad queda <= 0 o no tenía cantidad, o [UpdateItemUseCase] si queda sobrante.
  * 4. Calcula `rescuedValueCop` para productos usados con vencimiento en 0..3 días.
  * 5. Guarda el [CookingRecord] en Firestore/local.
+ *
+ * Devuelve [WriteOutcome.PENDING] si alguna escritura quedó en la cola sin conexión (spec 006 §13), para mostrar
+ * "Guardado en tu teléfono".
  */
 class FinishCookingUseCase @Inject constructor(
     private val getRecipeDetail: GetRecipeDetailUseCase,
@@ -115,12 +118,13 @@ class FinishCookingUseCase @Inject constructor(
             id = recordId,
             recipeId = recipeId,
             servings = servings,
-            cookedAt = System.currentTimeMillis(),
+            cookedAt = clock.millis(),
             rescuedValueCop = totalRescuedCop.toInt().coerceAtLeast(0)
         )
 
         cookingHistoryRepository.saveRecord(record)
-            .getOrElse { return Result.failure(it) }
+            .onSuccess { if (it == WriteOutcome.PENDING) worstOutcome = WriteOutcome.PENDING }
+            .onFailure { return Result.failure(it) }
 
         return Result.success(worstOutcome)
     }

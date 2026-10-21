@@ -31,8 +31,8 @@ import org.junit.Test
  * Descripción: Pruebas instrumentadas del detalle sin estado (spec 009, CA-RIA-04-01 y 04-02, T008; Figma
  * `557:2856`): barra con el nombre, tiempos y dificultad, "<Tienda> · precios de octubre 2026" (CA-RIA-04-07), grupos
  * con cantidades, el empaque que falta con su tienda y precio y "Básico de despensa",
- * "En tu inventario", selector de porciones con sus límites, "Empezar a cocinar" deshabilitado hasta la cocina guiada
- * (#115), estados de carga/error y la flecha atrás.
+ * "En tu inventario", selector de porciones con sus límites, "Empezar a cocinar" que abre la cocina guiada (#116),
+ * estados de carga/error y la flecha atrás.
  */
 class RecipeDetailScreenTest {
 
@@ -130,10 +130,12 @@ class RecipeDetailScreenTest {
     }
 
     @Test
-    fun caRia0401_empezarACocinarQuedaDeshabilitadoHastaLaCocinaGuiada() {
+    fun caRia0403_empezarACocinarAbreAntesDeEmpezar() {
         mostrar()
 
-        composeTestRule.onNodeWithText("Empezar a cocinar").assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Empezar a cocinar").performClick()
+
+        assertEquals(listOf<RecipeDetailEvent>(RecipeDetailEvent.StartCooking), eventos)
     }
 
     @Test

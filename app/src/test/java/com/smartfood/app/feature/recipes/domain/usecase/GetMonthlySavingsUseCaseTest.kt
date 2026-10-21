@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.recipes.domain.usecase
 
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.recipes.domain.model.CookingRecord
 import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
 import com.smartfood.app.testutil.fixedClock
@@ -29,7 +30,8 @@ class GetMonthlySavingsUseCaseTest {
         var list = emptyList<CookingRecord>()
         override fun observeHistory(): Flow<List<CookingRecord>> = flowOf(list)
         override fun newRecordId(): String = "id"
-        override suspend fun saveRecord(record: CookingRecord): Result<Unit> = Result.success(Unit)
+        override suspend fun saveRecord(record: CookingRecord): Result<WriteOutcome> =
+            Result.success(WriteOutcome.SYNCED)
     }
 
     private lateinit var repo: FakeHistoryRepo

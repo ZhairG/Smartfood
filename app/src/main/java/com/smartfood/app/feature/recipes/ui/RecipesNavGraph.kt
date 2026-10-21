@@ -31,7 +31,8 @@ import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverViewModel
  * Fecha: Octubre 2026
  * Descripción: Destinos de recetas dentro de `MainGraph` (spec 009, plan §5, T006 a T008). Descubrir y el detalle
  * muestran la barra inferior con Recetas resaltado, como el Figma (`557:3028` y `557:2856`); tocar Recetas desde el
- * detalle vuelve a Descubrir. El flujo de la IA y la cocina se agregan en sus tareas.
+ * detalle vuelve a Descubrir. La cocina guiada (`557:2819` y `557:2781`, #116) va del detalle a "Antes de empezar" y
+ * a los pasos; todas las navegaciones del prototipo son instantáneas. El flujo de la IA se agrega en su tarea.
  *
  * @param navController Controlador de navegación de la app.
  */
@@ -89,11 +90,9 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
             val state by viewModel.uiState.collectAsStateWithLifecycle()
             ObserveEffects(viewModel.effects) { effect ->
                 when (effect) {
-                    CookingEffect.OpenGuide -> navController.navigate(
-                        Route.Cooking(state.recipeId, state.servings)
-                    )
-                    CookingEffect.NavigateBack -> navController.popBackStack()
-                    CookingEffect.PlayTimerFinishedAlert -> {}
+                    CookingEffect.OpenGuide -> navController.navigate(Route.Cooking(state.recipeId, state.servings))
+                    CookingEffect.ExitToDetail -> navController.popBackStack<Route.RecipeDetail>(inclusive = false)
+                    CookingEffect.PlayTimerFinishedAlert -> Unit
                 }
             }
             CookingIntroScreen(state = state, onEvent = viewModel::onEvent, onBack = navController::popBackStack)
@@ -110,9 +109,10 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
             val context = LocalContext.current
             ObserveEffects(viewModel.effects) { effect ->
                 when (effect) {
-                    CookingEffect.NavigateBack -> navController.popBackStack()
+                    // "Salir" y el cierre vuelven al detalle (Figma 557:2786), sin pasar por "Antes de empezar".
+                    CookingEffect.ExitToDetail -> navController.popBackStack<Route.RecipeDetail>(inclusive = false)
                     CookingEffect.PlayTimerFinishedAlert -> playTimerFinishedAlert(context)
-                    else -> {}
+                    CookingEffect.OpenGuide -> Unit
                 }
             }
             CookingScreen(state = state, onEvent = viewModel::onEvent, onBack = navController::popBackStack)

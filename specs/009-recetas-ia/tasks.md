@@ -77,10 +77,10 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |
 | CA-RIA-04-02 | U `RecipeDetailViewModelTest` |
-| CA-RIA-04-03 | I `CookingScreenTest` |
+| CA-RIA-04-03 | I `CookingScreenTest`, I `RecipeDetailScreenTest` |
 | CA-RIA-04-04 | U `CookingViewModelTest`, I `CookingScreenTest`, M |
-| CA-RIA-04-05 | U `FinishCookingUseCaseTest`, R |
-| CA-RIA-04-06 | U `GetMonthlySavingsUseCaseTest` |
+| CA-RIA-04-05 | U `FinishCookingUseCaseTest`, U `CookingViewModelTest`, I `CookingScreenTest`, R |
+| CA-RIA-04-06 | U `GetMonthlySavingsUseCaseTest`, U `FinishCookingUseCaseTest`, I `ProfileScreenTest` |
 | CA-RIA-04-07 | U `RecipeDetailViewModelTest`, I `RecipeDetailScreenTest` |
 | RNF-RIA-01 | U `MealPlannerTest` (mismo resultado dos veces) |
 | RNF-RIA-02 | U `MealPlannerPerformanceTest`, M |

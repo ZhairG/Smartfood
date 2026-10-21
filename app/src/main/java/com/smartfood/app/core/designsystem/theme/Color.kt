@@ -92,6 +92,12 @@ val ErrorRed = Color(0xFFD92E2E)
  */
 val YellowExpiring = Color(0xFFF6E938)
 
+/**
+ * Amarillo claro de la tarjeta del temporizador de la cocina guiada (Figma `557:2793`, spec 009 CA-RIA-04-04; aprobado
+ * por Zhair el 2026-10-21).
+ */
+val YellowSoft = Color(0xFFFFF7D6)
+
 // === Superficies y Paneles Dark / Light ===
 /** Fondo del panel en modo oscuro. */
 val SurfaceDark = Color(0xFF0E2118)

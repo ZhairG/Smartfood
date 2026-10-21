@@ -123,7 +123,7 @@ return mejor?.let(::Found) ?: NoPlan(sugerencias)
 
 | Ruta | Campos | Reglas |
 |---|---|---|
-| `users/{uid}/cookings/{id}` | `recipeId` (string), `cookedAt` (timestamp del servidor), `rescuedValueCop` (int ≥ 0) | dueño; crear y leer, no editar |
+| `users/{uid}/cookings/{id}` | `recipeId` (string), `servings` (int > 0), `cookedAt` (timestamp del servidor), `rescuedValueCop` (int ≥ 0) | dueño; crear, leer y borrar, no editar |
 
 Se escribe con `Map`, como el inventario, y funciona sin conexión gracias a la caché de Firestore. Las favoritas
 (`users/{uid}/favorites`, carpeta `ui/saved/`) pasan al próximo módulo (#117, spec §6).
@@ -153,7 +153,8 @@ valor de referencia de los ingredientes por vencer usados.
 1. Para cada `IngredientUse` del producto `p`: si `p` no tiene cantidad o le queda ≤ 0 → `DeleteItemUseCase(p.id)`;
    si no → `UpdateItemUseCase` con la cantidad restante en su unidad original.
 2. Guardar `cookings/{id}` con el valor rescatado.
-3. Todo con la cola sin conexión del inventario (spec 006 §13); el resultado se muestra con "Guardado".
+3. Todo con la cola sin conexión del inventario (spec 006 §13): cada escritura espera al servidor como mucho 3 s y, si
+   no responde, el resultado es "Guardado en tu teléfono"; si no, "Guardado". Después vuelve al detalle.
 
 ## 7. Decisiones (ADR)
 

@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.profile.ui
 
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.usecase.LogoutUseCase
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
@@ -69,7 +70,8 @@ class ProfileViewModelTest {
     private class FakeHistoryRepo : CookingHistoryRepository {
         override fun observeHistory(): Flow<List<CookingRecord>> = flowOf(emptyList())
         override fun newRecordId(): String = "id"
-        override suspend fun saveRecord(record: CookingRecord): Result<Unit> = Result.success(Unit)
+        override suspend fun saveRecord(record: CookingRecord): Result<WriteOutcome> =
+            Result.success(WriteOutcome.SYNCED)
     }
 
     private fun crearViewModel(repository: InventoryRepository = inventoryRepository) = ProfileViewModel(

@@ -8,70 +8,82 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Timer
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.outlined.CloudUpload
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodLoadingDialog
-import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.components.SmartFoodResultDialog
+import com.smartfood.app.core.designsystem.components.SmartFoodTextLink
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.components.SmartFoodWarningDialog
 import com.smartfood.app.core.designsystem.theme.GreenCheck
-import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
-import com.smartfood.app.core.designsystem.theme.formMetricsFor
+import com.smartfood.app.core.designsystem.theme.GreenDark
+import com.smartfood.app.core.designsystem.theme.GreyLight
+import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
+import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.YellowSoft
 import com.smartfood.app.core.designsystem.theme.spacing
-import com.smartfood.app.feature.auth.ui.components.FlexibleGap
+import com.smartfood.app.core.designsystem.util.figmaShadow
+import com.smartfood.app.feature.inventory.ui.messageRes
+import com.smartfood.app.feature.recipes.domain.model.RecipeStep
+import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 
 /**
  * Nombre: CookingScreens.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pantallas stateless de preparación previa ("Antes de empezar") y pasos de cocina guiada (spec 009, HU-RIA-04; Figma 557:2819 y 557:2781).
+ * Descripción: Pantallas stateless de "Antes de empezar" y de la cocina guiada (spec 009, HU-RIA-04, CA-RIA-04-03 a
+ * 04-05), fieles al Figma `557:2819` y `557:2781` con las desviaciones aprobadas de la spec §9: sin video ni "Omitir
+ * video", la foto de la receta en cada paso, sin "¿Necesitas ayuda? Ver técnica…" y la tarjeta del temporizador que se
+ * toca para iniciarlo o pausarlo, con "Reiniciar".
  */
 
-private const val GlyphFraction = 0.55f
-
-/** Pantalla "Antes de empezar" (Figma 557:2819). Foto de la receta con botón play, título, tarjeta de preparación y botones de guía. */
+/**
+ * "Antes de empezar" (Figma `557:2819`): foto de la receta, "<Receta>, paso a paso", la tarjeta "Prepara antes de
+ * iniciar" y "Comenzar guía" (CA-RIA-04-03).
+ *
+ * @param state Estado de la cocina.
+ * @param onEvent Acciones de la persona.
+ * @param onBack Flecha atrás: vuelve al detalle.
+ * @param modifier Modificador opcional.
+ */
 @Composable
 fun CookingIntroScreen(
     state: CookingUiState,
@@ -84,144 +96,74 @@ fun CookingIntroScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        SmartFoodTopBar(
-            title = stringResource(id = R.string.recipes_cooking_intro_title),
-            onBack = onBack
-        )
-
-        BoxWithConstraints(modifier = Modifier.weight(1f)) {
-            CompositionLocalProvider(LocalFormMetrics provides formMetricsFor(maxHeight)) {
-                when {
-                    state.isLoading -> Loading()
-                    state.hasError -> Error()
-                    else -> Column(
+        SmartFoodTopBar(title = stringResource(id = R.string.recipes_cooking_intro_title), onBack = onBack)
+        when {
+            state.isLoading -> Loading(Modifier.weight(1f))
+            state.hasError -> Error(Modifier.weight(1f))
+            else -> Column(
+                verticalArrangement = Arrangement.spacedBy(ContentGap),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(ContentPadding)
+            ) {
+                RecipePhoto(
+                    photo = state.photo,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(IntroPhotoRatio)
+                        .clip(RoundedCornerShape(CardRadius))
+                )
+                Text(
+                    text = stringResource(id = R.string.recipes_cooking_intro_heading, state.name),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = TitleStyle(),
+                    modifier = Modifier.semantics { heading() }
+                )
+                if (state.beforeStarting.isNotEmpty()) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(CardInnerGap),
                         modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                            .fillMaxWidth()
+                            .cardShadow()
+                            .clip(RoundedCornerShape(CardRadius))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .padding(CardPadding)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(210.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            RecipePhoto(
-                                photo = state.photo,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .background(MaterialTheme.colorScheme.secondary, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.PlayArrow,
-                                    contentDescription = "Reproducir video",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(32.dp)
-                                )
-                            }
-                        }
-
                         Text(
-                            text = "${state.name}, paso a paso",
-                            style = MaterialTheme.typography.headlineSmall.copy(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
+                            text = stringResource(id = R.string.recipes_prepare_before),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = CardTitleStyle()
                         )
-
+                        // Una sola línea con "✓" entre cada preparativo, como el Figma (557:2834).
                         Text(
-                            text = stringResource(id = R.string.recipes_cooking_intro_video_text),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = 13.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        )
-
-                        if (state.beforeStarting.isNotEmpty()) {
-                            Card(
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .border(
-                                        1.dp,
-                                        MaterialTheme.colorScheme.outline,
-                                        RoundedCornerShape(16.dp)
-                                    )
-                            ) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.padding(16.dp)
-                                ) {
-                                    Text(
-                                        text = stringResource(id = R.string.recipes_prepare_before),
-                                        style = MaterialTheme.typography.titleMedium.copy(
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                    )
-                                    state.beforeStarting.forEach { item ->
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                            modifier = Modifier.padding(vertical = 2.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Outlined.Check,
-                                                contentDescription = null,
-                                                tint = GreenCheck,
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                            Text(
-                                                text = item,
-                                                style = MaterialTheme.typography.bodyMedium.copy(
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        FlexibleGap(minHeight = 16.dp)
-
-                        OutlinedButton(
-                            onClick = { onEvent(CookingEvent.StartGuideClicked) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(LocalFormMetrics.current.buttonHeight)
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.recipes_skip_video),
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            )
-                        }
-
-                        SmartFoodPrimaryButton(
-                            text = stringResource(id = R.string.recipes_start_guide),
-                            onClick = { onEvent(CookingEvent.StartGuideClicked) },
-                            green = false
+                            text = state.beforeStarting.joinToString(separator = " ") { "✓ $it" },
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = BodyStyle()
                         )
                     }
                 }
+                RecipeActionButton(
+                    text = stringResource(id = R.string.recipes_start_guide),
+                    onClick = { onEvent(CookingEvent.StartGuideClicked) },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
 }
 
-/** Pantalla "Cocina guiada" (Figma 557:2781). Avance de paso a paso, temporizador e imágenes. */
+/**
+ * Cocina guiada (Figma `557:2781`): "Cocinando · paso N de T" con "Salir", la barra de avance, "PASO N", la foto, el
+ * título y el texto del paso, el temporizador si el paso tiene tiempo y "Anterior" / "Siguiente" ("Terminar" en el
+ * último paso, CA-RIA-04-04 y 04-05).
+ *
+ * @param state Estado de la cocina.
+ * @param onEvent Acciones de la persona.
+ * @param onBack Flecha atrás: vuelve a "Antes de empezar" (Figma `633:2973`).
+ * @param modifier Modificador opcional.
+ */
 @Composable
 fun CookingScreen(
     state: CookingUiState,
@@ -229,233 +171,83 @@ fun CookingScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (state.isFinishConfirmVisible) {
-        SmartFoodWarningDialog(
-            title = stringResource(id = R.string.recipes_confirm_finish_title),
-            body = "",
-            confirmText = stringResource(id = R.string.recipes_finish),
-            dismissText = stringResource(id = R.string.edit_profile_cancel),
-            onConfirm = { onEvent(CookingEvent.ConfirmFinishClicked) },
-            onDismiss = { onEvent(CookingEvent.DismissFinishDialog) }
-        )
-    }
-
-    if (state.isSaving) {
-        SmartFoodLoadingDialog(text = stringResource(id = R.string.edit_profile_saving))
-    }
-
-    if (state.isSavedSuccess) {
-        SmartFoodResultDialog(
-            icon = {
-                Icon(
-                    imageVector = Icons.Outlined.Check,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * GlyphFraction)
-                )
-            },
-            title = stringResource(
-                id = if (state.isSavedOnPhone) R.string.recipes_cooking_saved_phone else R.string.recipes_cooking_saved
-            ),
-            body = null
-        )
-    }
-
+    CookingDialogs(dialog = state.dialog, onEvent = onEvent)
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
         SmartFoodTopBar(
-            title = stringResource(
-                id = R.string.recipes_cooking_progress,
-                state.currentStepIndex + 1,
-                state.steps.size
-            ),
-            onBack = { onEvent(CookingEvent.ExitClicked) },
+            title = stringResource(id = R.string.recipes_cooking_progress, state.currentStepIndex + 1, state.steps.size),
+            onBack = onBack,
             action = {
-                TextButton(onClick = { onEvent(CookingEvent.ExitClicked) }) {
-                    Text(
-                        text = stringResource(id = R.string.recipes_exit),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
+                Text(
+                    text = stringResource(id = R.string.recipes_exit),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = CardTitleStyle(),
+                    modifier = Modifier.clickable(role = Role.Button) { onEvent(CookingEvent.ExitClicked) }
+                )
             }
         )
-
-        BoxWithConstraints(modifier = Modifier.weight(1f)) {
-            CompositionLocalProvider(LocalFormMetrics provides formMetricsFor(maxHeight)) {
-                when {
-                    state.isLoading -> Loading()
-                    state.hasError || state.currentStep == null -> Error()
-                    else -> {
-                        val step = requireNotNull(state.currentStep)
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                                .padding(20.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            LinearProgressIndicator(
-                                progress = { state.progressFraction },
-                                modifier = Modifier.fillMaxWidth().height(6.dp),
-                                color = MaterialTheme.colorScheme.secondary,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                            )
-
-                            Text(
-                                text = stringResource(id = R.string.recipes_step_label, state.currentStepIndex + 1),
-                                color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp
-                                )
-                            )
-
-                            RecipePhoto(
-                                photo = state.photo,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(180.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(
-                                        MaterialTheme.colorScheme.primaryContainer,
-                                        RoundedCornerShape(16.dp)
-                                    )
-                            )
-
-                            Text(
-                                text = step.title,
-                                style = MaterialTheme.typography.headlineSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            )
-
-                            Text(
-                                text = step.text,
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontSize = 15.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            )
-
-                            if (step.minutes != null) {
-                                val minutes = state.timerSecondsRemaining / 60
-                                val seconds = state.timerSecondsRemaining % 60
-                                Card(
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4)),
-                                    shape = RoundedCornerShape(16.dp),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(16.dp),
-                                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                                    ) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Outlined.Timer,
-                                                    contentDescription = null,
-                                                    tint = Color(0xFF3E2723),
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                                Text(
-                                                    text = stringResource(id = R.string.recipes_timer_label, minutes, seconds),
-                                                    style = MaterialTheme.typography.titleMedium.copy(
-                                                        fontWeight = FontWeight.Bold,
-                                                        color = Color(0xFF3E2723)
-                                                    )
-                                                )
-                                            }
-
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                IconButton(
-                                                    onClick = {
-                                                        if (state.isTimerRunning) {
-                                                            onEvent(CookingEvent.PauseTimerClicked)
-                                                        } else {
-                                                            onEvent(CookingEvent.StartTimerClicked)
-                                                        }
-                                                    }
-                                                ) {
-                                                    Icon(
-                                                        imageVector = if (state.isTimerRunning) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                                        contentDescription = if (state.isTimerRunning) "Pausar" else "Iniciar",
-                                                        tint = Color(0xFF3E2723)
-                                                    )
-                                                }
-                                                IconButton(onClick = { onEvent(CookingEvent.ResetTimerClicked) }) {
-                                                    Icon(
-                                                        imageVector = Icons.Filled.Refresh,
-                                                        contentDescription = "Reiniciar",
-                                                        tint = Color(0xFF3E2723)
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        Text(
-                                            text = stringResource(id = R.string.recipes_timer_subtitle),
-                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                fontSize = 12.sp,
-                                                color = Color(0xFF5D4037)
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-
-                            FlexibleGap(minHeight = 16.dp)
-
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                OutlinedButton(
-                                    onClick = { onEvent(CookingEvent.PreviousStepClicked) },
-                                    enabled = !state.isFirstStep,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(text = stringResource(id = R.string.recipes_previous))
-                                }
-
-                                if (state.isLastStep) {
-                                    SmartFoodPrimaryButton(
-                                        text = stringResource(id = R.string.recipes_finish),
-                                        onClick = { onEvent(CookingEvent.FinishClicked) },
-                                        green = true,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                } else {
-                                    SmartFoodPrimaryButton(
-                                        text = stringResource(id = R.string.recipes_next),
-                                        onClick = { onEvent(CookingEvent.NextStepClicked) },
-                                        green = false,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                            }
-
-                            Text(
-                                text = stringResource(id = R.string.recipes_cooking_help_prompt),
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    fontSize = 13.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-                            )
-                        }
+        val step = state.currentStep
+        when {
+            state.isLoading -> Loading(Modifier.weight(1f))
+            state.hasError || step == null -> Error(Modifier.weight(1f))
+            else -> Column(
+                verticalArrangement = Arrangement.spacedBy(ContentGap),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(ContentPadding)
+            ) {
+                StepProgress(fraction = state.progressFraction)
+                Text(
+                    text = stringResource(id = R.string.recipes_step_label, state.currentStepIndex + 1),
+                    color = GreenCheck,
+                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                )
+                RecipePhoto(
+                    photo = state.photo,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(StepPhotoRatio)
+                        .clip(RoundedCornerShape(CardRadius))
+                )
+                Text(
+                    text = step.title,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = TitleStyle(),
+                    modifier = Modifier.semantics { heading() }
+                )
+                Text(text = step.text, color = MaterialTheme.colorScheme.onSurfaceVariant, style = BodyStyle())
+                if (state.hasTimer) {
+                    TimerCard(
+                        secondsRemaining = state.timerSecondsRemaining,
+                        running = state.isTimerRunning,
+                        onToggle = { onEvent(CookingEvent.TimerToggled) },
+                        onReset = { onEvent(CookingEvent.ResetTimerClicked) }
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(ActionsGap), modifier = Modifier.fillMaxWidth()) {
+                    OutlineActionButton(
+                        text = stringResource(id = R.string.recipes_previous),
+                        enabled = !state.isFirstStep,
+                        onClick = { onEvent(CookingEvent.PreviousStepClicked) },
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (state.isLastStep) {
+                        RecipeActionButton(
+                            text = stringResource(id = R.string.recipes_finish),
+                            onClick = { onEvent(CookingEvent.FinishClicked) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    } else {
+                        RecipeActionButton(
+                            text = stringResource(id = R.string.recipes_next),
+                            onClick = { onEvent(CookingEvent.NextStepClicked) },
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }
@@ -463,39 +255,236 @@ fun CookingScreen(
     }
 }
 
-/** Reproduce sonido de notificación y vibración cuando el temporizador llega a cero (spec 009, T020). */
-fun playTimerFinishedAlert(context: Context) {
-    try {
-        val notificationUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val ringtone = RingtoneManager.getRingtone(context, notificationUri)
-        ringtone?.play()
-    } catch (_: Exception) {}
+/** Barra de avance del Figma (`633:2856`): gris de fondo y naranja hasta el paso actual. */
+@Composable
+private fun StepProgress(fraction: Float) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(ProgressHeight)
+            .background(GreyLight)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(fraction.coerceIn(0f, 1f))
+                .height(ProgressHeight)
+                .background(MaterialTheme.colorScheme.secondary)
+        )
+    }
+}
 
-    try {
+/**
+ * Tarjeta amarilla del temporizador (Figma `557:2793`). Tocarla lo inicia o lo pausa y "Reiniciar" vuelve al tiempo del
+ * paso (desviación aprobada, spec §9). TalkBack anuncia la acción y si está en marcha.
+ */
+@Composable
+private fun TimerCard(
+    secondsRemaining: Int,
+    running: Boolean,
+    onToggle: () -> Unit,
+    onReset: () -> Unit,
+) {
+    val dark = LocalIsDarkTheme.current
+    val container = if (dark) MaterialTheme.colorScheme.surfaceVariant else YellowSoft
+    val toggleLabel = stringResource(id = if (running) R.string.recipes_timer_pause else R.string.recipes_timer_start)
+    val stateLabel = stringResource(id = if (running) R.string.recipes_timer_running else R.string.recipes_timer_paused)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(CardInnerGap),
+        modifier = Modifier
+            .fillMaxWidth()
+            .cardShadow()
+            .clip(RoundedCornerShape(CardRadius))
+            .background(container)
+            .clickable(role = Role.Button, onClickLabel = toggleLabel, onClick = onToggle)
+            .semantics { stateDescription = stateLabel }
+            .padding(CardPadding)
+    ) {
+        Text(
+            text = stringResource(id = R.string.recipes_timer_label, secondsRemaining / 60, secondsRemaining % 60),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = CardTitleStyle()
+        )
+        Text(
+            text = stringResource(id = R.string.recipes_timer_subtitle),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = BodyStyle()
+        )
+        SmartFoodTextLink(
+            text = stringResource(id = R.string.recipes_timer_reset),
+            onClick = onReset,
+            fontSize = 13.sp
+        )
+    }
+}
+
+/** Botón blanco con borde verde del Figma ("Anterior", `557:2797`): mismo alto, radio y sombra que el naranja. */
+@Composable
+private fun OutlineActionButton(
+    text: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(ButtonRadius)
+    // Atenuado con colores, no con transparencia, para no cortar la sombra (como RecipeActionButton).
+    val content = if (enabled) MaterialTheme.colorScheme.primary else GreyLight
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .height(ButtonHeight)
+            .figmaShadow(borderRadius = ButtonRadius)
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(ButtonBorder, content, shape)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+    ) {
+        Text(
+            text = text,
+            color = content,
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp, lineHeight = 22.5.sp, fontWeight = FontWeight.Bold),
+            maxLines = 1
+        )
+    }
+}
+
+/** "¿Cocinaste esta receta?", guardando y el resultado (CA-RIA-04-05; sin conexión, spec 006 §13). */
+@Composable
+private fun CookingDialogs(dialog: CookingDialog?, onEvent: (CookingEvent) -> Unit) {
+    when (dialog) {
+        CookingDialog.ConfirmFinish -> SmartFoodWarningDialog(
+            title = stringResource(id = R.string.recipes_confirm_finish_title),
+            body = stringResource(id = R.string.recipes_confirm_finish_body),
+            confirmText = stringResource(id = R.string.recipes_finish),
+            dismissText = stringResource(id = R.string.recipes_cancel),
+            onConfirm = { onEvent(CookingEvent.ConfirmFinishClicked) },
+            onDismiss = { onEvent(CookingEvent.DismissDialog) }
+        )
+        CookingDialog.Saving -> SmartFoodLoadingDialog(text = stringResource(id = R.string.recipes_cooking_saving))
+        is CookingDialog.Saved -> if (dialog.onPhone) {
+            SmartFoodResultDialog(
+                icon = { ResultIcon(Icons.Outlined.CloudUpload, MaterialTheme.colorScheme.primary) },
+                title = stringResource(id = R.string.recipes_cooking_saved_phone),
+                body = stringResource(id = R.string.recipes_cooking_saved_phone_body)
+            )
+        } else {
+            SmartFoodResultDialog(
+                icon = { ResultIcon(Icons.Outlined.Check, MaterialTheme.colorScheme.primary) },
+                title = stringResource(id = R.string.recipes_cooking_saved),
+                body = stringResource(id = R.string.recipes_cooking_saved_body)
+            )
+        }
+        is CookingDialog.Failed -> SmartFoodResultDialog(
+            icon = { ResultIcon(Icons.Outlined.ErrorOutline, MaterialTheme.colorScheme.error) },
+            title = stringResource(id = R.string.recipes_cooking_failed),
+            body = stringResource(id = dialog.error.messageRes()),
+            destructive = true
+        )
+        null -> Unit
+    }
+}
+
+/** Ícono del resultado: el glifo ocupa el 40 % del círculo, como en el inventario (T025). */
+@Composable
+private fun ResultIcon(icon: ImageVector, tint: Color) {
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = tint,
+        modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * GlyphFraction)
+    )
+}
+
+/** Reproduce el sonido de notificación y vibra cuando el temporizador llega a cero (spec 009, T020). */
+fun playTimerFinishedAlert(context: Context) {
+    runCatching {
+        RingtoneManager.getRingtone(context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))?.play()
+    }
+    runCatching {
         val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
-            vibratorManager?.defaultVibrator
+            (context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
         } else {
             @Suppress("DEPRECATION")
             context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator?.vibrate(VibrationEffect.createOneShot(500L, VibrationEffect.DEFAULT_AMPLITUDE))
+            vibrator?.vibrate(VibrationEffect.createOneShot(VibrationMillis, VibrationEffect.DEFAULT_AMPLITUDE))
         } else {
             @Suppress("DEPRECATION")
-            vibrator?.vibrate(500L)
+            vibrator?.vibrate(VibrationMillis)
         }
-    } catch (_: Exception) {}
+    }
 }
 
 @Composable
-private fun Loading() = Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+private fun Loading(modifier: Modifier) = Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxWidth()) {
+    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+}
 
 @Composable
-private fun Error() = Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+private fun Error(modifier: Modifier) = Box(
+    contentAlignment = Alignment.Center,
+    modifier = modifier
+        .fillMaxWidth()
+        .padding(ContentPadding)
+) {
     Text(
         text = stringResource(id = R.string.recipes_detail_error),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 14.sp),
+        textAlign = TextAlign.Center
     )
+}
+
+/** Sombra suave de las tarjetas del Figma: `0 3 6` verde oscuro al 9 %. */
+private fun Modifier.cardShadow(): Modifier =
+    figmaShadow(color = GreenDark.copy(alpha = CardShadowAlpha), borderRadius = CardRadius, blurRadius = 6.dp, offsetY = 3.dp)
+
+/** Poppins Bold de 20 sp (título de la receta y del paso). */
+@Composable
+private fun TitleStyle() = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold)
+
+/** Poppins SemiBold de 13 sp (título de las tarjetas y "Salir"). */
+@Composable
+private fun CardTitleStyle() = MaterialTheme.typography.labelLarge.copy(fontSize = 13.sp, lineHeight = 19.5.sp, fontWeight = FontWeight.SemiBold)
+
+/** Poppins Regular de 13 sp con interlineado 1,45. */
+@Composable
+private fun BodyStyle() = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp, lineHeight = 18.85.sp)
+
+// Medidas del Figma 557:2819 y 557:2781. No son de formulario, así que no van en FormMetrics.
+private val ContentPadding = 20.dp
+private val ContentGap = 16.dp
+private const val IntroPhotoRatio = 372f / 230f
+private const val StepPhotoRatio = 372f / 250f
+private val CardRadius = 20.dp
+private val CardPadding = 16.dp
+private val CardInnerGap = 12.dp
+private const val CardShadowAlpha = 0.09f
+private val ProgressHeight = 5.dp
+private val ActionsGap = 10.dp
+private val ButtonHeight = 48.dp
+private val ButtonRadius = 10.dp
+private val ButtonBorder = 1.dp
+private const val GlyphFraction = 0.4f
+private const val VibrationMillis = 500L
+
+@Preview(showBackground = true, heightDp = 900)
+@Composable
+private fun CookingScreenPreview() {
+    SmartfoodTheme {
+        CookingScreen(
+            state = CookingUiState(
+                isLoading = false,
+                name = "Pollo guisado",
+                photo = "receta_pollo_guisado",
+                steps = listOf(
+                    RecipeStep("Sofríe la cebolla y el tomate", "Cocina a fuego medio durante 5 minutos.", minutes = 5),
+                    RecipeStep("Agrega el pollo", "Cocina tapado 20 minutos.", minutes = 20),
+                ),
+                timerSecondsRemaining = 222
+            ),
+            onEvent = {},
+            onBack = {}
+        )
+    }
 }
