@@ -35,7 +35,7 @@
 - [x] T020 Temporizador con sonido y vibración (CA-RIA-04-04).
 - [x] T021 `CookingHistoryRepository` (`cookings`), reglas y `rules-test`; `FinishCookingUseCase` que descuenta el inventario y registra lo rescatado (CA-RIA-04-05).
 - [x] T022 `GetMonthlySavingsUseCase` y tarjeta "Ahorrados este mes" del Perfil (CA-RIA-04-06).
-- [ ] T023 `CookingScreenTest` y pruebas de los casos de uso.
+- [x] T023 `CookingScreenTest` y pruebas de los casos de uso.
 
 ## Precios de mercado por tienda (Zhair, 2026-10-20)
 - [x] T030 Presentación de mercado, precios por tienda y básicos en `ingredientes.json`; `harina-maiz` para las arepas; `Store`, `Ingredient.pack`/`prices`/`pantryBasic`; `RecipeCatalogTest` y `AssetsRecipeCatalogTest` (RF-RIA-01).
