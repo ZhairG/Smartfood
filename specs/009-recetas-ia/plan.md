@@ -133,11 +133,15 @@ valor de referencia de los ingredientes por vencer usados.
 ## 5. Pantallas y navegación
 
 - `MainTab.RECIPES` pasa a `enabled = true` (`core/navigation/MainTabScaffold.kt`); `MainTab.SAVED` sigue gris (spec
-  §9). Rutas nuevas en `Routes.kt`: `Recipes`, `AiContext`, `AiPlan`, `AiHelp`, `RecipeDetail(id)`, `CookingIntro(id)`,
+  §9). Rutas nuevas en `Routes.kt`: `Recipes`, `AiPlan`, `AiHelp`, `RecipeDetail(id)`, `CookingIntro(id)`,
   `Cooking(id)`; registradas en `RecipesNavGraph.kt` dentro de `mainGraph`.
-- El flujo de la IA (contexto → cargando → plan / sin coincidencias) usa **un solo** `AiPlanViewModel` con
-  `AiUiState` (`Context`, `Loading`, `Plan`, `NoPlan`) para no pasar el plan entre rutas. El cálculo corre en
-  `Dispatchers.Default` y se cancela con "Cancelar".
+- El flujo de la IA (contexto → cargando → plan / sin coincidencias) es **una sola ruta**, `Route.AiPlan`, con **un solo**
+  `AiPlanViewModel` y `AiUiState.step` (`Context`, `Loading`, `Plan`, `NoPlan`): así el plan no pasa entre rutas
+  (decisión del 2026-10-21; reemplaza `AiContext`). La Ayuda es `Route.AiHelp`. El cálculo corre en `Dispatchers.Default`,
+  "Analizando opciones" dura al menos 1,5 s y "Cancelar" cancela la corrutina. Todas las navegaciones del prototipo son
+  instantáneas; la flecha atrás del flujo vuelve a Descubrir y la de la Ayuda al contexto.
+- "Ver recetas económicas" vuelve a Descubrir con el filtro "Económicas": el grafo escribe `"recipes_filter"` en el
+  `savedStateHandle` de la entrada `Route.Recipes` y `RecipesDiscoverViewModel` lo lee.
 - Restricciones alimentarias (CA-RIA-02-09): `GeneratePlanUseCase` lee `GetFoodPreferencesUseCase` (spec 008) y
   traduce cada `DietaryRestriction` a `DietRule` por nombre (`PlanContext.diet`); el contexto las muestra. Requiere la
   spec 008 en `master` y `git merge master` en `feature/009-recetas-ia`.

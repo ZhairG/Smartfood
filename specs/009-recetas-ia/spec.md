@@ -149,6 +149,12 @@ solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
 | "Carulla - Optimizado para tu zona" se muestra como "<Mi supermercado> · precios de octubre 2026" (aprobada el 2026-10-20). | Los precios son una referencia por tienda, sin integración en vivo con los supermercados. |
 | Las filas de ingredientes que faltan muestran el empaque y el precio en dos líneas ("Tomate 1 kg" / "D1 · $4.200"). | El Figma solo muestra un precio; el mercado se hace por empaques (decisión de Zhair del 2026-10-20). |
 | El contexto de la IA muestra "Según tus preferencias: <restricciones>" (aprobada el 2026-10-19). | El Figma no tiene restricciones alimentarias; sin la línea, el usuario no sabe por qué faltan recetas. |
+| En el contexto de la IA, tocar "N porciones" o el tiempo abre la hoja de opciones del inventario (1 a 12 porciones; 20, 35, 45 o 60 min o "Sin límite", que es el valor inicial) y "Sin picante" se activa o desactiva con un toque (aprobada por Zhair el 2026-10-21). | El Figma `633:2948` muestra los chips sin definir cómo se cambian. |
+| El presupuesto arranca en COP $50.000 (pasos de $1.000, de $2.000 a $100.000) y dice "COP $50.000 · <Mi supermercado>" en lugar de "· Bogota" (aprobada por Zhair el 2026-10-21). | Con compras por empaques completos, $15.000 casi nunca alcanza para 3 días; los precios son de la tienda elegida. |
+| "Analizando opciones" se muestra al menos 1,5 s, o lo que tarde el cálculo si es más (aprobada por Zhair el 2026-10-21). | El agente tarda unos 50 ms; el prototipo usa 2 s (`AFTER_TIMEOUT`). |
+| "Tu plan de 3 días" muestra las tres tarjetas a lo ancho, una debajo de otra, con la etiqueta "Día N" donde el Figma dice "Mejor opción" (aprobada por Zhair el 2026-10-21). | Son tres recetas, no dos; lado a lado no caben. |
+| "Sin coincidencias" lista las sugerencias que calcula el agente (subir el presupuesto a COP $X, permitir picante, subir el tiempo, agregar productos al inventario) en lugar del texto fijo del Figma; no hay "sustituciones económicas". | Las sugerencias deben salir de datos reales (CA-RIA-02-07); el agente no hace sustituciones. |
+| "Contactar soporte" abre el correo a smartfood.equipo@gmail.com con el asunto "SmartFood: ayuda con la IA" (aprobada por Zhair el 2026-10-21). En la Ayuda, la barra inferior resalta Recetas (el Figma `557:2476` resalta Guardadas por error). | El Figma no define el correo; la Ayuda es parte de Recetas. |
 
 ## 10. Plan de entrega
 
