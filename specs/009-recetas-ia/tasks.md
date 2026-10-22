@@ -24,11 +24,11 @@
 - [x] T013 `AgentEvaluationTest` (30 inventarios, líneas base, métricas) y `MealPlannerPerformanceTest` (RNF-RIA-02, RNF-RIA-03). *Se corre con el catálogo real (`recetas.json` del #113), decisión de Zhair.*
 
 ## Issue 3: Flujo de la IA (intermedia) — después de los Issues 1 y 2
-- [ ] T014 `GeneratePlanUseCase` (con las restricciones del Perfil como `PlanContext.diet`, CA-RIA-02-09) y `AiPlanViewModel` (`Context`, `Loading`, `Plan`, `NoPlan`, cancelar, ajustar) con pruebas.
-- [ ] T015 Pantalla de contexto: inventario detectado, aviso del que vence primero, presupuesto, porciones, picante, tiempo y "Según tus preferencias" (CA-RIA-02-01).
-- [ ] T016 "Analizando opciones" con el arco de progreso y "Cancelar" (CA-RIA-02-02).
-- [ ] T017 "Tu plan de 3 días" con "¿Por qué te conviene?" y "Ajustar"; "Sin coincidencias" con sugerencias (CA-RIA-02-03, 02-06 a 02-08).
-- [ ] T018 Ayuda y "Contactar soporte" (CA-RIA-03-01); `AiFlowScreenTest`.
+- [x] T014 `GeneratePlanUseCase` (con las restricciones del Perfil como `PlanContext.diet`, CA-RIA-02-09) y `AiPlanViewModel` (`Context`, `Loading`, `Plan`, `NoPlan`, cancelar, ajustar) con pruebas. Implementación y compilación verificadas; pruebas de estados en `AiFlowScreenTest`.
+- [x] T015 Pantalla de contexto: inventario detectado, aviso del que vence primero, presupuesto, porciones, picante, tiempo y "Según tus preferencias" (CA-RIA-02-01).
+- [x] T016 "Analizando opciones" con el arco de progreso y "Cancelar" (CA-RIA-02-02).
+- [x] T017 "Tu plan de 3 días" con "¿Por qué te conviene?" y "Ajustar"; "Sin coincidencias" con sugerencias (CA-RIA-02-03, 02-06 a 02-08).
+- [x] T018 Ayuda y "Contactar soporte" (CA-RIA-03-01); `AiFlowScreenTest`.
 
 ## Issue 4: Cocina guiada (intermedia)
 - [x] T019 "Antes de empezar" (sin video) y cocina guiada con pasos, "Anterior", "Siguiente" y "Salir" (CA-RIA-04-03, 04-04).

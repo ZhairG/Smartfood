@@ -116,6 +116,12 @@ sealed interface Route {
         override val screenRoute: ScreenRoute = ScreenRoute.RECIPES
     }
 
+    @Serializable
+    data object AiPlan : Route { override val screenRoute: ScreenRoute = ScreenRoute.AI_PLAN }
+
+    @Serializable
+    data object AiHelp : Route { override val screenRoute: ScreenRoute = ScreenRoute.AI_HELP }
+
     /**
      * Detalle de una receta del catálogo (spec 009, CA-RIA-04-01).
      *

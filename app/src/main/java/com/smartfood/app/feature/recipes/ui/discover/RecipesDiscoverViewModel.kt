@@ -1,6 +1,7 @@
 package com.smartfood.app.feature.recipes.ui.discover
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
@@ -45,11 +46,18 @@ class RecipesDiscoverViewModel @Inject constructor(
     private val rankRecipes: RankRecipesForMeUseCase,
     observeInventory: ObserveInventoryUseCase,
     getPreferredStore: GetPreferredStoreUseCase,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val catalog = MutableStateFlow<CatalogState>(CatalogState.Loading)
     private val query = MutableStateFlow("")
-    private val filter = MutableStateFlow(RecipeFilter.FOR_YOU)
+    private val filter = MutableStateFlow(RecipeFilter.entries.first())
+
+    init {
+        savedStateHandle.getStateFlow<String?>("recipes_filter", null).value?.let { value ->
+            filter.value = RecipeFilter.entries.firstOrNull { it.name == value } ?: RecipeFilter.FOR_YOU
+        }
+    }
 
     private val _effects = Channel<RecipesDiscoverEffect>(Channel.BUFFERED)
 

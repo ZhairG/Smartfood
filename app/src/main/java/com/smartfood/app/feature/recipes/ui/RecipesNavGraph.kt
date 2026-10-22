@@ -26,6 +26,10 @@ import com.smartfood.app.feature.recipes.ui.cooking.TimerAlarm
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverEffect
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverScreen
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverViewModel
+import com.smartfood.app.feature.recipes.ui.ai.AiFlowScreen
+import com.smartfood.app.feature.recipes.ui.ai.AiHelpScreen
+import com.smartfood.app.feature.recipes.ui.ai.AiPlanViewModel
+import com.smartfood.app.feature.recipes.ui.ai.AiEffect
 
 /**
  * Nombre: RecipesNavGraph.kt
@@ -57,9 +61,22 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
                         navController.navigate(Route.RecipeDetail(effect.recipeId))
                 }
             }
-            RecipesDiscoverScreen(state = state, onEvent = viewModel::onEvent)
+            RecipesDiscoverScreen(state = state, onEvent = viewModel::onEvent, onSuggestRecipes = { navController.navigate(Route.AiPlan) })
         }
     }
+    composable<Route.AiPlan> {
+        MainTabScaffold(currentTab = MainTab.RECIPES, onTabSelected = navController::navigateToTab) {
+            val viewModel: AiPlanViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveEffects(viewModel.effects) { effect -> when (effect) {
+                is AiEffect.OpenRecipe -> navController.navigate(Route.RecipeDetail(effect.recipeId))
+                AiEffect.OpenEconomicRecipes -> { navController.getBackStackEntry<Route.Recipes>().savedStateHandle["recipes_filter"] = "ECONOMIC"; navController.popBackStack<Route.Recipes>(inclusive = false) }
+                AiEffect.OpenHelp -> navController.navigate(Route.AiHelp)
+            } }
+            AiFlowScreen(state, viewModel::onEvent, onBack = { navController.popBackStack<Route.Recipes>(inclusive = false) })
+        }
+    }
+    composable<Route.AiHelp> { AiHelpScreen(onBack = { navController.popBackStack() }) }
     composable<Route.RecipeDetail> {
         MainTabScaffold(
             currentTab = MainTab.RECIPES,
