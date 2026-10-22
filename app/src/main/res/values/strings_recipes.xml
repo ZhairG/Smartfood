@@ -57,6 +57,10 @@
     <string name="recipes_timer_pause">Pausar temporizador</string>
     <string name="recipes_timer_running">En marcha</string>
     <string name="recipes_timer_paused">En pausa</string>
+    <string name="recipes_timer_done">⏱ ¡Tiempo!</string>
+    <string name="recipes_timer_ringing_hint">Toca la tarjeta para detener la alarma.</string>
+    <string name="recipes_timer_stop_alarm">Detener alarma</string>
+    <string name="recipes_timer_ringing">Sonando</string>
     <string name="recipes_confirm_finish_title">¿Cocinaste esta receta?</string>
     <string name="recipes_confirm_finish_body">Descontaremos de tu inventario los ingredientes que usaste.</string>
     <string name="recipes_cancel">Cancelar</string>

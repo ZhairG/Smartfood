@@ -144,9 +144,10 @@ valor de referencia de los ingredientes por vencer usados.
 - Componentes a reutilizar: la barra de búsqueda de `InventorySearchScreen`, `CategoryChips` para los
   filtros, tarjetas con `AsyncImage`, `SmartFoodPrimaryButton`, `SmartFoodResultDialog`/`SmartFoodWarningDialog`,
   el arco "Progreso" como `CircularProgressIndicator` con los colores del Figma.
-- Temporizador: `CookingViewModel` con un `Job` de `delay(1000)`; al llegar a 0, `TimerAlarm`: la alarma del teléfono
-  (`USAGE_ALARM`) durante 5 s y tres vibraciones. El sonido de notificación de algunos teléfonos dura menos de un
-  segundo y no se oía (2026-10-21). Sin servicio en primer plano: si la app se cierra, el temporizador se detiene (documentado).
+- Temporizador: `CookingViewModel` con un `Job` de `delay(1000)`; al llegar a 0, `TimerAlarm` repite el "bip-bip-bip-bip"
+  de un despertador digital (`res/raw/timer_alarm.ogg`, de Wikimedia Commons, CC BY-SA 4.0; `docs/licenses/sonidos.md`,
+  `tools/timer_sound.py`) con uso de alarma y vibra al mismo ritmo hasta que la persona toca la tarjeta, cambia de paso
+  o sale; si nadie la atiende, se calla al minuto (decisión de Zhair del 2026-10-21). Sin servicio en primer plano: si la app se cierra, el temporizador se detiene (documentado).
 - "Contactar soporte": `Intent.ACTION_SENDTO` con `mailto:` al correo del equipo.
 
 ## 6. Descuento del inventario (`FinishCookingUseCase`)

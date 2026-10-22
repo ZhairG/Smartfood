@@ -25,6 +25,8 @@ data class CookingUiState(
     val currentStepIndex: Int = 0,
     val timerSecondsRemaining: Int = 0,
     val isTimerRunning: Boolean = false,
+    /** El temporizador llegó a 0 y la alarma suena hasta que la persona la detiene (CA-RIA-04-04). */
+    val isAlarmRinging: Boolean = false,
     val dialog: CookingDialog? = null,
 ) {
     val currentStep: RecipeStep?
@@ -75,7 +77,7 @@ sealed interface CookingEvent {
     data object ConfirmFinishClicked : CookingEvent
     data object DismissDialog : CookingEvent
 
-    /** Tocar la tarjeta del temporizador lo inicia o lo pausa (desviación aprobada, spec §9). */
+    /** Tocar la tarjeta del temporizador lo inicia, lo pausa o detiene la alarma (desviación aprobada, spec §9). */
     data object TimerToggled : CookingEvent
     data object ResetTimerClicked : CookingEvent
 }
@@ -85,5 +87,10 @@ sealed interface CookingEffect {
 
     /** Vuelve al detalle de la receta, cerrando "Antes de empezar" y la guía. */
     data object ExitToDetail : CookingEffect
+
+    /** El temporizador llegó a 0: empieza la alarma. */
     data object PlayTimerFinishedAlert : CookingEffect
+
+    /** La persona detuvo la alarma, cambió de paso o salió. */
+    data object StopTimerAlert : CookingEffect
 }

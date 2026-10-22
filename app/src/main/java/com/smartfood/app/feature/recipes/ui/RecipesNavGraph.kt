@@ -94,7 +94,7 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
                 when (effect) {
                     CookingEffect.OpenGuide -> navController.navigate(Route.Cooking(state.recipeId, state.servings))
                     CookingEffect.ExitToDetail -> navController.popBackStack<Route.RecipeDetail>(inclusive = false)
-                    CookingEffect.PlayTimerFinishedAlert -> Unit
+                    CookingEffect.PlayTimerFinishedAlert, CookingEffect.StopTimerAlert -> Unit
                 }
             }
             CookingIntroScreen(state = state, onEvent = viewModel::onEvent, onBack = navController::popBackStack)
@@ -117,6 +117,7 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
                     // "Salir" y el cierre vuelven al detalle (Figma 557:2786), sin pasar por "Antes de empezar".
                     CookingEffect.ExitToDetail -> navController.popBackStack<Route.RecipeDetail>(inclusive = false)
                     CookingEffect.PlayTimerFinishedAlert -> alarm.play()
+                    CookingEffect.StopTimerAlert -> alarm.stop()
                     CookingEffect.OpenGuide -> Unit
                 }
             }

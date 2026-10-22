@@ -227,7 +227,46 @@ class CookingViewModelTest {
 
         assertEquals(0, viewModel.uiState.value.timerSecondsRemaining)
         assertFalse(viewModel.uiState.value.isTimerRunning)
+        assertTrue(viewModel.uiState.value.isAlarmRinging)
         assertEquals(CookingEffect.PlayTimerFinishedAlert, viewModel.effects.first())
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `CA-RIA-04-04 la alarma suena hasta que se toca la tarjeta`() = runTest {
+        val viewModel = viewModel()
+        runCurrent()
+        viewModel.onEvent(CookingEvent.TimerToggled)
+        advanceTimeBy(300_001)
+        assertEquals(CookingEffect.PlayTimerFinishedAlert, viewModel.effects.first())
+
+        viewModel.onEvent(CookingEvent.TimerToggled)
+
+        assertFalse(viewModel.uiState.value.isAlarmRinging)
+        assertFalse(viewModel.uiState.value.isTimerRunning)
+        assertEquals(CookingEffect.StopTimerAlert, viewModel.effects.first())
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `CA-RIA-04-04 cambiar de paso detiene la alarma y si nadie la atiende se calla al minuto`() = runTest {
+        val viewModel = viewModel()
+        runCurrent()
+        viewModel.onEvent(CookingEvent.TimerToggled)
+        advanceTimeBy(300_001)
+        viewModel.effects.first()
+
+        advanceTimeBy(CookingViewModel.ALARM_MAX_MILLIS + 1)
+        assertFalse(viewModel.uiState.value.isAlarmRinging)
+
+        viewModel.onEvent(CookingEvent.ResetTimerClicked)
+        viewModel.onEvent(CookingEvent.TimerToggled)
+        advanceTimeBy(300_001)
+        viewModel.effects.first()
+        viewModel.onEvent(CookingEvent.NextStepClicked)
+
+        assertFalse(viewModel.uiState.value.isAlarmRinging)
+        assertEquals(CookingEffect.StopTimerAlert, viewModel.effects.first())
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

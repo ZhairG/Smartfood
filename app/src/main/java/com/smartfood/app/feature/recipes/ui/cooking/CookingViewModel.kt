@@ -53,6 +53,7 @@ class CookingViewModel @Inject constructor(
     val effects: Flow<CookingEffect> = _effects.receiveAsFlow()
 
     private var timerJob: Job? = null
+    private var alarmJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -85,12 +86,17 @@ class CookingViewModel @Inject constructor(
             CookingEvent.PreviousStepClicked -> changeStep(delta = -1)
             CookingEvent.ExitClicked -> {
                 pauseTimer()
+                stopAlarm()
                 send(CookingEffect.ExitToDetail)
             }
             CookingEvent.FinishClicked -> _uiState.update { it.copy(dialog = CookingDialog.ConfirmFinish) }
             CookingEvent.DismissDialog -> _uiState.update { it.copy(dialog = null) }
             CookingEvent.ConfirmFinishClicked -> confirmFinish()
-            CookingEvent.TimerToggled -> if (_uiState.value.isTimerRunning) pauseTimer() else startTimer()
+            CookingEvent.TimerToggled -> when {
+                _uiState.value.isAlarmRinging -> stopAlarm()
+                _uiState.value.isTimerRunning -> pauseTimer()
+                else -> startTimer()
+            }
             CookingEvent.ResetTimerClicked -> resetTimer()
         }
     }
@@ -102,6 +108,7 @@ class CookingViewModel @Inject constructor(
     private fun confirmFinish() {
         if (_uiState.value.dialog == CookingDialog.Saving) return
         pauseTimer()
+        stopAlarm()
         _uiState.update { it.copy(dialog = CookingDialog.Saving) }
         viewModelScope.launch {
             finishCookingUseCase(recipeId, servings).fold(
@@ -136,10 +143,27 @@ class CookingViewModel @Inject constructor(
                     }
                 }
             }
-            if (_uiState.value.timerSecondsRemaining == 0) {
-                _effects.send(CookingEffect.PlayTimerFinishedAlert)
-            }
+            if (_uiState.value.timerSecondsRemaining == 0) startAlarm()
         }
+    }
+
+    /** Suena hasta que la persona la detiene; si nadie la atiende, se calla sola a los [ALARM_MAX_MILLIS]. */
+    private suspend fun startAlarm() {
+        _uiState.update { it.copy(isAlarmRinging = true) }
+        _effects.send(CookingEffect.PlayTimerFinishedAlert)
+        alarmJob?.cancel()
+        alarmJob = viewModelScope.launch {
+            delay(ALARM_MAX_MILLIS)
+            _uiState.update { it.copy(isAlarmRinging = false) }
+        }
+    }
+
+    private fun stopAlarm() {
+        if (!_uiState.value.isAlarmRinging) return
+        alarmJob?.cancel()
+        alarmJob = null
+        _uiState.update { it.copy(isAlarmRinging = false) }
+        send(CookingEffect.StopTimerAlert)
     }
 
     private fun pauseTimer() {
@@ -150,12 +174,14 @@ class CookingViewModel @Inject constructor(
 
     private fun resetTimer() {
         pauseTimer()
+        stopAlarm()
         val step = _uiState.value.currentStep
         _uiState.update { it.copy(timerSecondsRemaining = (step?.minutes ?: 0) * 60) }
     }
 
     private fun changeStep(delta: Int) {
         pauseTimer()
+        stopAlarm()
         val state = _uiState.value
         val newIndex = (state.currentStepIndex + delta).coerceIn(0, state.steps.lastIndex.coerceAtLeast(0))
         val step = state.steps.getOrNull(newIndex)
@@ -177,6 +203,9 @@ class CookingViewModel @Inject constructor(
         const val RECIPE_ID_KEY = "recipeId"
         const val SERVINGS_KEY = "servings"
         const val DEFAULT_SERVINGS = 2
+
+        /** Igual que `TimerAlarm.MAX_MILLIS`: la alarma se calla sola al minuto. */
+        const val ALARM_MAX_MILLIS = 60_000L
 
         /** Lo que se ve "Guardado" o el error antes de seguir, como en el editor y el Perfil. */
         const val RESULT_DIALOG_MILLIS = 2_000L

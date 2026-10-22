@@ -219,6 +219,7 @@ fun CookingScreen(
                     TimerCard(
                         secondsRemaining = state.timerSecondsRemaining,
                         running = state.isTimerRunning,
+                        ringing = state.isAlarmRinging,
                         onToggle = { onEvent(CookingEvent.TimerToggled) },
                         onReset = { onEvent(CookingEvent.ResetTimerClicked) }
                     )
@@ -269,19 +270,33 @@ private fun StepProgress(fraction: Float) {
 
 /**
  * Tarjeta amarilla del temporizador (Figma `557:2793`). Tocarla lo inicia o lo pausa y "Reiniciar" vuelve al tiempo del
- * paso (desviación aprobada, spec §9). TalkBack anuncia la acción y si está en marcha.
+ * paso (desviación aprobada, spec §9). Al llegar a 0 dice "¡Tiempo!" y tocarla detiene la alarma. TalkBack anuncia la
+ * acción y el estado.
  */
 @Composable
 private fun TimerCard(
     secondsRemaining: Int,
     running: Boolean,
+    ringing: Boolean,
     onToggle: () -> Unit,
     onReset: () -> Unit,
 ) {
     val dark = LocalIsDarkTheme.current
     val container = if (dark) MaterialTheme.colorScheme.surfaceVariant else YellowSoft
-    val toggleLabel = stringResource(id = if (running) R.string.recipes_timer_pause else R.string.recipes_timer_start)
-    val stateLabel = stringResource(id = if (running) R.string.recipes_timer_running else R.string.recipes_timer_paused)
+    val toggleLabel = stringResource(
+        id = when {
+            ringing -> R.string.recipes_timer_stop_alarm
+            running -> R.string.recipes_timer_pause
+            else -> R.string.recipes_timer_start
+        }
+    )
+    val stateLabel = stringResource(
+        id = when {
+            ringing -> R.string.recipes_timer_ringing
+            running -> R.string.recipes_timer_running
+            else -> R.string.recipes_timer_paused
+        }
+    )
     Column(
         verticalArrangement = Arrangement.spacedBy(CardInnerGap),
         modifier = Modifier
@@ -294,12 +309,16 @@ private fun TimerCard(
             .padding(CardPadding)
     ) {
         Text(
-            text = stringResource(id = R.string.recipes_timer_label, secondsRemaining / 60, secondsRemaining % 60),
+            text = if (ringing) {
+                stringResource(id = R.string.recipes_timer_done)
+            } else {
+                stringResource(id = R.string.recipes_timer_label, secondsRemaining / 60, secondsRemaining % 60)
+            },
             color = MaterialTheme.colorScheme.onSurface,
             style = CardTitleStyle()
         )
         Text(
-            text = stringResource(id = R.string.recipes_timer_subtitle),
+            text = stringResource(id = if (ringing) R.string.recipes_timer_ringing_hint else R.string.recipes_timer_subtitle),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = BodyStyle()
         )

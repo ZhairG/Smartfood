@@ -105,6 +105,16 @@ class CookingScreenTest {
     }
 
     @Test
+    fun caRia0404_alLlegarACeroLaTarjetaDiceTiempoYSeTocaParaDetenerLaAlarma() {
+        guia(cocinando(segundos = 0).copy(isAlarmRinging = true))
+
+        composeTestRule.onNodeWithText("⏱ ¡Tiempo!").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Toca la tarjeta para detener la alarma.").performClick()
+
+        assertEquals(listOf<CookingEvent>(CookingEvent.TimerToggled), eventos)
+    }
+
+    @Test
     fun caRia0404_unPasoSinTiempoNoMuestraElTemporizador() {
         guia(cocinando(paso = 1))
 
