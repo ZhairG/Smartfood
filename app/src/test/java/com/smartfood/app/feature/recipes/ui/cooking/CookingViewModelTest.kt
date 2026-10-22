@@ -249,7 +249,7 @@ class CookingViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `CA-RIA-04-04 cambiar de paso detiene la alarma y si nadie la atiende se calla al minuto`() = runTest {
+    fun `CA-RIA-04-04 cambiar de paso detiene la alarma y si nadie la atiende se calla a los 5 segundos`() = runTest {
         val viewModel = viewModel()
         runCurrent()
         viewModel.onEvent(CookingEvent.TimerToggled)

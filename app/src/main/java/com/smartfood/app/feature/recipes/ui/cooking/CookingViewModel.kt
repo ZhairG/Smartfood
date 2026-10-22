@@ -204,8 +204,8 @@ class CookingViewModel @Inject constructor(
         const val SERVINGS_KEY = "servings"
         const val DEFAULT_SERVINGS = 2
 
-        /** Igual que `TimerAlarm.MAX_MILLIS`: la alarma se calla sola al minuto. */
-        const val ALARM_MAX_MILLIS = 60_000L
+        /** Lo mismo que suena [TimerAlarm]: pasado ese tiempo la tarjeta deja de decir "¡Tiempo!". */
+        const val ALARM_MAX_MILLIS = TimerAlarm.MAX_MILLIS
 
         /** Lo que se ve "Guardado" o el error antes de seguir, como en el editor y el Perfil. */
         const val RESULT_DIALOG_MILLIS = 2_000L

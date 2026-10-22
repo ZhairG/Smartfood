@@ -147,7 +147,7 @@ valor de referencia de los ingredientes por vencer usados.
 - Temporizador: `CookingViewModel` con un `Job` de `delay(1000)`; al llegar a 0, `TimerAlarm` repite el "bip-bip-bip-bip"
   de un despertador digital (`res/raw/timer_alarm.ogg`, de Wikimedia Commons, CC BY-SA 4.0; `docs/licenses/sonidos.md`,
   `tools/timer_sound.py`) con uso de alarma y vibra al mismo ritmo hasta que la persona toca la tarjeta, cambia de paso
-  o sale; si nadie la atiende, se calla al minuto (decisión de Zhair del 2026-10-21). Sin servicio en primer plano: si la app se cierra, el temporizador se detiene (documentado).
+  o sale; si nadie la atiende, se calla a los 5 s (decisión de Zhair del 2026-10-21). Sin servicio en primer plano: si la app se cierra, el temporizador se detiene (documentado).
 - "Contactar soporte": `Intent.ACTION_SENDTO` con `mailto:` al correo del equipo.
 
 ## 6. Descuento del inventario (`FinishCookingUseCase`)

@@ -80,8 +80,8 @@ class TimerAlarm(private val context: Context) {
     }
 
     companion object {
-        /** Si nadie detiene la alarma, se calla sola a los 60 s. */
-        const val MAX_MILLIS = 60_000L
+        /** Si nadie detiene la alarma, se calla sola a los 5 s (decisión de Zhair del 2026-10-21). */
+        const val MAX_MILLIS = 5_000L
         private const val REPEAT_FROM_START = 0
 
         /** Vibra mientras suenan los bips y pausa el resto del segundo, al ritmo del sonido. */
