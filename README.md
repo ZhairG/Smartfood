@@ -19,3 +19,20 @@ Tomadas en un teléfono con Android 16 el 2026-10-19, con el build debug de `fea
 | `008-perfil/09-cambiar-contrasena.png` | Cambiar contraseña | `603:2358` |
 | `008-perfil/11-cerrar-sesion.png` | ¿Cerrar sesión? | `604:2668` |
 | `008-perfil/12-tema.png` | Tema de la app (sin frame en el Figma) | — |
+
+## Módulo 4: Recetas + IA (spec 009, PR #121)
+
+Tomadas en un teléfono con Android 16 el 2026-10-23, con el **APK release** (R8) de `feature/009-recetas-ia`. Sin la barra de estado ni la del sistema (no muestran datos personales). Las diferencias con el Figma son las desviaciones aprobadas de la spec §9.
+
+| Archivo | Pantalla | Frame del Figma |
+|---|---|---|
+| `009-recetas-ia/01-descubrir.png` | Recetas: descubrir | `557:3028` |
+| `009-recetas-ia/02-detalle.png` | Detalle de receta | `557:2856` |
+| `009-recetas-ia/03-antes-de-empezar.png` | Antes de empezar (sin video, §9) | `557:2819` |
+| `009-recetas-ia/04-cocina-guiada.png` | Cocina guiada con temporizador | `557:2781` |
+| `009-recetas-ia/05-ia-contexto.png` | Sugerencia con IA: contexto | `633:2948` |
+| `009-recetas-ia/06-ia-analizando.png` | Analizando opciones | `666:3546` |
+| `009-recetas-ia/07-ia-plan.png` | Tu plan de 3 días (§9) | `557:2903` |
+| `009-recetas-ia/08-ia-por-que-te-conviene.png` | ¿Por qué te conviene? | `557:2903` |
+| `009-recetas-ia/09-ia-sin-coincidencias.png` | Sin coincidencias | `557:2515` |
+| `009-recetas-ia/10-ia-ayuda.png` | Ayuda | `557:2476` |
