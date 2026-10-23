@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.recipes.ui.ai
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartfood.app.feature.recipes.domain.model.AiContext
@@ -106,7 +107,12 @@ class AiPlanViewModel @Inject constructor(
         generation = viewModelScope.launch {
             val outcome = coroutineScope {
                 val result = async {
-                    generatePlan(loaded, state.budgetCop, state.servings, state.maxMinutes, state.noSpicy)
+                    val started = System.nanoTime()
+                    generatePlan(loaded, state.budgetCop, state.servings, state.maxMinutes, state.noSpicy).also {
+                        // Tiempo del agente para CA-RIA-02-10 (≤ 2 s con 50 recetas), medido en el teléfono con el APK
+                        // release: `adb logcat -s SmartFoodIA`.
+                        Log.i(TAG, "Plan calculado en ${(System.nanoTime() - started) / 1_000_000} ms")
+                    }
                 }
                 delay(MIN_LOADING_MILLIS)
                 result.await()
@@ -136,5 +142,7 @@ class AiPlanViewModel @Inject constructor(
 
         /** Un producto "por vencer" vence en 3 días o menos (spec §2). */
         const val EXPIRING_DAYS = 3
+
+        private const val TAG = "SmartFoodIA"
     }
 }
