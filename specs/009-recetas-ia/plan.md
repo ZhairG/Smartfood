@@ -16,19 +16,18 @@ feature/recipes/
 │   │   ├── RecipeEvaluator.kt        uso de inventario, faltantes, costo y utilidad de una receta o un plan
 │   │   ├── MealPlanner.kt            CSP: backtracking + forward checking + ramificación y poda
 │   │   └── PlanExplainer.kt          "¿Por qué te conviene?" a partir del plan
-│   ├── repository/   RecipeCatalog, FavoritesRepository, CookingHistoryRepository
+│   ├── repository/   RecipeCatalog, CookingHistoryRepository
 │   └── usecase/      GetRecipes, SearchRecipes, RankRecipesForMe, GeneratePlan, GetRecipeDetail,
-│                     ToggleFavorite, ObserveFavorites, FinishCooking, GetMonthlySavings
+│                     FinishCooking, GetMonthlySavings
 ├── data/
 │   ├── catalog/      AssetsRecipeCatalog (lee assets/recetas.json e ingredientes.json con kotlinx.serialization)
-│   ├── repository/   FirestoreFavoritesRepository, FirestoreCookingHistoryRepository
+│   ├── repository/   FirestoreCookingHistoryRepository
 │   └── di/           RecipesDataModule
 └── ui/
     ├── discover/     Descubrir (pestaña Recetas)
     ├── ai/           Contexto, Cargando, Plan, Sin coincidencias, Ayuda (un ViewModel compartido: AiPlanViewModel)
     ├── detail/       Detalle de receta
     ├── cooking/      Antes de empezar y Cocina guiada (temporizador)
-    ├── saved/        Guardadas
     └── RecipesNavGraph.kt
 app/src/main/assets/recetas.json, ingredientes.json
 ```
@@ -41,7 +40,10 @@ Modelos a copiar: estructura de `feature/inventory` (contratos `XContract.kt`, `
 ```jsonc
 // ingredientes.json
 [{ "id": "pollo", "nombre": "Pollo", "sinonimos": ["pechuga", "muslo", "pollo entero"],
-   "seccion": "Carnes", "unidad": "g", "precioCop": 14500, "precioPor": 1000, "vidaUtilDias": 2 }]
+   "seccion": "Carnes", "unidad": "g", "vidaUtilDias": 2,
+   "empaque": { "cantidad": 1000, "etiqueta": "1 kg" },
+   "precios": { "exito": 22250, "carulla": 24900, "olimpica": 9590, "d1": 14500 },
+   "etiquetas": ["carne", "origen_animal"] }]
 // recetas.json
 [{ "id": "pollo-guisado", "nombre": "Pollo guisado con arroz", "foto": "receta_pollo_guisado",
    "porciones": 4, "prepMin": 15, "coccionMin": 25, "reposoMin": 0, "dificultad": "Media",
@@ -51,7 +53,13 @@ Modelos a copiar: estructura de `feature/inventory` (contratos `XContract.kt`, `
    "pasos": [{ "titulo": "Sofríe la cebolla y el tomate", "texto": "Cocina a fuego medio…", "minutos": 5 }] }]
 ```
 
-- `unidad` ∈ `g`, `ml`, `und`. `precioCop` es el precio de `precioPor` unidades (p. ej. 1000 g).
+- `etiquetas` (opcional) ⊆ `carne`, `marisco`, `origen_animal`, `gluten`, `lactosa`, `frutos_secos` (`FoodTag`): el
+  huevo, la leche, el queso y la miel llevan `origen_animal`; los lácteos, además, `lactosa`. Con ellas el agente sabe
+  qué recetas admite cada restricción alimentaria (§3.3).
+- `unidad` ∈ `g`, `ml`, `und`. `empaque` es la presentación de mercado (`cantidad` en la unidad base) y `precios`, su
+  precio en cada tienda (`exito`, `carulla`, `olimpica`, `d1`; una tienda puede faltar). `"basico": true` marca los
+  básicos de despensa. Fuente de verdad: `docs/precios/precios.json`, que `tools/precios/aplicar.py` aplica a este
+  archivo (ver `tools/precios/README.md`); la tabla legible es `docs/precios/precios-<mes>-<año>.md`.
 - Las fotos van en `res/drawable-nodpi/receta_*.webp` (≤ 150 KB cada una); su fuente, en `docs/licenses/fotos-recetas.md`.
 - Contenido: 30 a 50 recetas de cocina colombiana cotidiana. El catálogo se valida con una prueba unitaria
   (`RecipeCatalogTest`): ids únicos, cada ingrediente existe, cantidades > 0, al menos un paso.
@@ -68,7 +76,10 @@ Modelos a copiar: estructura de `feature/inventory` (contratos `XContract.kt`, `
 
 ### 3.2 Evaluación (`RecipeEvaluator`)
 Para una receta escalada a `porciones`, con el inventario **restante**:
-- `usado[i]` = mín(necesario, disponible); `faltante[i]` = necesario − usado; `costo` = Σ faltante·precio.
+- `usado[i]` = mín(necesario, disponible); `faltante[i]` = necesario − usado.
+- `empaques[i]` = ⌈faltante / empaque⌉ y `costo` = Σ empaques·precio en la tienda de `PlanContext.store` (o la más
+  barata si esa tienda no lo tiene). El sobrante del empaque entra al inventario del plan como producto comprado (no
+  vence, no rescata ni se desperdicia) y lo usan los días siguientes. Los básicos no se compran ni cuentan como faltantes.
 - `aprovechamiento` = ingredientes cubiertos por el inventario / ingredientes de la receta.
 - `rescate(día d)` = Σ sobre productos que vencen en ≤ 3 días y `d ≤ díasParaVencer`: `usado · 1/(días+1)`, en
   unidades normalizadas (cada producto aporta su fracción usada, entre 0 y 1, para no favorecer las unidades grandes).
@@ -78,7 +89,8 @@ Para una receta escalada a `porciones`, con el inventario **restante**:
 
 ### 3.3 Búsqueda (`MealPlanner.plan(context): PlanResult`)
 ```
-dominio = recetas que cumplen tiempo ≤ máx, picante permitido y faltantes ≤ 3 con el inventario completo
+dominio = recetas que cumplen tiempo ≤ máx, picante permitido, dieta (ningún ingrediente con una etiqueta
+          prohibida por PlanContext.diet) y faltantes ≤ 3 con el inventario completo
 mejor = null
 fun buscar(día, asignadas, inventarioRestante, presupuestoRestante, utilidadParcial):
     si día == 4: si utilidad > mejor.utilidad → mejor = plan; return
@@ -111,26 +123,35 @@ return mejor?.let(::Found) ?: NoPlan(sugerencias)
 
 | Ruta | Campos | Reglas |
 |---|---|---|
-| `users/{uid}/favorites/{recipeId}` | `savedAt` (timestamp del servidor) | dueño; solo ese campo |
-| `users/{uid}/cookings/{id}` | `recipeId` (string), `cookedAt` (timestamp del servidor), `rescuedValueCop` (int ≥ 0) | dueño; crear y leer, no editar |
+| `users/{uid}/cookings/{id}` | `recipeId` (string), `servings` (int > 0), `cookedAt` (timestamp del servidor), `rescuedValueCop` (int ≥ 0) | dueño; crear, leer y borrar, no editar |
 
-Se escriben con `Map`, como el inventario. Funcionan sin conexión gracias a la caché de Firestore (CA-RIA-05-03).
+Se escribe con `Map`, como el inventario, y funciona sin conexión gracias a la caché de Firestore. Las favoritas
+(`users/{uid}/favorites`, carpeta `ui/saved/`) pasan al próximo módulo (#117, spec §6).
 "Ahorrados este mes" = Σ `rescuedValueCop` de `cookings` con `cookedAt` en el mes actual; `rescuedValueCop` =
 valor de referencia de los ingredientes por vencer usados.
 
 ## 5. Pantallas y navegación
 
-- `MainTab.RECIPES` y `MainTab.SAVED` pasan a `enabled = true` (`core/navigation/MainTabScaffold.kt`); rutas nuevas
-  en `Routes.kt`: `Recipes`, `Saved`, `AiContext`, `AiPlan`, `AiHelp`, `RecipeDetail(id)`, `CookingIntro(id)`,
+- `MainTab.RECIPES` pasa a `enabled = true` (`core/navigation/MainTabScaffold.kt`); `MainTab.SAVED` sigue gris (spec
+  §9). Rutas nuevas en `Routes.kt`: `Recipes`, `AiPlan`, `AiHelp`, `RecipeDetail(id)`, `CookingIntro(id)`,
   `Cooking(id)`; registradas en `RecipesNavGraph.kt` dentro de `mainGraph`.
-- El flujo de la IA (contexto → cargando → plan / sin coincidencias) usa **un solo** `AiPlanViewModel` con
-  `AiUiState` (`Context`, `Loading`, `Plan`, `NoPlan`) para no pasar el plan entre rutas. El cálculo corre en
-  `Dispatchers.Default` y se cancela con "Cancelar".
+- El flujo de la IA (contexto → cargando → plan / sin coincidencias) es **una sola ruta**, `Route.AiPlan`, con **un solo**
+  `AiPlanViewModel` y `AiUiState.step` (`Context`, `Loading`, `Plan`, `NoPlan`): así el plan no pasa entre rutas
+  (decisión del 2026-10-21; reemplaza `AiContext`). La Ayuda es `Route.AiHelp`. El cálculo corre en `Dispatchers.Default`,
+  "Analizando opciones" dura al menos 1,5 s y "Cancelar" cancela la corrutina. Todas las navegaciones del prototipo son
+  instantáneas; la flecha atrás del flujo vuelve a Descubrir y la de la Ayuda al contexto.
+- "Ver recetas económicas" vuelve a Descubrir con el filtro "Económicas": el grafo escribe `"recipes_filter"` en el
+  `savedStateHandle` de la entrada `Route.Recipes` y `RecipesDiscoverViewModel` lo lee.
+- Restricciones alimentarias (CA-RIA-02-09): `GeneratePlanUseCase` lee `GetFoodPreferencesUseCase` (spec 008) y
+  traduce cada `DietaryRestriction` a `DietRule` por nombre (`PlanContext.diet`); el contexto las muestra. Requiere la
+  spec 008 en `master` y `git merge master` en `feature/009-recetas-ia`.
 - Componentes a reutilizar: la barra de búsqueda de `InventorySearchScreen`, `CategoryChips` para los
   filtros, tarjetas con `AsyncImage`, `SmartFoodPrimaryButton`, `SmartFoodResultDialog`/`SmartFoodWarningDialog`,
   el arco "Progreso" como `CircularProgressIndicator` con los colores del Figma.
-- Temporizador: `CookingViewModel` con un `Job` de `delay(1000)`; al llegar a 0, `RingtoneManager` (notificación por
-  defecto) y `Vibrator`. Sin servicio en primer plano: si la app se cierra, el temporizador se detiene (documentado).
+- Temporizador: `CookingViewModel` con un `Job` de `delay(1000)`; al llegar a 0, `TimerAlarm` repite el "bip-bip-bip-bip"
+  de un despertador digital (`res/raw/timer_alarm.ogg`, de Wikimedia Commons, CC BY-SA 4.0; `docs/licenses/sonidos.md`,
+  `tools/timer_sound.py`) con uso de alarma y vibra al mismo ritmo hasta que la persona toca la tarjeta, cambia de paso
+  o sale; si nadie la atiende, se calla a los 5 s (decisión de Zhair del 2026-10-21). Sin servicio en primer plano: si la app se cierra, el temporizador se detiene (documentado).
 - "Contactar soporte": `Intent.ACTION_SENDTO` con `mailto:` al correo del equipo.
 
 ## 6. Descuento del inventario (`FinishCookingUseCase`)
@@ -138,7 +159,8 @@ valor de referencia de los ingredientes por vencer usados.
 1. Para cada `IngredientUse` del producto `p`: si `p` no tiene cantidad o le queda ≤ 0 → `DeleteItemUseCase(p.id)`;
    si no → `UpdateItemUseCase` con la cantidad restante en su unidad original.
 2. Guardar `cookings/{id}` con el valor rescatado.
-3. Todo con la cola sin conexión del inventario (spec 006 §13); el resultado se muestra con "Guardado".
+3. Todo con la cola sin conexión del inventario (spec 006 §13): cada escritura espera al servidor como mucho 3 s y, si
+   no responde, el resultado es "Guardado en tu teléfono"; si no, "Guardado". Después vuelve al detalle.
 
 ## 7. Decisiones (ADR)
 
@@ -153,9 +175,9 @@ valor de referencia de los ingredientes por vencer usados.
 ## 8. Estrategia de pruebas
 
 - **Unitarias:** las del agente (§3.4), `RecipeCatalogTest`, casos de uso (`FinishCookingUseCaseTest`,
-  `GetMonthlySavingsUseCaseTest`, `ToggleFavoriteUseCaseTest`) y un `…ViewModelTest` por pantalla (`AiPlanViewModel`
+  `GetMonthlySavingsUseCaseTest`) y un `…ViewModelTest` por pantalla (`AiPlanViewModel`
   con `Context → Loading → Plan/NoPlan`, cancelar, ajustar).
 - **Instrumentadas** (con `PantallaEnFlujo`): `RecipesDiscoverScreenTest`, `AiFlowScreenTest`,
-  `RecipeDetailScreenTest`, `CookingScreenTest`, `SavedRecipesScreenTest`; `MainNavigationTest` para las pestañas.
-- **Reglas:** `rules-test/firestore.test.js` para `favorites` y `cookings`.
+  `RecipeDetailScreenTest`, `CookingScreenTest`; `MainNavigationTest` para las pestañas.
+- **Reglas:** `rules-test/firestore.test.js` para `cookings`.
 - **Manual:** checklist de `tasks.md`, con el tiempo del plan medido en el teléfono (release).

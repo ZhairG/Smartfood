@@ -1,0 +1,1188 @@
+{
+ "fecha": "2026-10-20",
+ "nota": "Consulta puntual en los buscadores públicos de cada tienda. Fuente de verdad de empaques y precios; se aplica con tools/precios/aplicar.py.",
+ "ingredientes": {
+  "cebolla": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 2150,
+     "producto": "4 x Cebolla blanca o cabezona, ≈ 800 g ($3.437)"
+    },
+    "carulla": {
+     "precio": 2350,
+     "producto": "Cebolla blanca 1 und, ≈ 200 g ($938)"
+    },
+    "olimpica": {
+     "precio": 1450,
+     "producto": "Cebolla cabezona blanca 1 kg ($2.900)"
+    },
+    "d1": {
+     "precio": 2150,
+     "producto": "Cebolla cabezona 1000 g ($4.300)"
+    }
+   }
+  },
+  "tomate": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 1600,
+     "producto": "Tomate chonto Frescampo 1000 g ($3.206)"
+    },
+    "carulla": {
+     "precio": 3740,
+     "producto": "Tomate chonto Frescampo 1000 g ($7.480)"
+    },
+    "olimpica": {
+     "precio": 3330,
+     "producto": "Tomate chonto 1,5 kg ($9.990)"
+    },
+    "d1": {
+     "precio": 2950,
+     "producto": "Tomate chonto 1000 g ($5.900)"
+    }
+   }
+  },
+  "zanahoria": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 960,
+     "producto": "Zanahoria Frescampo 1000 g ($1.918)"
+    },
+    "carulla": {
+     "precio": 1040,
+     "producto": "Zanahoria Frescampo 1000 g ($2.072)"
+    },
+    "d1": {
+     "precio": 1550,
+     "producto": "Zanahoria 1000 g ($3.100)"
+    }
+   }
+  },
+  "papa": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3540,
+     "producto": "Papa pastusa a granel, kg"
+    },
+    "carulla": {
+     "precio": 5030,
+     "producto": "Papa pastusa a granel, kg"
+    },
+    "olimpica": {
+     "precio": 4900,
+     "producto": "Papa pastusa parda, kg"
+    },
+    "d1": {
+     "precio": 6000,
+     "producto": "Papa pastusa 2500 g ($14.990)"
+    }
+   }
+  },
+  "yuca": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 10720,
+     "producto": "Yuca limpia 500 g ($5.362)"
+    },
+    "carulla": {
+     "precio": 10720,
+     "producto": "Yuca limpia 500 g ($5.362)"
+    },
+    "olimpica": {
+     "precio": 2900,
+     "producto": "Yuca, kg"
+    }
+   }
+  },
+  "platano": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 6300,
+     "producto": "Plátano verde, kg"
+    },
+    "carulla": {
+     "precio": 4690,
+     "producto": "Plátano Frescampo 1600 g ($7.500)"
+    },
+    "olimpica": {
+     "precio": 3850,
+     "producto": "Plátano verde, kg"
+    },
+    "d1": {
+     "precio": 4400,
+     "producto": "Plátano 1000 g"
+    }
+   }
+  },
+  "lechuga": {
+   "empaque": {
+    "cantidad": 350,
+    "etiqueta": "1 und"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3610,
+     "producto": "Lechuga verde a granel, 350 g"
+    },
+    "carulla": {
+     "precio": 7370,
+     "producto": "Lechuga romana 200 g ($4.214)"
+    },
+    "olimpica": {
+     "precio": 2090,
+     "producto": "Lechuga batavia 500 g ($2.990)"
+    },
+    "d1": {
+     "precio": 5540,
+     "producto": "Lechuga verde crespa 180 g ($2.850)"
+    }
+   }
+  },
+  "pepino": {
+   "empaque": {
+    "cantidad": 300,
+    "etiqueta": "1 und"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 1390,
+     "producto": "Pepino cohombro 1 und"
+    },
+    "carulla": {
+     "precio": 1740,
+     "producto": "Pepino cohombro 1 und"
+    },
+    "olimpica": {
+     "precio": 1520,
+     "producto": "Pepino cohombro 1 kg ($5.050)"
+    },
+    "d1": {
+     "precio": 1990,
+     "producto": "Pepino cohombro 1 und"
+    }
+   }
+  },
+  "calabacin": {
+   "empaque": {
+    "cantidad": 250,
+    "etiqueta": "1 und"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3510,
+     "producto": "Zucchini 1 und"
+    },
+    "carulla": {
+     "precio": 1200,
+     "producto": "Zucchini 1 und"
+    },
+    "olimpica": {
+     "precio": 1600,
+     "producto": "Calabacín, kg ($6.400)"
+    }
+   }
+  },
+  "mazorca": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "2 und"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 11160,
+     "producto": "Chocolo mazorca entera 500 g"
+    },
+    "carulla": {
+     "precio": 8250,
+     "producto": "Mazorca dulce 600 g ($9.898)"
+    },
+    "olimpica": {
+     "precio": 5780,
+     "producto": "Mazorca bogotana, kg ($11.550)"
+    },
+    "d1": {
+     "precio": 7600,
+     "producto": "Mazorca 1 und ($3.800)"
+    }
+   }
+  },
+  "guascas": {
+   "empaque": {
+    "cantidad": 15,
+    "etiqueta": "15 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 5810,
+     "producto": "Guascas deshidratadas 15 g"
+    },
+    "carulla": {
+     "precio": 5840,
+     "producto": "Guascas deshidratadas 15 g"
+    },
+    "olimpica": {
+     "precio": 4130,
+     "producto": "Guasca Saysa entera 10 g ($2.750)"
+    }
+   }
+  },
+  "albahaca": {
+   "empaque": {
+    "cantidad": 50,
+    "etiqueta": "50 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 1540,
+     "producto": "Albahaca fresca 50 g"
+    },
+    "carulla": {
+     "precio": 1750,
+     "producto": "Albahaca genovesa 50 g"
+    },
+    "olimpica": {
+     "precio": 4300,
+     "producto": "Albahaca Naturomar 50 g"
+    }
+   }
+  },
+  "aji": {
+   "empaque": {
+    "cantidad": 100,
+    "etiqueta": "100 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 2410,
+     "producto": "Ají picosito 250 g ($6.020)"
+    },
+    "carulla": {
+     "precio": 3460,
+     "producto": "Ají picosito jalapeño 100 g"
+    }
+   }
+  },
+  "aguacate": {
+   "empaque": {
+    "cantidad": 250,
+    "etiqueta": "1 und"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 1190,
+     "producto": "Aguacate Hass 1 und"
+    },
+    "carulla": {
+     "precio": 3450,
+     "producto": "Aguacate orgánico 500 g ($6.900)"
+    },
+    "olimpica": {
+     "precio": 3900,
+     "producto": "Aguacate Lorena, kg ($15.600)"
+    },
+    "d1": {
+     "precio": 1650,
+     "producto": "Aguacate Hass 1 und"
+    }
+   }
+  },
+  "cilantro": {
+   "empaque": {
+    "cantidad": 50,
+    "etiqueta": "50 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3680,
+     "producto": "Cilantro 50 g"
+    },
+    "carulla": {
+     "precio": 3110,
+     "producto": "Cilantro 50 g"
+    },
+    "olimpica": {
+     "precio": 2250,
+     "producto": "Cilantro criollo 50 g"
+    },
+    "d1": {
+     "precio": 1450,
+     "producto": "Cilantro 100 g ($2.900)"
+    }
+   }
+  },
+  "ajo": {
+   "empaque": {
+    "cantidad": 150,
+    "etiqueta": "3 cabezas"
+   },
+   "basico": false,
+   "precios": {
+    "carulla": {
+     "precio": 2160,
+     "producto": "Ajo seleccionado 180 g ($2.590)"
+    },
+    "olimpica": {
+     "precio": 2190,
+     "producto": "Ajo a granel, kg ($14.600)"
+    },
+    "d1": {
+     "precio": 1100,
+     "producto": "Ajo malla 3 unidades"
+    }
+   }
+  },
+  "pimenton": {
+   "empaque": {
+    "cantidad": 250,
+    "etiqueta": "1 und"
+   },
+   "basico": false,
+   "precios": {
+    "carulla": {
+     "precio": 2820,
+     "producto": "Pimentón rojo 450 g ($5.082)"
+    },
+    "olimpica": {
+     "precio": 1580,
+     "producto": "Pimentón rojo 450 g ($2.850)"
+    },
+    "d1": {
+     "precio": 1250,
+     "producto": "Pimentón 1 und"
+    }
+   }
+  },
+  "cebolla-larga": {
+   "empaque": {
+    "cantidad": 300,
+    "etiqueta": "300 g"
+   },
+   "basico": false,
+   "precios": {
+    "carulla": {
+     "precio": 4760,
+     "producto": "Cebolla larga 300 g"
+    },
+    "olimpica": {
+     "precio": 3150,
+     "producto": "Cebolla larga La Giralda 500 g ($5.242)"
+    },
+    "d1": {
+     "precio": 1980,
+     "producto": "Cebolla larga 500 g ($3.300)"
+    }
+   }
+  },
+  "banano": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "6 und"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 2940,
+     "producto": "Banano 1 und ($490), ≈ 6 por kg"
+    },
+    "carulla": {
+     "precio": 2940,
+     "producto": "Banano 1 und ($490), ≈ 6 por kg"
+    },
+    "olimpica": {
+     "precio": 2900,
+     "producto": "Banano a granel, kg"
+    },
+    "d1": {
+     "precio": 3300,
+     "producto": "Banano 1 und ($550), ≈ 6 por kg"
+    }
+   }
+  },
+  "fresa": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 7270,
+     "producto": "Fresa 500 g"
+    },
+    "carulla": {
+     "precio": 8220,
+     "producto": "Fresa extra 500 g"
+    },
+    "d1": {
+     "precio": 9980,
+     "producto": "Fresa 250 g ($4.990)"
+    }
+   }
+  },
+  "limon": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 2100,
+     "producto": "Limón Tahití 1000 g ($4.200)"
+    },
+    "carulla": {
+     "precio": 3230,
+     "producto": "Limón Tahití 1000 g ($6.468)"
+    },
+    "olimpica": {
+     "precio": 2700,
+     "producto": "Limón Tahití, kg ($5.400)"
+    },
+    "d1": {
+     "precio": 2780,
+     "producto": "Limón Tahití 1000 g ($5.550)"
+    }
+   }
+  },
+  "arroz": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 4300,
+     "producto": "Arroz Sonora blanco 1000 g"
+    },
+    "carulla": {
+     "precio": 4480,
+     "producto": "Arroz Blanquita blanco 1000 g"
+    },
+    "olimpica": {
+     "precio": 4200,
+     "producto": "Arroz Roa 1 kg"
+    },
+    "d1": {
+     "precio": 3790,
+     "producto": "Arroz premium Albar 1000 g"
+    }
+   }
+  },
+  "pasta": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3140,
+     "producto": "Spaghetti Pastas Pan 500 g"
+    },
+    "carulla": {
+     "precio": 2600,
+     "producto": "Spaghetti La Nieve 500 g"
+    },
+    "olimpica": {
+     "precio": 3990,
+     "producto": "Spaghetti Ferrara 500 g"
+    },
+    "d1": {
+     "precio": 3990,
+     "producto": "Spaghetti Deliziare 500 g"
+    }
+   }
+  },
+  "pan": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 4990,
+     "producto": "Pan tajado Frescampo 500 g"
+    },
+    "carulla": {
+     "precio": 4990,
+     "producto": "Pan tajado Frescampo 500 g"
+    },
+    "olimpica": {
+     "precio": 7140,
+     "producto": "Pan tajado Milenio 480 g ($6.850)"
+    },
+    "d1": {
+     "precio": 3320,
+     "producto": "Pan tajado blanco Horneaditos 450 g ($2.990)"
+    }
+   }
+  },
+  "tortilla": {
+   "empaque": {
+    "cantidad": 250,
+    "etiqueta": "10 und"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 6310,
+     "producto": "Tortillas de trigo Tía Rosa x10, 250 g"
+    },
+    "carulla": {
+     "precio": 6500,
+     "producto": "Tortillas de trigo Tía Rosa x10, 250 g"
+    },
+    "olimpica": {
+     "precio": 4880,
+     "producto": "Tortilla de trigo Tía Rosa x10, 250 g"
+    },
+    "d1": {
+     "precio": 3720,
+     "producto": "Tortilla fajita Crachos x12, 360 g ($5.350)"
+    }
+   }
+  },
+  "avena": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 2300,
+     "producto": "Avena en hojuelas Ekono 500 g"
+    },
+    "carulla": {
+     "precio": 2370,
+     "producto": "Avena en hojuelas Ekono 500 g"
+    },
+    "olimpica": {
+     "precio": 2810,
+     "producto": "Avena Medalla de Oro 400 g ($2.250)"
+    },
+    "d1": {
+     "precio": 2810,
+     "producto": "Avena en hojuelas Fit Graan 400 g ($2.250)"
+    }
+   }
+  },
+  "maiz": {
+   "empaque": {
+    "cantidad": 300,
+    "etiqueta": "1 lata"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 6870,
+     "producto": "Maíz tierno La Coruña 280 g ($6.410)"
+    },
+    "carulla": {
+     "precio": 7290,
+     "producto": "Maíz tierno La Coruña 280 g ($6.800)"
+    },
+    "olimpica": {
+     "precio": 4400,
+     "producto": "Maíz tierno Kari 340 g ($4.990)"
+    },
+    "d1": {
+     "precio": 4630,
+     "producto": "Maíz tierno Cooltivo 340 g ($5.250)"
+    }
+   }
+  },
+  "lentejas": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 1950,
+     "producto": "Lenteja Frescampo 500 g"
+    },
+    "carulla": {
+     "precio": 1950,
+     "producto": "Lenteja Frescampo 500 g"
+    },
+    "olimpica": {
+     "precio": 1950,
+     "producto": "Lenteja Olímpica 500 g"
+    },
+    "d1": {
+     "precio": 1590,
+     "producto": "Lenteja El Estío 500 g"
+    }
+   }
+  },
+  "frijoles": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 6500,
+     "producto": "Fríjol sabanero rojo Frescampo 500 g"
+    },
+    "carulla": {
+     "precio": 6500,
+     "producto": "Fríjol sabanero rojo Frescampo 500 g"
+    },
+    "olimpica": {
+     "precio": 4250,
+     "producto": "Fríjol radical rojo Olímpica 500 g"
+    },
+    "d1": {
+     "precio": 2990,
+     "producto": "Fríjol rojo El Estío 500 g"
+    }
+   }
+  },
+  "garbanzos": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3200,
+     "producto": "Garbanzo Frescampo 500 g"
+    },
+    "carulla": {
+     "precio": 3300,
+     "producto": "Garbanzo Frescampo 500 g"
+    },
+    "olimpica": {
+     "precio": 2510,
+     "producto": "Garbanzo Olímpica 500 g"
+    },
+    "d1": {
+     "precio": 2650,
+     "producto": "Garbanzo El Estío 500 g"
+    }
+   }
+  },
+  "pollo": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 22250,
+     "producto": "Pechuga de pollo sin piel, kg"
+    },
+    "carulla": {
+     "precio": 24900,
+     "producto": "Pechuga de pollo sin piel Friko, kg"
+    },
+    "olimpica": {
+     "precio": 9590,
+     "producto": "Pechuga de pollo congelada, kg"
+    },
+    "d1": {
+     "precio": 14500,
+     "producto": "Pechugas de pollo Brasset 1100 g ($15.950)"
+    }
+   }
+  },
+  "carne": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 15170,
+     "producto": "Molida de res Frescampo 450 g ($13.650)"
+    },
+    "carulla": {
+     "precio": 15170,
+     "producto": "Molida de res Frescampo 450 g ($13.650)"
+    },
+    "olimpica": {
+     "precio": 19800,
+     "producto": "Carne de res para asar 500 g"
+    },
+    "d1": {
+     "precio": 15700,
+     "producto": "Molida de res 85/15 Red Cut 500 g"
+    }
+   }
+  },
+  "pescado": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 15310,
+     "producto": "Filete de tilapia 650 g ($19.900)"
+    },
+    "carulla": {
+     "precio": 15310,
+     "producto": "Filete de tilapia 650 g ($19.900)"
+    },
+    "olimpica": {
+     "precio": 24530,
+     "producto": "Filete de tilapia 500 g"
+    },
+    "d1": {
+     "precio": 17440,
+     "producto": "Filetes de tilapia Captain Bay 400 g ($13.950)"
+    }
+   }
+  },
+  "atun": {
+   "empaque": {
+    "cantidad": 170,
+    "etiqueta": "1 lata"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 13960,
+     "producto": "Atún La Soberana en agua 182 g ($14.950)"
+    },
+    "carulla": {
+     "precio": 14100,
+     "producto": "Atún La Soberana en agua 182 g ($15.100)"
+    },
+    "olimpica": {
+     "precio": 5590,
+     "producto": "Atún Medalla de Oro lomitos en agua 170 g"
+    },
+    "d1": {
+     "precio": 4450,
+     "producto": "Atún en agua Carlo Forte 170 g"
+    }
+   }
+  },
+  "huevo": {
+   "empaque": {
+    "cantidad": 30,
+    "etiqueta": "30 und"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 17100,
+     "producto": "Huevos AA rojos x30"
+    },
+    "carulla": {
+     "precio": 17500,
+     "producto": "Huevos AA rojos x30"
+    },
+    "olimpica": {
+     "precio": 11920,
+     "producto": "Huevo tipo B x30"
+    },
+    "d1": {
+     "precio": 12490,
+     "producto": "Huevo tipo A Sol Naciente x30"
+    }
+   }
+  },
+  "queso": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 16850,
+     "producto": "Queso campesino El Galán 500 g"
+    },
+    "carulla": {
+     "precio": 16330,
+     "producto": "Queso campesino La María 450 g ($14.700)"
+    },
+    "olimpica": {
+     "precio": 15600,
+     "producto": "Queso campesino Betania 500 g"
+    },
+    "d1": {
+     "precio": 13560,
+     "producto": "Queso campesino Latti 350 g ($9.490)"
+    }
+   }
+  },
+  "leche": {
+   "empaque": {
+    "cantidad": 1100,
+    "etiqueta": "1,1 L"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3770,
+     "producto": "Leche entera Frescampo 1100 ml"
+    },
+    "carulla": {
+     "precio": 3770,
+     "producto": "Leche entera Frescampo 1100 ml"
+    },
+    "olimpica": {
+     "precio": 4060,
+     "producto": "Leche entera Olímpica 800 ml ($2.950)"
+    },
+    "d1": {
+     "precio": 3780,
+     "producto": "Leche entera Latti 900 ml ($3.090)"
+    }
+   }
+  },
+  "mantequilla": {
+   "empaque": {
+    "cantidad": 250,
+    "etiqueta": "250 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 14250,
+     "producto": "Mantequilla Betania 250 g"
+    },
+    "carulla": {
+     "precio": 15800,
+     "producto": "Mantequilla Colanta 250 g"
+    },
+    "olimpica": {
+     "precio": 15600,
+     "producto": "Mantequilla Colanta 250 g"
+    },
+    "d1": {
+     "precio": 12490,
+     "producto": "Mantequilla Latti 200 g ($9.990)"
+    }
+   }
+  },
+  "aceite": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 L"
+   },
+   "basico": true,
+   "precios": {
+    "exito": {
+     "precio": 7720,
+     "producto": "Aceite vegetal Frescampo 900 ml ($6.950)"
+    },
+    "carulla": {
+     "precio": 7500,
+     "producto": "Aceite vegetal Frescampo 900 ml ($6.750)"
+    },
+    "olimpica": {
+     "precio": 7210,
+     "producto": "Aceite Medalla de Oro 900 ml ($6.490)"
+    },
+    "d1": {
+     "precio": 7720,
+     "producto": "Aceite vegetal Imatá 900 ml ($6.950)"
+    }
+   }
+  },
+  "sal": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": true,
+   "precios": {
+    "exito": {
+     "precio": 2950,
+     "producto": "Sal Refisal 1000 g"
+    },
+    "carulla": {
+     "precio": 3400,
+     "producto": "Sal Refisal 1000 g"
+    },
+    "olimpica": {
+     "precio": 2580,
+     "producto": "Sal Refisal 1 kg"
+    },
+    "d1": {
+     "precio": 2900,
+     "producto": "Sal Refisal 1000 g"
+    }
+   }
+  },
+  "comino": {
+   "empaque": {
+    "cantidad": 50,
+    "etiqueta": "50 g"
+   },
+   "basico": true,
+   "precios": {
+    "exito": {
+     "precio": 2850,
+     "producto": "Comino molido Comarrico 50 g"
+    },
+    "carulla": {
+     "precio": 3080,
+     "producto": "Comino molido Comarrico 50 g"
+    },
+    "olimpica": {
+     "precio": 2830,
+     "producto": "Comino molido Comarrico 50 g"
+    },
+    "d1": {
+     "precio": 3550,
+     "producto": "Comino Speciaria 28 g ($1.990)"
+    }
+   }
+  },
+  "pimienta": {
+   "empaque": {
+    "cantidad": 50,
+    "etiqueta": "50 g"
+   },
+   "basico": true,
+   "precios": {
+    "exito": {
+     "precio": 7990,
+     "producto": "Pimienta negra Frescampo 50 g"
+    },
+    "carulla": {
+     "precio": 3110,
+     "producto": "Pimienta molida Frescampo 55 g ($3.420)"
+    },
+    "olimpica": {
+     "precio": 1740,
+     "producto": "Pimienta Olímpica 60 g ($2.090)"
+    },
+    "d1": {
+     "precio": 3120,
+     "producto": "Pimienta molida Speciaria 28 g ($1.750)"
+    }
+   }
+  },
+  "azucar": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": true,
+   "precios": {
+    "exito": {
+     "precio": 4430,
+     "producto": "Azúcar Riopaila 1000 g"
+    },
+    "carulla": {
+     "precio": 4450,
+     "producto": "Azúcar Mayagüez 1000 g"
+    },
+    "olimpica": {
+     "precio": 4500,
+     "producto": "Azúcar Mayagüez 1 kg"
+    },
+    "d1": {
+     "precio": 3100,
+     "producto": "Azúcar blanca 1000 g"
+    }
+   }
+  },
+  "almendras": {
+   "empaque": {
+    "cantidad": 250,
+    "etiqueta": "250 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 22750,
+     "producto": "Almendras Vitad 200 g ($18.200)"
+    },
+    "carulla": {
+     "precio": 23500,
+     "producto": "Almendras Vitad 200 g ($18.800)"
+    },
+    "olimpica": {
+     "precio": 18990,
+     "producto": "Almendras enteras Kari 250 g"
+    },
+    "d1": {
+     "precio": 14830,
+     "producto": "Almendra Nuthos 150 g ($8.900)"
+    }
+   }
+  },
+  "harina-maiz": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3270,
+     "producto": "Harina de maíz precocida blanca La Nieve 1000 g"
+    },
+    "carulla": {
+     "precio": 3600,
+     "producto": "Harina de maíz precocida blanca Megarepa 1000 g"
+    },
+    "olimpica": {
+     "precio": 2540,
+     "producto": "Harina de maíz precocida blanca Medalla de Oro 1 kg"
+    },
+    "d1": {
+     "precio": 2550,
+     "producto": "Harina de maíz blanco Quicksy 1 kg"
+    }
+   }
+  },
+  "miel": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 8980,
+     "producto": "Miel de abejas Hapicampo 500 g"
+    },
+    "carulla": {
+     "precio": 9900,
+     "producto": "Miel de abejas Hapicampo 500 g"
+    },
+    "olimpica": {
+     "precio": 15460,
+     "producto": "Miel de abeja Olímpica 614 g ($18.980)"
+    },
+    "d1": {
+     "precio": 12710,
+     "producto": "Miel de abejas Meel 350 g ($8.900)"
+    }
+   }
+  },
+  "ahuyama": {
+   "empaque": {
+    "cantidad": 1000,
+    "etiqueta": "1 kg"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 2560,
+     "producto": "Ahuyama, kg"
+    },
+    "carulla": {
+     "precio": 2650,
+     "producto": "Ahuyama, kg"
+    },
+    "olimpica": {
+     "precio": 4900,
+     "producto": "Ahuyama zapallo porcionado, kg"
+    }
+   }
+  },
+  "arveja": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 1850,
+     "producto": "Arveja verde Frescampo 500 g"
+    },
+    "carulla": {
+     "precio": 1850,
+     "producto": "Arveja verde Frescampo 500 g"
+    },
+    "olimpica": {
+     "precio": 1700,
+     "producto": "Arveja verde Olímpica 500 g"
+    }
+   }
+  },
+  "habichuela": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 3510,
+     "producto": "Habichuela Ekono 500 g"
+    }
+   }
+  },
+  "champinones": {
+   "empaque": {
+    "cantidad": 250,
+    "etiqueta": "250 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 6220,
+     "producto": "Champiñones frescos 1000 g ($24.864)"
+    },
+    "olimpica": {
+     "precio": 9900,
+     "producto": "Champiñón tajado La Giralda 250 g"
+    },
+    "d1": {
+     "precio": 7900,
+     "producto": "Champiñón 250 g"
+    }
+   }
+  }
+ }
+}

@@ -6,6 +6,7 @@ import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.MealBudget
 import com.smartfood.app.feature.profile.domain.model.SpiceLevel
+import com.smartfood.app.feature.profile.domain.model.Supermarket
 
 /**
  * Nombre: FoodPreferencesContract.kt
@@ -65,6 +66,9 @@ sealed interface FoodPreferencesEvent {
 
     /** Toca un presupuesto: si ya estaba elegido, se quita (solo uno, CA-PER-03-02). */
     data class BudgetSelected(val budget: MealBudget) : FoodPreferencesEvent
+
+    /** Toca un supermercado: queda elegido (siempre hay uno, CA-PER-03-05). */
+    data class StoreSelected(val store: Supermarket) : FoodPreferencesEvent
 
     data object SaveClicked : FoodPreferencesEvent
     data object SaveConfirmed : FoodPreferencesEvent

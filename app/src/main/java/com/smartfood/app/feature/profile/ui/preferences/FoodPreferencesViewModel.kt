@@ -71,6 +71,7 @@ class FoodPreferencesViewModel @Inject constructor(
             is FoodPreferencesEvent.BudgetSelected -> edit { preferences ->
                 preferences.copy(budget = if (preferences.budget == event.budget) null else event.budget)
             }
+            is FoodPreferencesEvent.StoreSelected -> edit { preferences -> preferences.copy(store = event.store) }
             FoodPreferencesEvent.SaveClicked -> if (_uiState.value.isSaveEnabled) {
                 _uiState.update { it.copy(dialog = FoodPreferencesDialog.ConfirmSave) }
             }

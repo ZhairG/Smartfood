@@ -41,6 +41,7 @@ import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.MealBudget
 import com.smartfood.app.feature.profile.domain.model.SpiceLevel
+import com.smartfood.app.feature.profile.domain.model.Supermarket
 
 /**
  * Nombre: FoodPreferencesScreen.kt
@@ -134,6 +135,16 @@ private fun FoodPreferencesContent(
                         text = stringResource(id = budget.titleRes),
                         selected = state.draft.budget == budget,
                         onClick = { onEvent(FoodPreferencesEvent.BudgetSelected(budget)) }
+                    )
+                }
+            }
+            // No está en el Figma (desviación aprobada, spec 008 §9): precios de las recetas por tienda (CA-PER-03-05).
+            PreferenceGroup(title = stringResource(id = R.string.preferences_store)) {
+                Supermarket.entries.forEach { store ->
+                    PreferenceChip(
+                        text = stringResource(id = store.titleRes),
+                        selected = state.draft.storeOrDefault == store,
+                        onClick = { onEvent(FoodPreferencesEvent.StoreSelected(store)) }
                     )
                 }
             }

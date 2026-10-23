@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícono "play-arrow" del botón "Empezar a cocinar" (Figma 582:2489), convertido del SVG del MCP (spec 009, T008).
+     Se tiñe con el tema desde el botón. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M8,19V5L19,12L8,19Z"
+        android:fillColor="#FFFFFFFF" />
+</vector>

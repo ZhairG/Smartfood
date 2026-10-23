@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Conserva en el build release las fotos de las recetas (spec 009, RNF-RIA-05). RecipePhoto las busca por el nombre
+    que trae recetas.json (getIdentifier), así que el reductor de recursos de R8 no ve ninguna referencia y las borraba.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/receta_*" />

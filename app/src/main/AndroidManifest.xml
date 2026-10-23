@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- Aviso de vencimiento (spec 006, HU-INV-08, T039). En API 33+ se pide tras el primer guardado. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Vibración para temporizador de cocina (spec 009, T020). -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <queries>
         <intent>

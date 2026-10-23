@@ -110,6 +110,40 @@ sealed interface Route {
         override val screenRoute: ScreenRoute = ScreenRoute.PROFILE
     }
 
+    /** Pestaña Recetas: Descubrir (spec 009, CA-RIA-01-01). */
+    @Serializable
+    data object Recipes : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.RECIPES
+    }
+
+    @Serializable
+    data object AiPlan : Route { override val screenRoute: ScreenRoute = ScreenRoute.AI_PLAN }
+
+    @Serializable
+    data object AiHelp : Route { override val screenRoute: ScreenRoute = ScreenRoute.AI_HELP }
+
+    /**
+     * Detalle de una receta del catálogo (spec 009, CA-RIA-04-01).
+     *
+     * @property recipeId Identificador de la receta.
+     */
+    @Serializable
+    data class RecipeDetail(val recipeId: String) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.RECIPE_DETAIL
+    }
+
+    /** Preparación previa de una receta (spec 009, CA-RIA-04-03). */
+    @Serializable
+    data class CookingIntro(val recipeId: String, val servings: Int = 2) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.COOKING_INTRO
+    }
+
+    /** Pasos de cocina guiada de una receta (spec 009, CA-RIA-04-04). */
+    @Serializable
+    data class Cooking(val recipeId: String, val servings: Int = 2) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.COOKING
+    }
+
     /** "Editar información" del Perfil (spec 008, HU-PER-02). */
     @Serializable
     data object EditProfile : Route {

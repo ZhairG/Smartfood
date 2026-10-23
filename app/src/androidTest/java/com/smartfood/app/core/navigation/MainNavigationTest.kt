@@ -1,9 +1,12 @@
 package com.smartfood.app.core.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isHeading
+import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -75,6 +78,33 @@ class MainNavigationTest {
 
         composeTestRule.onNodeWithText("Perfil").assertIsSelected()
         composeTestRule.onNodeWithText("Cerrar Sesión").assertIsDisplayed()
+    }
+
+    @Test
+    fun caRia0101_laPestanaRecetasAbreDescubrirYSeResalta() {
+        composeTestRule.onNodeWithText("Recetas").performClick()
+        composeTestRule.waitForIdle()
+
+        // La barra queda con Recetas seleccionada y el encabezado del Figma se ve como título.
+        composeTestRule.onNode(hasText("Recetas") and isSelected()).assertIsDisplayed()
+        composeTestRule.onNode(hasText("Recetas") and isHeading()).assertIsDisplayed()
+        // Guardadas sigue deshabilitada (spec 009 §9).
+        composeTestRule.onNodeWithText("Guardadas").assertIsNotEnabled()
+    }
+
+    @Test
+    fun caRia0101_cambiarEntreRecetasEInventarioNoApila() {
+        composeTestRule.onNodeWithText("Recetas").performClick()
+        composeTestRule.waitForIdle()
+        // Inventario queda como base y Recetas encima: dos pantallas, nunca más.
+        assertEquals(2, pantallasEnLaPila())
+
+        composeTestRule.onNodeWithText("Inventario").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(1, pantallasEnLaPila())
+        composeTestRule.onNodeWithText("Inventario").assertIsSelected()
+        composeTestRule.onNodeWithText("Mi Inventario").assertIsDisplayed()
     }
 
     @Test
