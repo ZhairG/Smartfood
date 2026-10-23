@@ -51,7 +51,7 @@
 
 ## Cierre (en el mismo PR)
 - [x] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
-- [ ] T028 Medición del tiempo del plan en el teléfono (release) y checklist manual; capturas Figma vs app en el PR.
+- [x] T028 Medición del tiempo del plan en el teléfono (release) y checklist manual; capturas Figma vs app en el PR.
 - [x] T029 Tabla de métricas de `AgentEvaluationTest` para el informe de IA; matriz, `README.md` y `AGENTS.md` al día.
 
 ## Matriz de trazabilidad
