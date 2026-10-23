@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "Sin coincidencias" (Figma 557:2515): base de datos con una lupa, de trazo naranja. Redibujado a mano desde el
+     frame (61 × 65 px); se tiñe con el color secundario del tema. Spec 009, CA-RIA-02-07, T017. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="68dp"
+    android:viewportWidth="64"
+    android:viewportHeight="68">
+    <group android:translateX="1.2" android:translateY="0.6">
+        <path
+            android:pathData="M0.4,10.4 a28.4,9.4 0 1,0 56.8,0 a28.4,9.4 0 1,0 -56.8,0
+                M0.4,10.4 L0.4,56.6
+                M57.2,10.4 L57.2,31.6
+                M0.4,33.5 A28.4,9.4 0 0,0 28.8,42.9
+                M0.4,56.6 A28.4,9.4 0 0,0 28.8,66
+                M38.5,51.3 a9.4,9.4 0 1,0 18.8,0 a9.4,9.4 0 1,0 -18.8,0
+                M54.6,58.3 L60.6,64.3"
+            android:strokeColor="#FF000000"
+            android:strokeWidth="1.3"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000" />
+    </group>
+</vector>

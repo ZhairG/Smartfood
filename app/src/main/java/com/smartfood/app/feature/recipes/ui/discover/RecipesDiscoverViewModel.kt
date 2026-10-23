@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -38,6 +39,7 @@ import kotlinx.coroutines.launch
  * @param rankRecipes Orden y filtros (CA-RIA-01-02 y 01-03).
  * @param observeInventory Inventario actual para calcular costo y rescate.
  * @param getPreferredStore "Mi supermercado" del Perfil para los precios (CA-RIA-04-07).
+ * @param savedStateHandle Recibe el filtro que pide "Ver recetas económicas" ([FILTER_KEY]).
  */
 @HiltViewModel
 class RecipesDiscoverViewModel @Inject constructor(
@@ -51,11 +53,16 @@ class RecipesDiscoverViewModel @Inject constructor(
 
     private val catalog = MutableStateFlow<CatalogState>(CatalogState.Loading)
     private val query = MutableStateFlow("")
-    private val filter = MutableStateFlow(RecipeFilter.entries.first())
+    private val filter = MutableStateFlow(RecipeFilter.FOR_YOU)
 
     init {
-        savedStateHandle.getStateFlow<String?>("recipes_filter", null).value?.let { value ->
-            filter.value = RecipeFilter.entries.firstOrNull { it.name == value } ?: RecipeFilter.FOR_YOU
+        // "Ver recetas económicas" del flujo de la IA (CA-RIA-02-07) deja el filtro en el savedStateHandle de esta
+        // entrada. Este ViewModel ya existe al volver, así que se observa (no se lee una sola vez) y se borra al usarlo.
+        viewModelScope.launch {
+            savedStateHandle.getStateFlow<String?>(FILTER_KEY, null).filterNotNull().collect { value ->
+                RecipeFilter.entries.firstOrNull { it.name == value }?.let { filter.value = it }
+                savedStateHandle[FILTER_KEY] = null
+            }
         }
     }
 
@@ -139,8 +146,11 @@ class RecipesDiscoverViewModel @Inject constructor(
         data object Error : CatalogState
     }
 
-    private companion object {
+    companion object {
+        /** Clave del `savedStateHandle` con el filtro que pide otra pantalla ("Ver recetas económicas"). */
+        const val FILTER_KEY = "recipes_filter"
+
         /** Igual que las demás pantallas: se deja de observar un rato después de salir. */
-        const val StopTimeoutMs = 5_000L
+        private const val StopTimeoutMs = 5_000L
     }
 }

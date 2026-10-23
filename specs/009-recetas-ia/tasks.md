@@ -24,7 +24,7 @@
 - [x] T013 `AgentEvaluationTest` (30 inventarios, líneas base, métricas) y `MealPlannerPerformanceTest` (RNF-RIA-02, RNF-RIA-03). *Se corre con el catálogo real (`recetas.json` del #113), decisión de Zhair.*
 
 ## Issue 3: Flujo de la IA (intermedia) — después de los Issues 1 y 2
-- [x] T014 `GeneratePlanUseCase` (con las restricciones del Perfil como `PlanContext.diet`, CA-RIA-02-09) y `AiPlanViewModel` (`Context`, `Loading`, `Plan`, `NoPlan`, cancelar, ajustar) con pruebas. Implementación y compilación verificadas; pruebas de estados en `AiFlowScreenTest`.
+- [x] T014 `GeneratePlanUseCase` (con las restricciones del Perfil como `PlanContext.diet`, CA-RIA-02-09) y `AiPlanViewModel` (`Context`, `Loading`, `Plan`, `NoPlan`, cancelar, ajustar) con pruebas.
 - [x] T015 Pantalla de contexto: inventario detectado, aviso del que vence primero, presupuesto, porciones, picante, tiempo y "Según tus preferencias" (CA-RIA-02-01).
 - [x] T016 "Analizando opciones" con el arco de progreso y "Cancelar" (CA-RIA-02-02).
 - [x] T017 "Tu plan de 3 días" con "¿Por qué te conviene?" y "Ajustar"; "Sin coincidencias" con sugerencias (CA-RIA-02-03, 02-06 a 02-08).
@@ -64,15 +64,15 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-01-02 | U `RankRecipesForMeUseCaseTest`, I `RecipesDiscoverScreenTest` |
 | CA-RIA-01-03 | U `RankRecipesForMeUseCaseTest`, I `RecipesDiscoverScreenTest` |
 | CA-RIA-01-04 | U `SearchRecipesUseCaseTest` |
-| CA-RIA-02-01 | I `AiFlowScreenTest` |
+| CA-RIA-02-01 | U `GetAiContextUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest`, I `RecipesDiscoverScreenTest` |
 | CA-RIA-02-02 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-03 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-04 | U `MealPlannerTest` (contra fuerza bruta) |
 | CA-RIA-02-05 | U `MealPlannerTest` |
-| CA-RIA-02-06 | U `PlanExplainerTest` |
-| CA-RIA-02-07 | U `MealPlannerTest`, I `AiFlowScreenTest` |
-| CA-RIA-02-08 | U `AiPlanViewModelTest` |
-| CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `MealPlannerCatalogTest`, U `GeneratePlanUseCaseTest` |
+| CA-RIA-02-06 | U `PlanExplainerTest`, U `GeneratePlanUseCaseTest`, I `AiFlowScreenTest` |
+| CA-RIA-02-07 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, U `RecipesDiscoverViewModelTest`, I `AiFlowScreenTest` |
+| CA-RIA-02-08 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
+| CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `MealPlannerCatalogTest`, U `GetAiContextUseCaseTest`, U `GeneratePlanUseCaseTest` |
 | CA-RIA-02-10 | U `MealPlannerPerformanceTest`, M (release) |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |

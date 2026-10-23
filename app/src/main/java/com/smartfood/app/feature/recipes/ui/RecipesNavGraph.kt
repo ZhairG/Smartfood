@@ -1,14 +1,18 @@
 package com.smartfood.app.feature.recipes.ui
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.smartfood.app.R
 import com.smartfood.app.core.navigation.MainTab
 import com.smartfood.app.core.navigation.MainTabScaffold
 import com.smartfood.app.core.navigation.NavTransitions
@@ -26,6 +30,7 @@ import com.smartfood.app.feature.recipes.ui.cooking.TimerAlarm
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverEffect
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverScreen
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverViewModel
+import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
 import com.smartfood.app.feature.recipes.ui.ai.AiFlowScreen
 import com.smartfood.app.feature.recipes.ui.ai.AiHelpScreen
 import com.smartfood.app.feature.recipes.ui.ai.AiPlanViewModel
@@ -64,19 +69,58 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
             RecipesDiscoverScreen(state = state, onEvent = viewModel::onEvent, onSuggestRecipes = { navController.navigate(Route.AiPlan) })
         }
     }
+    // Flujo de la IA (#115, plan §5): una sola ruta con su ViewModel; todas las navegaciones del prototipo son
+    // instantáneas y la flecha atrás vuelve a Descubrir.
     composable<Route.AiPlan> {
-        MainTabScaffold(currentTab = MainTab.RECIPES, onTabSelected = navController::navigateToTab) {
+        MainTabScaffold(
+            currentTab = MainTab.RECIPES,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Recipes>(inclusive = false) }
+        ) {
             val viewModel: AiPlanViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
-            ObserveEffects(viewModel.effects) { effect -> when (effect) {
-                is AiEffect.OpenRecipe -> navController.navigate(Route.RecipeDetail(effect.recipeId))
-                AiEffect.OpenEconomicRecipes -> { navController.getBackStackEntry<Route.Recipes>().savedStateHandle["recipes_filter"] = "ECONOMIC"; navController.popBackStack<Route.Recipes>(inclusive = false) }
-                AiEffect.OpenHelp -> navController.navigate(Route.AiHelp)
-            } }
-            AiFlowScreen(state, viewModel::onEvent, onBack = { navController.popBackStack<Route.Recipes>(inclusive = false) })
+            ObserveEffects(viewModel.effects) { effect ->
+                when (effect) {
+                    is AiEffect.OpenRecipe -> navController.navigate(Route.RecipeDetail(effect.recipeId))
+                    // "Ver recetas económicas" (CA-RIA-02-07): Descubrir lee el filtro de su savedStateHandle.
+                    AiEffect.OpenEconomicRecipes -> {
+                        navController.getBackStackEntry<Route.Recipes>().savedStateHandle[RecipesDiscoverViewModel.FILTER_KEY] =
+                            RecipeFilter.ECONOMIC.name
+                        navController.popBackStack<Route.Recipes>(inclusive = false)
+                    }
+                    AiEffect.OpenHelp -> navController.navigate(Route.AiHelp)
+                }
+            }
+            AiFlowScreen(
+                state = state,
+                onEvent = viewModel::onEvent,
+                onBack = { navController.popBackStack<Route.Recipes>(inclusive = false) }
+            )
         }
     }
-    composable<Route.AiHelp> { AiHelpScreen(onBack = { navController.popBackStack() }) }
+    composable<Route.AiHelp> {
+        MainTabScaffold(
+            currentTab = MainTab.RECIPES,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Recipes>(inclusive = false) }
+        ) {
+            val context = LocalContext.current
+            val subject = stringResource(id = R.string.recipes_ai_support_subject)
+            val email = stringResource(id = R.string.recipes_ai_support_email)
+            AiHelpScreen(
+                onBack = { navController.popBackStack() },
+                // "Contactar soporte" (CA-RIA-03-01). Sin app de correo, no hace nada en lugar de cerrar la app.
+                onContactSupport = {
+                    runCatching {
+                        context.startActivity(
+                            Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$email"))
+                                .putExtra(Intent.EXTRA_SUBJECT, subject)
+                        )
+                    }
+                }
+            )
+        }
+    }
     composable<Route.RecipeDetail> {
         MainTabScaffold(
             currentTab = MainTab.RECIPES,

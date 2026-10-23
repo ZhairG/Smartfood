@@ -2,7 +2,7 @@ package com.smartfood.app.feature.recipes.ui.discover
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
@@ -35,13 +35,16 @@ class RecipesDiscoverScreenTest {
     private val eventos = mutableListOf<RecipesDiscoverEvent>()
     private val estado = mutableStateOf(RecipesDiscoverUiState(isLoading = false))
 
+    private var sugirio = false
+
     private fun mostrar(inicial: RecipesDiscoverUiState = RecipesDiscoverUiState(isLoading = false)) {
         estado.value = inicial
         composeTestRule.setContent {
             SmartfoodTheme {
                 RecipesDiscoverScreen(
                     state = estado.value,
-                    onEvent = { eventos += it }
+                    onEvent = { eventos += it },
+                    onSuggestRecipes = { sugirio = true }
                 )
             }
         }
@@ -62,10 +65,12 @@ class RecipesDiscoverScreenTest {
     }
 
     @Test
-    fun caRia0101_sugerirmeRecetasQuedaDeshabilitadoHastaQueExistaElFlujoDeIa() {
+    fun caRia0201_sugerirmeRecetasAbreLaSugerenciaConIa() {
         mostrar()
 
-        composeTestRule.onNodeWithText("Sugerirme recetas").assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Sugerirme recetas").assertIsEnabled().performClick()
+
+        assertTrue(sugirio)
     }
 
     @Test

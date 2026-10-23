@@ -56,6 +56,7 @@ import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.figmaShadow
 import com.smartfood.app.feature.inventory.ui.messageRes
 import com.smartfood.app.feature.recipes.domain.model.RecipeStep
+import com.smartfood.app.feature.recipes.ui.components.OutlineActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 
@@ -330,36 +331,6 @@ private fun TimerCard(
     }
 }
 
-/** Botón blanco con borde verde del Figma ("Anterior", `557:2797`): mismo alto, radio y sombra que el naranja. */
-@Composable
-private fun OutlineActionButton(
-    text: String,
-    enabled: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val shape = RoundedCornerShape(ButtonRadius)
-    // Atenuado con colores, no con transparencia, para no cortar la sombra (como RecipeActionButton).
-    val content = if (enabled) MaterialTheme.colorScheme.primary else GreyLight
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .height(ButtonHeight)
-            .figmaShadow(borderRadius = ButtonRadius)
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .border(ButtonBorder, content, shape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-    ) {
-        Text(
-            text = text,
-            color = content,
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp, lineHeight = 22.5.sp, fontWeight = FontWeight.Bold),
-            maxLines = 1
-        )
-    }
-}
-
 /** "¿Cocinaste esta receta?", guardando y el resultado (CA-RIA-04-05; sin conexión, spec 006 §13). */
 @Composable
 private fun CookingDialogs(dialog: CookingDialog?, onEvent: (CookingEvent) -> Unit) {
@@ -454,9 +425,6 @@ private val CardInnerGap = 12.dp
 private const val CardShadowAlpha = 0.09f
 private val ProgressHeight = 5.dp
 private val ActionsGap = 10.dp
-private val ButtonHeight = 48.dp
-private val ButtonRadius = 10.dp
-private val ButtonBorder = 1.dp
 private const val GlyphFraction = 0.4f
 
 @Preview(showBackground = true, heightDp = 900)
