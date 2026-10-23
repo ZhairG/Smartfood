@@ -70,8 +70,9 @@ solo guardan preferencias de Android Studio.
 | 004 Correo de bienvenida            | [`specs/004-correo-registro`](specs/004-correo-registro/spec.md) | ✅ Implementado y desplegado |
 | 005 Documentos legales              | [`specs/005-documentos-legales`](specs/005-documentos-legales/spec.md) | ✅ Implementado (texto en vista previa) |
 | 006 Inventario                      | [`specs/006-inventario`](specs/006-inventario/spec.md) | ✅ Implementado (con uso sin conexión) |
-| 007 Catálogo de recetas             | — | Pendiente |
-| 008 Agente recomendador             | — | Pendiente |
+| 008 Perfil                          | [`specs/008-perfil`](specs/008-perfil/spec.md) | ✅ Implementado |
+| 009 Recetas + IA                    | [`specs/009-recetas-ia`](specs/009-recetas-ia/spec.md) | ✅ Implementado (agente CSP de plan de 3 días; [evaluación](docs/ia/evaluacion-agente.md)) |
+| 010 Recetas guardadas               | — | Pendiente (próximo módulo, #117) |
 
 ## Metodología: Spec Driven Development
 
@@ -220,6 +221,10 @@ com.smartfood.app/
     ├── home/            Saludo y cierre de sesión (punto de entrada de las próximas features)
     ├── legal/           Términos y Política de privacidad (spec 005)
     ├── profile/         Perfil del Figma: datos de la cuenta y "Cerrar sesión" (avisa si hay cambios sin subir)
+    ├── recipes/         Recetas + IA (spec 009): catálogo propio, agente CSP, flujo de la IA y cocina guiada
+    │   ├── domain/      agent/ (MealPlanner, RecipeEvaluator, PlanExplainer, IngredientMatcher), model/, usecase/
+    │   ├── data/        catalog/ (JSON de assets/), repository/ (historial de cocinadas), di/
+    │   └── ui/          discover/, detail/, ai/ (flujo de la IA y Ayuda), cooking/ (guía y temporizador), components/
     ├── inventory/       Inventario (spec 006): lista por vencimiento, búsqueda por texto y voz, editor con foto
     │   ├── domain/      model/ (InventoryItem, WriteOutcome), repository/ (InventoryRepository, PhotoSync…), usecase/
     │   ├── data/        repository/ (Firestore y Storage), sync/ (fotos con WorkManager), reminder/ (aviso diario),

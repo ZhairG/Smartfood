@@ -50,9 +50,9 @@
 - [x] T037 Variedad con el catálogo real: ≥ 20 vegetarianas y ≥ 12 veganas en `RecipeCatalogTest`; `MealPlannerCatalogTest` arma un plan con cada restricción (CA-RIA-02-09).
 
 ## Cierre (en el mismo PR)
-- [ ] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
+- [x] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
 - [ ] T028 Medición del tiempo del plan en el teléfono (release) y checklist manual; capturas Figma vs app en el PR.
-- [ ] T029 Tabla de métricas de `AgentEvaluationTest` para el informe de IA; matriz, `README.md` y `AGENTS.md` al día.
+- [x] T029 Tabla de métricas de `AgentEvaluationTest` para el informe de IA; matriz, `README.md` y `AGENTS.md` al día.
 
 ## Matriz de trazabilidad
 
@@ -73,7 +73,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-07 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, U `RecipesDiscoverViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-08 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `MealPlannerCatalogTest`, U `GetAiContextUseCaseTest`, U `GeneratePlanUseCaseTest` |
-| CA-RIA-02-10 | U `MealPlannerPerformanceTest`, M (release) |
+| CA-RIA-02-10 | U `MealPlannerPerformanceTest`, M (release: 62 ms el peor caso, `docs/ia/evaluacion-agente.md`) |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |
 | CA-RIA-04-02 | U `RecipeDetailViewModelTest` |
