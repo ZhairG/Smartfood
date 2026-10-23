@@ -4,7 +4,7 @@
 > cuando cumple la Definition of Done de la [constitución](../constitution.md#7-definition-of-done).
 
 ## Fase 0: Preparación
-- [ ] T001 La spec, el plan, las tareas y las capturas de `disenos-figma/Modulo 4 - Recetas + IA`.
+- [x] T001 La spec, el plan, las tareas y las capturas de `disenos-figma/Modulo 4 - Recetas + IA`.
 
 ## Issue 1: Catálogo, Descubrir y Detalle (intermedia)
 - [x] T002 Modelos `Recipe`, `RecipeIngredient`, `RecipeStep`, `Ingredient` y contrato `RecipeCatalog` (RF-RIA-01). *Hecha en el #114, porque el agente los necesita; el #113 los reutiliza.*

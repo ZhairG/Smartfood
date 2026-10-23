@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Feature | `009-recetas-ia` (Módulo 4) |
-| Estado | Borrador para aprobación |
+| Estado | Implementada (PR #121, fusionado el 2026-10-23) |
 | Fecha | 2026-10-18 |
 | Depende de | 006-inventario, 008-perfil |
 | Afecta | Pestaña Recetas, inventario (descuento al cocinar), tarjetas del Perfil, reglas de Firestore |
