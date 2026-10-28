@@ -24,9 +24,11 @@ import com.smartfood.app.feature.recipes.domain.model.Recipe
  * - **Restricciones entre variables:** recetas distintas, inventario compartido (cada receta usa lo que dejaron las
  *   anteriores), presupuesto total y faltantes de cada receta con el inventario que le queda.
  * - **Objetivo:** maximizar la utilidad del plan ([RecipeEvaluator.planUtility]).
- * - **Búsqueda:** backtracking que asigna los días en orden, con **forward checking** (solo se prueban las recetas que
- *   todavía caben en el presupuesto y el inventario restantes) y **ramificación y poda** (se descarta una rama cuya
- *   utilidad máxima posible no alcanza la del mejor plan encontrado).
+ * - **Búsqueda:** backtracking que asigna los días en orden, con **forward checking** (una rama sigue solo si quedan
+ *   recetas que caben en el presupuesto restante para todos los días que faltan; cada día se prueban las que además
+ *   tienen como mucho `maxMissing` faltantes) y **ramificación y poda** (se descarta una rama cuya utilidad máxima posible
+ *   no alcanza la del mejor plan encontrado; la cota usa todo el rescate que sigue disponible en el inventario, así que
+ *   nunca subestima).
  *
  * Es determinista (RNF-RIA-01): ante utilidades iguales gana el plan con los ids de receta menores en orden.
  *
@@ -106,28 +108,27 @@ class MealPlanner(
             }
             return
         }
-        // Forward checking: con el inventario, lo comprado y el presupuesto que quedan, solo sirven para este día las recetas
-        // que todavía cumplen.
+        // Forward checking. Una receta que hoy no cabe en el presupuesto restante tampoco cabrá otro día: lo que otra receta
+        // compre antes se paga igual dentro del plan. Los faltantes, en cambio, pueden bajar (el sobrante de un empaque
+        // comprado antes cubre un ingrediente), así que solo deciden qué recetas sirven hoy, no si la rama tiene salida.
         val usedIds = chosen.mapTo(HashSet()) { it.recipe.id }
-        val candidates = domain.asSequence()
+        val affordable = domain.asSequence()
             .filter { it.id !in usedIds }
             .map { Assigned(it, evaluator.evaluate(it, context.servings, day, stock, context.store)) }
-            .filter { it.evaluation.missingCount <= context.maxMissing && it.evaluation.costCop <= budgetLeft }
-            .sortedWith(compareByDescending<Assigned> { it.evaluation.utility }.thenBy { it.recipe.id })
+            .filter { it.evaluation.costCop <= budgetLeft }
             .toList()
         val daysLeft = context.days - day + 1
-        if (candidates.size < daysLeft) return
+        if (affordable.size < daysLeft) return
+        val candidates = affordable
+            .filter { it.evaluation.missingCount <= context.maxMissing }
+            .sortedWith(compareByDescending<Assigned> { it.evaluation.utility }.thenBy { it.recipe.id })
 
-        // Para los días que faltan, el rescate de hoy es el mejor caso (solo baja) y el costo puede bajar hasta 0 con lo que
-        // sobre de un empaque: la cota usa solo el rescate, que nunca subestima.
-        val optimistic = candidates.map { weights.rescue * it.evaluation.rescue }
-        val order = optimistic.indices.sortedByDescending { optimistic[it] }
-        val sortedOptimistic = order.map { optimistic[it] }
-        val position = IntArray(order.size).also { pos -> order.forEachIndexed { rank, i -> pos[i] = rank } }
-        for ((index, candidate) in candidates.withIndex()) {
-            // Cota optimista: lo que lleva el plan, más esta receta, más el mejor rescate posible del resto para los días
-            // que faltan, sin descontar costo ni desperdicio.
-            val bound = partial + candidate.evaluation.utility + topSum(sortedOptimistic, daysLeft - 1, skip = position[index])
+        for (candidate in candidates) {
+            // Cota optimista: lo que lleva el plan, más esta receta, más todo el rescate que el inventario todavía puede dar
+            // en los días que faltan, sin descontar costo ni desperdicio. El rescate de una receta puede subir de un día a
+            // otro (si otra se lleva un producto, saca de otro que vence pronto), pero nunca supera lo que queda sin usar.
+            val future = if (day < context.days) evaluator.rescuePotential(candidate.evaluation.remaining, day + 1) else 0.0
+            val bound = partial + candidate.evaluation.utility + weights.rescue * future
             if (best.plan != null && bound < best.utility - EPSILON) continue
             assign(
                 day + 1,
@@ -191,19 +192,6 @@ class MealPlanner(
         val CHEAPEST = PlannerWeights(rescue = 0.0, cost = 1.0, waste = 0.0)
 
         fun roundUpToThousand(cop: Long): Long = (cop + 999) / 1000 * 1000
-
-        /** Suma de los [count] mayores valores de [sortedDesc] sin contar la posición [skip]. */
-        fun topSum(sortedDesc: List<Double>, count: Int, skip: Int): Double {
-            var sum = 0.0
-            var taken = 0
-            for (i in sortedDesc.indices) {
-                if (taken == count) break
-                if (i == skip) continue
-                sum += sortedDesc[i]
-                taken++
-            }
-            return sum
-        }
 
         /** Orden lexicográfico de dos listas de ids del mismo tamaño. */
         fun compareIds(a: List<String>, b: List<String>): Int {

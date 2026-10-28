@@ -168,16 +168,24 @@ si hay menos de 3: no hay plan
 
 asignar(día, elegidas, inventario, presupuesto que queda):
     si ya hay 3 días: calcular U (restando el desperdicio) y guardar si es el mejor
-    candidatas ← recetas no usadas, con ≤ 3 faltantes y que caben en el presupuesto   # forward checking
-    ordenarlas de mayor a menor utilidad
+    posibles ← recetas no usadas que caben en el presupuesto que queda                 # forward checking
+    si hay menos posibles que días por llenar: volver atrás
+    candidatas ← las posibles con ≤ 3 faltantes hoy, de mayor a menor utilidad
     para cada candidata:
         si su mejor caso posible < mejor plan: saltarla                               # poda
         asignar(día + 1, elegidas + candidata, inventario − lo que usa, presupuesto − su costo)
 ```
 
-**¿La poda puede perder el mejor plan?** No. El "mejor caso" de una rama es optimista: suma el mejor rescate posible
-de los días que faltan y no resta costo ni desperdicio, así que **nunca se queda corto**. Si ni así alcanza, esa rama
-no puede ganar. `MealPlannerTest` lo comprueba comparando con una búsqueda que revisa **todas** las combinaciones.
+**¿La poda puede perder el mejor plan?** No. El "mejor caso" de una rama es optimista: suma **todo** el rescate que el
+inventario todavía puede dar en los días que faltan y no resta costo ni desperdicio, así que **nunca se queda corto**.
+Si ni así alcanza, esa rama no puede ganar. `MealPlannerTest` lo comprueba comparando con una búsqueda que revisa
+**todas** las combinaciones, también con productos repetidos y recetas con muchos faltantes.
+
+> **Corrección del 27/10/2026 (T038).** Antes el mejor caso sumaba el rescate *de hoy* de cada receta, y la búsqueda
+> se rendía si hoy no había suficientes recetas con ≤ 3 faltantes. Las dos cosas pueden cambiar de un día a otro: el
+> sobrante de un empaque baja los faltantes de otra receta, y si una receta se lleva un producto, otra puede rescatar
+> más de un producto distinto. En 2 de 20.000 escenarios aleatorios el agente perdía el mejor plan, y en un caso
+> armado a propósito no encontraba ninguno aunque existía. Las métricas de la evaluación no cambiaron.
 
 **¿Siempre da lo mismo?** Sí. Si dos planes empatan, gana el que tiene los ids de receta menores en orden alfabético.
 
@@ -270,28 +278,32 @@ withContext(Dispatchers.Default) {                                  // fuera del
 
 | Función | Línea | Qué hace |
 |---|---|---|
-| `plan()` | 43 | Busca el plan; si no hay, pide las sugerencias |
-| `search()` | 58 | Arma el **dominio** (filtros de tiempo, picante, dieta y costo) y empieza la búsqueda |
-| `assign()` | 87 | El **backtracking**: asigna un día y se llama a sí misma para el siguiente |
-| Forward checking | 112–119 | Deja solo las recetas que caben con el inventario y el presupuesto que quedan |
-| Poda | 130–131 | `if (bound < best.utility) continue`: salta las ramas que no pueden ganar |
-| `suggestions()` | 170 | Qué cambiar cuando no hay plan |
+| `plan()` | 45 | Busca el plan; si no hay, pide las sugerencias |
+| `search()` | 60 | Arma el **dominio** (filtros de tiempo, picante, dieta y costo) y empieza la búsqueda |
+| `assign()` | 89 | El **backtracking**: asigna un día y se llama a sí misma para el siguiente |
+| Forward checking | 111–124 | Deja las recetas que caben en el presupuesto que queda; hoy se prueban las que además tienen ≤ 3 faltantes |
+| Poda | 127–132 | `if (bound < best.utility) continue`: salta las ramas que no pueden ganar |
+| `suggestions()` | 171 | Qué cambiar cuando no hay plan |
 
 ```kotlin
-// Forward checking (línea 112)
-val candidates = domain.asSequence()
+// Forward checking (línea 115)
+val affordable = domain.asSequence()
     .filter { it.id !in usedIds }                                   // recetas distintas
     .map { Assigned(it, evaluator.evaluate(it, context.servings, day, stock, context.store)) }
-    .filter { it.evaluation.missingCount <= context.maxMissing && it.evaluation.costCop <= budgetLeft }
+    .filter { it.evaluation.costCop <= budgetLeft }                 // caben en el presupuesto que queda
+    .toList()
+if (affordable.size < daysLeft) return                              // no alcanzan para los días que faltan
+val candidates = affordable.filter { it.evaluation.missingCount <= context.maxMissing }   // sirven hoy
 ```
 
 ### ④ Evaluar una receta: `RecipeEvaluator` ([código](../../app/src/main/java/com/smartfood/app/feature/recipes/domain/agent/RecipeEvaluator.kt))
 
 - `evaluate()` (línea 59): qué sale del inventario, qué hay que comprar, cuánto cuesta, cuánto rescata y su utilidad.
-- `take()` (línea 101): primero usa lo que vence antes, después el sobrante de empaques ya comprados y, al final,
+- `take()` (línea 111): primero usa lo que vence antes, después el sobrante de empaques ya comprados y, al final,
   compra empaques completos.
 - `waste()` (línea 88): el desperdicio del plan.
-- `PantryStock` (línea 188): el inventario **inmutable**. Cada consumo crea un estado nuevo, así el backtracking
+- `rescuePotential()` (línea 97): todo el rescate que el inventario todavía puede dar; es la cota de la poda.
+- `PantryStock` (línea 198): el inventario **inmutable**. Cada consumo crea un estado nuevo, así el backtracking
   puede volver atrás sin deshacer nada.
 
 ### ⑤ Explicar: `PlanExplainer.explain()` ([código](../../app/src/main/java/com/smartfood/app/feature/recipes/domain/agent/PlanExplainer.kt), línea 47)

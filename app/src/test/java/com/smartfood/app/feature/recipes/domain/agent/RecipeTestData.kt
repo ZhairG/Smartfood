@@ -103,6 +103,49 @@ fun randomScenario(seed: Int, recipeCount: Int): RandomScenario {
     return RandomScenario(ingredients, recipes, pantry)
 }
 
+/**
+ * Escenario aleatorio que fuerza los casos difíciles del agente: recetas con más de 3 ingredientes que no están en casa
+ * (pueden entrar otro día gracias al sobrante de un empaque) y varios productos del mismo ingrediente que vencen pronto,
+ * con cantidades distintas (el rescate de una receta puede subir de un día a otro). Siempre igual para la misma [seed].
+ */
+fun randomScenarioExigente(seed: Int): RandomScenario {
+    val random = Random(seed + 10_000)
+    val ingredients = (1..8).map { i -> ingredient("ing$i", priceCop = 2_000L + random.nextLong(0, 15_000)) }
+        .associateBy { it.id }
+    val ids = ingredients.keys.toList()
+    val recipes = (1..random.nextInt(5, 9)).map { r ->
+        val used = ids.shuffled(random).take(random.nextInt(2, 6))
+        recipe("r%02d".format(r), *used.map { it to (50.0 + random.nextInt(0, 400)) }.toTypedArray())
+    }
+    // Solo los 4 primeros ingredientes tienen productos en casa, así que se repiten y al resto le faltan cosas.
+    val pantry = (0 until random.nextInt(2, 7)).map { i ->
+        val quantity = if (random.nextInt(6) == 0) null else 50.0 + random.nextInt(0, 900)
+        pantry("p$i", ids[random.nextInt(0, 4)], quantity, random.nextInt(0, 4))
+    }
+    return RandomScenario(ingredients, recipes, pantry)
+}
+
+/**
+ * Escenario pequeño con varios productos de los mismos 2 ingredientes, con cantidades muy distintas: el rescate de una
+ * receta puede subir si otra se lleva antes un producto. Con él se encontraron las semillas 3598 y 9545, en las que la
+ * cota anterior podaba el mejor plan. Siempre igual para la misma [seed].
+ */
+fun randomScenarioRepetidos(seed: Int): RandomScenario {
+    val random = Random(seed)
+    val ingredients = (1..5).map { i -> ingredient("ing$i", priceCop = 1_000L + random.nextLong(0, 30_000)) }
+        .associateBy { it.id }
+    val ids = ingredients.keys.toList()
+    val recipes = (1..random.nextInt(4, 7)).map { r ->
+        val used = ids.shuffled(random).take(random.nextInt(1, 4))
+        recipe("r%02d".format(r), *used.map { it to (20.0 + random.nextInt(0, 1200)) }.toTypedArray())
+    }
+    val pantry = (0 until random.nextInt(2, 6)).map { i ->
+        val quantity = if (random.nextInt(8) == 0) null else 20.0 + random.nextInt(0, 1500)
+        pantry("p$i", ids[random.nextInt(0, 2)], quantity, random.nextInt(0, 4))
+    }
+    return RandomScenario(ingredients, recipes, pantry)
+}
+
 /** Etiquetas de los ingredientes aleatorios según su número: uno de cada cuatro sin etiquetas. */
 private val RANDOM_TAGS = listOf(
     emptySet(),

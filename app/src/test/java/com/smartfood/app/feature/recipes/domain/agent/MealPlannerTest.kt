@@ -122,6 +122,57 @@ class MealPlannerTest {
     }
 
     @Test
+    fun `CA-RIA-02-04 una receta con mas de 3 faltantes hoy puede entrar otro dia con el sobrante de un empaque`() {
+        // "a" tiene 4 faltantes el día 1, pero si "b" compra antes el empaque de x, el sobrante la deja con 3.
+        val ings = listOf("x", "y", "z", "w", "v").map { ingredient(it) }.associateBy { it.id }
+        val recetas = listOf(
+            recipe("a", "x" to 100.0, "y" to 100.0, "z" to 100.0, "w" to 100.0),
+            recipe("b", "x" to 100.0),
+            recipe("c", "v" to 100.0),
+        )
+        val context = ctx(budget = 100_000)
+
+        val plan = MealPlanner(ings).search(recetas, emptyList(), context)
+
+        assertEquals(bruteForce(RandomScenario(ings, recetas, emptyList()), context)?.second, plan?.days?.map { it.recipe.id })
+        assertEquals(listOf("b", "a", "c"), plan!!.days.map { it.recipe.id })
+    }
+
+    @Test
+    fun `CA-RIA-02-04 coincide con la fuerza bruta con productos repetidos y recetas con muchos faltantes`() {
+        var withPlan = 0
+        repeat(150) { seed ->
+            val s = randomScenarioExigente(seed)
+            val context = PlanContext(budgetCop = listOf(40_000L, 80_000L, 200_000L)[seed % 3], servings = 4)
+            val expected = bruteForce(s, context)
+            val actual = MealPlanner(s.ingredients).search(s.recipes, s.pantry, context)
+
+            if (expected == null) {
+                assertNull("semilla $seed: no debería haber plan", actual)
+            } else {
+                withPlan++
+                assertEquals("semilla $seed: plan", expected.second, actual?.days?.map { it.recipe.id })
+                assertEquals("semilla $seed: utilidad", expected.first, actual!!.utility, 1e-9)
+            }
+        }
+        assertTrue("escenarios con plan: $withPlan de 150", withPlan >= 50)
+    }
+
+    @Test
+    fun `CA-RIA-02-04 la poda no pierde el mejor plan cuando el rescate de una receta sube de un dia a otro`() {
+        // Semillas en las que la cota anterior (el rescate de hoy de cada receta) podaba la rama del mejor plan.
+        listOf(3598, 9545).forEach { seed ->
+            val s = randomScenarioRepetidos(seed)
+            val context = PlanContext(budgetCop = 1_000_000, servings = 4)
+            val expected = bruteForce(s, context)!!
+            val actual = MealPlanner(s.ingredients).search(s.recipes, s.pantry, context)!!
+
+            assertEquals("semilla $seed: utilidad", expected.first, actual.utility, 1e-9)
+            assertEquals("semilla $seed: plan", expected.second, actual.days.map { it.recipe.id })
+        }
+    }
+
+    @Test
     fun `RNF-RIA-01 el mismo inventario y contexto dan siempre el mismo plan`() {
         val a = planner.plan(catalogo, despensa, ctx())
         val b = MealPlanner(ingredients).plan(catalogo.reversed(), despensa.reversed(), ctx())
