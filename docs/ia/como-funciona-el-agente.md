@@ -248,7 +248,8 @@ agente son estas:
 Todo el agente está en
 [`feature/recipes/domain/agent/`](../../app/src/main/java/com/smartfood/app/feature/recipes/domain/agent/), en
 **Kotlin puro**: no usa Android ni Firebase, así que se prueba con pruebas unitarias. Estos son los archivos en el
-orden en que se ejecutan.
+orden en que se ejecutan. `MealPlanner.kt` está explicado línea por línea en
+[`meal-planner-linea-por-linea.md`](meal-planner-linea-por-linea.md).
 
 ### ① Percibir: `GetAiContextUseCase` ([código](../../app/src/main/java/com/smartfood/app/feature/recipes/domain/usecase/GetAiContextUseCase.kt), línea 35)
 
