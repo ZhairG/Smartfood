@@ -94,17 +94,22 @@ dominio = recetas que cumplen tiempo ≤ máx, picante permitido, dieta (ningún
 mejor = null
 fun buscar(día, asignadas, inventarioRestante, presupuestoRestante, utilidadParcial):
     si día == 4: si utilidad > mejor.utilidad → mejor = plan; return
-    candidatas = dominio − asignadas, filtradas (forward checking) por: costo con inventarioRestante ≤ presupuestoRestante
-                 y faltantes ≤ 3
-    si candidatas vacía: return                                  // poda por factibilidad
+    posibles = dominio − asignadas con costo (inventarioRestante, este día) ≤ presupuestoRestante   // forward checking
+    si posibles < días que faltan: return                        // poda por factibilidad
+    candidatas = posibles con faltantes ≤ 3 este día
     ordenar candidatas por utilidad de un paso, de mayor a menor   // primero las prometedoras
     para cada r en candidatas:
-        cota = utilidadParcial + U(r, día) + cotaOptimista(días restantes)
-        si mejor != null y cota ≤ mejor.utilidad: continue      // ramificación y poda
+        cota = utilidadParcial + U(r, día) + rescatePotencial(inventario que deja r, desde día+1)
+        si mejor != null y cota < mejor.utilidad: continue      // ramificación y poda
         buscar(día+1, asignadas+r, restar(inventarioRestante, r), presupuestoRestante − costo(r), …)
 return mejor?.let(::Found) ?: NoPlan(sugerencias)
 ```
-- `cotaOptimista` = suma de los mayores `U` de un paso entre las candidatas restantes (nunca subestima).
+- La poda por factibilidad cuenta las recetas que **caben en el presupuesto**, no las que hoy tienen ≤ 3 faltantes: una
+  receta con 4 faltantes hoy puede quedar con 3 otro día gracias al sobrante de un empaque comprado antes (T038).
+- `rescatePotencial` = suma, sobre los productos que vencen en ≤ 3 días y siguen buenos desde `día+1`, de su fracción
+  sin usar por `1/(días + 1)`. Nunca subestima: ninguna receta rescata más de lo que queda de un producto. La cota
+  anterior (el rescate de hoy de las candidatas) podía subestimar, porque el rescate de una receta puede subir de un
+  día a otro (T038).
 - **Determinismo:** desempates por id de receta.
 - **Sin plan:** `NoPlan` calcula sugerencias: el presupuesto mínimo con el que existiría un plan (repitiendo la
   búsqueda sin la restricción de presupuesto y tomando el costo del mejor plan) y si quitar "Sin picante" o subir el

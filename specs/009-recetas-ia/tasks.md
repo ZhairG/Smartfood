@@ -49,6 +49,16 @@
 - [x] T036 20 recetas nuevas (30 → 50; 7 veganas, 7 vegetarianas, 6 para todos) y 4 ingredientes (ahuyama, arveja, habichuela, champiñones) con precio y foto de licencia libre.
 - [x] T037 Variedad con el catálogo real: ≥ 20 vegetarianas y ≥ 12 veganas en `RecipeCatalogTest`; `MealPlannerCatalogTest` arma un plan con cada restricción (CA-RIA-02-09).
 
+## Correcciones después de la entrega
+- [x] T038 `MealPlanner` ya no pierde planes (2026-10-27, CA-RIA-02-04):
+  - La poda por factibilidad cuenta las recetas que caben en el presupuesto, no solo las que hoy tienen ≤ 3 faltantes.
+  - La cota usa `RecipeEvaluator.rescuePotential`, que nunca subestima.
+  - Pruebas nuevas en `MealPlannerTest`: el caso mínimo con el sobrante de un empaque, las semillas 3598 y 9545
+    (`randomScenarioRepetidos`) y 150 escenarios con productos repetidos y recetas con muchos faltantes
+    (`randomScenarioExigente`), todos contra la fuerza bruta.
+  - Revisión aparte: 0 diferencias en 23.000 escenarios. Las métricas de `AgentEvaluationTest` no cambiaron y el
+    peor caso de `MealPlannerPerformanceTest` sigue por debajo de 2 s.
+
 ## Cierre (en el mismo PR)
 - [x] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
 - [x] T028 Medición del tiempo del plan en el teléfono (release) y checklist manual; capturas Figma vs app en el PR.
@@ -67,7 +77,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-01 | U `GetAiContextUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest`, I `RecipesDiscoverScreenTest` |
 | CA-RIA-02-02 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-03 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
-| CA-RIA-02-04 | U `MealPlannerTest` (contra fuerza bruta) |
+| CA-RIA-02-04 | U `MealPlannerTest` (contra fuerza bruta, también con productos repetidos y recetas con muchos faltantes, T038) |
 | CA-RIA-02-05 | U `MealPlannerTest` |
 | CA-RIA-02-06 | U `PlanExplainerTest`, U `GeneratePlanUseCaseTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-07 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, U `RecipesDiscoverViewModelTest`, I `AiFlowScreenTest` |

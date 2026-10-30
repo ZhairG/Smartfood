@@ -88,6 +88,16 @@ class RecipeEvaluator(
     fun waste(stock: PantryStock): Double =
         stock.items.filter { it.isExpiringSoon() }.sumOf { stock.unusedFraction(it.itemId) }
 
+    /**
+     * Cota superior del rescate que todavía pueden sumar las recetas cocinadas desde el día [fromDay] con [stock]: la
+     * fracción sin usar de cada producto que vence pronto y sigue en buen estado ese día, por su urgencia `1/(días + 1)`.
+     * Ninguna receta rescata más de lo que queda de un producto, así que la búsqueda puede podar con ella sin perder el
+     * mejor plan.
+     */
+    fun rescuePotential(stock: PantryStock, fromDay: Int): Double =
+        stock.items.filter { it.isExpiringSoon() && it.isUsableOn(fromDay) }
+            .sumOf { stock.unusedFraction(it.itemId) / (it.daysToExpire + 1) }
+
     /** Utilidad de un plan: suma de los aportes de cada día menos el desperdicio ponderado. */
     fun planUtility(dayUtilities: List<Double>, finalStock: PantryStock): Double =
         dayUtilities.sum() - weights.waste * waste(finalStock)
