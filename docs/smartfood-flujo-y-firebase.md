@@ -8,7 +8,7 @@ Respuestas cortas a las preguntas de control del curso.
 
 Usamos **Spec Driven Development**: primero se escribe qué se va a hacer y después el código.
 
-1. **Constitución** (`specs/constitution.md`): reglas que nunca se rompen (MVVM, sin secretos en el APK, fidelidad con Figma).
+1. **Constitución** ([`specs/constitution.md`](../specs/constitution.md)): reglas que nunca se rompen (MVVM, sin secretos en el APK, fidelidad con Figma).
 2. **`spec.md`**: historias de usuario (`HU-NN`) y criterios de aceptación (`CA-...`) en formato *Dado / Cuando / Entonces*.
 3. **`plan.md`**: cómo se va a construir (modelos, interfaces, decisiones).
 4. **`tasks.md`**: lista de tareas (`Tnnn`) y qué prueba cubre cada criterio.
@@ -37,7 +37,7 @@ En GitHub:
 
 - **ui**: pantallas en Compose y ViewModels.
 - **domain**: modelos, casos de uso e *interfaces* de repositorio. **No conoce Firebase.**
-- **data**: la única capa que usa Firebase (`FirestoreInventoryRepository`, etc.).
+- **data**: la única capa que usa Firebase ([`FirestoreInventoryRepository`](../app/src/main/java/com/smartfood/app/feature/inventory/data/repository/FirestoreInventoryRepository.kt), etc.).
 - **Hilt** conecta la interfaz con su implementación. En las pruebas se usa un repositorio falso.
 
 ---
@@ -55,13 +55,13 @@ passwordResets, welcomeEmails, emailChanges   ← solo las usa el servidor
 ```
 
 - Cada usuario tiene sus datos dentro de `users/{su uid}`.
-- Las recetas **no** están en Firestore: viajan dentro de la app (`assets/recetas.json`).
+- Las recetas **no** están en Firestore: viajan dentro de la app ([`assets/recetas.json`](../app/src/main/assets/recetas.json)).
 
-**Seguridad (`firestore.rules`):**
+**Seguridad ([`firestore.rules`](../firestore.rules)):**
 
 - Un usuario solo puede leer y escribir lo suyo: `request.auth.uid == uid`.
 - El servidor valida los datos: campos permitidos, categorías válidas, formato de fecha, cantidades en rango.
-- Las reglas tienen pruebas automáticas en `rules-test/`.
+- Las reglas tienen pruebas automáticas en [`rules-test/`](../rules-test/).
 
 **Sin conexión:** Firestore guarda una copia local. Si no hay red, el cambio queda en el teléfono ("Guardado en tu teléfono") y se sube solo cuando vuelve la conexión.
 
@@ -76,10 +76,10 @@ Pantalla (Compose)  →  ViewModel  →  Caso de uso  →  Repositorio  →  Fir
  toca "Guardar"        save()        AddItemUseCase   createItem()    users/{uid}/inventory
 ```
 
-1. **Pantalla** (`ProductEditorScreen`): solo dibuja el estado y avisa del evento `SaveClicked`.
-2. **ViewModel** (`ProductEditorViewModel`): arma los datos del formulario, muestra "cargando" y llama al caso de uso.
-3. **Caso de uso** (`AddItemUseCase`): valida los datos (las reglas de negocio están aquí) y llama a `repository.createItem(item)`.
-4. **Repositorio** (`FirestoreInventoryRepository`): escribe en `users/{uid}/inventory/{id}`.
+1. **Pantalla** ([`ProductEditorScreen`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorScreen.kt)): solo dibuja el estado y avisa del evento `SaveClicked`.
+2. **ViewModel** ([`ProductEditorViewModel`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorViewModel.kt)): arma los datos del formulario, muestra "cargando" y llama al caso de uso.
+3. **Caso de uso** ([`AddItemUseCase`](../app/src/main/java/com/smartfood/app/feature/inventory/domain/usecase/SaveItemUseCases.kt#L32)): valida los datos (las reglas de negocio están aquí) y llama a `repository.createItem(item)`.
+4. **Repositorio** ([`FirestoreInventoryRepository`](../app/src/main/java/com/smartfood/app/feature/inventory/data/repository/FirestoreInventoryRepository.kt)): escribe en `users/{uid}/inventory/{id}`.
 5. **Firestore**: las reglas revisan que el usuario sea el dueño y que los datos sean válidos.
 6. **Respuesta**: si sale bien, se vuelve a la lista con el mensaje "Guardado". Si falla, se muestra el error y el formulario conserva lo escrito.
 
@@ -87,10 +87,10 @@ La lista se actualiza sola, porque está **escuchando** Firestore en tiempo real
 
 | Operación | Caso de uso | Llamada a Firestore |
 |---|---|---|
-| Create | `AddItemUseCase` | `document(id).set(...)` |
-| Read | `ObserveInventoryUseCase` / `GetItemUseCase` | `snapshots()` / `document(id).get()` |
-| Update | `UpdateItemUseCase` | `document(id).update(...)` |
-| Delete | `DeleteItemUseCase` | `document(id).delete()` |
+| Create | [`AddItemUseCase`](../app/src/main/java/com/smartfood/app/feature/inventory/domain/usecase/SaveItemUseCases.kt#L32) | `document(id).set(...)` |
+| Read | [`ObserveInventoryUseCase`](../app/src/main/java/com/smartfood/app/feature/inventory/domain/usecase/ObserveInventoryUseCase.kt) / [`GetItemUseCase`](../app/src/main/java/com/smartfood/app/feature/inventory/domain/usecase/GetItemUseCase.kt) | `snapshots()` / `document(id).get()` |
+| Update | [`UpdateItemUseCase`](../app/src/main/java/com/smartfood/app/feature/inventory/domain/usecase/SaveItemUseCases.kt#L75) | `document(id).update(...)` |
+| Delete | [`DeleteItemUseCase`](../app/src/main/java/com/smartfood/app/feature/inventory/domain/usecase/DeleteItemUseCase.kt) | `document(id).delete()` |
 
 ---
 

@@ -11,14 +11,14 @@ Cada sección tiene tres partes:
 
 | Unidad del curso | Qué se ve aquí | Archivos |
 |---|---|---|
-| 1. Tu primera app para Android | `setContent`, composables, `Text`, `Column`, `Modifier`, recursos, `@Preview` | `MainActivity.kt`, `LoginScreen.kt` |
-| 2. Compila la IU de una app | Kotlin (data class, sealed, `when`, lambdas), estado, recomposición, elevación de estado, campos de texto, pruebas | `LoginContract.kt`, `LoginScreen.kt`, `LoginScreenTest.kt` |
-| 3. Listas y Material Design | Genéricos y extensiones, `LazyColumn`, tema de Material 3, animaciones | `InventoryScreen.kt`, `InventoryItemRow.kt`, `Theme.kt`, `InventorySkeleton.kt` |
-| 4. Navegación y arquitectura | `ViewModel`, `StateFlow`, UDF, Navigation Compose, tamaños de pantalla | `LoginViewModel.kt`, `AuthNavGraph.kt`, `AppNavHost.kt`, `ProductEditorScreen.kt` |
-| 5. Conectarse a Internet | Corrutinas, repositorio, inyección de dependencias, imágenes de Internet | `ProductEditorRoute.kt`, `InventoryItemRow.kt` |
-| 6. Persistencia de datos | DataStore | `ThemeViewModel.kt`, `MainActivity.kt` |
-| 7. WorkManager | Trabajo en segundo plano | `SmartfoodApp.kt` |
-| 8. Views y Compose | Una View de Android dentro de Compose | `ProductCameraRoute.kt` |
+| 1. Tu primera app para Android | `setContent`, composables, `Text`, `Column`, `Modifier`, recursos, `@Preview` | [`MainActivity.kt`](../app/src/main/java/com/smartfood/app/MainActivity.kt), [`LoginScreen.kt`](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginScreen.kt) |
+| 2. Compila la IU de una app | Kotlin (data class, sealed, `when`, lambdas), estado, recomposición, elevación de estado, campos de texto, pruebas | [`LoginContract.kt`](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginContract.kt), `LoginScreen.kt`, [`LoginScreenTest.kt`](../app/src/androidTest/java/com/smartfood/app/feature/auth/ui/login/LoginScreenTest.kt) |
+| 3. Listas y Material Design | Genéricos y extensiones, `LazyColumn`, tema de Material 3, animaciones | [`InventoryScreen.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/list/InventoryScreen.kt), [`InventoryItemRow.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/components/InventoryItemRow.kt), [`Theme.kt`](../app/src/main/java/com/smartfood/app/core/designsystem/theme/Theme.kt), [`InventorySkeleton.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/list/InventorySkeleton.kt) |
+| 4. Navegación y arquitectura | `ViewModel`, `StateFlow`, UDF, Navigation Compose, tamaños de pantalla | [`LoginViewModel.kt`](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginViewModel.kt), [`AuthNavGraph.kt`](../app/src/main/java/com/smartfood/app/feature/auth/ui/AuthNavGraph.kt), [`AppNavHost.kt`](../app/src/main/java/com/smartfood/app/core/navigation/AppNavHost.kt), [`ProductEditorScreen.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorScreen.kt) |
+| 5. Conectarse a Internet | Corrutinas, repositorio, inyección de dependencias, imágenes de Internet | [`ProductEditorRoute.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorRoute.kt), `InventoryItemRow.kt` |
+| 6. Persistencia de datos | DataStore | [`ThemeViewModel.kt`](../app/src/main/java/com/smartfood/app/core/preferences/ThemeViewModel.kt), `MainActivity.kt` |
+| 7. WorkManager | Trabajo en segundo plano | [`SmartfoodApp.kt`](../app/src/main/java/com/smartfood/app/SmartfoodApp.kt) |
+| 8. Views y Compose | Una View de Android dentro de Compose | [`ProductCameraRoute.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/camera/ProductCameraRoute.kt) |
 
 ---
 
@@ -33,7 +33,7 @@ Estas cuatro ideas explican casi todas las notas técnicas del documento.
 | **Saltar lo que no cambió** | Si los parámetros de un composable son iguales a los de la vez anterior, Compose no lo ejecuta (*skipping*). Por eso el estado es inmutable y se cambia con `copy()` |
 | **Efectos con ciclo de vida** | Lo que sale de la interfaz (red, navegación) va en `LaunchedEffect` o en el ViewModel, nunca directo en el composable, porque un composable se puede ejecutar muchas veces |
 
-**Debug frente a release.** El APK de debug no pasa por R8 e incluye información para depurar, así que es más lento. El de release (`isMinifyEnabled = true` e `isShrinkResources = true` en `app/build.gradle.kts`) es más pequeño y rápido. Las animaciones y la fluidez se miden **siempre** con el APK release en un teléfono real, como dice `AGENTS.md`.
+**Debug frente a release.** El APK de debug no pasa por R8 e incluye información para depurar, así que es más lento. El de release (`isMinifyEnabled = true` e `isShrinkResources = true` en [`app/build.gradle.kts`](../app/build.gradle.kts)) es más pequeño y rápido. Las animaciones y la fluidez se miden **siempre** con el APK release en un teléfono real, como dice [`AGENTS.md`](../AGENTS.md).
 
 ---
 
@@ -44,8 +44,9 @@ Estas cuatro ideas explican casi todas las notas técnicas del documento.
 **Concepto.** Una app de Compose tiene una sola `Activity`. En `onCreate`, `setContent { }` reemplaza el XML: todo lo
 que va dentro son composables.
 
+Archivo: [MainActivity.kt, líneas 25–42](../app/src/main/java/com/smartfood/app/MainActivity.kt#L25-L42)
+
 ```kotlin
-// MainActivity.kt
 @AndroidEntryPoint                                                     // 1
 class MainActivity : ComponentActivity() {                             // 2
 
@@ -80,7 +81,7 @@ class MainActivity : ComponentActivity() {                             // 2
 | 9 | Aplica el tema de la app a todo lo que va adentro (unidad 3) |
 | 10 | La navegación: decide qué pantalla se ve (unidad 4) |
 
-**Decisión.** El tema envuelve a `AppNavHost` una sola vez. Así ninguna pantalla tiene que aplicarlo, y cambiar el
+**Decisión.** El tema envuelve a [`AppNavHost`](../app/src/main/java/com/smartfood/app/core/navigation/AppNavHost.kt) una sola vez. Así ninguna pantalla tiene que aplicarlo, y cambiar el
 modo en el Perfil cambia toda la app al instante.
 
 > **Notas técnicas**
@@ -97,8 +98,9 @@ modo en el Perfil cambia toda la app al instante.
 "emite" se dibuja. `Column` apila hacia abajo, `Row` de lado y `Box` encima. `Modifier` cambia tamaño, margen,
 fondo y clics.
 
+Archivo: [LoginScreen.kt, líneas 98–113](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginScreen.kt#L98-L113)
+
 ```kotlin
-// LoginScreen.kt
 @Composable                                                            // 1
 private fun LoginWelcomeHeader(modifier: Modifier = Modifier) {        // 2
     Column(modifier = modifier) {                                      // 3
@@ -120,13 +122,13 @@ private fun LoginWelcomeHeader(modifier: Modifier = Modifier) {        // 2
 | Línea | Qué hace |
 |---|---|
 | 1 | Marca la función como composable: solo se puede llamar desde otro composable |
-| 2 | `private`: solo la usa `LoginScreen`. `modifier: Modifier = Modifier` deja que quien la llame la ajuste; el valor por defecto es "sin cambios" |
+| 2 | `private`: solo la usa [`LoginScreen`](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginScreen.kt). `modifier: Modifier = Modifier` deja que quien la llame la ajuste; el valor por defecto es "sin cambios" |
 | 3 | Apila los dos textos. El `modifier` recibido se aplica al contenedor exterior, como recomienda Compose |
-| 4 | `stringResource` lee `res/values/strings.xml`. El texto nunca se escribe en el código |
+| 4 | `stringResource` lee [`res/values/strings.xml`](../app/src/main/res/values/strings.xml). El texto nunca se escribe en el código |
 | 5 | El estilo del título sale de `LocalFormMetrics`: cambia de tamaño según el alto del teléfono (unidad 4) |
 | 6 | El color sale del tema (`primary`), nunca de un `Color(0xFF…)` fijo |
 | 7 | `Spacer` deja espacio vacío. `3.dp` es una medida del Figma |
-| 8 | Tipografía del tema (Poppins), definida en `Type.kt` |
+| 8 | Tipografía del tema (Poppins), definida en [`Type.kt`](../app/src/main/java/com/smartfood/app/core/designsystem/theme/Type.kt) |
 
 **Decisión.** Los textos van en `strings.xml` y los colores en el tema por dos razones: la app se puede traducir y
 el modo oscuro funciona sin tocar cada pantalla.
@@ -140,6 +142,8 @@ el modo oscuro funciona sin tocar cada pantalla.
 > - **Decisión técnica:** Los colores se leen por **rol** (`colorScheme.primary`). Cambiar de modo claro a oscuro solo cambia el esquema que provee el tema, y los composables que leen ese rol se recomponen solos.
 
 ## 1.3 `@Preview`
+
+Archivo: [LoginScreen.kt, líneas 222–233](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginScreen.kt#L222-L233)
 
 ```kotlin
 @Preview(showBackground = true, showSystemUi = true)                   // 1
@@ -163,7 +167,7 @@ private fun LoginScreenPreview() {
 | 3 | Un estado inicial vacío, escrito a mano |
 | 4 | Lambdas vacías: en la vista previa no se navega |
 
-**Decisión.** La vista previa solo funciona porque `LoginScreen` **no tiene ViewModel**: recibe todo por parámetros.
+**Decisión.** La vista previa solo funciona porque [`LoginScreen`](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginScreen.kt) **no tiene ViewModel**: recibe todo por parámetros.
 Es la razón de separar Screen y ViewModel (unidad 4).
 
 > **Notas técnicas**
@@ -177,8 +181,9 @@ Es la razón de separar Screen y ViewModel (unidad 4).
 
 ## 2.1 Kotlin: `data class`, `sealed interface`, valores por defecto y propiedades calculadas
 
+Archivo: [LoginContract.kt, líneas 24–53](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginContract.kt#L24-L53)
+
 ```kotlin
-// LoginContract.kt
 @Immutable                                                             // 1
 data class LoginUiState(                                               // 2
     val email: String = "",                                            // 3
@@ -238,8 +243,9 @@ de un vistazo qué muestra la pantalla y qué puede pasar en ella, sin leer el V
 - **Elevación de estado** (*state hoisting*): el composable no guarda el estado. Lo recibe por parámetro (`value`) y
   avisa los cambios con una lambda (`onValueChange`).
 
+Archivo: [LoginScreen.kt, líneas 118–165](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginScreen.kt#L118-L165)
+
 ```kotlin
-// LoginScreen.kt
 @Composable
 private fun LoginFormFields(
     state: LoginUiState,                                               // 1
@@ -320,8 +326,10 @@ sobrevive al giro de pantalla y la lógica se puede probar sin la interfaz.
 
 Para estado que **solo importa a la interfaz** y no a la lógica:
 
+Archivo: [InventoryNavGraph.kt, línea 80](../app/src/main/java/com/smartfood/app/feature/inventory/ui/InventoryNavGraph.kt#L80)
+
 ```kotlin
-// InventoryNavGraph.kt (destino del editor)
+// destino del editor
 var leaveToList by remember { mutableStateOf(false) }                  // 1
 ```
 
@@ -336,13 +344,14 @@ Aquí solo recuerda si hay que volver a la lista al salir del editor. Es una dec
 > **Notas técnicas**
 >
 > - **Concepto profundo: memoización posicional:** `remember` guarda el valor en la *slot table*, en la **posición** donde se llamó. Por eso, si se llama dentro de un `if` y la condición cambia, el valor se pierde: esa posición se descarta.
-> - **`remember` frente a `rememberSaveable`:** `remember` se pierde al girar el teléfono. `rememberSaveable` guarda el valor en el `Bundle` de la actividad y sobrevive al giro **y** a que Android cierre la app en segundo plano. La app usa `rememberSaveable` para mostrar u ocultar la contraseña (`Inputs.kt`, línea 284): si giras el teléfono, la contraseña sigue visible u oculta como la dejaste.
+> - **`remember` frente a `rememberSaveable`:** `remember` se pierde al girar el teléfono. `rememberSaveable` guarda el valor en el `Bundle` de la actividad y sobrevive al giro **y** a que Android cierre la app en segundo plano. La app usa `rememberSaveable` para mostrar u ocultar la contraseña ([`Inputs.kt`, línea 284](../app/src/main/java/com/smartfood/app/core/designsystem/components/Inputs.kt#L284)): si giras el teléfono, la contraseña sigue visible u oculta como la dejaste.
 > - **Decisión técnica:** `leaveToList` usa `remember` porque solo vive durante un toque. Si se perdiera en un giro, lo peor que pasa es volver a la pantalla anterior en lugar de a la lista.
 
 ## 2.4 Un botón con estado de carga
 
+Archivo: [Buttons.kt, líneas 65–121](../app/src/main/java/com/smartfood/app/core/designsystem/components/Buttons.kt#L65-L121)
+
 ```kotlin
-// core/designsystem/components/Buttons.kt
 @Composable
 fun SmartFoodPrimaryButton(
     text: String,
@@ -393,8 +402,9 @@ fun SmartFoodPrimaryButton(
 
 ## 2.5 Pruebas automatizadas de la pantalla
 
+Archivo: [LoginScreenTest.kt, líneas 26–89](../app/src/androidTest/java/com/smartfood/app/feature/auth/ui/login/LoginScreenTest.kt#L26-L89)
+
 ```kotlin
-// androidTest/.../LoginScreenTest.kt
 class LoginScreenTest {
 
     @get:Rule
@@ -441,7 +451,7 @@ ViewModel, con pruebas unitarias que corren en el computador.
 > **Notas técnicas**
 >
 > - **Concepto profundo: el árbol de semántica:** `onNodeWithText` no busca píxeles. Busca en el **árbol de semántica**, el mismo que usa TalkBack. Cuando una prueba no encuentra un botón, muchas veces significa que TalkBack tampoco lo anuncia bien: accesibilidad y pruebas usan la misma información.
-> - **Sincronización:** La regla de Compose espera a que no haya recomposiciones pendientes antes de cada verificación, así que la prueba no necesita `Thread.sleep`. Con animaciones o esperas, las pruebas avanzan el reloj con `mainClock`, como pide `AGENTS.md` para el cambio de perfil de `FormMetrics`.
+> - **Sincronización:** La regla de Compose espera a que no haya recomposiciones pendientes antes de cada verificación, así que la prueba no necesita `Thread.sleep`. Con animaciones o esperas, las pruebas avanzan el reloj con `mainClock`, como pide [`AGENTS.md`](../AGENTS.md) para el cambio de perfil de [`FormMetrics`](../app/src/main/java/com/smartfood/app/core/designsystem/theme/FormMetrics.kt).
 > - **Hardware:** Las pruebas instrumentadas corren en un emulador o teléfono real (ART y GPU reales). Las unitarias corren en la JVM del computador, sin dibujar nada; por eso un componente que se cae al dibujarse pasa las unitarias (Issue #60) y hay que correr las instrumentadas de las pantallas que se tocan.
 
 ---
@@ -450,8 +460,9 @@ ViewModel, con pruebas unitarias que corren en el computador.
 
 ## 3.1 Kotlin: genéricos, extensiones y funciones de orden superior
 
+Archivo: [ObserveEffects.kt, líneas 22–29](../app/src/main/java/com/smartfood/app/core/navigation/ObserveEffects.kt#L22-L29)
+
 ```kotlin
-// core/navigation/ObserveEffects.kt
 @Composable
 fun <T> ObserveEffects(effects: Flow<T>, onEffect: (T) -> Unit) {      // 1
     val lifecycleOwner = LocalLifecycleOwner.current                   // 2
@@ -476,8 +487,9 @@ fun <T> ObserveEffects(effects: Flow<T>, onEffect: (T) -> Unit) {      // 1
 
 **Extensión** (agrega una propiedad a un `enum` sin modificarlo):
 
+Archivo: [InventoryItemRow.kt, líneas 66–73](../app/src/main/java/com/smartfood/app/feature/inventory/ui/components/InventoryItemRow.kt#L66-L73)
+
 ```kotlin
-// InventoryItemRow.kt
 val FoodCategory.titleRes: Int                                         // 1
     get() = when (this) {                                              // 2
         FoodCategory.FRUITS -> R.string.category_fruits
@@ -506,8 +518,9 @@ dominio sigue siendo Kotlin puro.
 
 **Concepto.** `LazyColumn` dibuja **solo las filas visibles**. Una `Column` con 200 productos los dibujaría todos.
 
+Archivo: [InventoryScreen.kt, líneas 153–179](../app/src/main/java/com/smartfood/app/feature/inventory/ui/list/InventoryScreen.kt#L153-L179)
+
 ```kotlin
-// InventoryScreen.kt
 @Composable
 private fun InventoryList(
     sections: List<InventorySection>,
@@ -560,12 +573,14 @@ sección. Así hay un solo desplazamiento para todo el inventario.
 > - **Concepto profundo:** `LazyColumn` compone, mide y dibuja **solo** las filas visibles, más algunas que precarga en la dirección del scroll (*prefetch*). Cuando una fila sale de la pantalla, su composición se descarta o se **reutiliza** para una fila nueva.
 > - **Optimización pendiente: `contentType`:** La lista mezcla encabezados y filas de producto. Si se agrega `contentType` a `item` (encabezado) y a `items` (producto), Compose solo reutiliza una fila de producto para otra fila de producto, y el scroll es más fluido en teléfonos de gama baja. Hoy no lo usa.
 > - **La `key` y la posición del scroll:** Con `key`, si llega un producto nuevo arriba, Compose sabe que las demás filas son las mismas y **conserva la posición del scroll**. Sin `key`, las filas se identificarían por posición y la lista saltaría.
-> - **Hardware:** En gama baja, los tirones al deslizar casi siempre vienen de componer filas nuevas durante el movimiento. Por eso el rendimiento se mide con el **APK release**, no con el de debug: `AGENTS.md` registra que en debug Compose pierde unos 300 ms al iniciar cada pantalla. Las librerías de Compose traen sus propios perfiles de compilación (*baseline profiles*); la app no agrega uno para su propio código, y sería una mejora posible.
+> - **Hardware:** En gama baja, los tirones al deslizar casi siempre vienen de componer filas nuevas durante el movimiento. Por eso el rendimiento se mide con el **APK release**, no con el de debug: [`AGENTS.md`](../AGENTS.md) registra que en debug Compose pierde unos 300 ms al iniciar cada pantalla. Las librerías de Compose traen sus propios perfiles de compilación (*baseline profiles*); la app no agrega uno para su propio código, y sería una mejora posible.
 
 ## 3.3 Una fila: `Row`, `weight`, `clickable`, textos que no se desbordan
 
+Archivo: [InventoryItemRow.kt, líneas 106–173](../app/src/main/java/com/smartfood/app/feature/inventory/ui/components/InventoryItemRow.kt#L106-L173)
+
 ```kotlin
-// InventoryItemRow.kt (resumen)
+// resumen
 Row(
     modifier = Modifier
         .fillMaxWidth()
@@ -622,8 +637,9 @@ Row(
 **Concepto.** `MaterialTheme` reparte colores (`colorScheme`), tipografía (`typography`) y formas a todos los
 composables de adentro. Los componentes leen **roles** (`primary`, `surface`, `onSurface`), no colores fijos.
 
+Archivo: [Theme.kt, líneas 21–100](../app/src/main/java/com/smartfood/app/core/designsystem/theme/Theme.kt#L21-L100)
+
 ```kotlin
-// core/designsystem/theme/Theme.kt
 private val LightColorScheme = lightColorScheme(                       // 1
     primary = GreenDark,                                               // 2
     onPrimary = White,                                                 // 3
@@ -659,7 +675,7 @@ fun SmartfoodTheme(
 | Línea | Qué hace |
 |---|---|
 | 1 | Crea el esquema de color claro de Material 3 |
-| 2 | Al **rol** `primary` se le asigna el token `GreenDark` (definido en `Color.kt`) |
+| 2 | Al **rol** `primary` se le asigna el token `GreenDark` (definido en [`Color.kt`](../app/src/main/java/com/smartfood/app/core/designsystem/theme/Color.kt)) |
 | 3 | `onPrimary`: el color del texto que va **encima** de `primary` |
 | 4 | Por defecto la app es clara, aunque el teléfono esté en modo oscuro (spec 002) |
 | 5 | Color dinámico de Android 12+ apagado: la app conserva los colores de su marca |
@@ -669,8 +685,9 @@ fun SmartfoodTheme(
 
 **Espaciados propios en el tema:**
 
+Archivo: [Spacing.kt, líneas 33–61](../app/src/main/java/com/smartfood/app/core/designsystem/theme/Spacing.kt#L33-L61)
+
 ```kotlin
-// Spacing.kt
 data class Spacing(val small: Dp = 8.dp, val medium: Dp = 16.dp, val large: Dp = 24.dp, /* … */)
 val LocalSpacing = compositionLocalOf { Spacing() }                    // 1
 
@@ -693,7 +710,7 @@ un token. Así un solo cambio arregla todas las pantallas que usan ese rol.
 >
 > - **Concepto profundo: `CompositionLocal`:** Es una forma de pasar un valor a **todos** los descendientes sin escribirlo como parámetro en cada nivel. `MaterialTheme.colorScheme` es en realidad la lectura de un `CompositionLocal`.
 > - **`staticCompositionLocalOf` frente a `compositionLocalOf`:** `LocalIsDarkTheme` es **static**: Compose no anota quién lo lee y, cuando cambia, recompone todo lo que está debajo del proveedor. `LocalSpacing` es **dinámico**: anota cada lectura y solo recompone a quien lo leyó. Static conviene para valores que casi nunca cambian (el modo de color cambia solo cuando el usuario lo elige).
-> - **Optimización:** `CompositionLocalProvider(LocalSpacing provides Spacing())` crea un `Spacing` nuevo en cada recomposición del tema, pero `compositionLocalOf` compara con `equals` por defecto. Como `Spacing` es una `data class` con los mismos valores, no invalida nada.
+> - **Optimización:** `CompositionLocalProvider(LocalSpacing provides Spacing())` crea un [`Spacing`](../app/src/main/java/com/smartfood/app/core/designsystem/theme/Spacing.kt) nuevo en cada recomposición del tema, pero `compositionLocalOf` compara con `equals` por defecto. Como `Spacing` es una `data class` con los mismos valores, no invalida nada.
 > - **Hardware: modo oscuro y batería:** En pantallas OLED/AMOLED, cada píxel oscuro **gasta menos energía**, porque ese píxel se apaga o casi. En pantallas LCD no hay ahorro: la luz de fondo está siempre encendida.
 > - **Decisión técnica:** El color dinámico (Android 12+, a partir del fondo de pantalla) está apagado para que la app conserve los colores de su marca y del Figma.
 
@@ -702,8 +719,10 @@ un token. Así un solo cambio arregla todas las pantallas que usan ese rol.
 **Concepto.** `rememberInfiniteTransition` + `animateFloat` producen un número que cambia solo, en bucle. Cada
 cambio recompone a quien lo lee.
 
+Archivo: [InventorySkeleton.kt, líneas 114–128](../app/src/main/java/com/smartfood/app/feature/inventory/ui/list/InventorySkeleton.kt#L114-L128)
+
 ```kotlin
-// InventorySkeleton.kt — brillo del esqueleto de carga
+// brillo del esqueleto de carga
 @Composable
 private fun shimmerBrush(): Brush {
     val base = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)   // 1
@@ -737,8 +756,8 @@ dónde aparecerán los productos y la espera se siente más corta.
 > **Notas técnicas**
 >
 > - **Concepto profundo: en qué fase se lee la animación:** Un valor animado se puede leer en la composición, en el diseño o en el dibujo. Leerlo en la **composición** (como aquí, al crear el `Brush`) obliga a recomponer, medir y dibujar en cada cuadro. Leerlo solo en el **dibujo** (dentro de `drawBehind` o `graphicsLayer { }`) se salta las dos primeras fases.
-> - **Optimización pendiente:** `shimmerBrush()` devuelve un valor, así que no tiene un ámbito de recomposición propio: el cambio de `progress` invalida a `InventorySkeleton` completo en cada cuadro. Leer `progress` dentro de un `Modifier.drawWithCache` o `drawBehind` dejaría la composición quieta. Hoy el costo es pequeño, porque el esqueleto se ve poco tiempo y tiene pocos bloques.
-> - **Ejemplo de la técnica correcta en la app:** `AuthScreenScaffold` oculta el formulario mientras elige el perfil de medidas con `graphicsLayer { alpha = if (settled) 1f else 0f }`. El `alpha` se aplica en la capa de dibujo: cambiarlo no vuelve a medir el formulario.
+> - **Optimización pendiente:** `shimmerBrush()` devuelve un valor, así que no tiene un ámbito de recomposición propio: el cambio de `progress` invalida a [`InventorySkeleton`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/list/InventorySkeleton.kt) completo en cada cuadro. Leer `progress` dentro de un `Modifier.drawWithCache` o `drawBehind` dejaría la composición quieta. Hoy el costo es pequeño, porque el esqueleto se ve poco tiempo y tiene pocos bloques.
+> - **Ejemplo de la técnica correcta en la app:** [`AuthScreenScaffold`](../app/src/main/java/com/smartfood/app/feature/auth/ui/components/AuthScreenScaffold.kt) oculta el formulario mientras elige el perfil de medidas con `graphicsLayer { alpha = if (settled) 1f else 0f }`. El `alpha` se aplica en la capa de dibujo: cambiarlo no vuelve a medir el formulario.
 > - **Hardware:** Las animaciones de Compose se ajustan a la frecuencia de la pantalla. En un teléfono de 120 Hz el brillo se ve más suave, pero el presupuesto por cuadro baja a 8,3 ms.
 
 ---
@@ -753,8 +772,9 @@ dónde aparecerán los productos y la espera se siente más corta.
 - **Flujo unidireccional (UDF):** el estado baja del ViewModel a la pantalla y los eventos suben de la pantalla al
   ViewModel.
 
+Archivo: [LoginViewModel.kt, líneas 28–67](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginViewModel.kt#L28-L67)
+
 ```kotlin
-// LoginViewModel.kt
 @HiltViewModel                                                         // 1
 class LoginViewModel @Inject constructor(                              // 2
     private val login: LoginUseCase
@@ -797,7 +817,7 @@ class LoginViewModel @Inject constructor(                              // 2
 
 | Línea | Qué hace |
 |---|---|
-| 1–2 | Hilt crea el ViewModel y le entrega el `LoginUseCase` (unidad 5) |
+| 1–2 | Hilt crea el ViewModel y le entrega el [`LoginUseCase`](../app/src/main/java/com/smartfood/app/feature/auth/domain/usecase/LoginUseCase.kt) (unidad 5) |
 | 3 | Estado **privado y modificable**: solo el ViewModel lo cambia. El `_` del nombre es la convención para lo privado |
 | 4 | Versión **pública de solo lectura**: la pantalla no puede cambiar el estado por su cuenta |
 | 5 | `Channel` para los efectos. `BUFFERED` los guarda si en ese momento nadie escucha (por ejemplo, durante un giro) |
@@ -821,7 +841,7 @@ a estado; así la regla se prueba una vez y no se repite.
 
 > **Notas técnicas**
 >
-> - **Concepto profundo: qué sobrevive y qué no:** El ViewModel sobrevive al **giro de pantalla**, pero no a que Android **cierre el proceso** para liberar memoria con la app en segundo plano. En ese caso, el `LoginUiState` vuelve vacío al regresar. Para que algo sobreviva al cierre del proceso hay que guardarlo en `SavedStateHandle`; el editor de productos lo recibe para leer el id del producto que se edita (`ProductEditorViewModel`, línea 51).
+> - **Concepto profundo: qué sobrevive y qué no:** El ViewModel sobrevive al **giro de pantalla**, pero no a que Android **cierre el proceso** para liberar memoria con la app en segundo plano. En ese caso, el `LoginUiState` vuelve vacío al regresar. Para que algo sobreviva al cierre del proceso hay que guardarlo en `SavedStateHandle`; el editor de productos lo recibe para leer el id del producto que se edita ([`ProductEditorViewModel`, línea 51](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorViewModel.kt#L51)).
 > - **`StateFlow` descarta valores repetidos:** Si `update` produce un estado **igual** (`equals`) al anterior, `StateFlow` no emite y la pantalla no se recompone. Además es *conflated*: si el estado cambia tres veces antes de que la pantalla lo lea, la pantalla recibe solo el último.
 > - **Seguridad entre hilos:** `_uiState.update { }` usa una operación atómica (*compare-and-set*) en un bucle: si dos corrutinas lo cambian a la vez, ninguna pisa a la otra. Leer `value`, copiarlo y asignarlo en dos pasos sí podría perder un cambio.
 > - **`Channel` frente a `SharedFlow`:** Un `Channel` entrega cada efecto a **un solo** receptor y lo guarda si nadie escucha. Un `SharedFlow` sin *replay* lo perdería si la pantalla no está escuchando en ese instante (por ejemplo, durante un giro). Por eso los efectos de navegación van por `Channel`.
@@ -829,8 +849,9 @@ a estado; así la regla se prueba una vez y no se repite.
 
 ## 4.2 Un flujo que se observa: el inventario en tiempo real
 
+Archivo: [InventoryViewModel.kt, líneas 42–76](../app/src/main/java/com/smartfood/app/feature/inventory/ui/list/InventoryViewModel.kt#L42-L76)
+
 ```kotlin
-// InventoryViewModel.kt
 private var observeJob: Job? = null                                    // 1
 
 init { observeInventory() }                                            // 2
@@ -863,13 +884,14 @@ private fun observeInventory() {
 > **Notas técnicas**
 >
 > - **Concepto profundo:** `observeInventoryUseCase()` termina en un *listener* de Firestore (`snapshots()`), que mantiene una conexión abierta y recibe cada cambio del servidor. También emite desde la caché local, por eso la lista aparece aunque no haya red.
-> - **Optimización pendiente:** La observación corre en `viewModelScope`, así que sigue activa mientras el ViewModel exista, **aunque la app esté minimizada**. `InventorySearchViewModel` ya usa el patrón recomendado: `stateIn(started = SharingStarted.WhileSubscribed(StopTimeoutMs))`, que detiene la escucha poco después de que la pantalla deja de mirar y la reanuda al volver. Aplicarlo a la lista ahorraría red y batería en segundo plano.
+> - **Optimización pendiente:** La observación corre en `viewModelScope`, así que sigue activa mientras el ViewModel exista, **aunque la app esté minimizada**. [`InventorySearchViewModel`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/search/InventorySearchViewModel.kt) ya usa el patrón recomendado: `stateIn(started = SharingStarted.WhileSubscribed(StopTimeoutMs))`, que detiene la escucha poco después de que la pantalla deja de mirar y la reanuda al volver. Aplicarlo a la lista ahorraría red y batería en segundo plano.
 > - **Hardware:** Cuando el teléfono entra en reposo profundo (*Doze*), Android limita la red de las apps en segundo plano. Al salir del reposo, Firestore se reconecta solo y entrega los cambios acumulados.
 
 ## 4.3 La pantalla elige qué mostrar según el estado
 
+Archivo: [InventoryScreen.kt, líneas 66–90](../app/src/main/java/com/smartfood/app/feature/inventory/ui/list/InventoryScreen.kt#L66-L90)
+
 ```kotlin
-// InventoryScreen.kt
 @Composable
 fun InventoryScreen(state: InventoryUiState, onEvent: (InventoryEvent) -> Unit, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -902,7 +924,7 @@ fun InventoryScreen(state: InventoryUiState, onEvent: (InventoryEvent) -> Unit, 
 | 4 | Los cuatro estados de una pantalla con datos: **carga, error, vacío y contenido**. Nunca queda en blanco |
 | 5 | `Box` permite poner el botón "+" **encima** de la lista, abajo a la derecha |
 
-**Decisión.** `InventoryScreen` no sabe de dónde vienen los datos ni cómo se navega. Por eso se prueba con estados
+**Decisión.** [`InventoryScreen`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/list/InventoryScreen.kt) no sabe de dónde vienen los datos ni cómo se navega. Por eso se prueba con estados
 escritos a mano: uno de carga, uno de error, uno vacío y uno con productos.
 
 > **Notas técnicas**
@@ -912,8 +934,9 @@ escritos a mano: uno de carga, uno de error, uno vacío y uno con productos.
 
 ## 4.4 Navigation Compose: el cableado de una pantalla
 
+Archivo: [AuthNavGraph.kt, líneas 37–59](../app/src/main/java/com/smartfood/app/feature/auth/ui/AuthNavGraph.kt#L37-L59)
+
 ```kotlin
-// AuthNavGraph.kt
 fun NavGraphBuilder.authGraph(navController: NavHostController) {      // 1
     navigation<Route.AuthGraph>(startDestination = Route.Login) {      // 2
         composable<Route.Login> {                                      // 3
@@ -964,13 +987,14 @@ Así la Screen se puede ver en `@Preview` y probar sin nada de lo demás.
 
 > **Notas técnicas**
 >
-> - **Concepto profundo: un ViewModel por entrada de la pila:** `hiltViewModel()` guarda el ViewModel en el `ViewModelStore` de esa **entrada de la pila** (`NavBackStackEntry`). Si abres Login, vas a Registro y vuelves, el `LoginViewModel` es el mismo y conserva lo escrito. Si Login sale de la pila (con `popUpTo`), se destruye y libera memoria.
-> - **Optimización:** La referencia `viewModel::onEvent` es estable: el *strong skipping* la recuerda, así que `LoginScreen` se puede saltar cuando su `state` no cambia.
+> - **Concepto profundo: un ViewModel por entrada de la pila:** `hiltViewModel()` guarda el ViewModel en el `ViewModelStore` de esa **entrada de la pila** (`NavBackStackEntry`). Si abres Login, vas a Registro y vuelves, el [`LoginViewModel`](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginViewModel.kt) es el mismo y conserva lo escrito. Si Login sale de la pila (con `popUpTo`), se destruye y libera memoria.
+> - **Optimización:** La referencia `viewModel::onEvent` es estable: el *strong skipping* la recuerda, así que [`LoginScreen`](../app/src/main/java/com/smartfood/app/feature/auth/ui/login/LoginScreen.kt) se puede saltar cuando su `state` no cambia.
 
 ## 4.5 Rutas tipadas, el `NavHost` y la pila
 
+Archivo: [Routes.kt, líneas 11–131](../app/src/main/java/com/smartfood/app/core/navigation/Routes.kt#L11-L131)
+
 ```kotlin
-// Routes.kt
 @Serializable                                                          // 1
 sealed interface Route {
     @Serializable data object Login : Route { /* … */ }                // 2
@@ -985,8 +1009,9 @@ sealed interface Route {
 | 2 | Una pantalla sin argumentos |
 | 3 | Una pantalla **con argumentos**: `navigate(Route.ProductEditor(itemId = "abc"))`. El compilador revisa el tipo; `null` significa "producto nuevo" |
 
+Archivo: [AppNavHost.kt, líneas 34–70](../app/src/main/java/com/smartfood/app/core/navigation/AppNavHost.kt#L34-L70)
+
 ```kotlin
-// AppNavHost.kt
 NavHost(
     navController = navController,
     startDestination = Route.Splash,                                   // 1
@@ -1017,8 +1042,9 @@ fun NavHostController.navigateToMainGraph() {
 
 **Transiciones (también de la unidad 3, animación):**
 
+Archivo: [NavTransitions.kt, líneas 26–30](../app/src/main/java/com/smartfood/app/core/navigation/NavTransitions.kt#L26-L30)
+
 ```kotlin
-// NavTransitions.kt
 private val pushSpec = tween<IntOffset>(durationMillis = PUSH_DURATION_MS, easing = FastOutSlowInEasing)  // 1
 
 val enter: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
@@ -1033,14 +1059,16 @@ val enter: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransiti
 
 > **Notas técnicas**
 >
-> - **Concepto profundo: rutas tipadas:** El plugin de Kotlin Serialization genera **al compilar** el código que convierte `Route.ProductEditor(itemId = "abc")` en texto y de vuelta, sin reflexión. Aun así, `AGENTS.md` pide revisar los cambios de serialización contra `app/proguard-rules.pro`, porque R8 en modo completo puede quitar clases que solo se usan de forma indirecta.
+> - **Concepto profundo: rutas tipadas:** El plugin de Kotlin Serialization genera **al compilar** el código que convierte `Route.ProductEditor(itemId = "abc")` en texto y de vuelta, sin reflexión. Aun así, [`AGENTS.md`](../AGENTS.md) pide revisar los cambios de serialización contra [`app/proguard-rules.pro`](../app/proguard-rules.pro), porque R8 en modo completo puede quitar clases que solo se usan de forma indirecta.
 > - **Memoria de la pila:** Cada pantalla en la pila conserva su ViewModel y su estado guardado. `popUpTo(graph.id) { inclusive = true }`, al entrar a la app, libera todo lo de autenticación.
 > - **Hardware: la transición:** Durante los 600 ms del empuje, **las dos pantallas** están compuestas y se dibujan a la vez. Es el momento más pesado de la navegación; por eso en debug se nota lento y en release no.
 
 ## 4.6 Devolver un resultado a la pantalla anterior
 
+Archivo: [InventoryNavGraph.kt, líneas 99–101](../app/src/main/java/com/smartfood/app/feature/inventory/ui/InventoryNavGraph.kt#L99-L101)
+
 ```kotlin
-// InventoryNavGraph.kt (editor)
+// editor
 onBackWithResult = { result ->
     navController.previousBackStackEntry?.savedStateHandle?.set(EDITOR_RESULT_KEY, result.encode())  // 1
     navController.popBackStack()                                       // 2
@@ -1050,7 +1078,7 @@ onBackWithResult = { result ->
 | Línea | Qué hace |
 |---|---|
 | 1 | Deja el resultado ("Guardado", "Eliminado") en la pantalla **anterior** de la pila |
-| 2 | Vuelve. La lista lee ese resultado con `EditorResultHost` y muestra el mensaje encima |
+| 2 | Vuelve. La lista lee ese resultado con [`EditorResultHost`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/EditorResultHost.kt) y muestra el mensaje encima |
 
 > **Notas técnicas**
 >
@@ -1062,8 +1090,9 @@ onBackWithResult = { result ->
 **Concepto.** El curso usa *window size classes* (`Compact`, `Medium`, `Expanded`) según el **ancho**. SmartFood
 aplica la misma idea según el **alto**, porque el problema de los formularios son los teléfonos bajos.
 
+Archivo: [ProductEditorScreen.kt, líneas 127–137](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorScreen.kt#L127-L137)
+
 ```kotlin
-// ProductEditorScreen.kt
 BoxWithConstraints(                                                    // 1
     modifier = Modifier.weight(1f).navigationBarsPadding()             // 2
 ) {
@@ -1086,8 +1115,9 @@ BoxWithConstraints(                                                    // 1
 | 3 | Elige el perfil `Compact`, `Medium` o `Regular` según el alto, y lo entrega a todos los campos de adentro |
 | 4 | `imePadding()`: cuando se abre el teclado, el contenido se recorta para no quedar debajo de él |
 
+Archivo: [FormMetrics.kt, líneas 186–189](../app/src/main/java/com/smartfood/app/core/designsystem/theme/FormMetrics.kt#L186-L189)
+
 ```kotlin
-// FormMetrics.kt
 fun formMetricsFor(availableHeight: Dp): FormMetrics = when {
     availableHeight >= FormMetrics.RegularMinHeight -> FormMetrics.Regular
     availableHeight >= FormMetrics.MediumMinHeight -> FormMetrics.Medium
@@ -1100,8 +1130,9 @@ abierto, los campos cambiarían de tamaño cada vez que aparece.
 
 **Desplazamiento del formulario:**
 
+Archivo: [ProductEditorScreen.kt, líneas 160–166](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorScreen.kt#L160-L166)
+
 ```kotlin
-// ProductEditorScreen.kt
 Column(
     verticalArrangement = Arrangement.spacedBy(metrics.fieldSpacing),  // 1
     modifier = Modifier
@@ -1118,15 +1149,16 @@ Column(
 
 > **Notas técnicas**
 >
-> - **Concepto profundo: `BoxWithConstraints`:** Por dentro usa `SubcomposeLayout`: **pospone la composición** de su contenido hasta la fase de diseño, cuando ya conoce el tamaño. Es más costoso que un `Box` normal, así que se usa solo donde la medida decide qué componer (aquí, el perfil de `FormMetrics`).
-> - **El teclado sin recomponer:** Cuando el teclado se abre, `WindowInsets.ime` cambia **en cada cuadro** de su animación. En `AuthScreenScaffold`, el encabezado de marca lee ese valor dentro de `Modifier.layout { }`, es decir, en la **fase de diseño**: se encoge cuadro a cuadro sin recomponer. Si lo leyera en la composición, se recompondría en cada cuadro de la animación del teclado.
+> - **Concepto profundo: `BoxWithConstraints`:** Por dentro usa `SubcomposeLayout`: **pospone la composición** de su contenido hasta la fase de diseño, cuando ya conoce el tamaño. Es más costoso que un `Box` normal, así que se usa solo donde la medida decide qué componer (aquí, el perfil de [`FormMetrics`](../app/src/main/java/com/smartfood/app/core/designsystem/theme/FormMetrics.kt)).
+> - **El teclado sin recomponer:** Cuando el teclado se abre, `WindowInsets.ime` cambia **en cada cuadro** de su animación. En [`AuthScreenScaffold`](../app/src/main/java/com/smartfood/app/feature/auth/ui/components/AuthScreenScaffold.kt), el encabezado de marca lee ese valor dentro de `Modifier.layout { }`, es decir, en la **fase de diseño**: se encoge cuadro a cuadro sin recomponer. Si lo leyera en la composición, se recompondría en cada cuadro de la animación del teclado.
 > - **Hardware:** El alto útil cambia mucho entre teléfonos: pantallas bajas, cámaras dentro de la pantalla y una barra de navegación de 3 botones (más alta) frente a la de gestos (más delgada). Por eso el perfil se elige con el alto **sin** las barras del sistema.
-> - **Decisión técnica:** `AGENTS.md` prohíbe el scroll programático (`scrollTo`). El margen del teclado se aplica fuera del `verticalScroll`, y Compose mantiene visible el campo enfocado por su cuenta.
+> - **Decisión técnica:** [`AGENTS.md`](../AGENTS.md) prohíbe el scroll programático (`scrollTo`). El margen del teclado se aplica fuera del `verticalScroll`, y Compose mantiene visible el campo enfocado por su cuenta.
 
 ## 4.8 Diálogos controlados por el estado
 
+Archivo: [ProductEditorScreen.kt, líneas 296–348](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorScreen.kt#L296-L348)
+
 ```kotlin
-// ProductEditorScreen.kt
 when (state.dialog) {                                                  // 1
     EditorDialog.CategorySheet -> OptionSheet(
         title = stringResource(id = R.string.editor_category_sheet_title),
@@ -1155,7 +1187,7 @@ guardar y un giro de pantalla lo cerraría solo.
 > **Notas técnicas**
 >
 > - **Concepto profundo:** Un `Dialog` de Compose abre una **ventana nueva** del sistema, con su propia composición encima de la pantalla. Por eso se dibuja sobre todo, incluida la barra inferior.
-> - **Hardware y versión de Android:** El fondo desenfocado del diálogo sin conexión (`Modifier.blur`) solo funciona desde **Android 12** (API 31). En versiones anteriores, que la app soporta desde `minSdk` 24, el desenfoque no tiene efecto y queda solo el oscurecimiento propio del diálogo (comentario en `AuthScreenScaffold.kt`).
+> - **Hardware y versión de Android:** El fondo desenfocado del diálogo sin conexión (`Modifier.blur`) solo funciona desde **Android 12** (API 31). En versiones anteriores, que la app soporta desde `minSdk` 24, el desenfoque no tiene efecto y queda solo el oscurecimiento propio del diálogo (comentario en [`AuthScreenScaffold.kt`](../app/src/main/java/com/smartfood/app/feature/auth/ui/components/AuthScreenScaffold.kt)).
 
 ---
 
@@ -1163,8 +1195,9 @@ guardar y un giro de pantalla lo cerraría solo.
 
 ## 5.1 Corrutinas en la interfaz
 
+Archivo: [ProductEditorRoute.kt, líneas 51–64](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorRoute.kt#L51-L64)
+
 ```kotlin
-// ProductEditorRoute.kt
 val scope = rememberCoroutineScope()                                   // 1
 val context = LocalContext.current
 
@@ -1190,7 +1223,7 @@ val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.
 |---|---|---|
 | `viewModelScope.launch` | ViewModels | Lógica que debe sobrevivir a recomposiciones |
 | `rememberCoroutineScope()` | Rutas | Trabajo que inicia un toque del usuario |
-| `LaunchedEffect(clave)` | Rutas y `ObserveEffects` | Trabajo que inicia la pantalla y se reinicia si cambia la clave |
+| `LaunchedEffect(clave)` | Rutas y [`ObserveEffects`](../app/src/main/java/com/smartfood/app/core/navigation/ObserveEffects.kt) | Trabajo que inicia la pantalla y se reinicia si cambia la clave |
 | `withContext(Dispatchers.IO)` | Archivos y fotos | Disco o red fuera del hilo principal |
 
 > **Notas técnicas**
@@ -1207,7 +1240,7 @@ mismo con **Hilt**:
 
 | En el curso | En SmartFood |
 |---|---|
-| `class AppContainer { val repo = … }` | `@Module` + `@Binds` (`InventoryDataModule`) |
+| `class AppContainer { val repo = … }` | `@Module` + `@Binds` ([`InventoryDataModule`](../app/src/main/java/com/smartfood/app/feature/inventory/data/di/InventoryDataModule.kt)) |
 | `ViewModelProvider.Factory` a mano | `@HiltViewModel` + `@Inject constructor` |
 | `viewModel(factory = …)` | `hiltViewModel()` |
 | `Application` que crea el contenedor | `@HiltAndroidApp class SmartfoodApp` |
@@ -1218,13 +1251,14 @@ genera.
 > **Notas técnicas**
 >
 > - **Concepto profundo:** Hilt genera las *factories* al compilar. Al arrancar no escanea clases ni usa reflexión, así que el costo de inicio es casi el mismo que escribirlas a mano.
-> - **Memoria:** Lo que es caro de crear (`FirebaseFirestore`, `FirebaseAuth`, el `DataStore`) se provee como `@Singleton` en `CoreDataModule`: una sola instancia en toda la app.
+> - **Memoria:** Lo que es caro de crear (`FirebaseFirestore`, `FirebaseAuth`, el `DataStore`) se provee como `@Singleton` en [`CoreDataModule`](../app/src/main/java/com/smartfood/app/core/di/CoreDataModule.kt): una sola instancia en toda la app.
 > - **Pruebas:** Como el ViewModel recibe sus dependencias por el constructor, las pruebas unitarias le pasan *fakes* (`FakeInventoryRepository`) sin Hilt ni Firebase.
 
 ## 5.3 Imágenes de Internet con Coil
 
+Archivo: [InventoryItemRow.kt, líneas 211–227](../app/src/main/java/com/smartfood/app/feature/inventory/ui/components/InventoryItemRow.kt#L211-L227)
+
 ```kotlin
-// InventoryItemRow.kt
 val photoModel: Any? = item.localPhotoPath?.let { File(it) } ?: item.photo?.url  // 1
 if (photoModel == null) {
     Box(modifier = Modifier.size(ThumbnailHeight).background(color = status.color, shape = TrailingThumbnailShape))  // 2
@@ -1253,7 +1287,7 @@ todavía no se haya subido.
 >
 > - **Concepto profundo: la caché de Coil:** Coil tiene dos cachés: en **memoria** (las imágenes ya decodificadas que se vieron hace poco) y en **disco** (los archivos descargados). Volver a la lista no descarga las fotos otra vez.
 > - **Optimización: tamaño de decodificación:** Coil decodifica la imagen al tamaño del composable que la muestra, no al tamaño original. Una miniatura de 60 dp ocupa poca memoria aunque la foto original sea mucho más grande.
-> - **Hardware: memoria de una foto:** Una foto de 12 MP (4000 × 3000) decodificada ocupa unos 48 MB (4 bytes por píxel). Por eso la app comprime las fotos **antes de subirlas**: lado mayor de 1080 px y calidad JPEG 80 (`PhotoScaling.kt`). Se ahorran memoria, datos móviles y espacio en Storage, que solo acepta archivos de menos de 2 MB (`storage.rules`).
+> - **Hardware: memoria de una foto:** Una foto de 12 MP (4000 × 3000) decodificada ocupa unos 48 MB (4 bytes por píxel). Por eso la app comprime las fotos **antes de subirlas**: lado mayor de 1080 px y calidad JPEG 80 ([`PhotoScaling.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/data/photo/PhotoScaling.kt)). Se ahorran memoria, datos móviles y espacio en Storage, que solo acepta archivos de menos de 2 MB ([`storage.rules`](../storage.rules)).
 
 ---
 
@@ -1263,15 +1297,16 @@ todavía no se haya subido.
 
 | Qué se guarda con DataStore | Archivo |
 |---|---|
-| "Recuérdame" del inicio de sesión | `feature/auth/data/local/DataStoreSessionPreferences.kt` |
-| Modo claro u oscuro | `core/preferences/DataStoreThemePreferences.kt` |
-| Ajustes de notificaciones | `feature/profile/data/local/DataStoreNotificationSettings.kt` |
-| Preferencias del inventario | `feature/inventory/data/local/DataStoreInventoryPreferences.kt` |
+| "Recuérdame" del inicio de sesión | [`feature/auth/data/local/DataStoreSessionPreferences.kt`](../app/src/main/java/com/smartfood/app/feature/auth/data/local/DataStoreSessionPreferences.kt) |
+| Modo claro u oscuro | [`core/preferences/DataStoreThemePreferences.kt`](../app/src/main/java/com/smartfood/app/core/preferences/DataStoreThemePreferences.kt) |
+| Ajustes de notificaciones | [`feature/profile/data/local/DataStoreNotificationSettings.kt`](../app/src/main/java/com/smartfood/app/feature/profile/data/local/DataStoreNotificationSettings.kt) |
+| Preferencias del inventario | [`feature/inventory/data/local/DataStoreInventoryPreferences.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/data/local/DataStoreInventoryPreferences.kt) |
 
 Cómo llega a la pantalla el modo guardado:
 
+Archivo: [ThemeViewModel.kt, líneas 28–35](../app/src/main/java/com/smartfood/app/core/preferences/ThemeViewModel.kt#L28-L35)
+
 ```kotlin
-// ThemeViewModel.kt
 private val _themeMode = MutableStateFlow(ThemeMode.Default)           // 1
 val themeMode: StateFlow<ThemeMode> = _themeMode.asStateFlow()
 
@@ -1285,7 +1320,7 @@ init {
 | Línea | Qué hace |
 |---|---|
 | 1 | Empieza en el modo por defecto (claro) mientras DataStore lee el modo guardado |
-| 2 | Cuando DataStore lee el modo guardado (o el usuario lo cambia), el tema se actualiza. `MainActivity` lo lee con `collectAsStateWithLifecycle()` (sección 1.1) |
+| 2 | Cuando DataStore lee el modo guardado (o el usuario lo cambia), el tema se actualiza. [`MainActivity`](../app/src/main/java/com/smartfood/app/MainActivity.kt) lo lee con `collectAsStateWithLifecycle()` (sección 1.1) |
 
 **Decisión: ¿por qué no Room?** Los datos del inventario viven en **Firestore**, que ya guarda una copia en el
 teléfono y funciona sin conexión. Room duplicaría esa copia. DataStore queda para los ajustes pequeños.
@@ -1293,7 +1328,7 @@ teléfono y funciona sin conexión. Room duplicaría esa copia. DataStore queda 
 > **Notas técnicas**
 >
 > - **Concepto profundo: DataStore frente a SharedPreferences:** DataStore lee y escribe con corrutinas, fuera del hilo principal, y cada escritura es una **transacción atómica**: se guarda todo o nada. `SharedPreferences` podía bloquear el hilo principal al guardar y causar ANR.
-> - **Regla de uso:** Solo puede existir **una instancia** de DataStore por archivo; dos instancias sobre el mismo archivo fallan. Por eso se crea una sola vez en `CoreDataModule` y se inyecta.
+> - **Regla de uso:** Solo puede existir **una instancia** de DataStore por archivo; dos instancias sobre el mismo archivo fallan. Por eso se crea una sola vez en [`CoreDataModule`](../app/src/main/java/com/smartfood/app/core/di/CoreDataModule.kt) y se inyecta.
 > - **La caché de Firestore:** Firestore guarda su copia local en una base de datos interna del teléfono (SQLite en Android). Es la "persistencia" del inventario y la razón de que no haga falta Room.
 
 ---
@@ -1301,10 +1336,10 @@ teléfono y funciona sin conexión. Room duplicaría esa copia. DataStore queda 
 # Unidad 7: WorkManager
 
 Las pantallas no usan WorkManager directamente, pero sí lo que hace:
-- `PhotoUploadWorker` sube las fotos cuando vuelve la red.
-- `ExpiryReminderWorker` envía el aviso diario de vencimientos.
+- [`PhotoUploadWorker`](../app/src/main/java/com/smartfood/app/feature/inventory/data/sync/PhotoUploadWorker.kt) sube las fotos cuando vuelve la red.
+- [`ExpiryReminderWorker`](../app/src/main/java/com/smartfood/app/feature/inventory/data/reminder/ExpiryReminderWorker.kt) envía el aviso diario de vencimientos.
 
-`SmartfoodApp` implementa `Configuration.Provider` para que WorkManager cree los *workers* con Hilt
+[`SmartfoodApp`](../app/src/main/java/com/smartfood/app/SmartfoodApp.kt) implementa `Configuration.Provider` para que WorkManager cree los *workers* con Hilt
 (`HiltWorkerFactory`).
 
 **Decisión.** Guardar un producto con foto **no espera** a que la foto suba. La pantalla vuelve enseguida con
@@ -1323,8 +1358,9 @@ Las pantallas no usan WorkManager directamente, pero sí lo que hace:
 **Concepto.** `AndroidView` mete una View clásica de Android dentro de Compose. Se usa cuando no existe un
 composable equivalente.
 
+Archivo: [ProductCameraRoute.kt, líneas 65–82](../app/src/main/java/com/smartfood/app/feature/inventory/ui/camera/ProductCameraRoute.kt#L65-L82)
+
 ```kotlin
-// ProductCameraRoute.kt
 val controller = remember {                                            // 1
     LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
 }
@@ -1357,7 +1393,7 @@ ProductCameraScreen(
 | 4 | `factory` crea la View de CameraX una sola vez y Compose la ubica como cualquier otro elemento |
 
 **Decisión.** La vista previa usa `PreviewView`, la View de CameraX (`androidx.camera.view`). Como llega por
-parámetro, `ProductCameraScreen` sigue sin estado y sus pruebas pueden pasarle un `Box` en lugar de la cámara.
+parámetro, [`ProductCameraScreen`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/camera/ProductCameraScreen.kt) sigue sin estado y sus pruebas pueden pasarle un `Box` en lugar de la cámara.
 
 > **Notas técnicas**
 >
@@ -1374,9 +1410,9 @@ parámetro, `ProductCameraScreen` sigue sin estado y sus pruebas pueden pasarle 
 | La Screen no tiene estado: recibe `state` y `onEvent` | 2 y 4 | Se puede previsualizar y probar sin Firebase |
 | Contract aparte: `UiState`, `Event` y `Effect` | 2 y 4 | El contrato de la pantalla se lee de un vistazo |
 | Los campos en rojo se derivan del `error` | 2 | Una sola fuente de verdad |
-| Navegación por `Effect` con `Channel`, recogida con `ObserveEffects` | 4 | Navega una vez, aunque se gire la pantalla |
+| Navegación por `Effect` con `Channel`, recogida con [`ObserveEffects`](../app/src/main/java/com/smartfood/app/core/navigation/ObserveEffects.kt) | 4 | Navega una vez, aunque se gire la pantalla |
 | Validaciones solo en los casos de uso | 4 | No se repiten en el ViewModel |
-| Textos en `strings.xml` y colores del tema | 1 y 3 | Traducción y modo oscuro sin tocar las pantallas |
+| Textos en [`strings.xml`](../app/src/main/res/values/strings.xml) y colores del tema | 1 y 3 | Traducción y modo oscuro sin tocar las pantallas |
 | Componentes `SmartFood*` y medidas de `LocalFormMetrics` | 3 y 4 | Fidelidad con el Figma en todos los teléfonos |
 | `LazyColumn` con `key` en las listas | 3 | Rendimiento y animaciones correctas |
 | Carga, error, vacío y contenido en un `when` | 4 | La pantalla nunca queda en blanco |
@@ -1387,15 +1423,15 @@ parámetro, `ProductCameraScreen` sigue sin estado y sus pruebas pueden pasarle 
 
 | Situación | Qué hace la app | Dónde |
 |---|---|---|
-| Teléfono de 120 Hz (8,3 ms por cuadro) | Las animaciones solo existen mientras hacen falta; el `alpha` se cambia en la capa de dibujo | `Buttons.kt`, `AuthScreenScaffold.kt` |
+| Teléfono de 120 Hz (8,3 ms por cuadro) | Las animaciones solo existen mientras hacen falta; el `alpha` se cambia en la capa de dibujo | [`Buttons.kt`](../app/src/main/java/com/smartfood/app/core/designsystem/components/Buttons.kt), [`AuthScreenScaffold.kt`](../app/src/main/java/com/smartfood/app/feature/auth/ui/components/AuthScreenScaffold.kt) |
 | Se abre el teclado | El encabezado se encoge en la fase de diseño, sin recomponer | `AuthScreenScaffold.kt` |
-| Pantalla baja o con barra de 3 botones | Perfil `Compact`, `Medium` o `Regular` según el alto útil | `FormMetrics.kt` |
-| Fotos de 12 MP | Se reducen a 1080 px y JPEG 80 antes de subirlas; Coil decodifica al tamaño de la miniatura | `PhotoScaling.kt`, `InventoryItemRow.kt` |
-| Pantalla OLED | El modo oscuro ahorra batería | `Theme.kt` |
+| Pantalla baja o con barra de 3 botones | Perfil `Compact`, `Medium` o `Regular` según el alto útil | [`FormMetrics.kt`](../app/src/main/java/com/smartfood/app/core/designsystem/theme/FormMetrics.kt) |
+| Fotos de 12 MP | Se reducen a 1080 px y JPEG 80 antes de subirlas; Coil decodifica al tamaño de la miniatura | [`PhotoScaling.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/data/photo/PhotoScaling.kt), [`InventoryItemRow.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/components/InventoryItemRow.kt) |
+| Pantalla OLED | El modo oscuro ahorra batería | [`Theme.kt`](../app/src/main/java/com/smartfood/app/core/designsystem/theme/Theme.kt) |
 | Android 11 o anterior | Sin desenfoque en el diálogo sin conexión; queda el oscurecimiento | `AuthScreenScaffold.kt` |
-| Android 13 o superior | Pide el permiso de notificaciones tras el primer guardado | `ProductEditorRoute.kt` |
-| Sin red | Firestore guarda en el teléfono y WorkManager sube las fotos después | `FirestoreInventoryRepository.kt`, `PhotoUploadWorker.kt` |
-| La app pasa a segundo plano | `collectAsStateWithLifecycle` y `repeatOnLifecycle` dejan de escuchar; la cámara se suelta | `ObserveEffects.kt`, `ProductCameraRoute.kt` |
+| Android 13 o superior | Pide el permiso de notificaciones tras el primer guardado | [`ProductEditorRoute.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/editor/ProductEditorRoute.kt) |
+| Sin red | Firestore guarda en el teléfono y WorkManager sube las fotos después | [`FirestoreInventoryRepository.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/data/repository/FirestoreInventoryRepository.kt), [`PhotoUploadWorker.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/data/sync/PhotoUploadWorker.kt) |
+| La app pasa a segundo plano | `collectAsStateWithLifecycle` y `repeatOnLifecycle` dejan de escuchar; la cámara se suelta | [`ObserveEffects.kt`](../app/src/main/java/com/smartfood/app/core/navigation/ObserveEffects.kt), [`ProductCameraRoute.kt`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/camera/ProductCameraRoute.kt) |
 
 ## Mejoras de optimización encontradas al escribir esta guía
 
@@ -1403,7 +1439,7 @@ parámetro, `ProductCameraScreen` sigue sin estado y sus pruebas pueden pasarle 
 |---|---|---|
 | `contentType` en la `LazyColumn` del inventario | Scroll más fluido en gama baja | Bajo |
 | Leer el brillo del esqueleto en la fase de dibujo | El esqueleto no se recompone en cada cuadro | Bajo |
-| `stateIn(WhileSubscribed)` en `InventoryViewModel`, como en la búsqueda | Menos red y batería con la app minimizada | Medio |
+| `stateIn(WhileSubscribed)` en [`InventoryViewModel`](../app/src/main/java/com/smartfood/app/feature/inventory/ui/list/InventoryViewModel.kt), como en la búsqueda | Menos red y batería con la app minimizada | Medio |
 | Quitar `remember(onEvent) { { … } }` en código nuevo | Código más simple; el compilador ya lo hace | Bajo |
 | Un *baseline profile* para el código de la app | Arranque y primeras pantallas más rápidos | Medio |
 
