@@ -4,7 +4,9 @@ import com.smartfood.app.feature.recipes.data.catalog.AndroidRecipeAssetSource
 import com.smartfood.app.feature.recipes.data.catalog.AssetsRecipeCatalog
 import com.smartfood.app.feature.recipes.data.catalog.RecipeAssetSource
 import com.smartfood.app.feature.recipes.data.repository.FirestoreCookingHistoryRepository
+import com.smartfood.app.feature.recipes.data.repository.FirestoreFavoritesRepository
 import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
+import com.smartfood.app.feature.recipes.domain.repository.FavoritesRepository
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import dagger.Binds
 import dagger.Module
@@ -42,6 +44,11 @@ abstract class RecipesDataModule {
     abstract fun bindCookingHistoryRepository(
         impl: FirestoreCookingHistoryRepository
     ): CookingHistoryRepository
+
+    /** Favoritas en Firestore (`users/{uid}/favorites`, spec 010, T002). */
+    @Binds
+    @Singleton
+    abstract fun bindFavoritesRepository(impl: FirestoreFavoritesRepository): FavoritesRepository
 
     companion object {
 

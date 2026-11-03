@@ -12,7 +12,7 @@
 - [x] T001 La spec, el plan, las tareas y las capturas de `disenos-figma/Modulo 5 - Recetas guardadas`.
 
 ## Issue 1: Favoritas y lista Guardadas (intermedia, #117)
-- [ ] T002 **Dominio y datos de favoritas** (RF-SAV-01, CA-SAV-01-04, 01-05):
+- [x] T002 **Dominio y datos de favoritas** (RF-SAV-01, CA-SAV-01-04, 01-05):
   - crea `…/feature/recipes/domain/model/SavedRecipes.kt` con los modelos de plan §2.2 que usa este Issue:
     `FavoriteSource`, `Favorite`, `SavedFilter`, `SavedSort`, `SavedRecipeCard`;
   - crea `…/domain/repository/FavoritesRepository.kt` y `…/data/repository/FirestoreFavoritesRepository.kt` (patrón
