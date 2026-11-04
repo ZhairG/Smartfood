@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // Reglas de seguridad de SmartFood (spec 001, RNF-02; spec 003, RNF-REC-02; spec 004, RNF-MAIL-04;
-// spec 005, CA-LEG-02-02; spec 006, RNF-INV-01).
+// spec 005, CA-LEG-02-02; spec 006, RNF-INV-01; spec 010, RNF-SAV-01).
 // Cada usuario solo puede leer y escribir su propio perfil y su inventario. Todo lo demás está denegado.
 // Pruebas: rules-test/ (firebase emulators:exec --only firestore,storage "npm --prefix rules-test test").
 service cloud.firestore {
@@ -114,6 +114,19 @@ service cloud.firestore {
       allow read, delete: if isOwner(uid);
       allow create: if isOwner(uid) && validCooking(request.resource.data);
       allow update: if false;
+    }
+
+    // Favoritas (spec 010, RF-SAV-01 y RNF-SAV-01, CA-SAV-01-04 y 01-05): solo el origen y la hora del servidor.
+    // Se permite crear y actualizar porque tocar el ♡ dos veces seguidas sin conexión hace un `set` sobre un documento
+    // que ya existe (plan §6 y §7).
+    match /users/{uid}/favorites/{recipeId} {
+      function validFavorite(d) {
+        return d.keys().hasOnly(['source', 'savedAt'])
+          && d.source in ['catalog', 'own']
+          && d.savedAt == request.time;
+      }
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && validFavorite(request.resource.data);
     }
   }
 }

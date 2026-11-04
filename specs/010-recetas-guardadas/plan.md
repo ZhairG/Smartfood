@@ -210,11 +210,13 @@ Detalles visuales (de los frames; los valores salen de los tokens existentes y d
 
 ```
 match /users/{uid}/favorites/{recipeId} {
-  allow read, delete: if request.auth.uid == uid;
-  allow create, update: if request.auth.uid == uid
+  allow read, delete: if isOwner(uid);
+  // `create` y `update` porque volver a tocar el ♡ sin conexión hace un `set` sobre un documento que ya existe. El
+  // `savedAt` debe ser la hora del servidor, igual que `cookedAt` en el historial de cocción (spec 009).
+  allow create, update: if isOwner(uid)
     && request.resource.data.keys().hasOnly(['source', 'savedAt'])
     && request.resource.data.source in ['catalog', 'own']
-    && request.resource.data.savedAt is timestamp;
+    && request.resource.data.savedAt == request.time;
 }
 match /users/{uid}/recipes/{recipeId} {
   function validRecipe(d) {
@@ -252,6 +254,7 @@ Casos nuevos en `rules-test/firestore.test.js`:
 | Deshacer reescribe la receta | Borrar cuando pasan los 8 s | Funciona sin conexión y aunque la app se cierre durante el aviso (spec §7). |
 | Crear también marca favorita | Solo "Creadas por mí" | El frame `666:3804` muestra la receta creada en "Favoritas". |
 | "Sin conexión" = hay escrituras pendientes | Leer el estado de la red | Es el mismo criterio del inventario (`isPendingSync`) y no necesita permisos. |
+| Reglas: `create` y `update`, con `savedAt == request.time` | Solo `create`, o `savedAt is timestamp` | Tocar el ♡ dos veces sin conexión hace un `set` sobre un documento existente, y la hora debe salir del servidor, como en el historial de cocción (Zhair, 2026-11-02). |
 
 ## 8. Estrategia de pruebas
 

@@ -2,8 +2,8 @@
  * Nombre: firestore.test.js
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Pruebas de firestore.rules para el inventario (spec 006, RNF-INV-01, plan §3) y regresión del
- * perfil (spec 005, CA-LEG-02-02). Se ejecutan contra el emulador de Firestore:
+ * Descripción: Pruebas de firestore.rules para el inventario (spec 006, RNF-INV-01, plan §3), las favoritas
+ * (spec 010, RNF-SAV-01) y regresión del perfil (spec 005, CA-LEG-02-02). Se ejecutan contra el emulador de Firestore:
  * firebase emulators:exec --only firestore,storage "npm --prefix rules-test test"
  */
 import { after, before, beforeEach, describe, test } from 'node:test';
@@ -302,5 +302,46 @@ describe('historial de cocción (spec 009, CA-RIA-04-05)', () => {
   test('CA-RIA-04-05 no se permite la edición de un registro ya creado', async () => {
     await assertSucceeds(setDoc(cooking('u1'), validCooking()));
     await assertFails(setDoc(cooking('u1'), validCooking({ rescuedValueCop: 5000 })));
+  });
+});
+
+describe('favoritas (spec 010, RF-SAV-01, RNF-SAV-01)', () => {
+  const favorite = (uid, id = 'arepas_hogao') => doc(db(uid), `users/${uid ?? 'u1'}/favorites/${id}`);
+  const validFavorite = (cambios = {}) => ({
+    source: 'catalog',
+    savedAt: serverTimestamp(),
+    ...cambios,
+  });
+  const sembrarFavorita = async () => env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'users/u1/favorites/arepas_hogao'), {
+      source: 'catalog',
+      savedAt: Timestamp.fromDate(new Date('2026-11-01T10:00:00Z')),
+    });
+  });
+
+  test('CA-SAV-01-05 el dueño guarda, lee, vuelve a guardar y borra su favorita', async () => {
+    await assertSucceeds(setDoc(favorite('u1'), validFavorite()));
+    await assertSucceeds(getDoc(favorite('u1')));
+    // Tocar el ♡ dos veces seguidas sin conexión hace un `set` sobre el documento que ya existe (plan §7).
+    await assertSucceeds(setDoc(favorite('u1'), validFavorite({ source: 'own' })));
+    await assertSucceeds(deleteDoc(favorite('u1')));
+  });
+
+  test('RNF-SAV-01 otro usuario o anónimo no puede leer, crear ni borrar', async () => {
+    await sembrarFavorita();
+    const ajena = doc(db('u2'), 'users/u1/favorites/arepas_hogao');
+    await assertFails(getDoc(ajena));
+    await assertFails(setDoc(doc(db('u2'), 'users/u1/favorites/pasta'), validFavorite()));
+    await assertFails(deleteDoc(ajena));
+    await assertFails(getDoc(favorite(null)));
+    await assertFails(setDoc(doc(db(null), 'users/u1/favorites/pasta'), validFavorite()));
+  });
+
+  test('RNF-SAV-01 solo se aceptan las claves, el origen y la hora del servidor', async () => {
+    await assertFails(setDoc(favorite('u1', 'a'), validFavorite({ extra: true })));
+    await assertFails(setDoc(favorite('u1', 'b'), validFavorite({ source: 'manual' })));
+    await assertFails(setDoc(favorite('u1', 'c'), validFavorite({ source: 'CATALOG' })));
+    await assertFails(setDoc(favorite('u1', 'd'), validFavorite({ savedAt: Timestamp.now() })));
+    await assertFails(setDoc(favorite('u1', 'e'), validFavorite({ savedAt: 'ayer' })));
   });
 });
