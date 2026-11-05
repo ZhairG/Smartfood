@@ -42,7 +42,7 @@
   - textos en el archivo nuevo `res/values/strings_saved.xml`;
   - el ícono de libro del vacío se exporta del Figma `557:2585` a `res/drawable/ic_figma_book.xml`;
   - el "+" y "Crear receta" navegan a `Route.OwnRecipeEditor()`, que en este Issue es un destino vacío; T013 lo llena.
-- [ ] T008 **Pruebas:** `SavedRecipesViewModelTest` y `SavedRecipesScreenTest` (chips, búsqueda, orden, vacío,
+- [x] T008 **Pruebas:** `SavedRecipesViewModelTest` y `SavedRecipesScreenTest` (chips, búsqueda, orden, vacío,
   "Sin conexión").
 
 ## Issue 2: Crear y editar receta propia (avanzada, #130)
