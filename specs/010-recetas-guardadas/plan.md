@@ -174,7 +174,8 @@ En `core/navigation/Routes.kt` y `ScreenRoute.kt`:
 - `MainTabScaffold.kt`:
   - `MainTab.SAVED` pasa a `enabled = true`;
   - `navigateToTab` lleva a `Route.Saved`;
-  - `Route.Saved` y sus pantallas internas marcan la pestaña "Guardadas".
+  - `Route.Saved` y sus pantallas internas marcan la pestaña "Guardadas". El detalle del catálogo es compartido:
+    `Route.RecipeDetail(recipeId, fromSaved = true)` lo marca cuando se abre desde Guardadas.
 - `RecipesNavGraph.kt`: una función nueva `savedDestinations(navController)` registra las 5 rutas. `MainNavGraph.kt`
   la llama.
 - Las pantallas internas usan `NavTransitions`, igual que `RecipeDetail`.
@@ -189,7 +190,7 @@ En `core/navigation/Routes.kt` y `ScreenRoute.kt`:
 
 | Pantalla | Estado (`XUiState`) | Eventos principales |
 |---|---|---|
-| `SavedRecipesScreen` | `filter`, `query`, `sort`, `cards`, `isEmptyOverall`, `hasPendingSync`, `isSortMenuOpen`, `deleted: DeletedOwnRecipe?`, `undoSecondsLeft` | `FilterChanged`, `QueryChanged`, `SortChanged`, `FavoriteToggled(id)`, `CardClicked`, `AddClicked`, `UndoClicked` |
+| `SavedRecipesScreen` | `isLoading`, `hasError`, `filter`, `query`, `sort`, `cards`, `isEmptyOverall`, `hasPendingSync`, `isSortMenuOpen`; el #131 agrega `deleted: DeletedOwnRecipe?` y `undoSecondsLeft` | `FilterChanged`, `QueryChanged`, `ClearQuery`, `SortClicked`, `SortDismissed`, `SortChanged`, `FavoriteToggled(id)`, `CardClicked`, `AddClicked`; el #131 agrega `UndoClicked`. Efectos: `OpenRecipe`, `OpenOwnRecipe`, `OpenNewRecipe` |
 | `OwnRecipeEditorScreen` | `isNew`, `draft`, `error: OwnRecipeError?` (los campos en rojo **se derivan** de `error`), `isSaving`, `isCategorySheetOpen`, `ingredientSheet: IngredientSheetState?` | `NameChanged`, `CategoryPicked`, `IngredientAdded/Updated/Removed`, `CookMinutesChanged`, `PreparationChanged`, `SaveClicked`, `DiscardClicked`, `DeleteClicked` |
 | `OwnRecipeSavedScreen` | sin ViewModel: recibe `name` y `edited` | `ViewRecipe`, `CreateAnother`, `Back` |
 | `DeleteOwnRecipeScreen` | `isDeleting`, `error` | `ConfirmClicked`, `CancelClicked` |

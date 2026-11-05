@@ -55,6 +55,7 @@ favoritas.
 | CA-SAV-02-08 | **Dado** un chip sin recetas (por ejemplo, "Creadas por mí" sin recetas creadas), **entonces** veo un texto corto que lo explica en lugar de la cuadrícula. |
 | CA-SAV-02-09 | **Dado** que tengo cambios que esperan sincronizarse, **entonces** debajo de las tarjetas veo la tarjeta "Sin conexión · Tus recetas guardadas siguen disponibles. Los cambios se sincronizarán después." (Figma `633:2723`), que desaparece al sincronizar. |
 | CA-SAV-02-10 | **Dado** que toco el "+" o "Crear receta", **entonces** se abre "Nueva receta" (Figma `557:2693`). |
+| CA-SAV-02-11 | **Dado** que mis recetas guardadas no se pueden leer, **entonces** veo "No pudimos cargar tus recetas guardadas." en lugar de la lista, la app no se cierra y en Recetas y en el detalle las tarjetas se ven sin ♡ marcado. *(Zhair, 2026-11-05.)* |
 
 ### HU-SAV-03: Crear una receta propia
 **Como** usuario **quiero** escribir mis propias recetas **para** tenerlas junto a las del catálogo.
@@ -187,6 +188,7 @@ Flujo:
 | "Editar receta" muestra la tarjeta de ingredientes. En el Figma `666:3647` no aparece. | Si no, no se podrían corregir los ingredientes. |
 | El aviso de error "No pudimos guardar los cambios" también aparece en "Nueva receta". | Mismo formulario y mismas reglas. |
 | Las tarjetas de Recetas y el detalle muestran el ♡. Esto anula la desviación de la spec 009 §9 que lo quitaba. | El módulo de favoritas ya existe. |
+| En el detalle, el ♡ reemplaza al `⋮` de la barra (Figma `557:2856`), que no tiene acción. | Aprobado por Zhair en el #117 (2026-11-02). |
 
 ## 10. Plan de entrega
 

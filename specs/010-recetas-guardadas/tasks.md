@@ -68,12 +68,12 @@
     `ProductEditor*`);
   - `IngredientSheet.kt` y la hoja de categoría con `OptionSheet`;
   - `OwnRecipeErrorText.kt`;
-  - la ruta `OwnRecipeEditor(recipeId)`.
+  - la ruta `OwnRecipeEditor(recipeId)` ya existe como destino vacío (T007): se llena, no se vuelve a crear.
 - [ ] T014 **"¡Receta guardada!" y detalle** (CA-SAV-03-07, 04-02, 04-05):
   - `OwnRecipeSavedScreen.kt` (creada y editada);
   - `OwnRecipeDetailScreen.kt` con su ViewModel;
   - las rutas `OwnRecipeSaved` y `OwnRecipeDetail`;
-  - la tarjeta propia de Guardadas abre el editor (CA-SAV-02-06).
+  - la tarjeta propia de Guardadas ya abre el editor con `SavedRecipesEffect.OpenOwnRecipe` (CA-SAV-02-06, T007).
 - [ ] T015 **Pruebas:** `OwnRecipeEditorViewModelTest`, `OwnRecipeEditorScreenTest`, `OwnRecipeSavedScreenTest` y
   `OwnRecipeDetailScreenTest`.
 - [ ] T016 **Navegación del flujo:** crear → éxito → "Ver receta" / "Crear otra" / flecha, en `MainNavigationTest`.
@@ -98,7 +98,8 @@
 
 ## Cierre (en el mismo PR)
 - [ ] T022 Suite instrumentada completa y `rules-test` en verde.
-- [ ] T023 Despliegue de `firestore.rules` (con confirmación de Zhair).
+- [ ] T023 Despliegue del bloque `recipes` de `firestore.rules` (con confirmación de Zhair). El bloque `favorites` se
+  despliega al cerrar el #117, para poder probar el ♡ contra Firebase.
 - [ ] T024 Checklist manual en el teléfono (abajo) y capturas Figma vs app en el PR.
 - [ ] T025 Matriz al día, `tools/ca_coverage_baseline.txt`, `README.md` y `AGENTS.md` (arquitectura de Guardadas).
 
@@ -118,11 +119,12 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-SAV-02-03 | U `ObserveSavedRecipesUseCaseTest` |
 | CA-SAV-02-04 | U `ObserveSavedRecipesUseCaseTest`, I `SavedRecipesScreenTest` |
 | CA-SAV-02-05 | U `ObserveSavedRecipesUseCaseTest`, U `SavedRecipesViewModelTest`, I `SavedRecipesScreenTest` |
-| CA-SAV-02-06 | U `SavedRecipesViewModelTest` |
+| CA-SAV-02-06 | U `SavedRecipesViewModelTest`, I `SavedRecipesScreenTest`, I `MainNavigationTest` |
 | CA-SAV-02-07 | U `ObserveSavedRecipesUseCaseTest`, I `SavedRecipesScreenTest` |
 | CA-SAV-02-08 | I `SavedRecipesScreenTest` |
 | CA-SAV-02-09 | U `ObserveSavedRecipesUseCaseTest`, I `SavedRecipesScreenTest`, M |
-| CA-SAV-02-10 | U `SavedRecipesViewModelTest`, I `MainNavigationTest` |
+| CA-SAV-02-10 | U `SavedRecipesViewModelTest`, I `SavedRecipesScreenTest`, I `MainNavigationTest` |
+| CA-SAV-02-11 | U `SavedRecipesViewModelTest`, U `RecipesDiscoverViewModelTest`, U `RecipeDetailViewModelTest`, I `SavedRecipesScreenTest` |
 | CA-SAV-03-01 | I `OwnRecipeEditorScreenTest` |
 | CA-SAV-03-02 | U `OwnRecipeEditorViewModelTest`, I `OwnRecipeEditorScreenTest` |
 | CA-SAV-03-03 | U `OwnRecipeEditorViewModelTest`, I `OwnRecipeEditorScreenTest` |
