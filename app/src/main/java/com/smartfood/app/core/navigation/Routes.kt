@@ -134,8 +134,14 @@ sealed interface Route {
      * @property recipeId Identificador de la receta.
      */
     @Serializable
-    data class RecipeDetail(val recipeId: String) : Route {
+    data class RecipeDetail(val recipeId: String, val fromSaved: Boolean = false) : Route {
         override val screenRoute: ScreenRoute get() = ScreenRoute.RECIPE_DETAIL
+    }
+
+    /** Crear (`recipeId = null`) o editar una receta propia (spec 010, plan §4). El #130 lo llena en T013. */
+    @Serializable
+    data class OwnRecipeEditor(val recipeId: String? = null) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.OWN_RECIPE_EDITOR
     }
 
     /** Preparación previa de una receta (spec 009, CA-RIA-04-03). */

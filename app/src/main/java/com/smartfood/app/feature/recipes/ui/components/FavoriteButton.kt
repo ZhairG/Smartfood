@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenCheck
@@ -37,10 +37,12 @@ fun FavoriteButton(
     val heartColor = if (isFavorite) GreenCheck else MaterialTheme.colorScheme.onSurfaceVariant
     val drawable = if (isFavorite) R.drawable.ic_figma_heart_filled else R.drawable.ic_figma_heart
 
+    // El área táctil es de 48 dp aunque el ♡ se vea más pequeño (RNF-SAV-04).
     Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(HeartSize)
-            .clickable(onClick = onClick)
+            .size(TouchTargetSize)
+            .clickable(role = Role.Button, onClick = onClick)
     ) {
         if (showPill) {
             Box(
@@ -48,7 +50,6 @@ fun FavoriteButton(
                     .size(HeartPillSize)
                     .clip(RoundedCornerShape(HeartPillRadius))
                     .background(MaterialTheme.colorScheme.surface)
-                    .align(Alignment.Center)
             )
         }
         Icon(
@@ -59,13 +60,19 @@ fun FavoriteButton(
                 stringResource(id = R.string.cd_recipes_add_favorite)
             },
             tint = heartColor,
-            modifier = Modifier.size(HeartIconSize).align(Alignment.Center)
+            modifier = Modifier.size(HeartIconSize)
         )
     }
 }
 
+/**
+ * Desplaza el botón de 48 dp hacia la esquina de la tarjeta, para que la píldora de 22 dp quede a 8 dp de cada borde,
+ * como en el Figma `633:2723`.
+ */
+val FavoriteButtonCardOffset = 5.dp
+
 // Medidas del Figma 633:2723 y 557:2856. No son de formulario, así que no van en FormMetrics.
-private val HeartSize = 24.dp
+private val TouchTargetSize = 48.dp
 private val HeartPillSize = 22.dp
 private val HeartPillRadius = 10.dp
 private val HeartIconSize = 18.dp

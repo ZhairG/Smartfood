@@ -8,34 +8,33 @@ import com.smartfood.app.feature.recipes.domain.model.SavedSort
  * Nombre: SavedRecipesContract.kt
  * Autor: SmartFood Team
  * Fecha: Noviembre 2026
- * Descripción: Estado, eventos y efectos de la pantalla Guardadas (spec 010, HU-SAV-02, T007).
- * Los campos derivados (tarjetas, filtro activo, vacío, aviso "Sin conexión") los calcula
- * el ViewModel; la pantalla solo dibuja y avisa.
+ * Descripción: Estado, eventos y efectos de la pantalla Guardadas (spec 010, HU-SAV-02, T007). El aviso de deshacer se
+ * agrega en el #131 (T019).
  */
 
 /**
  * Estado de la pantalla Guardadas.
  *
+ * @property isLoading `true` hasta que llegan los primeros datos; evita que parpadee el estado vacío.
+ * @property hasError `true` si las recetas guardadas no se pudieron leer (CA-SAV-02-11).
  * @property filter Chip elegido.
  * @property query Texto de búsqueda.
  * @property sort Orden elegido.
  * @property cards Tarjetas visibles, ya filtradas, buscadas y ordenadas.
- * @property isEmptyOverall `true` si no hay recetas guardadas válidas.
- * @property hasPendingSync `true` si alguna favorita visible espera sincronizarse (CA-SAV-02-09).
+ * @property isEmptyOverall `true` si no hay ninguna receta guardada (CA-SAV-02-07).
+ * @property hasPendingSync `true` si hay cambios que esperan sincronizarse (CA-SAV-02-09).
  * @property isSortMenuOpen `true` si el menú "Ordenar" está abierto.
- * @property deleted Receta borrada pendiente de deshacer, o `null`.
- * @property undoSecondsLeft Segundos restantes de la cuenta regresiva de deshacer.
  */
 data class SavedRecipesUiState(
+    val isLoading: Boolean = true,
+    val hasError: Boolean = false,
     val filter: SavedFilter = SavedFilter.FAVORITES,
     val query: String = "",
     val sort: SavedSort = SavedSort.RECENT,
     val cards: List<SavedRecipeCard> = emptyList(),
-    val isEmptyOverall: Boolean = true,
+    val isEmptyOverall: Boolean = false,
     val hasPendingSync: Boolean = false,
     val isSortMenuOpen: Boolean = false,
-    val deleted: DeletedOwnRecipe? = null,
-    val undoSecondsLeft: Int = 0,
 )
 
 /** Acciones de la persona en Guardadas. */
@@ -47,18 +46,37 @@ sealed interface SavedRecipesEvent {
     /** Escribió en la búsqueda. */
     data class QueryChanged(val query: String) : SavedRecipesEvent
 
-    /** Cambió el orden elegido. */
+    /** Tocó la "x" de la búsqueda. */
+    data object ClearQuery : SavedRecipesEvent
+
+    /** Tocó "Ordenar". */
+    data object SortClicked : SavedRecipesEvent
+
+    /** Cerró el menú "Ordenar" sin confirmar. */
+    data object SortDismissed : SavedRecipesEvent
+
+    /** Confirmó un orden en el menú. */
     data class SortChanged(val sort: SavedSort) : SavedRecipesEvent
 
     /** Marcó o quitó una receta como favorita. */
     data class FavoriteToggled(val recipeId: String) : SavedRecipesEvent
 
-    /** Tocó una tarjeta para abrir el detalle o el editor. */
+    /** Tocó una tarjeta. */
     data class CardClicked(val recipeId: String) : SavedRecipesEvent
 
     /** Tocó "+" o "Crear receta". */
-    object AddClicked : SavedRecipesEvent
+    data object AddClicked : SavedRecipesEvent
+}
 
-    /** Tocó "Deshacer" en el aviso de eliminación. */
-    object UndoClicked : SavedRecipesEvent
+/** Efectos de navegación de Guardadas. */
+sealed interface SavedRecipesEffect {
+
+    /** Abre el detalle de una receta del catálogo. */
+    data class OpenRecipe(val recipeId: String) : SavedRecipesEffect
+
+    /** Abre "Editar receta" de una receta propia (CA-SAV-02-06). */
+    data class OpenOwnRecipe(val recipeId: String) : SavedRecipesEffect
+
+    /** Abre "Nueva receta" (CA-SAV-02-10). */
+    data object OpenNewRecipe : SavedRecipesEffect
 }

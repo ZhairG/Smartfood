@@ -1,8 +1,6 @@
 package com.smartfood.app.feature.recipes.ui.discover
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,21 +8,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,10 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -45,16 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenSoft
-import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.SurfaceLight
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
-import com.smartfood.app.feature.recipes.ui.components.FavoriteButton
 import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipeCard
-import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
+import com.smartfood.app.feature.recipes.ui.components.RecipeFilterPill
+import com.smartfood.app.feature.recipes.ui.components.RecipeSearchField
 import com.smartfood.app.feature.recipes.ui.components.RecipesHeader
-import com.smartfood.app.feature.recipes.ui.components.formatCop
 
 /**
  * Nombre: RecipesDiscoverScreen.kt
@@ -62,7 +46,7 @@ import com.smartfood.app.feature.recipes.ui.components.formatCop
  * Fecha: Octubre 2026
  * Descripción: Pantalla Descubrir de la pestaña Recetas (spec 009, HU-RIA-01, CA-RIA-01-01 a 01-04, T007), fiel al
  * Figma `557:3028`: encabezado verde, búsqueda, tarjeta "¿Qué cocinamos hoy?", filtros y tarjetas de receta con foto,
- * nombre, tiempo, kcal y costo. Sin ♡ (spec §9). Es stateless: recibe el estado y avisa los eventos.
+ * nombre, tiempo, kcal, costo y ♡ (spec 010, CA-SAV-01-01). Es stateless: recibe el estado y avisa los eventos.
  *
  * @param state Estado calculado por el ViewModel.
  * @param onEvent Acciones de la persona.
@@ -91,8 +75,9 @@ fun RecipesDiscoverScreen(
             verticalArrangement = Arrangement.spacedBy(ContentGap)
         ) {
             item(key = "buscador", span = { GridItemSpan(maxLineSpan) }) {
-                SearchField(
+                RecipeSearchField(
                     query = state.query,
+                    placeholder = stringResource(id = R.string.recipes_search_placeholder),
                     onQueryChanged = { onEvent(RecipesDiscoverEvent.QueryChanged(it)) },
                     onClearQuery = { onEvent(RecipesDiscoverEvent.ClearQuery) }
                 )
@@ -167,71 +152,6 @@ private fun SuggestCard(onSuggestRecipes: (() -> Unit)?) {
     }
 }
 
-/** Búsqueda del Figma (`557:3035`): píldora gris con la lupa y la "x" al escribir. */
-@Composable
-private fun SearchField(
-    query: String,
-    onQueryChanged: (String) -> Unit,
-    onClearQuery: () -> Unit,
-) {
-    val placeholder = stringResource(id = R.string.recipes_search_placeholder)
-    val textStyle = MaterialTheme.typography.bodyLarge.copy(
-        fontSize = 13.sp,
-        color = MaterialTheme.colorScheme.onSurface
-    )
-    BasicTextField(
-        value = query,
-        onValueChange = onQueryChanged,
-        singleLine = true,
-        textStyle = textStyle,
-        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-        modifier = Modifier
-            .fillMaxWidth()
-            .semantics { contentDescription = placeholder },
-        decorationBox = { innerTextField ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = SearchHeight)
-                    .background(color = SurfaceLight, shape = CircleShape)
-                    .padding(horizontal = SearchSidePadding)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_figma_search_bar),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(SearchIconSize)
-                )
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = SearchTextGap)
-                ) {
-                    if (query.isEmpty()) {
-                        Text(
-                            text = placeholder,
-                            style = textStyle,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    innerTextField()
-                }
-                if (query.isNotEmpty()) {
-                    IconButton(onClick = onClearQuery) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_figma_clear),
-                            contentDescription = stringResource(id = R.string.cd_recipes_clear_search),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(ClearIconSize)
-                        )
-                    }
-                }
-            }
-        }
-    )
-}
-
 /** Filtros del Figma (`557:3044`): "Para ti", "≤ 30 min" y "Económicas". */
 @Composable
 private fun RecipeFilters(
@@ -240,41 +160,12 @@ private fun RecipeFilters(
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(FilterGap)) {
         RecipeFilter.entries.forEach { filter ->
-            FilterPill(
+            RecipeFilterPill(
                 text = filter.label(),
                 selected = filter == selected,
                 onClick = { onSelected(filter) }
             )
         }
-    }
-}
-
-@Composable
-private fun FilterPill(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .clip(CircleShape)
-            .background(
-                if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-            )
-            .border(
-                width = 1.dp,
-                color = if (selected) MaterialTheme.colorScheme.primary else GreyDivider,
-                shape = CircleShape
-            )
-            .selectable(selected = selected, role = Role.Tab, onClick = onClick)
-            .padding(horizontal = FilterSidePadding, vertical = FilterVerticalPadding)
-    ) {
-        Text(
-            text = text,
-            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.labelLarge.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
-            maxLines = 1
-        )
     }
 }
 
@@ -326,14 +217,7 @@ private val CardElevation = 3.dp
 private val HeroPadding = 16.dp
 private val HeroGap = 12.dp
 private val HeroElevation = 3.dp
-private val SearchHeight = 48.dp
-private val SearchSidePadding = 16.dp
-private val SearchTextGap = 8.dp
-private val SearchIconSize = 20.dp
-private val ClearIconSize = 18.dp
 private val FilterGap = 8.dp
-private val FilterSidePadding = 12.dp
-private val FilterVerticalPadding = 7.dp
 private val MessageVerticalPadding = 32.dp
 
 @Preview(showBackground = true, heightDp = 900)

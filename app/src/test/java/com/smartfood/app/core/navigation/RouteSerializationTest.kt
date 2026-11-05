@@ -43,6 +43,10 @@ class RouteSerializationTest {
             Route.Profile,
             Route.Recipes,
             Route.RecipeDetail(recipeId = "pollo-guisado"),
+            Route.RecipeDetail(recipeId = "pollo-guisado", fromSaved = true),
+            Route.Saved,
+            Route.OwnRecipeEditor(),
+            Route.OwnRecipeEditor(recipeId = "abc123"),
         )
 
         routes.forEach { route ->

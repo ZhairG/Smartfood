@@ -5,9 +5,11 @@ import android.net.Uri
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -15,7 +17,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.navigation.MainTab
 import com.smartfood.app.core.navigation.MainTabScaffold
 import com.smartfood.app.core.navigation.NavTransitions
@@ -33,6 +37,7 @@ import com.smartfood.app.feature.recipes.ui.cooking.TimerAlarm
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverEffect
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverScreen
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverViewModel
+import com.smartfood.app.feature.recipes.ui.saved.SavedRecipesEffect
 import com.smartfood.app.feature.recipes.ui.saved.SavedRecipesScreen
 import com.smartfood.app.feature.recipes.ui.saved.SavedRecipesViewModel
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
@@ -126,11 +131,19 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
             )
         }
     }
-    composable<Route.RecipeDetail> {
+    composable<Route.RecipeDetail> { entry ->
+        // Abierto desde Guardadas, resalta esa pestaña y vuelve a ella (spec 010, plan §4).
+        val fromSaved = entry.toRoute<Route.RecipeDetail>().fromSaved
         MainTabScaffold(
-            currentTab = MainTab.RECIPES,
+            currentTab = if (fromSaved) MainTab.SAVED else MainTab.RECIPES,
             onTabSelected = navController::navigateToTab,
-            onCurrentTabReselected = { navController.popBackStack<Route.Recipes>(inclusive = false) }
+            onCurrentTabReselected = {
+                if (fromSaved) {
+                    navController.popBackStack<Route.Saved>(inclusive = false)
+                } else {
+                    navController.popBackStack<Route.Recipes>(inclusive = false)
+                }
+            }
         ) {
             val viewModel: RecipeDetailViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -192,21 +205,36 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
     }
 }
 
-/** Pestaña Guardadas (spec 010, T006 y T007). */
+/** Pestaña Guardadas (spec 010, T006 y T007) y el destino de "Nueva receta", que el #130 llena en T013. */
 fun NavGraphBuilder.savedDestinations(navController: NavHostController) {
     composable<Route.Saved> {
         MainTabScaffold(
             currentTab = MainTab.SAVED,
             onTabSelected = navController::navigateToTab,
-            onCurrentTabReselected = { navController.popBackStack<Route.Saved>(inclusive = false) },
         ) {
             val viewModel: SavedRecipesViewModel = hiltViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
-            SavedRecipesScreen(
-                state = state,
-                onEvent = viewModel::onEvent,
-                onSortMenuOpen = viewModel::openSortMenu,
-                onSortMenuClose = viewModel::closeSortMenu,
+            ObserveEffects(viewModel.effects) { effect ->
+                when (effect) {
+                    is SavedRecipesEffect.OpenRecipe ->
+                        navController.navigate(Route.RecipeDetail(effect.recipeId, fromSaved = true))
+                    is SavedRecipesEffect.OpenOwnRecipe ->
+                        navController.navigate(Route.OwnRecipeEditor(effect.recipeId))
+                    SavedRecipesEffect.OpenNewRecipe -> navController.navigate(Route.OwnRecipeEditor())
+                }
+            }
+            SavedRecipesScreen(state = state, onEvent = viewModel::onEvent)
+        }
+    }
+    composable<Route.OwnRecipeEditor> {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            SmartFoodTopBar(
+                title = stringResource(id = R.string.saved_new_recipe_title),
+                onBack = { navController.popBackStack() }
             )
         }
     }

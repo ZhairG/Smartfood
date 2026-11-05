@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -74,7 +75,7 @@ fun RecipeCard(
                 onClick = onFavoriteToggled,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(HeartPadding),
+                    .offset(FavoriteButtonCardOffset, FavoriteButtonCardOffset),
                 showPill = true,
             )
         }
@@ -124,7 +125,6 @@ fun RecipeCard(
 }
 
 // Medidas del Figma 557:3028. No son de formulario, así que no van en FormMetrics.
-private val HeartPadding = 8.dp
 private val CardRadius = 20.dp
 private val CardElevation = 3.dp
 // La foto de la tarjeta se ve de 173 × 111 en el Figma (557:3028).
