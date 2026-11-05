@@ -36,7 +36,7 @@
   - en `MainTabScaffold.kt`: `SAVED` habilitada y `navigateToTab` hacia `Route.Saved`;
   - `savedDestinations()` en `RecipesNavGraph.kt`, llamada desde `MainNavGraph.kt`;
   - actualiza `MainNavigationTest`.
-- [ ] T007 **Pantalla Guardadas** (CA-SAV-02-02 a 02-10):
+- [x] T007 **Pantalla Guardadas** (CA-SAV-02-02 a 02-10):
   - `…/ui/saved/SavedRecipesContract.kt`, `SavedRecipesViewModel.kt`, `SavedRecipesScreen.kt`, `SavedRecipeCard.kt` y
     `SortMenu.kt`;
   - textos en el archivo nuevo `res/values/strings_saved.xml`;

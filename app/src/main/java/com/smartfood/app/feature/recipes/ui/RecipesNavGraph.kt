@@ -33,6 +33,8 @@ import com.smartfood.app.feature.recipes.ui.cooking.TimerAlarm
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverEffect
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverScreen
 import com.smartfood.app.feature.recipes.ui.discover.RecipesDiscoverViewModel
+import com.smartfood.app.feature.recipes.ui.saved.SavedRecipesScreen
+import com.smartfood.app.feature.recipes.ui.saved.SavedRecipesViewModel
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
 import com.smartfood.app.feature.recipes.ui.ai.AiFlowScreen
 import com.smartfood.app.feature.recipes.ui.ai.AiHelpScreen
@@ -190,7 +192,7 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
     }
 }
 
-/** Pestaña Guardadas (spec 010, T006): destino vacío hasta que T007 cree la pantalla completa. */
+/** Pestaña Guardadas (spec 010, T006 y T007). */
 fun NavGraphBuilder.savedDestinations(navController: NavHostController) {
     composable<Route.Saved> {
         MainTabScaffold(
@@ -198,14 +200,14 @@ fun NavGraphBuilder.savedDestinations(navController: NavHostController) {
             onTabSelected = navController::navigateToTab,
             onCurrentTabReselected = { navController.popBackStack<Route.Saved>(inclusive = false) },
         ) {
-            androidx.compose.foundation.layout.Box(
-                modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-                contentAlignment = androidx.compose.ui.Alignment.Center
-            ) {
-                androidx.compose.material3.Text(
-                    text = androidx.compose.ui.res.stringResource(id = com.smartfood.app.R.string.tab_saved)
-                )
-            }
+            val viewModel: SavedRecipesViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            SavedRecipesScreen(
+                state = state,
+                onEvent = viewModel::onEvent,
+                onSortMenuOpen = viewModel::openSortMenu,
+                onSortMenuClose = viewModel::closeSortMenu,
+            )
         }
     }
 }

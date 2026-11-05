@@ -1,0 +1,20 @@
+<resources>
+    <!-- Guardadas (spec 010, T007) -->
+    <string name="saved_title">Guardadas</string>
+    <string name="saved_sort">Ordenar</string>
+    <string name="saved_search_placeholder">Buscar receta guardado...</string>
+    <string name="saved_chip_favorites">Favoritas</string>
+    <string name="saved_chip_own">Creadas por mí</string>
+    <string name="saved_chip_recent">Recientes</string>
+    <string name="saved_meta">%1$s · %2$s min</string>
+    <string name="saved_meta_own">2 porciones · %1$s min</string>
+    <string name="saved_empty_title">Aún no creas recetas</string>
+    <string name="saved_empty_body">Guarda una recomendación de IA o crea tu primera receta desde cero.</string>
+    <string name="saved_empty_button">Crear receta</string>
+    <string name="saved_empty_chip">Sin recetas</string>
+    <string name="saved_offline_title">Sin conexión</string>
+    <string name="saved_offline_body">Tus recetas guardadas siguen disponibles. Los cambios se sincronizarán después.</string>
+    <string name="saved_meta_servings">%1$d porciones</string>
+    <string name="cd_saved_add_favorite">Agregar a favoritas</string>
+    <string name="cd_saved_remove_favorite">Quitar de favoritas</string>
+</resources>

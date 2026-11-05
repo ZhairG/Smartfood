@@ -51,6 +51,18 @@ class RecipesDiscoverScreenTest {
     }
 
     @Test
+    fun caSav0101_tocarElCorazonEmiteFavoriteToggled() {
+        mostrar(conRecetas().copy(favoriteIds = emptySet()))
+
+        composeTestRule.onNodeWithContentDescription("Agregar a favoritas").performClick()
+
+        assertEquals(
+            listOf<RecipesDiscoverEvent>(RecipesDiscoverEvent.FavoriteToggled("pollo-guisado")),
+            eventos
+        )
+    }
+
+    @Test
     fun caRia0101_muestraElEncabezadoLaBusquedaLaTarjetaDeLaIaYLosFiltros() {
         mostrar()
 
@@ -167,6 +179,7 @@ class RecipesDiscoverScreenTest {
 
     private fun conRecetas() = RecipesDiscoverUiState(
         isLoading = false,
+        favoriteIds = setOf("pollo-guisado"),
         recipes = listOf(
             RecipeCardUi(
                 id = "pollo-guisado",
