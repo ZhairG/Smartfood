@@ -8,6 +8,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -54,7 +55,7 @@ class RecipesDiscoverScreenTest {
     fun caSav0101_tocarElCorazonEmiteFavoriteToggled() {
         mostrar(conRecetas().copy(favoriteIds = emptySet()))
 
-        composeTestRule.onNodeWithContentDescription("Agregar a favoritas").performClick()
+        composeTestRule.onAllNodesWithContentDescription("Agregar a favoritas")[0].performClick()
 
         assertEquals(
             listOf<RecipesDiscoverEvent>(RecipesDiscoverEvent.FavoriteToggled("pollo-guisado")),

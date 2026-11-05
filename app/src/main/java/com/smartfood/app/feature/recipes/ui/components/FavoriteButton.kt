@@ -49,7 +49,7 @@ fun FavoriteButton(
                 modifier = Modifier
                     .size(HeartPillSize)
                     .clip(RoundedCornerShape(HeartPillRadius))
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             )
         }
         Icon(
