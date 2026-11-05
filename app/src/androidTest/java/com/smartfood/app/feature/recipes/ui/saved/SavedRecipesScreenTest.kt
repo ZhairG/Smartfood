@@ -1,21 +1,18 @@
 package com.smartfood.app.feature.recipes.ui.saved
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.recipes.domain.model.SavedFilter
 import com.smartfood.app.feature.recipes.domain.model.SavedRecipeCard
-import com.smartfood.app.feature.recipes.domain.model.SavedSort
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -23,8 +20,9 @@ import org.junit.Test
  * Nombre: SavedRecipesScreenTest.kt
  * Autor: SmartFood Team
  * Fecha: Noviembre 2026
- * Descripción: Pruebas instrumentadas de Guardadas sin estado (spec 010, T008): chips, búsqueda, orden,
- * vacío y "Sin conexión" (CA-SAV-02-02 a 02-10).
+ * Descripción: Pruebas instrumentadas de Guardadas sin estado (spec 010, T008): lista, "Ordenar", "+", vacíos,
+ * "Sin conexión", carga y error (CA-SAV-02-02 a 02-11). La búsqueda y el orden reales se prueban en
+ * `ObserveSavedRecipesUseCaseTest`.
  */
 class SavedRecipesScreenTest {
 
@@ -32,142 +30,162 @@ class SavedRecipesScreenTest {
     val composeTestRule = createComposeRule()
 
     private val eventos = mutableListOf<SavedRecipesEvent>()
-    private val estado = mutableStateOf(SavedRecipesUiState(isEmptyOverall = false))
 
-    private fun mostrar(inicial: SavedRecipesUiState = estado.value) {
-        estado.value = inicial
+    private fun mostrar(estado: SavedRecipesUiState) {
         composeTestRule.setContent {
             SmartfoodTheme {
-                SavedRecipesScreen(
-                    state = estado.value,
-                    onEvent = { eventos += it },
-                    onSortMenuOpen = { },
-                    onSortMenuClose = { },
-                )
+                SavedRecipesScreen(state = estado, onEvent = { eventos += it })
             }
         }
     }
 
     @Test
-    fun caSav0202_muestraChipsYBuscador() = runTest {
+    fun caSav0202_muestraEncabezadoBuscadorChipsTarjetaYBotonCrear() {
         mostrar(conTarjetas())
 
-        composeTestRule.onNodeWithText("Favoritas").assertIsDisplayed()
+        composeTestRule.onNode(hasText("Guardadas") and isHeading()).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Ordenar").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Buscar receta guardado...").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Favoritas").assertIsSelected()
         composeTestRule.onNodeWithText("Creadas por mí").assertIsDisplayed()
         composeTestRule.onNodeWithText("Recientes").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Buscar receta guardado...").assertIsDisplayed()
-    }
-
-    @Test
-    fun caSav0203_filtroFavoritasMuestraTarjetas() = runTest {
-        mostrar(conTarjetas().copy(filter = SavedFilter.FAVORITES))
-
-        composeTestRule.onNodeWithText("Arepas de chócolo").assertIsDisplayed()
         composeTestRule.onNodeWithText("Pasta verde").assertIsDisplayed()
+        composeTestRule.onNodeWithText("2 porciones · 20 min").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Crear receta").assertIsDisplayed()
     }
 
     @Test
-    fun caSav0203 filtroCreadasPorMiEstaVacio() = runTest {
-        mostrar(conTarjetas().copy(filter = SavedFilter.OWN))
+    fun caSav0102_tocarElCorazonDeLaTarjetaEmiteFavoriteToggled() {
+        mostrar(conTarjetas())
 
-        composeTestRule.onNodeWithText("Sin recetas").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Quitar de favoritas").performClick()
+
+        assertEquals(listOf<SavedRecipesEvent>(SavedRecipesEvent.FavoriteToggled("pasta")), eventos)
     }
 
     @Test
-    fun caSav0204 buscarFiltraTarjetas() = runTest {
-        mostrar(conTarjetas().copy(filter = SavedFilter.FAVORITES))
+    fun caSav0203_tocarUnChipEmiteFilterChanged() {
+        mostrar(conTarjetas())
 
-        composeTestRule.onNodeWithText("Buscar receta guardado...").performTextInput("PASTA")
-        composeTestRule.onNodeWithText("Pasta verde").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Arepas de chócolo").assertIsNotDisplayed()
+        composeTestRule.onNodeWithText("Creadas por mí").performClick()
+
+        assertEquals(listOf<SavedRecipesEvent>(SavedRecipesEvent.FilterChanged(SavedFilter.OWN)), eventos)
     }
 
     @Test
-    fun caSav0204 buscarSinCoincidenciasMuestraVacio() = runTest {
-        mostrar(conTarjetas().copy(filter = SavedFilter.FAVORITES))
+    fun caSav0204_sinCoincidenciasMuestraElMensaje() {
+        mostrar(SavedRecipesUiState(isLoading = false, query = "xyz"))
 
-        composeTestRule.onNodeWithText("Buscar receta guardado...").performTextInput("XYZ")
-        composeTestRule.onNodeWithText("Sin recetas").assertIsDisplayed()
+        composeTestRule.onNodeWithText("No encontramos recetas con ese nombre").assertIsDisplayed()
     }
 
     @Test
-    fun caSav0205 ordenarPorNombreAZ() = runTest {
-        mostrar(conTarjetas().copy(sort = SavedSort.NAME))
+    fun caSav0205_tocarOrdenarEmiteSortClicked() {
+        mostrar(conTarjetas())
 
-        composeTestRule.onNodeWithText("Arepas de chócolo").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Pasta verde").assertIsDisplayed()
-        // Verificar orden alfabético: Arepas antes que Pasta
-        val arepasNode = composeTestRule.onNodeWithText("Arepas de chócolo")
-        val pastaNode = composeTestRule.onNodeWithText("Pasta verde")
-        val arepasPos = arepasNode.first().positionInRoot().topLeft.y
-        val pastaPos = pastaNode.first().positionInRoot().topLeft.y
-        assertTrue(arepasPos < pastaPos)
+        composeTestRule.onNodeWithText("Ordenar").performClick()
+
+        assertEquals(listOf<SavedRecipesEvent>(SavedRecipesEvent.SortClicked), eventos)
     }
 
     @Test
-    fun caSav0207 estadoVacioMuestraIconoYBoton() = runTest {
-        mostrar(SavedRecipesUiState(isEmptyOverall = true))
+    fun caSav0205_elMenuMuestraLasDosOpciones() {
+        mostrar(conTarjetas().copy(isSortMenuOpen = true))
+
+        composeTestRule.onNodeWithText("Más recientes").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Nombre A-Z").assertIsDisplayed()
+    }
+
+    @Test
+    fun caSav0206_tocarUnaTarjetaEmiteCardClicked() {
+        mostrar(conTarjetas())
+
+        composeTestRule.onNodeWithText("Pasta verde").performClick()
+
+        assertEquals(listOf<SavedRecipesEvent>(SavedRecipesEvent.CardClicked("pasta")), eventos)
+    }
+
+    @Test
+    fun caSav0207_sinRecetasOcultaBuscadorChipsYOrdenarYMuestraElVacio() {
+        mostrar(SavedRecipesUiState(isLoading = false, isEmptyOverall = true))
 
         composeTestRule.onNodeWithText("Aún no creas recetas").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Guarda una recomendación de IA o crea tu primera receta desde cero.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Guarda una recomendación de IA o crea tu primera receta desde cero.")
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText("Crear receta").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Buscar receta guardado...").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Favoritas").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Ordenar").assertDoesNotExist()
     }
 
     @Test
-    fun caSav0209 avisoSinConexionMuestraMensaje() = runTest {
+    fun caSav0208_sinFavoritasMuestraElTextoCortoSinBoton() {
+        mostrar(SavedRecipesUiState(isLoading = false))
+
+        composeTestRule.onNodeWithText("Aún no tienes recetas favoritas. Toca ♡ en una receta para guardarla aquí.")
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("Crear receta").assertDoesNotExist()
+    }
+
+    @Test
+    fun caSav0208_creadasPorMiSinRecetasMuestraElTextoCorto() {
+        mostrar(SavedRecipesUiState(isLoading = false, filter = SavedFilter.OWN))
+
+        composeTestRule.onNodeWithText("Aún no has creado recetas.").assertIsDisplayed()
+    }
+
+    @Test
+    fun caSav0209_conCambiosPendientesMuestraSinConexion() {
         mostrar(conTarjetas().copy(hasPendingSync = true))
 
         composeTestRule.onNodeWithText("Sin conexión").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Tus recetas guardadas siguen disponibles. Los cambios se sincronizarán después.").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText("Tus recetas guardadas siguen disponibles. Los cambios se sincronizarán después.")
+            .assertIsDisplayed()
     }
 
     @Test
-    fun caSav0202_tocarChipoFavoritasEmiteEvento() = runTest {
+    fun caSav0210_tocarElBotonCrearEmiteAddClicked() {
         mostrar(conTarjetas())
 
-        composeTestRule.onNodeWithText("Favoritas").performClick()
+        composeTestRule.onNodeWithContentDescription("Crear receta").performClick()
 
-        val eventosRecibidos = eventos.filter { it is SavedRecipesEvent.FilterChanged }
-        assertEquals(1, eventosRecibidos.size)
-        assertEquals(SavedFilter.FAVORITES, (eventosRecibidos.first() as SavedRecipesEvent.FilterChanged).filter)
+        assertEquals(listOf<SavedRecipesEvent>(SavedRecipesEvent.AddClicked), eventos)
     }
 
     @Test
-    fun caSav0202_tocarCrearRecetaEmiteEvento() = runTest {
-        mostrar(conTarjetas())
+    fun caSav0210_crearRecetaDelVacioEmiteAddClicked() {
+        mostrar(SavedRecipesUiState(isLoading = false, isEmptyOverall = true))
 
         composeTestRule.onNodeWithText("Crear receta").performClick()
 
-        val eventosRecibidos = eventos.filter { it is SavedRecipesEvent.AddClicked }
-        assertEquals(1, eventosRecibidos.size)
+        assertEquals(listOf<SavedRecipesEvent>(SavedRecipesEvent.AddClicked), eventos)
     }
 
-    private fun conTarjetas(
-        filter: SavedFilter = SavedFilter.FAVORITES,
-        sort: SavedSort = SavedSort.RECENT,
-        isEmptyOverall: Boolean = false,
-        hasPendingSync: Boolean = false,
-    ) = SavedRecipesUiState(
-        filter = filter,
-        sort = sort,
-        isEmptyOverall = isEmptyOverall,
-        hasPendingSync = hasPendingSync,
+    @Test
+    fun caSav0211_siFallaLaLecturaMuestraElErrorSinElVacio() {
+        mostrar(SavedRecipesUiState(isLoading = false, hasError = true))
+
+        composeTestRule.onNodeWithText("No pudimos cargar tus recetas guardadas.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Aún no creas recetas").assertDoesNotExist()
+    }
+
+    @Test
+    fun alCargarNoMuestraElVacio() {
+        mostrar(SavedRecipesUiState())
+
+        composeTestRule.onNodeWithContentDescription("Cargando recetas guardadas").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Aún no creas recetas").assertDoesNotExist()
+        assertTrue(eventos.isEmpty())
+    }
+
+    private fun conTarjetas() = SavedRecipesUiState(
+        isLoading = false,
         cards = listOf(
-            SavedRecipeCard(
-                id = "arepas",
-                name = "Arepas de chócolo",
-                photo = "receta_arepas",
-                servings = 2,
-                minutes = 30,
-                isFavorite = true,
-                isOwn = false,
-                lastChangeMillis = 1_000L,
-                isPendingSync = false,
-            ),
             SavedRecipeCard(
                 id = "pasta",
                 name = "Pasta verde",
-                photo = "receta_pasta",
+                photo = "receta_pasta_verde",
                 servings = 2,
                 minutes = 20,
                 isFavorite = true,

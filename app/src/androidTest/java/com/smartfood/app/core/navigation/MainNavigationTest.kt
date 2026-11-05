@@ -1,7 +1,7 @@
 package com.smartfood.app.core.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
@@ -99,6 +99,27 @@ class MainNavigationTest {
 
         composeTestRule.onNode(hasText("Guardadas") and isSelected()).assertIsDisplayed()
         composeTestRule.onNode(hasText("Guardadas") and isHeading()).assertIsDisplayed()
+    }
+
+    @Test
+    fun caSav0210_nuevaRecetaAbreSuPantallaSinBarraInferior() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.OwnRecipeEditor()) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(hasText("Nueva receta") and isHeading()).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Guardadas").assertDoesNotExist()
+    }
+
+    @Test
+    fun caSav0206_elDetalleAbiertoDesdeGuardadasResaltaEsaPestana() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread {
+            navController.navigate(Route.RecipeDetail(recipeId = "no-existe", fromSaved = true))
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(hasText("Guardadas") and isSelected()).assertIsDisplayed()
     }
 
     @Test
