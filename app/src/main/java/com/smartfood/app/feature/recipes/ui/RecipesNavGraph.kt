@@ -49,6 +49,9 @@ import com.smartfood.app.feature.recipes.ui.ai.AiEffect
 import com.smartfood.app.feature.recipes.ui.own.OwnRecipeEditorEffect
 import com.smartfood.app.feature.recipes.ui.own.OwnRecipeEditorScreen
 import com.smartfood.app.feature.recipes.ui.own.OwnRecipeEditorViewModel
+import com.smartfood.app.feature.recipes.ui.own.OwnRecipeSavedScreen
+import com.smartfood.app.feature.recipes.ui.own.OwnRecipeDetailScreen
+import com.smartfood.app.feature.recipes.ui.own.OwnRecipeDetailViewModel
 
 /**
  * Nombre: RecipesNavGraph.kt
@@ -237,9 +240,21 @@ fun NavGraphBuilder.savedDestinations(navController: NavHostController) {
         LaunchedEffect(route.recipeId) { viewModel.initialize(route.recipeId) }
         ObserveEffects(viewModel.effects) { effect ->
             when (effect) {
-                is OwnRecipeEditorEffect.Saved -> navController.popBackStack()
+                is OwnRecipeEditorEffect.Saved -> navController.navigate(Route.OwnRecipeSaved(effect.recipeId, effect.name, effect.edited))
             }
         }
         OwnRecipeEditorScreen(state = state, onEvent = viewModel::onEvent)
+    }
+    composable<Route.OwnRecipeSaved> { entry ->
+        val route = entry.toRoute<Route.OwnRecipeSaved>()
+        OwnRecipeSavedScreen(route.name, route.edited,
+            onView = { navController.navigate(Route.OwnRecipeDetail(route.recipeId)) },
+            onCreateAnother = { navController.navigate(Route.OwnRecipeEditor()) },
+            onBack = { navController.popBackStack<Route.Saved>(inclusive = false) })
+    }
+    composable<Route.OwnRecipeDetail> { entry ->
+        val viewModel: OwnRecipeDetailViewModel = hiltViewModel()
+        val recipe by viewModel.recipe.collectAsStateWithLifecycle()
+        recipe?.let { value -> OwnRecipeDetailScreen(value, onEdit = { navController.navigate(Route.OwnRecipeEditor(value.id)) }, onBack = { navController.popBackStack() }) }
     }
 }
