@@ -88,8 +88,17 @@ class MainNavigationTest {
         // La barra queda con Recetas seleccionada y el encabezado del Figma se ve como título.
         composeTestRule.onNode(hasText("Recetas") and isSelected()).assertIsDisplayed()
         composeTestRule.onNode(hasText("Recetas") and isHeading()).assertIsDisplayed()
-        // Guardadas sigue deshabilitada (spec 009 §9).
-        composeTestRule.onNodeWithText("Guardadas").assertIsNotEnabled()
+        // Guardadas ya está habilitada (spec 010, T006).
+        composeTestRule.onNodeWithText("Guardadas").assertIsEnabled()
+    }
+
+    @Test
+    fun caSav0201_laPestanaGuardadasEstaHabilitadaYSeResalta() {
+        composeTestRule.onNodeWithText("Guardadas").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(hasText("Guardadas") and isSelected()).assertIsDisplayed()
+        composeTestRule.onNode(hasText("Guardadas") and isHeading()).assertIsDisplayed()
     }
 
     @Test

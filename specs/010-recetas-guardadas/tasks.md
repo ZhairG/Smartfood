@@ -25,13 +25,13 @@
   - `ToggleFavoriteUseCase`, `ObserveFavoriteIdsUseCase` y `ObserveSavedRecipesUseCase` (en este Issue, solo con
     favoritas del catálogo; T010 agrega las propias);
   - pruebas `ToggleFavoriteUseCaseTest` y `ObserveSavedRecipesUseCaseTest`.
-- [ ] T005 **♡ en Recetas y en el detalle** (CA-SAV-01-01 a 01-03, desviación §9):
+- [x] T005 **♡ en Recetas y en el detalle** (CA-SAV-01-01 a 01-03, desviación §9):
   - crea `…/feature/recipes/ui/components/FavoriteButton.kt`;
   - mueve `RecipeCard` de `RecipesDiscoverScreen.kt` a `…/ui/components/RecipeCard.kt` con el ♡;
   - en `RecipesDiscoverContract/ViewModel` y `RecipeDetailContract/ViewModel`, agrega `favoriteIds` y el evento
     `FavoriteToggled`;
   - actualiza `RecipesDiscoverViewModelTest`, `RecipesDiscoverScreenTest` y `RecipeDetailScreenTest`.
-- [ ] T006 **Pestaña Guardadas** (CA-SAV-02-01):
+- [x] T006 **Pestaña Guardadas** (CA-SAV-02-01):
   - `Route.Saved` en `Routes.kt` y `ScreenRoute.kt`;
   - en `MainTabScaffold.kt`: `SAVED` habilitada y `navigateToTab` hacia `Route.Saved`;
   - `savedDestinations()` en `RecipesNavGraph.kt`, llamada desde `MainNavGraph.kt`;

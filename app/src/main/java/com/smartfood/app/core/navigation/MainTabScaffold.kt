@@ -29,10 +29,9 @@ import com.smartfood.app.core.designsystem.components.SmartFoodTab
 
 /** Pestañas de la barra inferior, en orden. */
 /**
- * Pestañas de la barra inferior del Figma (`476:4176`), en orden. Guardadas todavía no existe: se ve deshabilitada
- * (spec 009 §9 y spec 006, CA-INV-09-02, T055).
+ * Pestañas de la barra inferior del Figma (`476:4176`), en orden. Guardadas ya existe (spec 010, T006).
  */
-enum class MainTab(val enabled: Boolean = true) { INVENTORY, RECIPES, SAVED(enabled = false), PROFILE }
+enum class MainTab(val enabled: Boolean = true) { INVENTORY, RECIPES, SAVED, PROFILE }
 
 /**
  * Pantalla de pestaña con la barra inferior.
@@ -102,9 +101,8 @@ fun NavHostController.navigateToTab(tab: MainTab) {
     val route: Route = when (tab) {
         MainTab.INVENTORY -> Route.Inventory
         MainTab.RECIPES -> Route.Recipes
+        MainTab.SAVED -> Route.Saved
         MainTab.PROFILE -> Route.Profile
-        // Todavía no tiene pantalla: la pestaña está deshabilitada y nunca llega aquí.
-        MainTab.SAVED -> return
     }
     navigate(route) {
         popUpTo<Route.Inventory> { saveState = true }

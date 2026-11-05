@@ -28,6 +28,7 @@ enum class ScreenRoute(val routeName: String) {
     PRODUCT_CAMERA("product_camera"),
     PROFILE("profile"),
     RECIPES("recipes"),
+    SAVED("saved"),
     AI_PLAN("ai_plan"),
     AI_HELP("ai_help"),
     RECIPE_DETAIL("recipe_detail"),

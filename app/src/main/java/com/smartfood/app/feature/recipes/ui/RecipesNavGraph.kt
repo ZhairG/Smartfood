@@ -5,6 +5,9 @@ import android.net.Uri
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -183,6 +186,26 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
                 }
             }
             CookingScreen(state = state, onEvent = viewModel::onEvent, onBack = navController::popBackStack)
+        }
+    }
+}
+
+/** Pestaña Guardadas (spec 010, T006): destino vacío hasta que T007 cree la pantalla completa. */
+fun NavGraphBuilder.savedDestinations(navController: NavHostController) {
+    composable<Route.Saved> {
+        MainTabScaffold(
+            currentTab = MainTab.SAVED,
+            onTabSelected = navController::navigateToTab,
+            onCurrentTabReselected = { navController.popBackStack<Route.Saved>(inclusive = false) },
+        ) {
+            androidx.compose.foundation.layout.Box(
+                modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+                contentAlignment = androidx.compose.ui.Alignment.Center
+            ) {
+                androidx.compose.material3.Text(
+                    text = androidx.compose.ui.res.stringResource(id = com.smartfood.app.R.string.tab_saved)
+                )
+            }
         }
     }
 }

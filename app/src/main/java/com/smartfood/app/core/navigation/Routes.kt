@@ -116,6 +116,12 @@ sealed interface Route {
         override val screenRoute: ScreenRoute = ScreenRoute.RECIPES
     }
 
+    /** Pestaña Guardadas (spec 010, CA-SAV-02-01). */
+    @Serializable
+    data object Saved : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.SAVED
+    }
+
     @Serializable
     data object AiPlan : Route { override val screenRoute: ScreenRoute = ScreenRoute.AI_PLAN }
 
