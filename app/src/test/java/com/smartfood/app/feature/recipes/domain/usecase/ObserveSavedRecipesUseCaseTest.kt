@@ -5,6 +5,7 @@ import com.smartfood.app.feature.recipes.domain.model.SavedFilter
 import com.smartfood.app.feature.recipes.domain.model.SavedSort
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import com.smartfood.app.testutil.FakeFavoritesRepository
+import com.smartfood.app.testutil.FakeOwnRecipesRepository
 import com.smartfood.app.testutil.savedFavorite
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.first
@@ -31,7 +32,7 @@ class ObserveSavedRecipesUseCaseTest {
             recipe("sopa", "Sopa de tomate", minutes = 20),
         )
     )
-    private val observe = ObserveSavedRecipesUseCase(favorites, catalog)
+    private val observe = ObserveSavedRecipesUseCase(favorites, catalog, FakeOwnRecipesRepository())
 
     @Test
     fun `CA-SAV-02-03 recientes ordena favoritas por la última vez que se guardaron`() = runTest {

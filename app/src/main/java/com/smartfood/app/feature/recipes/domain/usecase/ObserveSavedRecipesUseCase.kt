@@ -8,7 +8,9 @@ import com.smartfood.app.feature.recipes.domain.model.SavedFilter
 import com.smartfood.app.feature.recipes.domain.model.SavedRecipeCard
 import com.smartfood.app.feature.recipes.domain.model.SavedRecipesData
 import com.smartfood.app.feature.recipes.domain.model.SavedSort
+import com.smartfood.app.feature.recipes.domain.model.OwnRecipe
 import com.smartfood.app.feature.recipes.domain.repository.FavoritesRepository
+import com.smartfood.app.feature.recipes.domain.repository.OwnRecipesRepository
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -29,6 +31,7 @@ import javax.inject.Inject
 class ObserveSavedRecipesUseCase @Inject constructor(
     private val favorites: FavoritesRepository,
     private val catalog: RecipeCatalog,
+    private val ownRecipes: OwnRecipesRepository,
 ) {
 
     /**
@@ -41,18 +44,22 @@ class ObserveSavedRecipesUseCase @Inject constructor(
         query: Flow<String>,
         sort: Flow<SavedSort>,
     ): Flow<SavedRecipesData> = combine(
-        flow { emit(catalog.recipes()) },
-        favorites.observeFavorites(),
-        filter,
-        query,
-        sort,
-    ) { recipes, values, selectedFilter, text, selectedSort ->
-        buildData(recipes, values, selectedFilter, text, selectedSort)
+        combine(
+            flow { emit(catalog.recipes()) },
+            favorites.observeFavorites(),
+            ownRecipes.observeRecipes(),
+        ) { recipes, values, own -> Triple(recipes, values, own) },
+        combine(filter, query, sort) { selectedFilter, text, selectedSort ->
+            Triple(selectedFilter, text, selectedSort)
+        },
+    ) { source, options ->
+        buildData(source.first, source.second, source.third, options.first, options.second, options.third)
     }
 
     private fun buildData(
         recipes: List<Recipe>,
         values: List<Favorite>,
+        own: List<OwnRecipe>,
         filter: SavedFilter,
         query: String,
         sort: SavedSort,
@@ -60,13 +67,20 @@ class ObserveSavedRecipesUseCase @Inject constructor(
         val recipesById = recipes.associateBy { it.id }
         val catalogFavorites = values.filter { it.source == FavoriteSource.CATALOG }
         val validFavorites = catalogFavorites.filter { it.recipeId in recipesById }
-        val allCards = validFavorites.map { favorite ->
+        val catalogCards = validFavorites.map { favorite ->
             recipesById.getValue(favorite.recipeId).toSavedCard(favorite)
         }
+        val ownCards = own.map { recipe ->
+            SavedRecipeCard(recipe.id, recipe.name, null, OwnRecipe.SERVINGS, recipe.cookMinutes,
+                values.any { it.recipeId == recipe.id && it.source == FavoriteSource.OWN },
+                true, maxOf(recipe.updatedAtMillis, values.firstOrNull { it.recipeId == recipe.id }?.savedAtMillis ?: 0L),
+                recipe.isPendingSync || values.any { it.recipeId == recipe.id && it.isPendingSync })
+        }
+        val allCards = catalogCards + ownCards
         val cardsForFilter = when (filter) {
-            SavedFilter.FAVORITES, SavedFilter.RECENT -> allCards
-            // T010 suma aquí las recetas propias; por ahora el chip queda vacío de forma explícita.
-            SavedFilter.OWN -> emptyList()
+            SavedFilter.FAVORITES -> allCards.filter { it.isFavorite }
+            SavedFilter.RECENT -> allCards
+            SavedFilter.OWN -> ownCards
         }
         val normalizedQuery = SearchInventoryUseCase.normalize(query)
         val found = cardsForFilter.filter { card ->
@@ -79,7 +93,7 @@ class ObserveSavedRecipesUseCase @Inject constructor(
         return SavedRecipesData(
             cards = ordered,
             isEmptyOverall = allCards.isEmpty(),
-            hasPendingSync = validFavorites.any { it.isPendingSync },
+            hasPendingSync = allCards.any { it.isPendingSync },
         )
     }
 
