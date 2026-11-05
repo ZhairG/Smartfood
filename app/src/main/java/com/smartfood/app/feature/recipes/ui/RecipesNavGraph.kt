@@ -3,6 +3,7 @@ package com.smartfood.app.feature.recipes.ui
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.background
@@ -45,6 +46,9 @@ import com.smartfood.app.feature.recipes.ui.ai.AiFlowScreen
 import com.smartfood.app.feature.recipes.ui.ai.AiHelpScreen
 import com.smartfood.app.feature.recipes.ui.ai.AiPlanViewModel
 import com.smartfood.app.feature.recipes.ui.ai.AiEffect
+import com.smartfood.app.feature.recipes.ui.own.OwnRecipeEditorEffect
+import com.smartfood.app.feature.recipes.ui.own.OwnRecipeEditorScreen
+import com.smartfood.app.feature.recipes.ui.own.OwnRecipeEditorViewModel
 
 /**
  * Nombre: RecipesNavGraph.kt
@@ -226,16 +230,16 @@ fun NavGraphBuilder.savedDestinations(navController: NavHostController) {
             SavedRecipesScreen(state = state, onEvent = viewModel::onEvent)
         }
     }
-    composable<Route.OwnRecipeEditor> {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
-        ) {
-            SmartFoodTopBar(
-                title = stringResource(id = R.string.saved_new_recipe_title),
-                onBack = { navController.popBackStack() }
-            )
+    composable<Route.OwnRecipeEditor> { entry ->
+        val route = entry.toRoute<Route.OwnRecipeEditor>()
+        val viewModel: OwnRecipeEditorViewModel = hiltViewModel()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        LaunchedEffect(route.recipeId) { viewModel.initialize(route.recipeId) }
+        ObserveEffects(viewModel.effects) { effect ->
+            when (effect) {
+                is OwnRecipeEditorEffect.Saved -> navController.popBackStack()
+            }
         }
+        OwnRecipeEditorScreen(state = state, onEvent = viewModel::onEvent)
     }
 }
