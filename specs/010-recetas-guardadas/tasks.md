@@ -21,7 +21,7 @@
   - agrega `FakeFavoritesRepository` en `app/src/sharedTest/.../testutil/SavedRecipesFakes.kt`.
 - [x] T003 **Reglas de favoritas** (RNF-SAV-01): bloque `favorites` de plan §6 en `firestore.rules` y sus casos en
   `rules-test/firestore.test.js`.
-- [ ] T004 **Casos de uso** (CA-SAV-01-03, CA-SAV-02-03, 02-04, 02-05):
+- [x] T004 **Casos de uso** (CA-SAV-01-03, CA-SAV-02-03, 02-04, 02-05):
   - `ToggleFavoriteUseCase`, `ObserveFavoriteIdsUseCase` y `ObserveSavedRecipesUseCase` (en este Issue, solo con
     favoritas del catálogo; T010 agrega las propias);
   - pruebas `ToggleFavoriteUseCaseTest` y `ObserveSavedRecipesUseCaseTest`.

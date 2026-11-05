@@ -86,3 +86,16 @@ data class SavedRecipeCard(
     val lastChangeMillis: Long,
     val isPendingSync: Boolean,
 )
+
+/**
+ * Resultado de combinar las favoritas con el catálogo para la pantalla Guardadas.
+ *
+ * @property cards Tarjetas después de aplicar chip, búsqueda y orden.
+ * @property isEmptyOverall `true` si no hay recetas guardadas válidas; las favoritas huérfanas no cuentan.
+ * @property hasPendingSync `true` si alguna favorita visible en Guardadas espera sincronizarse.
+ */
+data class SavedRecipesData(
+    val cards: List<SavedRecipeCard>,
+    val isEmptyOverall: Boolean,
+    val hasPendingSync: Boolean,
+)
