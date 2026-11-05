@@ -20,6 +20,9 @@ import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import com.smartfood.app.feature.recipes.domain.usecase.BuildRecipeIngredientsUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipeDetailUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ObserveFavoriteIdsUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ToggleFavoriteUseCase
+import com.smartfood.app.testutil.FakeFavoritesRepository
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.FakeProfileRepository
@@ -194,12 +197,17 @@ class RecipeDetailViewModelTest {
             photoSync = FakePhotoSync(),
             classifyExpiry = ClassifyExpiryUseCase(clock)
         )
+        val favorites = FakeFavoritesRepository().apply {
+            favorites.value = emptyList()
+        }
         return RecipeDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf(RecipeDetailViewModel.RECIPE_ID_KEY to recipeId)),
             getDetail = GetRecipeDetailUseCase(FakeRecipeCatalog()),
             buildIngredients = BuildRecipeIngredientsUseCase(IngredientMatcher(clock)),
             observeInventory = observeInventory,
             getPreferredStore = GetPreferredStoreUseCase(GetFoodPreferencesUseCase(profile)),
+            observeFavoriteIds = ObserveFavoriteIdsUseCase(favorites),
+            toggleFavorite = ToggleFavoriteUseCase(favorites),
         )
     }
 

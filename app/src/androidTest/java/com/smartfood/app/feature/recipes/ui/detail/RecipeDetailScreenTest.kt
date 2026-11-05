@@ -74,6 +74,18 @@ class RecipeDetailScreenTest {
     }
 
     @Test
+    fun caSav0102_tocarElCorazonEnElDetalleEmiteFavoriteToggled() {
+        mostrar()
+
+        composeTestRule.onNodeWithContentDescription("Quitar de favoritas").performClick()
+
+        assertEquals(
+            listOf<RecipeDetailEvent>(RecipeDetailEvent.FavoriteToggled),
+            eventos
+        )
+    }
+
+    @Test
     fun caRia0401_agrupaLosIngredientesConCantidadYCosto() {
         mostrar()
 
@@ -215,6 +227,7 @@ class RecipeDetailScreenTest {
         restMinutes = 0,
         difficulty = "Media",
         servings = 4,
+        isFavorite = true,
         groups = listOf(
             RecipeIngredientGroup(
                 section = "Verduras",

@@ -4,9 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
+import com.smartfood.app.feature.recipes.domain.model.FavoriteSource
 import com.smartfood.app.feature.recipes.domain.model.RecipeDetail
 import com.smartfood.app.feature.recipes.domain.usecase.BuildRecipeIngredientsUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipeDetailUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ObserveFavoriteIdsUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ToggleFavoriteUseCase
 import com.smartfood.app.feature.recipes.domain.model.Store
 import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,16 +29,19 @@ import kotlinx.coroutines.launch
 /**
  * Nombre: RecipeDetailViewModel.kt
  * Autor: SmartFood Team
- * Fecha: Octubre 2026
+ * Fecha: Noviembre 2026
  * Descripción: ViewModel del detalle (spec 009, HU-RIA-04, T008). Lee la receta del catálogo, observa el inventario y
  * delega el escalado y el costo en [BuildRecipeIngredientsUseCase]; las porciones se recalculan al cambiarlas
- * (CA-RIA-04-02). No repite reglas del dominio.
+ * (CA-RIA-04-02). No repite reglas del dominio. Expone si la receta es favorita para pintar el ♡ (spec 010,
+ * CA-SAV-01-02 y 01-03, T005).
  *
  * @param savedStateHandle Argumento `recipeId` de `Route.RecipeDetail`.
  * @param getDetail Lectura de la receta.
  * @param buildIngredients Escalado, agrupación y costo.
  * @param observeInventory Inventario actual para "En tu inventario".
  * @param getPreferredStore "Mi supermercado" del Perfil para los precios (CA-RIA-04-07).
+ * @param observeFavoriteIds Ids de las recetas del catálogo marcadas como favorita.
+ * @param toggleFavorite Marca o quita una receta como favorita.
  */
 @HiltViewModel
 class RecipeDetailViewModel @Inject constructor(
@@ -44,6 +50,8 @@ class RecipeDetailViewModel @Inject constructor(
     private val buildIngredients: BuildRecipeIngredientsUseCase,
     observeInventory: ObserveInventoryUseCase,
     getPreferredStore: GetPreferredStoreUseCase,
+    private val observeFavoriteIds: ObserveFavoriteIdsUseCase,
+    private val toggleFavorite: ToggleFavoriteUseCase,
 ) : ViewModel() {
 
     private val recipeId: String = checkNotNull(savedStateHandle.get<String>(RECIPE_ID_KEY)) {
@@ -74,9 +82,10 @@ class RecipeDetailViewModel @Inject constructor(
         detail,
         observeInventory().catch { emit(emptyList()) },
         servingsOverride,
+        observeFavoriteIds(),
         // D1 mientras se lee el Perfil; se vuelve a leer cada vez que la pantalla se observa de nuevo.
         flow { emit(Store.D1); emit(getPreferredStore()) },
-    ) { state, sections, override, store ->
+    ) { state, sections, override, favoriteIds, store ->
         when (state) {
             DetailState.Loading -> RecipeDetailUiState(isLoading = true, recipeId = recipeId)
             DetailState.Error -> RecipeDetailUiState(
@@ -106,6 +115,7 @@ class RecipeDetailViewModel @Inject constructor(
                     servings = servings,
                     groups = built.groups,
                     store = store,
+                    isFavorite = favoriteIds.contains(recipe.id),
                 )
             }
         }
@@ -122,6 +132,10 @@ class RecipeDetailViewModel @Inject constructor(
             }
             RecipeDetailEvent.DecreaseServings -> changeServings(delta = -1)
             RecipeDetailEvent.IncreaseServings -> changeServings(delta = 1)
+            is RecipeDetailEvent.FavoriteToggled -> viewModelScope.launch {
+                val isNowFavorite = !uiState.value.isFavorite
+                toggleFavorite(recipeId, FavoriteSource.CATALOG, isNowFavorite)
+            }
         }
     }
 

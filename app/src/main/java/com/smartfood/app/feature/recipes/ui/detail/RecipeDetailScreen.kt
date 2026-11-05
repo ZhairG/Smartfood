@@ -54,6 +54,7 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientGroup
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientLine
+import com.smartfood.app.feature.recipes.ui.components.FavoriteButton
 import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 import com.smartfood.app.feature.recipes.ui.components.formatCop
@@ -89,7 +90,13 @@ fun RecipeDetailScreen(
     ) {
         SmartFoodTopBar(
             title = state.name.ifEmpty { stringResource(id = R.string.recipes_title) },
-            onBack = onBack
+            onBack = onBack,
+            action = {
+                FavoriteButton(
+                    isFavorite = state.isFavorite,
+                    onClick = { onEvent(RecipeDetailEvent.FavoriteToggled) },
+                )
+            }
         )
         when {
             state.isLoading -> Box(

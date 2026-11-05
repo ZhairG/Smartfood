@@ -5,12 +5,16 @@ import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import com.smartfood.app.feature.profile.domain.usecase.GetFoodPreferencesUseCase
 import com.smartfood.app.feature.recipes.domain.agent.IngredientMatcher
+import com.smartfood.app.feature.recipes.domain.model.FavoriteSource
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
 import com.smartfood.app.feature.recipes.domain.usecase.AiFixtures
 import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipesUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ObserveFavoriteIdsUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.RankRecipesForMeUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.SearchRecipesUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ToggleFavoriteUseCase
+import com.smartfood.app.testutil.FakeFavoritesRepository
 import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.MainDispatcherRule
 import kotlinx.coroutines.flow.first
@@ -37,12 +41,17 @@ class RecipesDiscoverViewModelTest {
     fun `CA-RIA-02-07 ver recetas economicas llega con el filtro Economicas`() = runTest {
         val fixtures = AiFixtures()
         val handle = SavedStateHandle()
+        val favorites = FakeFavoritesRepository().apply {
+            favorites.value = emptyList()
+        }
         val viewModel = RecipesDiscoverViewModel(
             getRecipes = GetRecipesUseCase(fixtures.catalog),
             searchRecipes = SearchRecipesUseCase(),
             rankRecipes = RankRecipesForMeUseCase(IngredientMatcher(fixtures.clock)),
             observeInventory = ObserveInventoryUseCase(fixtures.inventory, FakePhotoSync(), ClassifyExpiryUseCase(fixtures.clock)),
             getPreferredStore = GetPreferredStoreUseCase(GetFoodPreferencesUseCase(fixtures.profile)),
+            observeFavoriteIds = ObserveFavoriteIdsUseCase(favorites),
+            toggleFavorite = ToggleFavoriteUseCase(favorites),
             savedStateHandle = handle,
         )
         assertEquals(RecipeFilter.FOR_YOU, viewModel.uiState.first { !it.isLoading }.filter)

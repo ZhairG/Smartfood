@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,7 +40,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,7 +49,9 @@ import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.SurfaceLight
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
+import com.smartfood.app.feature.recipes.ui.components.FavoriteButton
 import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
+import com.smartfood.app.feature.recipes.ui.components.RecipeCard
 import com.smartfood.app.feature.recipes.ui.components.RecipePhoto
 import com.smartfood.app.feature.recipes.ui.components.RecipesHeader
 import com.smartfood.app.feature.recipes.ui.components.formatCop
@@ -121,7 +120,9 @@ fun RecipesDiscoverScreen(
                 else -> items(items = state.recipes, key = { it.id }) { recipe ->
                     RecipeCard(
                         card = recipe,
-                        onClick = { onEvent(RecipesDiscoverEvent.RecipeClicked(recipe.id)) }
+                        isFavorite = state.favoriteIds.contains(recipe.id),
+                        onClick = { onEvent(RecipesDiscoverEvent.RecipeClicked(recipe.id)) },
+                        onFavoriteToggled = { onEvent(RecipesDiscoverEvent.FavoriteToggled(recipe.id)) }
                     )
                 }
             }
@@ -277,74 +278,6 @@ private fun FilterPill(
     }
 }
 
-/**
- * Tarjeta de receta del Figma (`557:3051`).
- *
- * @param card Datos de la receta.
- * @param onClick Abre el detalle.
- */
-@Composable
-private fun RecipeCard(
-    card: RecipeCardUi,
-    onClick: () -> Unit,
-) {
-    val shape = RoundedCornerShape(CardRadius)
-    val highlighted = card.expiringIngredient != null
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(elevation = CardElevation, shape = shape)
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .then(
-                if (highlighted) Modifier.border(1.dp, MaterialTheme.colorScheme.secondary, shape) else Modifier
-            )
-            .clickable(role = Role.Button, onClick = onClick)
-    ) {
-        RecipePhoto(
-            photo = card.photo,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(PhotoAspectRatio)
-        )
-        Column(
-            verticalArrangement = Arrangement.spacedBy(CardTextGap),
-            modifier = Modifier.padding(horizontal = CardTextSidePadding, vertical = CardTextVerticalPadding)
-        ) {
-            if (card.expiringIngredient != null) {
-                Text(
-                    text = stringResource(id = R.string.recipes_expiring_badge, card.expiringIngredient.lowercase()),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 10.sp, lineHeight = 15.sp, fontWeight = FontWeight.Bold),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            } else {
-                // El Figma deja la línea del aviso vacía para que los nombres queden alineados.
-                Spacer(modifier = Modifier.height(BadgeLineHeight))
-            }
-            Text(
-                text = card.name,
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp, lineHeight = 22.5.sp, fontWeight = FontWeight.Bold),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = stringResource(
-                    id = R.string.recipes_card_meta,
-                    card.minutes,
-                    card.kcal,
-                    formatCop(card.costCop)
-                ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 11.sp),
-                maxLines = 2
-            )
-        }
-    }
-}
-
 @Composable
 private fun Loading() {
     val loading = stringResource(id = R.string.cd_recipes_loading)
@@ -390,12 +323,6 @@ private val ContentGap = 16.dp
 private val CardGap = 12.dp
 private val CardRadius = 20.dp
 private val CardElevation = 3.dp
-// La foto de la tarjeta se ve de 173 × 111 en el Figma (557:3028).
-private val PhotoAspectRatio = 173f / 111f
-private val CardTextSidePadding = 10.dp
-private val CardTextVerticalPadding = 8.dp
-private val CardTextGap = 5.dp
-private val BadgeLineHeight = 12.dp
 private val HeroPadding = 16.dp
 private val HeroGap = 12.dp
 private val HeroElevation = 3.dp
