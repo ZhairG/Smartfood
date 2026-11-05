@@ -82,7 +82,8 @@ class RecipeDetailViewModel @Inject constructor(
         detail,
         observeInventory().catch { emit(emptyList()) },
         servingsOverride,
-        observeFavoriteIds(),
+        // Si las favoritas no se pueden leer, el detalle se ve sin ♡ en lugar de cerrar la app.
+        observeFavoriteIds().catch { emit(emptySet()) },
         // D1 mientras se lee el Perfil; se vuelve a leer cada vez que la pantalla se observa de nuevo.
         flow { emit(Store.D1); emit(getPreferredStore()) },
     ) { state, sections, override, favoriteIds, store ->

@@ -93,7 +93,7 @@ class RecipesDiscoverViewModel @Inject constructor(
      * Estado de la pantalla. Si el inventario no se puede leer, las recetas se ordenan con el inventario vacío en
      * lugar de cerrar la app.
      */
-    val baseUiState: StateFlow<RecipesDiscoverUiState> = combine<CatalogState, List<InventorySection>, String, RecipeFilter, Store, RecipesDiscoverUiState>(
+    private val baseUiState: StateFlow<RecipesDiscoverUiState> = combine<CatalogState, List<InventorySection>, String, RecipeFilter, Store, RecipesDiscoverUiState>(
         catalog,
         observeInventory().catch { emit(emptyList()) },
         query,
@@ -130,7 +130,8 @@ class RecipesDiscoverViewModel @Inject constructor(
 
     val uiState: StateFlow<RecipesDiscoverUiState> = combine(
         baseUiState,
-        observeFavoriteIds(),
+        // Si las favoritas no se pueden leer, las tarjetas se ven sin ♡ en lugar de cerrar la app.
+        observeFavoriteIds().catch { emit(emptySet()) },
     ) { state, favoriteIds ->
         state.copy(favoriteIds = favoriteIds)
     }.stateIn(

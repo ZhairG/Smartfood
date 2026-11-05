@@ -62,4 +62,26 @@ class RecipesDiscoverViewModelTest {
         assertEquals(RecipeFilter.ECONOMIC, viewModel.uiState.first { it.filter == RecipeFilter.ECONOMIC }.filter)
         assertNull("La clave se borra al usarla", handle.get<String>(RecipesDiscoverViewModel.FILTER_KEY))
     }
+
+    @Test
+    fun `CA-SAV-02-11 si las favoritas no se pueden leer las recetas se ven sin corazon y no se cierra`() = runTest {
+        val fixtures = AiFixtures()
+        val favorites = FakeFavoritesRepository().apply {
+            observeFailure = IllegalStateException("PERMISSION_DENIED")
+        }
+        val viewModel = RecipesDiscoverViewModel(
+            getRecipes = GetRecipesUseCase(fixtures.catalog),
+            searchRecipes = SearchRecipesUseCase(),
+            rankRecipes = RankRecipesForMeUseCase(IngredientMatcher(fixtures.clock)),
+            observeInventory = ObserveInventoryUseCase(fixtures.inventory, FakePhotoSync(), ClassifyExpiryUseCase(fixtures.clock)),
+            getPreferredStore = GetPreferredStoreUseCase(GetFoodPreferencesUseCase(fixtures.profile)),
+            observeFavoriteIds = ObserveFavoriteIdsUseCase(favorites),
+            toggleFavorite = ToggleFavoriteUseCase(favorites),
+            savedStateHandle = SavedStateHandle(),
+        )
+
+        val state = viewModel.uiState.first { !it.isLoading }
+
+        assertEquals(emptySet<String>(), state.favoriteIds)
+    }
 }

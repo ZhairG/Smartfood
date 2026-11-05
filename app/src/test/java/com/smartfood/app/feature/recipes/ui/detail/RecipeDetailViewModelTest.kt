@@ -188,7 +188,18 @@ class RecipeDetailViewModelTest {
         assertTrue(state.groups.isEmpty())
     }
 
+    @Test
+    fun `CA-SAV-02-11 si las favoritas no se pueden leer el detalle se ve sin corazon y no se cierra`() = runTest {
+        favorites.observeFailure = IllegalStateException("PERMISSION_DENIED")
+
+        val state = viewModel().uiState.first { !it.isLoading }
+
+        assertFalse(state.hasError)
+        assertFalse(state.isFavorite)
+    }
+
     private val profile = FakeProfileRepository()
+    private val favorites = FakeFavoritesRepository()
 
     private fun viewModel(recipeId: String = recipe.id): RecipeDetailViewModel {
         val repository = FakeInventoryRepository().apply { items.value = inventory }
@@ -197,9 +208,6 @@ class RecipeDetailViewModelTest {
             photoSync = FakePhotoSync(),
             classifyExpiry = ClassifyExpiryUseCase(clock)
         )
-        val favorites = FakeFavoritesRepository().apply {
-            favorites.value = emptyList()
-        }
         return RecipeDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf(RecipeDetailViewModel.RECIPE_ID_KEY to recipeId)),
             getDetail = GetRecipeDetailUseCase(FakeRecipeCatalog()),

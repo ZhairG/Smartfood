@@ -7,6 +7,8 @@ import com.smartfood.app.feature.recipes.domain.repository.FavoritesRepository
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 
 /**
  * Nombre: SavedRecipesFakes.kt
@@ -43,6 +45,9 @@ class FakeFavoritesRepository : FavoritesRepository {
     /** Si no es `null`, [setFavorite] devuelve este fallo sin cambiar la lista. */
     var setResult: Result<WriteOutcome>? = null
 
+    /** Si no es `null`, [observeFavorites] falla con este error, como cuando Firestore rechaza la lectura. */
+    var observeFailure: Throwable? = null
+
     /** Si no es `null`, las escrituras esperan a que se complete, para ver el estado mientras guardan. */
     var gate: CompletableDeferred<Unit>? = null
 
@@ -52,7 +57,10 @@ class FakeFavoritesRepository : FavoritesRepository {
     /** Llamadas recibidas en [setFavorite], en orden. */
     val setCalls = mutableListOf<FavoriteCall>()
 
-    override fun observeFavorites(): Flow<List<Favorite>> = favorites
+    override fun observeFavorites(): Flow<List<Favorite>> = flow {
+        observeFailure?.let { throw it }
+        emitAll(favorites)
+    }
 
     override suspend fun setFavorite(
         recipeId: String,
