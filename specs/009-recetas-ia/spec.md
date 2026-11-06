@@ -103,7 +103,7 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 - Videos reales de las recetas y "Omitir video".
 - "Creadas por mí" (recetas propias) y editar recetas.
 - **Recetas guardadas (favoritas): próximo módulo (#117).** El ♡ de las recetas, la pestaña Guardadas (Figma `633:2723`) con búsqueda, "Favoritas", "Recientes" y aviso sin conexión, y el contador "Recetas guardadas" del Perfil (antes CA-RIA-01-05 y HU-RIA-05, CA-RIA-05-01 a 05-03). Decisión de Zhair del 2026-10-19. Ahora lo define la [spec 010](../010-recetas-guardadas/spec.md), que además agrega las recetas propias.
-- Cocinas, nivel de picante y presupuesto de Preferencias alimentarias: quedan guardados y el agente no los usa (solo las restricciones, CA-RIA-02-09).
+- Nivel de picante y presupuesto de Preferencias alimentarias: quedan guardados y el agente no los usa. Las cocinas las usa desde la [spec 011](../011-cocinas-del-mundo/spec.md).
 - Precios reales de supermercados (se usa la tabla de referencia del catálogo).
 - Aprendizaje de pesos con datos de uso.
 

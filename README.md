@@ -73,6 +73,7 @@ solo guardan preferencias de Android Studio.
 | 008 Perfil                          | [`specs/008-perfil`](specs/008-perfil/spec.md) | ✅ Implementado |
 | 009 Recetas + IA                    | [`specs/009-recetas-ia`](specs/009-recetas-ia/spec.md) | ✅ Implementado (agente CSP de plan de 3 días; [evaluación](docs/ia/evaluacion-agente.md)) |
 | 010 Recetas guardadas               | [`specs/010-recetas-guardadas`](specs/010-recetas-guardadas/spec.md) | Implementada (#117, #130 y #131) |
+| 011 Cocinas del mundo               | [`specs/011-cocinas-del-mundo`](specs/011-cocinas-del-mundo/spec.md) | En desarrollo |
 
 ## Metodología: Spec Driven Development
 
