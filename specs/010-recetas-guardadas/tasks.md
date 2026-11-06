@@ -46,37 +46,37 @@
   "Sin conexión").
 
 ## Issue 2: Crear y editar receta propia (avanzada, #130)
-- [ ] T009 **Dominio y datos de recetas propias** (RF-SAV-02):
+- [x] T009 **Dominio y datos de recetas propias** (RF-SAV-02):
   - `RecipeCategory`, `OwnRecipe`, `OwnRecipeDraft`, `OwnRecipeField`, `OwnRecipeError` y `OwnRecipeException` en
     `SavedRecipes.kt`;
   - `OwnRecipesRepository`, `FirestoreOwnRecipesRepository`, `OwnRecipeDocument.kt` (Map ↔ modelo) y
     `data/mapper/OwnRecipeErrorMapper.kt`;
   - su `@Binds` y `FakeOwnRecipesRepository`;
   - prueba `OwnRecipeDocumentTest`.
-- [ ] T010 **Reglas de recetas** (RNF-SAV-01): bloque `recipes` de plan §6 y sus casos en `rules-test`.
+- [x] T010 **Reglas de recetas** (RNF-SAV-01): bloque `recipes` de plan §6 y sus casos en `rules-test`.
   `ObserveSavedRecipesUseCase` suma las recetas propias (chips "Creadas por mí" y "Recientes", CA-SAV-02-03).
-- [ ] T011 **Validación** (CA-SAV-03-05): `ValidateOwnRecipeUseCase` y `ValidateOwnRecipeUseCaseTest`, con cada límite:
+- [x] T011 **Validación** (CA-SAV-03-05): `ValidateOwnRecipeUseCase` y `ValidateOwnRecipeUseCaseTest`, con cada límite:
   - 1, 2, 60 y 61 caracteres en el nombre;
   - 0, 1, 240 y 241 minutos;
   - 2.000 y 2.001 caracteres en la preparación;
   - 20 y 21 ingredientes, ingredientes repetidos y cantidad 0.
-- [ ] T012 **Guardar y leer** (CA-SAV-03-04, 03-08, 03-09, 04-02):
+- [x] T012 **Guardar y leer** (CA-SAV-03-04, 03-08, 03-09, 04-02):
   - `SaveOwnRecipeUseCase` (una receta nueva también queda favorita) y `GetOwnRecipeUseCase`;
   - prueba `SaveOwnRecipeUseCaseTest`.
-- [ ] T013 **Editor** (CA-SAV-03-01 a 03-06, 04-01, 04-03, 04-04, desviaciones §9):
+- [x] T013 **Editor** (CA-SAV-03-01 a 03-06, 04-01, 04-03, 04-04, desviaciones §9):
   - `…/ui/own/OwnRecipeEditorContract.kt`, `OwnRecipeEditorViewModel.kt` y `OwnRecipeEditorScreen.kt` (copiar
     `ProductEditor*`);
   - `IngredientSheet.kt` y la hoja de categoría con `OptionSheet`;
   - `OwnRecipeErrorText.kt`;
   - la ruta `OwnRecipeEditor(recipeId)` ya existe como destino vacío (T007): se llena, no se vuelve a crear.
-- [ ] T014 **"¡Receta guardada!" y detalle** (CA-SAV-03-07, 04-02, 04-05):
+- [x] T014 **"¡Receta guardada!" y detalle** (CA-SAV-03-07, 04-02, 04-05):
   - `OwnRecipeSavedScreen.kt` (creada y editada);
   - `OwnRecipeDetailScreen.kt` con su ViewModel;
   - las rutas `OwnRecipeSaved` y `OwnRecipeDetail`;
   - la tarjeta propia de Guardadas ya abre el editor con `SavedRecipesEffect.OpenOwnRecipe` (CA-SAV-02-06, T007).
-- [ ] T015 **Pruebas:** `OwnRecipeEditorViewModelTest`, `OwnRecipeEditorScreenTest`, `OwnRecipeSavedScreenTest` y
+- [x] T015 **Pruebas:** `OwnRecipeEditorViewModelTest`, `OwnRecipeEditorScreenTest`, `OwnRecipeSavedScreenTest` y
   `OwnRecipeDetailScreenTest`.
-- [ ] T016 **Navegación del flujo:** crear → éxito → "Ver receta" / "Crear otra" / flecha, en `MainNavigationTest`.
+- [x] T016 **Navegación del flujo:** crear → éxito → "Ver receta" / "Crear otra" / flecha, en `MainNavigationTest`.
 
 ## Issue 3: Eliminar con deshacer y contador del Perfil (intermedia, #131)
 - [ ] T017 **Casos de uso** (CA-SAV-05-03, 05-04): `DeleteOwnRecipeUseCase` y `RestoreOwnRecipeUseCase`, con sus
