@@ -36,3 +36,18 @@ Tomadas en un teléfono con Android 16 el 2026-10-23, con el **APK release** (R8
 | `009-recetas-ia/08-ia-por-que-te-conviene.png` | ¿Por qué te conviene? | `557:2903` |
 | `009-recetas-ia/09-ia-sin-coincidencias.png` | Sin coincidencias | `557:2515` |
 | `009-recetas-ia/10-ia-ayuda.png` | Ayuda | `557:2476` |
+
+## Módulo 5: Recetas guardadas (spec 010)
+
+Comparaciones Figma (izquierda) y app (derecha), renderizadas en un teléfono V2436 con Android 16 el 2026-11-06, con el build debug de `feature/010-recetas-guardadas` y datos de prueba. La captura de Recetas es de la app real.
+
+| Archivo | Pantalla | Frame del Figma |
+|---|---|---|
+| `010-recetas-guardadas/01-guardadas.png` | Guardadas con "Sin conexión" | `633:2723` |
+| `010-recetas-guardadas/02-nueva-receta.png` | Nueva receta | `557:2693` |
+| `010-recetas-guardadas/03-editar-con-error.png` | Editar receta con error (con ingredientes, §9) | `557:2654` |
+| `010-recetas-guardadas/04-receta-guardada.png` | ¡Receta guardada! | `557:2551` |
+| `010-recetas-guardadas/05-confirmar-eliminacion.png` | Eliminar receta | `557:2620` |
+| `010-recetas-guardadas/06-receta-eliminada.png` | Aviso con deshacer y vacío | `557:2585` |
+| `010-recetas-guardadas/07-detalle-propio.png` | Detalle de receta propia (sin frame, §9) | — |
+| `010-recetas-guardadas/08-recetas-tarjetas.png` | Recetas con las tarjetas corregidas | `557:3028` |
