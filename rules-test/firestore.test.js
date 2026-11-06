@@ -345,3 +345,54 @@ describe('favoritas (spec 010, RF-SAV-01, RNF-SAV-01)', () => {
     await assertFails(setDoc(favorite('u1', 'e'), validFavorite({ savedAt: 'ayer' })));
   });
 });
+
+describe('recetas propias (spec 010, RF-SAV-02, RNF-SAV-01)', () => {
+  const recipe = (uid, id = 'r1') => doc(db(uid), `users/${uid ?? 'u1'}/recipes/${id}`);
+  const validRecipe = (cambios = {}) => ({
+    name: 'Arepas rellenas',
+    nameNormalized: 'arepas rellenas',
+    category: 'AREPAS',
+    ingredients: [{ ingredientId: 'tomate', quantity: 1 }],
+    cookMinutes: 30,
+    preparation: 'Mezclar y asar.',
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    ...cambios,
+  });
+
+  test('RNF-SAV-01 el dueño crea, lee, edita y borra su receta', async () => {
+    await assertSucceeds(setDoc(recipe('u1'), validRecipe()));
+    await assertSucceeds(getDoc(recipe('u1')));
+    await assertSucceeds(setDoc(recipe('u1'), validRecipe({
+      createdAt: Timestamp.fromDate(new Date('2026-11-01T10:00:00Z')),
+      cookMinutes: 45,
+    })));
+    await assertSucceeds(deleteDoc(recipe('u1')));
+  });
+
+  test('RNF-SAV-01 otro usuario o anónimo no puede leer ni escribir', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'users/u1/recipes/r1'), {
+        ...validRecipe(), createdAt: Timestamp.now(), updatedAt: Timestamp.now(),
+      });
+    });
+    const ajena = doc(db('u2'), 'users/u1/recipes/r1');
+    await assertFails(getDoc(ajena));
+    await assertFails(setDoc(ajena, validRecipe()));
+    await assertFails(deleteDoc(ajena));
+    await assertFails(getDoc(recipe(null)));
+  });
+
+  test('RNF-SAV-01 se rechazan los datos fuera de los límites', async () => {
+    await assertFails(setDoc(recipe('u1', 'a'), validRecipe({ extra: true })));
+    await assertFails(setDoc(recipe('u1', 'b'), validRecipe({ name: 'A' })));
+    await assertFails(setDoc(recipe('u1', 'c'), validRecipe({ name: 'a'.repeat(61) })));
+    await assertFails(setDoc(recipe('u1', 'd'), validRecipe({ cookMinutes: 0 })));
+    await assertFails(setDoc(recipe('u1', 'e'), validRecipe({ cookMinutes: 241 })));
+    await assertFails(setDoc(recipe('u1', 'f'), validRecipe({ category: 'SUSHI' })));
+    await assertFails(setDoc(recipe('u1', 'g'), validRecipe({ preparation: '' })));
+    const muchos = Array.from({ length: 21 }, (_, i) => ({ ingredientId: `i${i}`, quantity: 1 }));
+    await assertFails(setDoc(recipe('u1', 'h'), validRecipe({ ingredients: muchos })));
+    await assertFails(setDoc(recipe('u1', 'i'), validRecipe({ createdAt: 1000 })));
+  });
+});

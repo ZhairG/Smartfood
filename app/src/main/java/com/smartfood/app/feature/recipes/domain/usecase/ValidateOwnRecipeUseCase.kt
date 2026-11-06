@@ -15,8 +15,7 @@ import javax.inject.Inject
  */
 class ValidateOwnRecipeUseCase @Inject constructor() {
     operator fun invoke(draft: OwnRecipeDraft): Result<Unit> = runCatching {
-        val name = draft.name
-        if (name.length !in MIN_NAME..MAX_NAME || name != name.trim() || name.isBlank()) invalid(OwnRecipeField.NAME)
+        if (draft.name.trim().length !in MIN_NAME..MAX_NAME) invalid(OwnRecipeField.NAME)
         if (draft.category == null) invalid(OwnRecipeField.CATEGORY)
         if (draft.ingredients.size > MAX_INGREDIENTS || draft.ingredients.hasDuplicates() || draft.ingredients.any { it.quantity <= 0 }) {
             invalid(OwnRecipeField.INGREDIENTS)

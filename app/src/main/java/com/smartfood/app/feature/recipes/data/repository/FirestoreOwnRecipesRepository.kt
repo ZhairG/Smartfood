@@ -1,8 +1,10 @@
 package com.smartfood.app.feature.recipes.data.repository
 
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
+import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -43,13 +46,18 @@ class FirestoreOwnRecipesRepository @Inject constructor(
         emitAll(recipes().snapshots(MetadataChanges.INCLUDE))
     }.map { snapshot ->
         snapshot.documents.mapNotNull { document ->
-            ownRecipeFromDocument(document.id, document.data ?: emptyMap(), document.metadata.hasPendingWrites())
+            // ESTIMATE: sin conexión, la hora del servidor todavía no existe y la receta no debe desaparecer (CA-SAV-03-08).
+            ownRecipeFromDocument(
+                document.id,
+                document.getData(DocumentSnapshot.ServerTimestampBehavior.ESTIMATE) ?: emptyMap(),
+                document.metadata.hasPendingWrites(),
+            )
         }
     }.catch { throw OwnRecipeErrorMapper.toException(it) }
 
     override suspend fun getRecipe(id: String): Result<OwnRecipe> = safeRunCatching {
         val snapshot = recipes().document(id).get().await()
-        ownRecipeFromDocument(snapshot.id, snapshot.data ?: emptyMap())
+        ownRecipeFromDocument(snapshot.id, snapshot.getData(DocumentSnapshot.ServerTimestampBehavior.ESTIMATE) ?: emptyMap())
             ?: throw OwnRecipeException(OwnRecipeError.NotFound)
     }.mapOwnRecipeError()
 
@@ -57,7 +65,8 @@ class FirestoreOwnRecipesRepository @Inject constructor(
 
     override suspend fun saveRecipe(recipe: OwnRecipe, isNew: Boolean): Result<WriteOutcome> = write {
         val fields = recipe.toDocumentFields() + mapOf(
-            OwnRecipeDocument.CREATED_AT to if (isNew) FieldValue.serverTimestamp() else recipe.createdAtMillis,
+            // Las reglas exigen una fecha: al editar o deshacer se conserva la de creación como `Timestamp`.
+            OwnRecipeDocument.CREATED_AT to if (isNew) FieldValue.serverTimestamp() else Timestamp(Date(recipe.createdAtMillis)),
             OwnRecipeDocument.UPDATED_AT to FieldValue.serverTimestamp(),
         )
         recipes().document(recipe.id).set(fields)

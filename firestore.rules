@@ -128,20 +128,22 @@ service cloud.firestore {
       allow read, delete: if isOwner(uid);
       allow create, update: if isOwner(uid) && validFavorite(request.resource.data);
     }
-  }
-}
 
-match /users/{uid}/recipes/{recipeId} {
-  function validOwnRecipe(d) {
-    return d.keys().hasOnly(['name', 'nameNormalized', 'category', 'ingredients', 'cookMinutes', 'preparation', 'createdAt', 'updatedAt'])
-      && d.name is string && d.name.size() >= 2 && d.name.size() <= 60
-      && d.nameNormalized is string
-      && d.category in ['AREPAS', 'ARROCES', 'CARNES', 'POLLO', 'PESCADOS', 'PASTAS', 'SOPAS', 'ENSALADAS', 'DESAYUNOS', 'POSTRES', 'OTRAS']
-      && d.ingredients is list && d.ingredients.size() <= 20
-      && d.cookMinutes is int && d.cookMinutes >= 1 && d.cookMinutes <= 240
-      && d.preparation is string && d.preparation.size() >= 1 && d.preparation.size() <= 2000
-      && d.createdAt is timestamp && d.updatedAt is timestamp;
+    // Recetas propias (spec 010, RF-SAV-02 y RNF-SAV-01). Las reglas no recorren listas: la forma de cada ingrediente la
+    // garantiza el caso de uso (plan §6).
+    match /users/{uid}/recipes/{recipeId} {
+      function validOwnRecipe(d) {
+        return d.keys().hasOnly(['name', 'nameNormalized', 'category', 'ingredients', 'cookMinutes', 'preparation', 'createdAt', 'updatedAt'])
+          && d.name is string && d.name.size() >= 2 && d.name.size() <= 60
+          && d.nameNormalized is string
+          && d.category in ['AREPAS', 'ARROCES', 'CARNES', 'POLLO', 'PESCADOS', 'PASTAS', 'SOPAS', 'ENSALADAS', 'DESAYUNOS', 'POSTRES', 'OTRAS']
+          && d.ingredients is list && d.ingredients.size() <= 20
+          && d.cookMinutes is int && d.cookMinutes >= 1 && d.cookMinutes <= 240
+          && d.preparation is string && d.preparation.size() >= 1 && d.preparation.size() <= 2000
+          && d.createdAt is timestamp && d.updatedAt is timestamp;
+      }
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && validOwnRecipe(request.resource.data);
+    }
   }
-  allow read, delete: if request.auth != null && request.auth.uid == uid;
-  allow create, update: if request.auth != null && request.auth.uid == uid && validOwnRecipe(request.resource.data);
 }
