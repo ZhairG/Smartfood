@@ -98,7 +98,7 @@
 
 ## Cierre (en el mismo PR)
 - [ ] T022 Suite instrumentada completa y `rules-test` en verde.
-- [ ] T023 Despliegue del bloque `recipes` de `firestore.rules` (con confirmación de Zhair). El bloque `favorites` se
+- [x] T023 Despliegue del bloque `recipes` de `firestore.rules` (con confirmación de Zhair). El bloque `favorites` se
   despliega al cerrar el #117, para poder probar el ♡ contra Firebase.
 - [ ] T024 Checklist manual en el teléfono (abajo) y capturas Figma vs app en el PR.
 - [ ] T025 Matriz al día, `tools/ca_coverage_baseline.txt`, `README.md` y `AGENTS.md` (arquitectura de Guardadas).
