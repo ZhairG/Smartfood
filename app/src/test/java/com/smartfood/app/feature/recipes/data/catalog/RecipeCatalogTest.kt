@@ -44,12 +44,20 @@ class RecipeCatalogTest {
     private val storeNames = setOf("exito", "carulla", "olimpica", "d1")
     private val pantryBasics = setOf("aceite", "sal", "comino", "pimienta", "azucar")
     private val difficulties = setOf("Fácil", "Media", "Difícil")
+    private val cuisineNames = setOf("colombiana", "italiana", "asiatica", "mexicana", "mediterranea")
 
     @Test
     fun `RNF-RIA-05 el catálogo tiene 50 recetas con ids únicos`() {
         assertEquals("El catálogo debe tener 50 recetas", 50, recipes.size)
         assertEquals("Los ids de receta no pueden repetirse", recipes.size, recipes.map { it.text("id") }.toSet().size)
         assertEquals("Los ids de ingrediente no pueden repetirse", ingredients.size, ingredientIds.toSet().size)
+    }
+
+    @Test
+    fun `CA-COC-01-02 cada receta declara una cocina válida`() {
+        recipes.forEach { recipe ->
+            assertTrue("${recipe.text("id")} tiene una cocina inválida", recipe.text("cocina") in cuisineNames)
+        }
     }
 
     @Test

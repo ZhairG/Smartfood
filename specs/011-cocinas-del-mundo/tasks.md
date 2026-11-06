@@ -3,7 +3,7 @@
 > Rama `feature/011-cocinas-del-mundo`, un commit por tarea. Contratos en [`plan.md`](./plan.md).
 
 - [x] T001 La spec, el plan, las tareas y sus referencias en la spec 009 §6, `AGENTS.md`, `README.md` y `tools/ca_coverage.py`.
-- [ ] T002 **Cocina en el catálogo** (RF-COC-01, CA-COC-01-02): `RecipeCuisine`, `Recipe.cuisine`, `RecetaDto.cocina`,
+- [x] T002 **Cocina en el catálogo** (RF-COC-01, CA-COC-01-02): `RecipeCuisine`, `Recipe.cuisine`, `RecetaDto.cocina`,
   `cocinaARecipeCuisine`, y clasificar las 50 recetas actuales en `recetas.json`.
 - [ ] T003 **Ingredientes y precios** (CA-COC-01-04): `busquedas.json`, `docs/precios/precios.json`, `ingredientes.json` y
   la tabla del mes con `aplicar.py`.

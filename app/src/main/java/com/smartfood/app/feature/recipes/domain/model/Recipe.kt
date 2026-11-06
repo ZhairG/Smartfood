@@ -15,6 +15,12 @@ package com.smartfood.app.feature.recipes.domain.model
  */
 enum class FoodTag { MEAT, SEAFOOD, ANIMAL_PRODUCT, GLUTEN, LACTOSE, NUTS }
 
+/**
+ * Cocina de una receta (spec 011, RF-COC-01). Tiene los mismos nombres que `Cuisine` de Preferencias alimentarias
+ * (spec 008), que el flujo de la IA traduce 1:1 por nombre. En `recetas.json` va en `"cocina"`.
+ */
+enum class RecipeCuisine { COLOMBIAN, ITALIAN, ASIAN, MEXICAN, MEDITERRANEAN }
+
 /** Unidad base de un ingrediente del catálogo. Todas las cantidades del catálogo y del agente van en esta unidad. */
 enum class IngredientUnit { GRAM, MILLILITER, UNIT }
 
@@ -107,6 +113,7 @@ data class RecipeStep(val title: String, val text: String, val minutes: Int? = n
  * @property ingredients Ingredientes con su cantidad para [servings] porciones.
  * @property beforeStarting Preparativos de "Antes de empezar".
  * @property steps Pasos de la cocina guiada.
+ * @property cuisine Cocina de la receta (spec 011).
  */
 data class Recipe(
     val id: String,
@@ -122,6 +129,7 @@ data class Recipe(
     val ingredients: List<RecipeIngredient>,
     val beforeStarting: List<String> = emptyList(),
     val steps: List<RecipeStep>,
+    val cuisine: RecipeCuisine = RecipeCuisine.COLOMBIAN,
 ) {
     /** Tiempo total en minutos: preparación, cocción y reposo. */
     val totalMinutes: Int get() = prepMinutes + cookMinutes + restMinutes
