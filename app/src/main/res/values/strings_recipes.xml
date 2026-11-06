@@ -83,6 +83,7 @@
     <string name="recipes_ai_expires_tomorrow">⚠ %1$s vence mañana.</string>
     <string name="recipes_ai_expires_in_days">⚠ %1$s vence en %2$d días.</string>
     <string name="recipes_ai_preferences">Según tus preferencias: %1$s</string>
+    <string name="recipes_ai_cuisines">Cocina favorita: %1$s</string>
     <string name="recipes_ai_budget">Presupuesto máximo</string>
     <string name="recipes_ai_budget_value">$%1$s</string>
     <string name="recipes_ai_budget_store">COP $%1$s · %2$s</string>
@@ -119,6 +120,7 @@
     <string name="recipes_ai_try">Prueba una de estas opciones</string>
     <string name="recipes_ai_suggest_budget">Sube el presupuesto a COP $%1$s</string>
     <string name="recipes_ai_suggest_spicy">Permite recetas picantes</string>
+    <string name="recipes_ai_suggest_cuisine">Quita tu cocina favorita en el Perfil</string>
     <string name="recipes_ai_suggest_time">Sube el tiempo a %1$d min</string>
     <string name="recipes_ai_suggest_inventory">Agrega más productos a tu inventario</string>
     <string name="recipes_ai_adjust_context">Ajustar contexto</string>

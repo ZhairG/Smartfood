@@ -11,7 +11,7 @@
 - [x] T005 **Fotos** (CA-COC-01-03): `drawable-nodpi/receta_*.webp` y `docs/licenses/fotos-recetas.md`.
 - [x] T006 **Agente** (RF-COC-02, RF-COC-04, HU-COC-02, CA-COC-03-02, 03-03): `PlanContext.cuisines`, `fitsCuisine`,
   `PlanSuggestion.RemoveCuisine`, `GetAiContextUseCase` y `GeneratePlanUseCase`.
-- [ ] T007 **Flujo de la IA** (CA-COC-03-01, 03-04): `AiUiState`, `AiPlanViewModel`, `AiFlowScreen`, `AiReasonText` y textos.
+- [x] T007 **Flujo de la IA** (CA-COC-03-01, 03-04): `AiUiState`, `AiPlanViewModel`, `AiFlowScreen`, `AiReasonText` y textos.
 - [ ] T008 **Evaluación** (RNF-COC-02): repetir las pruebas del agente y agregar una sección fechada en
   `docs/ia/evaluacion-agente.md` y `docs/ia/sustentacion-agente.md`.
 
