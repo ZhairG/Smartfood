@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Feature | `010-recetas-guardadas` (Módulo 5) |
-| Estado | En planeación (Issues #117, #130 y #131) |
+| Estado | Implementada (Issues #117, #130 y #131); pendiente de fusionar |
 | Fecha | 2026-10-31 |
 | Depende de | 006-inventario (patrón sin conexión), 008-perfil (contador), 009-recetas-ia (catálogo, tarjetas y detalle) |
 | Afecta | Pestaña Guardadas, tarjetas y detalle de Recetas, contador del Perfil, `firestore.rules` |
@@ -190,7 +190,7 @@ Flujo:
 | Las tarjetas de Recetas y el detalle muestran el ♡. Esto anula la desviación de la spec 009 §9 que lo quitaba. | El módulo de favoritas ya existe. |
 | En el detalle, el ♡ reemplaza al `⋮` de la barra (Figma `557:2856`), que no tiene acción. Lleva la píldora blanca de las tarjetas, porque el verde no se distingue sobre la barra. | Aprobado por Zhair en el #117 (2026-11-02). |
 | El detalle de la receta propia usa el lenguaje del detalle del catálogo: cabecera con el libro sobre `GreenSoft`, tarjetas de ingredientes y preparación, y "Editar". | El Figma no define esta pantalla (Zhair, 2026-11-06). |
-| El aviso rojo y el texto de error usan el rol `error` (`#D92E2E`); el Figma usa `#DC2626` y `#FEE2E2`. | La constitución no permite colores nuevos sin aprobación; la diferencia es mínima. |
+| El aviso rojo y el texto de error usan el rol `error` (`#D92E2E`); el Figma usa `#DC2626` y `#FEE2E2`. | Un solo rojo en la app, sin tokens nuevos; la diferencia es mínima (Zhair, 2026-11-06). |
 
 ## 10. Plan de entrega
 

@@ -151,7 +151,7 @@ class SavedRecipesViewModelTest {
     }
 
     @Test
-    fun `CA-SAV-05-03 el aviso cuenta de 8 a 1 y se cierra solo`() = runTest {
+    fun `CA-SAV-05-03 CA-SAV-05-05 el aviso cuenta de 8 a 1 y se cierra solo`() = runTest {
         val viewModel = cargado(viewModel())
 
         eliminadas.publish(DeletedOwnRecipe(ownRecipe(id = "r1"), wasFavorite = false, favoriteSavedAtMillis = 0L))

@@ -7,6 +7,9 @@ Se reproducen con:
 ./gradlew :app:testDebugUnitTest --tests "*AgentEvaluationTest" --tests "*MealPlannerPerformanceTest"
 ```
 
+La comparación con otros algoritmos, la heurística y su admisibilidad están en la §6. La guía para estudiar la sustentación
+está en [`sustentacion-agente.md`](sustentacion-agente.md).
+
 ## 1. Formulación
 
 El agente es **basado en utilidad** y arma un **plan de 3 días** (una receta por día) a partir de lo que hay en el
