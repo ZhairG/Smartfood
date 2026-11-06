@@ -90,6 +90,8 @@ ingredientes y más usuarios, así que el pedido queda registrado como decisión
 - Con varias cocinas elegidas, una receta entra si es de cualquiera.
 - Los platos se adaptan a ingredientes que se consiguen en Colombia (por ejemplo, almendras en el pesto y hummus sin
   tahini). Su nombre se mantiene porque el plato sigue siendo reconocible.
+- Las recetas nuevas son sencillas a propósito. El agente admite máximo 3 ingredientes por comprar al día, así que con
+  una despensa típica (arroz, papa, cebolla, tomate, ajo y zanahoria) cada cocina debe tener al menos 3 recetas posibles.
 
 ## 8. Fidelidad con Figma
 

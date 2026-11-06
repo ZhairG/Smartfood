@@ -47,10 +47,18 @@ class RecipeCatalogTest {
     private val cuisineNames = setOf("colombiana", "italiana", "asiatica", "mexicana", "mediterranea")
 
     @Test
-    fun `RNF-RIA-05 el catálogo tiene 50 recetas con ids únicos`() {
-        assertEquals("El catálogo debe tener 50 recetas", 50, recipes.size)
+    fun `RNF-RIA-05 CA-COC-01-01 el catálogo tiene 70 recetas con ids únicos`() {
+        assertEquals("El catálogo debe tener 70 recetas", 70, recipes.size)
         assertEquals("Los ids de receta no pueden repetirse", recipes.size, recipes.map { it.text("id") }.toSet().size)
         assertEquals("Los ids de ingrediente no pueden repetirse", ingredients.size, ingredientIds.toSet().size)
+    }
+
+    @Test
+    fun `CA-COC-01-01 cada cocina tiene al menos 5 recetas`() {
+        val porCocina = recipes.groupingBy { it.text("cocina") }.eachCount()
+        cuisineNames.forEach { cocina ->
+            assertTrue("$cocina tiene ${porCocina[cocina] ?: 0} recetas", (porCocina[cocina] ?: 0) >= 5)
+        }
     }
 
     @Test
@@ -133,7 +141,7 @@ class RecipeCatalogTest {
     }
 
     @Test
-    fun `CA-RIA-02-09 los ingredientes tienen unidad, sección, precio y etiquetas válidas`() {
+    fun `CA-COC-01-04 CA-RIA-02-09 los ingredientes tienen unidad, sección, precio y etiquetas válidas`() {
         ingredients.forEach { ingredient ->
             val id = ingredient.text("id")
             assertTrue("$id: unidad inválida", ingredient.text("unidad") in unitNames)
@@ -189,7 +197,7 @@ class RecipeCatalogTest {
     }
 
     @Test
-    fun `RNF-RIA-05 cada foto está documentada con su fuente y licencia`() {
+    fun `CA-COC-01-03 RNF-RIA-05 cada foto está documentada con su fuente y licencia`() {
         recipes.forEach { recipe ->
             val photo = recipe.text("foto")
             val row = licenses.lineSequence().firstOrNull { it.contains("$photo.webp") }

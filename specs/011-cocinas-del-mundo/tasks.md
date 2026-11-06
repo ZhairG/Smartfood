@@ -7,7 +7,7 @@
   `cocinaARecipeCuisine`, y clasificar las 50 recetas actuales en `recetas.json`.
 - [x] T003 **Ingredientes y precios** (CA-COC-01-04): `busquedas.json`, `docs/precios/precios.json`, `ingredientes.json` y
   la tabla del mes con `aplicar.py`.
-- [ ] T004 **20 recetas nuevas** (CA-COC-01-01): `recetas.json`, revisadas con `revisar_catalogo.py`.
+- [x] T004 **20 recetas nuevas** (CA-COC-01-01): `recetas.json`, revisadas con `revisar_catalogo.py`.
 - [ ] T005 **Fotos** (CA-COC-01-03): `drawable-nodpi/receta_*.webp` y `docs/licenses/fotos-recetas.md`.
 - [ ] T006 **Agente** (RF-COC-02, RF-COC-04, HU-COC-02, CA-COC-03-02, 03-03): `PlanContext.cuisines`, `fitsCuisine`,
   `PlanSuggestion.RemoveCuisine`, `GetAiContextUseCase` y `GeneratePlanUseCase`.
