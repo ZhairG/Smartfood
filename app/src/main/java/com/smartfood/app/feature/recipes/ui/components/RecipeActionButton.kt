@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -42,6 +43,7 @@ import com.smartfood.app.core.designsystem.util.figmaShadow
  * @param modifier Modificador opcional; el ancho lo pone quien lo usa.
  * @param enabled `false` lo atenúa y lo deshabilita.
  * @param trailingIcon Ícono del Figma a la derecha del texto, o `null`.
+ * @param containerColor Color del botón; por defecto, el naranja. "Sí, eliminar" usa el rojo (spec 010, Figma `557:2620`).
  */
 @Composable
 fun RecipeActionButton(
@@ -50,13 +52,14 @@ fun RecipeActionButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     @DrawableRes trailingIcon: Int? = null,
+    containerColor: Color = MaterialTheme.colorScheme.secondary,
 ) {
     val shape = RoundedCornerShape(ButtonRadius)
     // Atenuado con colores opacos (no con transparencia): así no se ve la lista a través ni se corta la sombra.
     val container = if (enabled) {
-        MaterialTheme.colorScheme.secondary
+        containerColor
     } else {
-        lerp(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.secondary, DisabledMix)
+        lerp(MaterialTheme.colorScheme.surface, containerColor, DisabledMix)
     }
     val content = MaterialTheme.colorScheme.onSecondary.copy(alpha = if (enabled) 1f else DisabledContentAlpha)
     Row(

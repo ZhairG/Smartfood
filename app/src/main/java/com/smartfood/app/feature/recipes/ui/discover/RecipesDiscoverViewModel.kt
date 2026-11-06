@@ -3,13 +3,17 @@ package com.smartfood.app.feature.recipes.ui.discover
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.smartfood.app.feature.inventory.domain.model.InventorySection
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
+import com.smartfood.app.feature.recipes.domain.model.FavoriteSource
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
 import com.smartfood.app.feature.recipes.domain.model.RecipeSuggestion
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipesUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ObserveFavoriteIdsUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.RankRecipesForMeUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.RecipeCatalogData
 import com.smartfood.app.feature.recipes.domain.usecase.SearchRecipesUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ToggleFavoriteUseCase
 import com.smartfood.app.feature.recipes.domain.model.Store
 import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,16 +33,19 @@ import kotlinx.coroutines.launch
 /**
  * Nombre: RecipesDiscoverViewModel.kt
  * Autor: SmartFood Team
- * Fecha: Octubre 2026
+ * Fecha: Noviembre 2026
  * Descripción: ViewModel de Descubrir (spec 009, HU-RIA-01, T007). Lee el catálogo una vez, observa el inventario y
  * delega la búsqueda y el orden en los casos de uso; no repite reglas del dominio. "Para ti" usa la utilidad de cada
- * receta con el inventario actual (CA-RIA-01-02).
+ * receta con el inventario actual (CA-RIA-01-02). Expone los ids favoritos para pintar el ♡ (spec 010,
+ * CA-SAV-01-01 y 01-03, T005).
  *
  * @param getRecipes Lectura del catálogo.
  * @param searchRecipes Búsqueda por nombre o ingrediente (CA-RIA-01-04).
  * @param rankRecipes Orden y filtros (CA-RIA-01-02 y 01-03).
  * @param observeInventory Inventario actual para calcular costo y rescate.
  * @param getPreferredStore "Mi supermercado" del Perfil para los precios (CA-RIA-04-07).
+ * @param observeFavoriteIds Ids de las recetas del catálogo marcadas como favorita.
+ * @param toggleFavorite Marca o quita una receta como favorita.
  * @param savedStateHandle Recibe el filtro que pide "Ver recetas económicas" ([FILTER_KEY]).
  */
 @HiltViewModel
@@ -48,6 +55,8 @@ class RecipesDiscoverViewModel @Inject constructor(
     private val rankRecipes: RankRecipesForMeUseCase,
     observeInventory: ObserveInventoryUseCase,
     getPreferredStore: GetPreferredStoreUseCase,
+    private val observeFavoriteIds: ObserveFavoriteIdsUseCase,
+    private val toggleFavorite: ToggleFavoriteUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -84,7 +93,7 @@ class RecipesDiscoverViewModel @Inject constructor(
      * Estado de la pantalla. Si el inventario no se puede leer, las recetas se ordenan con el inventario vacío en
      * lugar de cerrar la app.
      */
-    val uiState: StateFlow<RecipesDiscoverUiState> = combine(
+    private val baseUiState: StateFlow<RecipesDiscoverUiState> = combine<CatalogState, List<InventorySection>, String, RecipeFilter, Store, RecipesDiscoverUiState>(
         catalog,
         observeInventory().catch { emit(emptyList()) },
         query,
@@ -119,6 +128,18 @@ class RecipesDiscoverViewModel @Inject constructor(
         initialValue = RecipesDiscoverUiState(isLoading = true)
     )
 
+    val uiState: StateFlow<RecipesDiscoverUiState> = combine(
+        baseUiState,
+        // Si las favoritas no se pueden leer, las tarjetas se ven sin ♡ en lugar de cerrar la app.
+        observeFavoriteIds().catch { emit(emptySet()) },
+    ) { state, favoriteIds ->
+        state.copy(favoriteIds = favoriteIds)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(StopTimeoutMs),
+        initialValue = RecipesDiscoverUiState(isLoading = true)
+    )
+
     fun onEvent(event: RecipesDiscoverEvent) {
         when (event) {
             is RecipesDiscoverEvent.QueryChanged -> query.value = event.query
@@ -126,6 +147,10 @@ class RecipesDiscoverViewModel @Inject constructor(
             is RecipesDiscoverEvent.FilterSelected -> filter.value = event.filter
             is RecipesDiscoverEvent.RecipeClicked ->
                 viewModelScope.launch { _effects.send(RecipesDiscoverEffect.OpenRecipe(event.recipeId)) }
+            is RecipesDiscoverEvent.FavoriteToggled -> viewModelScope.launch {
+                val isNowFavorite = !uiState.value.favoriteIds.contains(event.recipeId)
+                toggleFavorite(event.recipeId, FavoriteSource.CATALOG, isNowFavorite)
+            }
         }
     }
 

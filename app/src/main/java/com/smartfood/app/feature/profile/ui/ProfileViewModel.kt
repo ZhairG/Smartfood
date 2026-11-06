@@ -10,6 +10,7 @@ import com.smartfood.app.feature.inventory.domain.usecase.HasPendingChangesUseCa
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
 import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.CountSavedRecipesUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetMonthlySavingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -46,6 +47,7 @@ class ProfileViewModel @Inject constructor(
     private val hasPendingChanges: HasPendingChangesUseCase,
     private val themePreferences: ThemePreferences,
     private val getMonthlySavings: GetMonthlySavingsUseCase,
+    private val countSavedRecipes: CountSavedRecipesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -88,6 +90,12 @@ class ProfileViewModel @Inject constructor(
             observeInventory()
                 .catch { emit(emptyList()) }
                 .collect { sections -> _uiState.update { it.copy(inventoryCount = sections.sumOf { s -> s.items.size }) } }
+        }
+        viewModelScope.launch {
+            // Si las recetas no se pueden leer, la tarjeta queda en 0 sin cerrar la pantalla (spec 010, CA-SAV-06-01).
+            countSavedRecipes()
+                .catch { emit(0) }
+                .collect { count -> _uiState.update { it.copy(savedRecipesCount = count) } }
         }
         viewModelScope.launch {
             getMonthlySavings()
@@ -150,6 +158,7 @@ class ProfileViewModel @Inject constructor(
  * @property email Correo del encabezado.
  * @property initials Iniciales del avatar.
  * @property photoUrl Foto de perfil, o `null` para mostrar las iniciales (CA-PER-01-01).
+ * @property savedRecipesCount Recetas guardadas, sin contar dos veces una creada que es favorita (spec 010, CA-SAV-06-01).
  * @property inventoryCount Productos del inventario, para la tarjeta "Ingredientes en inventario".
  * @property themeMode Tema elegido, que se muestra a la derecha de "Tema de la app" (CA-PER-06-01).
  * @property isThemeSheetVisible `true` mientras está abierta la hoja para elegir el tema (CA-PER-06-02).
@@ -164,6 +173,7 @@ data class ProfileUiState(
     val initials: String? = null,
     val photoUrl: String? = null,
     val inventoryCount: Int = 0,
+    val savedRecipesCount: Int = 0,
     val monthlySavingsCop: Int = 0,
     val themeMode: ThemeMode = ThemeMode.Default,
     val isThemeSheetVisible: Boolean = false,

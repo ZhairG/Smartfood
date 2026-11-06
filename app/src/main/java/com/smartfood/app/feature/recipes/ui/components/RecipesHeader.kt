@@ -32,11 +32,20 @@ import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
  * Nombre: RecipesHeader.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Encabezado de la pestaña Recetas (spec 009, T006, Figma `557:3028`): fondo verde, el tenedor y cuchillo
- * del Figma a la izquierda y el título "Recetas" centrado. No es clicable; el ícono es decorativo.
+ * Descripción: Encabezado de las pestañas Recetas (spec 009, T006, Figma `557:3028`) y Guardadas (spec 010, T007, Figma
+ * `633:2723`): fondo verde, el tenedor y cuchillo del Figma a la izquierda, el título centrado y una acción opcional a
+ * la derecha. El ícono es decorativo.
+ *
+ * @param modifier Modificador opcional.
+ * @param title Título centrado; por defecto, "Recetas".
+ * @param action Acción opcional a la derecha, como "Ordenar".
  */
 @Composable
-fun RecipesHeader(modifier: Modifier = Modifier) {
+fun RecipesHeader(
+    modifier: Modifier = Modifier,
+    title: String = stringResource(id = R.string.recipes_title),
+    action: (@Composable () -> Unit)? = null,
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -55,7 +64,7 @@ fun RecipesHeader(modifier: Modifier = Modifier) {
                 .size(RecipesHeaderIconSize)
         )
         Text(
-            text = stringResource(id = R.string.recipes_title),
+            text = title,
             color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center,
@@ -66,6 +75,9 @@ fun RecipesHeader(modifier: Modifier = Modifier) {
                 .padding(horizontal = RecipesHeaderTitlePadding)
                 .semantics { heading() }
         )
+        if (action != null) {
+            Box(modifier = Modifier.align(Alignment.CenterEnd).padding(end = RecipesHeaderSidePadding)) { action() }
+        }
     }
 }
 

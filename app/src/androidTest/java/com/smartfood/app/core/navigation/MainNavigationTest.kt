@@ -1,13 +1,14 @@
 package com.smartfood.app.core.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -88,8 +89,99 @@ class MainNavigationTest {
         // La barra queda con Recetas seleccionada y el encabezado del Figma se ve como título.
         composeTestRule.onNode(hasText("Recetas") and isSelected()).assertIsDisplayed()
         composeTestRule.onNode(hasText("Recetas") and isHeading()).assertIsDisplayed()
-        // Guardadas sigue deshabilitada (spec 009 §9).
-        composeTestRule.onNodeWithText("Guardadas").assertIsNotEnabled()
+        // Guardadas ya está habilitada (spec 010, T006).
+        composeTestRule.onNodeWithText("Guardadas").assertIsEnabled()
+    }
+
+    @Test
+    fun caSav0201_laPestanaGuardadasEstaHabilitadaYSeResalta() {
+        composeTestRule.onNodeWithText("Guardadas").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(hasText("Guardadas") and isSelected()).assertIsDisplayed()
+        composeTestRule.onNode(hasText("Guardadas") and isHeading()).assertIsDisplayed()
+    }
+
+    @Test
+    fun caSav0210_nuevaRecetaAbreSuPantallaConGuardadasResaltada() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread { navController.navigate(Route.OwnRecipeEditor()) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(hasText("Nueva receta") and isHeading()).assertIsDisplayed()
+        composeTestRule.onNode(hasText("Guardadas") and isSelected()).assertIsDisplayed()
+    }
+
+    @Test
+    fun caSav0404_laFlechaDelEditorVuelveAGuardadas() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread { navController.navigate(Route.OwnRecipeEditor()) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithContentDescription("Volver").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.Saved>() == true)
+    }
+
+    @Test
+    fun caSav0307_crearOtraAbreNuevaRecetaSinApilar() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread { navController.navigate(Route.OwnRecipeSaved("r1", "Arepas", false)) }
+        composeTestRule.waitForIdle()
+        val pantallas = pantallasEnLaPila()
+
+        composeTestRule.onNodeWithText("Crear otra").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.OwnRecipeEditor>() == true)
+        assertEquals(pantallas, pantallasEnLaPila())
+    }
+
+    @Test
+    fun caSav0307_verRecetaAbreElDetalleYLaFlechaVuelveAGuardadas() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread { navController.navigate(Route.OwnRecipeSaved("r1", "Arepas", false)) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Ver receta").performClick()
+        composeTestRule.waitForIdle()
+        assertTrue(navController.currentDestination?.hasRoute<Route.OwnRecipeDetail>() == true)
+
+        composeTestRule.onNodeWithContentDescription("Volver").performClick()
+        composeTestRule.waitForIdle()
+        assertTrue(navController.currentDestination?.hasRoute<Route.Saved>() == true)
+    }
+
+    @Test
+    fun caSav0502_cancelarVuelveAlEditor() {
+        composeTestRule.runOnUiThread {
+            navController.navigate(Route.Saved)
+            navController.navigate(Route.OwnRecipeEditor("r1"))
+            navController.navigate(Route.DeleteOwnRecipe("r1", "Arepas"))
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Cancelar").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.OwnRecipeEditor>() == true)
+    }
+
+    @Test
+    fun caSav0206_elDetalleAbiertoDesdeGuardadasResaltaEsaPestana() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread {
+            navController.navigate(Route.RecipeDetail(recipeId = "no-existe", fromSaved = true))
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(hasText("Guardadas") and isSelected()).assertIsDisplayed()
     }
 
     @Test

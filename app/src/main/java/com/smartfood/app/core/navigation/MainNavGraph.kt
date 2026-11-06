@@ -6,6 +6,7 @@ import androidx.navigation.compose.navigation
 import com.smartfood.app.feature.inventory.ui.inventoryDestinations
 import com.smartfood.app.feature.profile.ui.profileDestination
 import com.smartfood.app.feature.recipes.ui.recipesDestinations
+import com.smartfood.app.feature.recipes.ui.savedDestinations
 
 /**
  * Nombre: MainNavGraph.kt
@@ -21,6 +22,7 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
     navigation<Route.MainGraph>(startDestination = Route.Inventory) {
         inventoryDestinations(navController)
         recipesDestinations(navController)
+        savedDestinations(navController)
         profileDestination(navController)
     }
 }

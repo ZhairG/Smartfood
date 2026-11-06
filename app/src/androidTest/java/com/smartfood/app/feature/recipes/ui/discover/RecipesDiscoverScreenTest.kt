@@ -1,15 +1,20 @@
 package com.smartfood.app.feature.recipes.ui.discover
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
@@ -48,6 +53,35 @@ class RecipesDiscoverScreenTest {
                 )
             }
         }
+    }
+
+    @Test
+    fun caRia0101_detrasDelNombreSeVeElFondoBlancoDeLaTarjeta() {
+        mostrar(conRecetas())
+
+        composeTestRule.waitForIdle()
+
+        // La tarjeta agrupa su semántica: estos son los límites de toda la tarjeta, no los del texto.
+        val tarjeta = composeTestRule.onNodeWithText("Pasta verde rápida").fetchSemanticsNode().boundsInRoot
+        val pantalla = composeTestRule.onRoot().captureToImage().toPixelMap()
+
+        // Debajo de la foto, en el margen interno sin texto, debe verse el fondo de la tarjeta. Sin él, la sombra se veía
+        // por dentro de la tarjeta (T005).
+        val x = tarjeta.left.toInt() + MARGEN_PX
+        val y = tarjeta.center.y.toInt() + MARGEN_PX
+        assertEquals("Píxel ($x, $y) de $tarjeta", Color.White, pantalla[x, y])
+    }
+
+    @Test
+    fun caSav0101_tocarElCorazonEmiteFavoriteToggled() {
+        mostrar(conRecetas().copy(favoriteIds = emptySet()))
+
+        composeTestRule.onAllNodesWithContentDescription("Agregar a favoritas")[0].performClick()
+
+        assertEquals(
+            listOf<RecipesDiscoverEvent>(RecipesDiscoverEvent.FavoriteToggled("pollo-guisado")),
+            eventos
+        )
     }
 
     @Test
@@ -167,6 +201,7 @@ class RecipesDiscoverScreenTest {
 
     private fun conRecetas() = RecipesDiscoverUiState(
         isLoading = false,
+        favoriteIds = setOf("pollo-guisado"),
         recipes = listOf(
             RecipeCardUi(
                 id = "pollo-guisado",
@@ -187,4 +222,8 @@ class RecipesDiscoverScreenTest {
             )
         )
     )
+
+    private companion object {
+        const val MARGEN_PX = 10
+    }
 }

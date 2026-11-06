@@ -20,6 +20,9 @@ import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import com.smartfood.app.feature.recipes.domain.usecase.BuildRecipeIngredientsUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipeDetailUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ObserveFavoriteIdsUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.ToggleFavoriteUseCase
+import com.smartfood.app.testutil.FakeFavoritesRepository
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.FakeProfileRepository
@@ -185,7 +188,18 @@ class RecipeDetailViewModelTest {
         assertTrue(state.groups.isEmpty())
     }
 
+    @Test
+    fun `CA-SAV-02-11 si las favoritas no se pueden leer el detalle se ve sin corazon y no se cierra`() = runTest {
+        favorites.observeFailure = IllegalStateException("PERMISSION_DENIED")
+
+        val state = viewModel().uiState.first { !it.isLoading }
+
+        assertFalse(state.hasError)
+        assertFalse(state.isFavorite)
+    }
+
     private val profile = FakeProfileRepository()
+    private val favorites = FakeFavoritesRepository()
 
     private fun viewModel(recipeId: String = recipe.id): RecipeDetailViewModel {
         val repository = FakeInventoryRepository().apply { items.value = inventory }
@@ -200,6 +214,8 @@ class RecipeDetailViewModelTest {
             buildIngredients = BuildRecipeIngredientsUseCase(IngredientMatcher(clock)),
             observeInventory = observeInventory,
             getPreferredStore = GetPreferredStoreUseCase(GetFoodPreferencesUseCase(profile)),
+            observeFavoriteIds = ObserveFavoriteIdsUseCase(favorites),
+            toggleFavorite = ToggleFavoriteUseCase(favorites),
         )
     }
 

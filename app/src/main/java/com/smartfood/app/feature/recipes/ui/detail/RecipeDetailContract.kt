@@ -26,6 +26,7 @@ import com.smartfood.app.feature.recipes.domain.model.Store
  * @property servings Porciones elegidas.
  * @property groups Ingredientes agrupados por sección, ya escalados.
  * @property store Supermercado de los precios ("Mi supermercado", CA-RIA-04-07).
+ * @property isFavorite `true` si la receta está marcada como favorita (spec 010, CA-SAV-01-02).
  */
 data class RecipeDetailUiState(
     val isLoading: Boolean = true,
@@ -40,6 +41,7 @@ data class RecipeDetailUiState(
     val servings: Int = 1,
     val groups: List<RecipeIngredientGroup> = emptyList(),
     val store: Store = Store.D1,
+    val isFavorite: Boolean = false,
 )
 
 /** Acciones de la persona en el detalle. */
@@ -53,6 +55,9 @@ sealed interface RecipeDetailEvent {
 
     /** Agregó una porción (máximo 12). */
     data object IncreaseServings : RecipeDetailEvent
+
+    /** Tocó el ♡ para marcar o quitar la receta como favorita (spec 010, CA-SAV-01-03). */
+    object FavoriteToggled : RecipeDetailEvent
 }
 
 /** Efectos de navegación del detalle. */

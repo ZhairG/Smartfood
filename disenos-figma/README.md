@@ -34,3 +34,20 @@ La fuente de verdad sigue siendo el Figma (frames e interacciones del prototipo)
 | 10 | Video y entrada de cocina ("Antes de empezar") | 557-2819 |
 | 11 | Cocina guiada (paso 1 de 5) | 557-2781 |
 | — | Componente "Progreso" (arco de carga, 81×81) | 281-272 |
+
+## Módulo 5 - Recetas guardadas
+Capturas tomadas el 2026-10-31. Todas las interacciones del prototipo son instantáneas (spec 010, §8).
+
+| # | Pantalla | Nodo |
+|---|---|---|
+| 01 | Guardadas: Favoritas, con "Sin conexión" | 633-2723 |
+| 02 | Guardadas después de crear ("Recetas guardadas 1") | 666-3804 |
+| 03 | Guardadas después de editar ("Recetas guardadas 2") | 666-3892 |
+| 04 | Nueva receta | 557-2693 |
+| 05 | "¡Receta guardada!" | 557-2551 |
+| 06 | Editar receta | 666-3647 |
+| 07 | Editar receta con error (0 min) | 557-2654 |
+| 08 | Editar receta corregida ("Editar receta 2") | 666-3753 |
+| 09 | "¡Receta guardada!" (actualizada) | 666-3717 |
+| 10 | Eliminar receta (confirmación) | 557-2620 |
+| 11 | Receta eliminada (deshacer · 8 s) y vacío | 557-2585 |

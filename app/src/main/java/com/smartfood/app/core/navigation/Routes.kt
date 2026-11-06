@@ -116,6 +116,12 @@ sealed interface Route {
         override val screenRoute: ScreenRoute = ScreenRoute.RECIPES
     }
 
+    /** Pestaña Guardadas (spec 010, CA-SAV-02-01). */
+    @Serializable
+    data object Saved : Route {
+        override val screenRoute: ScreenRoute = ScreenRoute.SAVED
+    }
+
     @Serializable
     data object AiPlan : Route { override val screenRoute: ScreenRoute = ScreenRoute.AI_PLAN }
 
@@ -128,8 +134,30 @@ sealed interface Route {
      * @property recipeId Identificador de la receta.
      */
     @Serializable
-    data class RecipeDetail(val recipeId: String) : Route {
+    data class RecipeDetail(val recipeId: String, val fromSaved: Boolean = false) : Route {
         override val screenRoute: ScreenRoute get() = ScreenRoute.RECIPE_DETAIL
+    }
+
+    /** Crear (`recipeId = null`) o editar una receta propia (spec 010, plan §4). El #130 lo llena en T013. */
+    @Serializable
+    data class OwnRecipeEditor(val recipeId: String? = null) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.OWN_RECIPE_EDITOR
+    }
+
+    @Serializable
+    data class OwnRecipeSaved(val recipeId: String, val name: String, val edited: Boolean) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.OWN_RECIPE_SAVED
+    }
+
+    @Serializable
+    data class DeleteOwnRecipe(val recipeId: String, val name: String) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.DELETE_OWN_RECIPE
+    }
+
+    /** Detalle de una receta propia (spec 010, CA-SAV-04-05). */
+    @Serializable
+    data class OwnRecipeDetail(val recipeId: String) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.OWN_RECIPE_DETAIL
     }
 
     /** Preparación previa de una receta (spec 009, CA-RIA-04-03). */

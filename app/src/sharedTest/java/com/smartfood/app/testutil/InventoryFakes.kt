@@ -7,6 +7,7 @@ import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
 import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.SpeechEvent
+import com.smartfood.app.feature.inventory.domain.model.SpeechError
 import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.inventory.domain.model.inventoryFailure
 import com.smartfood.app.feature.inventory.domain.repository.ExpiryReminderScheduler
@@ -236,6 +237,10 @@ class FakeSpeechToText(var available: Boolean = true) : SpeechToText {
         listenCalls++
         isListening = true
         try {
+            if (!available) {
+                emit(SpeechEvent.Failed(SpeechError.NOT_AVAILABLE))
+                return@flow
+            }
             for (event in events) {
                 emit(event)
                 if (event is SpeechEvent.Result || event is SpeechEvent.Failed) break

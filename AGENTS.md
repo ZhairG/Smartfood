@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code), Gemini or any other
 
 ## Proyecto
 
-App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, paquete `com.smartfood.app`. Proyecto universitario (UTADEO 2026-2) para reducir el desperdicio de comida en hogares: inventario + vencimientos + presupuesto, con un agente de recomendación de recetas. Hoy están implementados la autenticación (módulo 1), el **inventario** (spec 006), con uso sin conexión, el **perfil** (spec 008) y **recetas + IA** (spec 009). El próximo módulo son las recetas guardadas (#117, spec 010).
+App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, paquete `com.smartfood.app`. Proyecto universitario (UTADEO 2026-2) para reducir el desperdicio de comida en hogares: inventario + vencimientos + presupuesto, con un agente de recomendación de recetas. Hoy están implementados la autenticación (módulo 1), el **inventario** (spec 006), con uso sin conexión, el **perfil** (spec 008), **recetas + IA** (spec 009) y las **recetas guardadas** (spec 010).
 
 `compileSdk`/`targetSdk` 37, `minSdk` 24, Java 11. Todas las dependencias van en `gradle/libs.versions.toml`.
 
@@ -12,7 +12,7 @@ App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, pa
 
 Antes de escribir código, leer **`specs/constitution.md`** (principios no negociables) y la spec de la feature.
 
-- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario`, `008-perfil` y `009-recetas-ia` (implementadas). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`, `CA-RIA-01-01`).
+- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario`, `008-perfil`, `009-recetas-ia` y `010-recetas-guardadas` (implementadas). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`, `CA-RIA-01-01`, `CA-SAV-01-01`).
 - Las capturas de referencia de cada módulo están en `disenos-figma/` (índice en su `README.md`); la fuente de verdad sigue siendo el Figma.
 - Cada feature vive en `specs/NNN-nombre/` con `spec.md` (QUÉ: historias, criterios Dado/Cuando/Entonces), `plan.md` (CÓMO: contratos, decisiones) y `tasks.md` (tareas + matriz CA → test).
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
@@ -55,41 +55,7 @@ El profesor evalúa que la app funcione **exactamente como el prototipo**, como 
 
 ### Si el MCP de Figma no está configurado
 
-Antes de implementar, la IA comprueba si tiene herramientas de Figma disponibles. **Si no las tiene, no implementa el diseño**: identifica el entorno y el modelo en que está corriendo y muestra **solo** los pasos de ese entorno, tal como aparecen abajo. Si no puede identificarlo, pregunta cuál es.
-
-Hay dos servidores. Usar el **remoto** salvo que el entorno no permita iniciar sesión con OAuth:
-
-| Servidor | URL | Requisito |
-|---|---|---|
-| Remoto (recomendado) | `https://mcp.figma.com/mcp` | Cuenta de Figma con acceso al archivo. Las cuentas gratuitas tienen un límite bajo de llamadas al mes. |
-| Escritorio | `http://127.0.0.1:3845/mcp` | App de escritorio de Figma abierta, Dev Mode, *Enable desktop MCP server*. Requiere un asiento Dev o Full de un plan pago. |
-
-**Gemini CLI**
-1. Ejecutar `gemini mcp add --transport http figma https://mcp.figma.com/mcp` (o agregar en `~/.gemini/settings.json`: `"mcpServers": { "figma": { "httpUrl": "https://mcp.figma.com/mcp" } }`).
-2. Abrir `gemini` y ejecutar `/mcp auth figma`; autorizar en el navegador con la cuenta de Figma.
-3. Comprobar con `/mcp` que `figma` aparece conectado con sus herramientas.
-
-**Gemini en Android Studio**
-1. *Settings → Tools → AI → MCP Servers* → activar *Enable MCP Servers*.
-2. En el `mcp.json` que abre, agregar `"mcpServers": { "figma": { "httpUrl": "https://mcp.figma.com/mcp" } }`. Si la versión no permite iniciar sesión, usar el servidor de escritorio: `"httpUrl": "http://127.0.0.1:3845/mcp"` con la app de Figma abierta.
-3. Aplicar y comprobar en el chat del agente (modo *Agent*) que aparecen las herramientas de Figma.
-
-**Claude Code**
-1. Ejecutar `claude mcp add --transport http figma https://mcp.figma.com/mcp`.
-2. En la sesión, ejecutar `/mcp`, elegir `figma` → *Authenticate* y autorizar en el navegador.
-
-**VS Code (GitHub Copilot, modo Agent)**
-1. Crear `.vscode/mcp.json` con `{ "servers": { "figma": { "type": "http", "url": "https://mcp.figma.com/mcp" } } }`.
-2. Pulsar *Start* sobre el servidor en ese archivo y autorizar en el navegador.
-3. En el chat, modo *Agent* → icono de herramientas → comprobar que figuran las de Figma.
-
-**Cursor**
-1. *Settings → MCP → Add new MCP server*, o en `~/.cursor/mcp.json`: `{ "mcpServers": { "figma": { "url": "https://mcp.figma.com/mcp" } } }`.
-2. Pulsar *Connect* / *Login* junto a `figma` y autorizar en el navegador.
-
-**Otro entorno:** buscar en su configuración la sección "MCP servers", agregar un servidor HTTP con la URL remota y autenticarse. Si el entorno no admite MCP, decirlo y pedir al usuario que exporte el frame (captura + medidas de Dev Mode) mientras tanto.
-
-Después de configurarlo, reiniciar la sesión del agente y pedirle que lea un frame del archivo para confirmar la conexión.
+Antes de implementar, la IA comprueba si tiene herramientas de Figma disponibles. **Si no las tiene, no implementa el diseño**: identifica el entorno y el modelo en que está corriendo y muestra **solo** los pasos de ese entorno, tal como aparecen en [`docs/figma-mcp.md`](docs/figma-mcp.md) (Gemini CLI, Gemini en Android Studio, Claude Code, VS Code, Cursor y otros). Si no puede identificarlo, pregunta cuál es.
 
 ## Flujo de trabajo en GitHub (ramas y pull requests)
 
@@ -262,6 +228,12 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
   - **Flujo de la IA (`ui/ai`):** una sola ruta (`Route.AiPlan`) con `AiPlanViewModel` y `AiUiState.step` (`Context`, `Loading`, `Plan`, `NoPlan`), más `Route.AiHelp`. `GetAiContextUseCase` arma el contexto (inventario emparejado, restricciones del Perfil como `DietRule`, tienda) y `GeneratePlanUseCase` corre el agente en `Dispatchers.Default`. `AiReasonText.kt` es el único lugar que convierte razones y sugerencias en texto.
   - **Cocina guiada (`ui/cooking`):** "Antes de empezar" y los pasos con temporizador; `TimerAlarm` repite `res/raw/timer_alarm.ogg` (generado con `tools/timer_sound.py`, fuente en `docs/licenses/sonidos.md`) con volumen de alarma. `FinishCookingUseCase` descuenta el inventario y guarda `users/{uid}/cookings` (espera al servidor 3 s, como el inventario); `GetMonthlySavingsUseCase` alimenta "Ahorrados este mes" del Perfil.
   - Botones de recetas: `RecipeActionButton` (naranja) y `OutlineActionButton` (blanco con borde). Textos en `res/values/strings_recipes.xml`; desviaciones aprobadas del Figma en la spec §9.
+- **Recetas guardadas (spec 010, `feature/recipes`):** favoritas y recetas propias, en la misma feature porque usan el catálogo y las tarjetas.
+  - **Datos:** `users/{uid}/favorites` y `users/{uid}/recipes`, con el patrón sin conexión del inventario (`WriteOutcome`, espera de 3 s). Las fechas pendientes se leen con `ServerTimestampBehavior.ESTIMATE`.
+  - **Guardadas (`ui/saved`):** `ObserveSavedRecipesUseCase` combina favoritas, recetas propias y catálogo, y aplica chip, búsqueda y orden. Un fallo de lectura muestra un mensaje, nunca cierra la app (CA-SAV-02-11).
+  - **Recetas propias (`ui/own`):** editor, "¡Receta guardada!", detalle y "Eliminar receta". Sus pantallas conservan la barra inferior con Guardadas resaltada. `OwnRecipeText.kt` es el único mapeo de categorías y errores a texto.
+  - **Deshacer:** `DeleteOwnRecipeUseCase` borra de verdad y deja la copia en `DeletedRecipeStore`; `SavedRecipesViewModel` cuenta de 8 a 1 y `RestoreOwnRecipeUseCase` la vuelve a escribir.
+  - Textos en `res/values/strings_saved.xml`; la sombra de las tarjetas es `recipeCardShadow()`.
 - **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 600 ms se declaran una sola vez (`NavTransitions`). `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
 - **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore`, `FirebaseFunctions` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
 - **Design system (`core/designsystem`):** `theme/` (tokens), `components/` (prefijo `SmartFood`) y `util/` (modificadores, `SystemBarEffect`, `ClearFocusOnKeyboardDismiss`).
@@ -302,6 +274,6 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 
 ## Configuración externa
 
-Firebase (`smartfood-f62a1`, plan Blaze): Authentication con correo/contraseña, Cloud Firestore (`southamerica-east1`) y Cloud Functions. Reglas en `firestore.rules`: cada usuario solo accede a `users/{su uid}` (al crearlo debe incluir la constancia de la spec 005), y `passwordResets` y `welcomeEmails` están cerrados a los clientes. El inventario vive en `users/{uid}/inventory` (solo el dueño, con los datos validados) y sus fotos en Storage (`storage.rules`: JPEG de menos de 2 MB, sin sobrescribir); el bucket de Storage se crea en `southamerica-east1` antes de desplegar `storage.rules`. Las pruebas de ambas reglas están en `rules-test/`. Los secretos de Gmail se configuran con `firebase functions:secrets:set` (ver README).
+Firebase (`smartfood-f62a1`, plan Blaze): Authentication con correo/contraseña, Cloud Firestore (`southamerica-east1`) y Cloud Functions. Reglas en `firestore.rules`: cada usuario solo accede a `users/{su uid}` (al crearlo debe incluir la constancia de la spec 005), y `passwordResets` y `welcomeEmails` están cerrados a los clientes. Las favoritas y las recetas propias viven en `users/{uid}/favorites` y `users/{uid}/recipes`, también solo del dueño. El inventario vive en `users/{uid}/inventory` (solo el dueño, con los datos validados) y sus fotos en Storage (`storage.rules`: JPEG de menos de 2 MB, sin sobrescribir); el bucket de Storage se crea en `southamerica-east1` antes de desplegar `storage.rules`. Las pruebas de ambas reglas están en `rules-test/`. Los secretos de Gmail se configuran con `firebase functions:secrets:set` (ver README).
 
 La API key de Android tiene restricción por paquete + SHA-1. Cada computador necesita el `google-services.json` vigente (no se versiona) y su SHA-1 de debug registrada en Google Cloud Console. Si en Logcat aparece `API key expired` o `Requests from this Android client application com.smartfood.app are blocked`, la causa es esa configuración, no el código (ver "Primero: configurar tu equipo" en el README).

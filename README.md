@@ -72,7 +72,7 @@ solo guardan preferencias de Android Studio.
 | 006 Inventario                      | [`specs/006-inventario`](specs/006-inventario/spec.md) | ✅ Implementado (con uso sin conexión) |
 | 008 Perfil                          | [`specs/008-perfil`](specs/008-perfil/spec.md) | ✅ Implementado |
 | 009 Recetas + IA                    | [`specs/009-recetas-ia`](specs/009-recetas-ia/spec.md) | ✅ Implementado (agente CSP de plan de 3 días; [evaluación](docs/ia/evaluacion-agente.md)) |
-| 010 Recetas guardadas               | — | Pendiente (próximo módulo, #117) |
+| 010 Recetas guardadas               | [`specs/010-recetas-guardadas`](specs/010-recetas-guardadas/spec.md) | Implementada (#117, #130 y #131) |
 
 ## Metodología: Spec Driven Development
 

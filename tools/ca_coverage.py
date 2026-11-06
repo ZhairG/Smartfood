@@ -21,7 +21,7 @@ ROOTS = ["app/src/test", "app/src/androidTest"]
 # Nombre de cada prueba: la función que sigue a @Test, entre comillas invertidas o en camelCase/snake_case.
 TEST_NAME = re.compile(r"@Test\s*(?:@[\w.()\"= ]+\s*)*fun\s+(`[^`]+`|[\w]+)")
 
-AREAS = {"inv": "INV", "ui": "UI", "rec": "REC", "leg": "LEG", "mail": "MAIL"}
+AREAS = {"inv": "INV", "ui": "UI", "rec": "REC", "leg": "LEG", "mail": "MAIL", "per": "PER", "ria": "RIA", "sav": "SAV"}
 
 # Un código puede seguir con más números de la misma área: `caInv0101_0102` son CA-INV-01-01 y CA-INV-01-02, y
 # `ca0103_0105`, CA-01-03 y CA-01-05 (#105, pruebas por flujo).
@@ -30,9 +30,9 @@ START = r"(?<![a-zA-Z0-9])"
 
 PATTERNS = [
     # CA-INV-01-02, CA_INV_01_02, ca_inv_01_02, ca-ui-02-08
-    (re.compile(START + r"(ca|rf|rnf)[-_](inv|ui|rec|leg|mail)[-_](\d{2})(?:[-_](\d{2}))?()", re.I), "area"),
+    (re.compile(START + r"(ca|rf|rnf)[-_](inv|ui|rec|leg|mail|per|ria|sav)[-_](\d{2})(?:[-_](\d{2}))?()", re.I), "area"),
     # caInv0102, rnfInv04, rfInv01, caRec0301, caLeg0101, caInv0101_0102
-    (re.compile(r"(?<![a-z])(ca|rf|rnf)(Inv|Ui|Rec|Leg|Mail)(\d{2})(\d{2})?" + MORE), "area"),
+    (re.compile(r"(?<![a-z])(ca|rf|rnf)(Inv|Ui|Rec|Leg|Mail|Per|Ria|Sav)(\d{2})(\d{2})?" + MORE), "area"),
     # CA-02-01, ca_05_03
     (re.compile(START + r"ca[-_](\d{2})[-_](\d{2})(?![0-9])()", re.I), "auth"),
     # ca0201, ca0103_0105

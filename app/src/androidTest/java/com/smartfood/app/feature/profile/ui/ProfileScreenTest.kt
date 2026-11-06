@@ -43,6 +43,7 @@ class ProfileScreenTest {
                         email = "pepito@correo.com",
                         initials = "PP",
                         inventoryCount = 34,
+                        savedRecipesCount = 7,
                         monthlySavingsCop = 12_500,
                         themeMode = themeMode,
                         isThemeSheetVisible = isThemeSheetVisible,
@@ -69,6 +70,7 @@ class ProfileScreenTest {
 
         composeTestRule.onNodeWithText("34").assertIsDisplayed()
         composeTestRule.onNodeWithText("Ingredientes en inventario").assertIsDisplayed()
+        composeTestRule.onNodeWithText("7").assertIsDisplayed()
         composeTestRule.onNodeWithText("Recetas guardadas").assertIsDisplayed()
         composeTestRule.onNodeWithText("Ahorrados este mes").assertIsDisplayed()
     }

@@ -5,7 +5,7 @@ import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
 /**
  * Nombre: RecipesDiscoverContract.kt
  * Autor: SmartFood Team
- * Fecha: Octubre 2026
+ * Fecha: Noviembre 2026
  * Descripción: Estado, eventos y efectos de la pantalla Descubrir (spec 009, HU-RIA-01, T007). Los campos derivados
  * (tarjetas, filtro activo, vacío) los calcula el ViewModel; la pantalla solo dibuja y avisa.
  */
@@ -18,6 +18,7 @@ import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
  * @property query Texto de la búsqueda.
  * @property filter Filtro activo.
  * @property recipes Tarjetas visibles, ya buscadas, filtradas y ordenadas.
+ * @property favoriteIds Ids de las recetas del catálogo marcadas como favoritas (spec 010, CA-SAV-01-01).
  */
 data class RecipesDiscoverUiState(
     val isLoading: Boolean = true,
@@ -25,6 +26,7 @@ data class RecipesDiscoverUiState(
     val query: String = "",
     val filter: RecipeFilter = RecipeFilter.FOR_YOU,
     val recipes: List<RecipeCardUi> = emptyList(),
+    val favoriteIds: Set<String> = emptySet(),
 )
 
 /**
@@ -62,6 +64,9 @@ sealed interface RecipesDiscoverEvent {
 
     /** Tocó una tarjeta para ver el detalle. */
     data class RecipeClicked(val recipeId: String) : RecipesDiscoverEvent
+
+    /** Tocó el ♡ para marcar o quitar una receta como favorita (spec 010, CA-SAV-01-03). */
+    data class FavoriteToggled(val recipeId: String) : RecipesDiscoverEvent
 }
 
 /** Efectos de un solo uso. */
