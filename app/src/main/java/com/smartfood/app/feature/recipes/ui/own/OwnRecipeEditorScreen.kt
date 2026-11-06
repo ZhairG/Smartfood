@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -32,9 +31,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -295,13 +298,13 @@ private fun BoxField(
         textStyle = style,
         keyboardOptions = keyboardOptions,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        visualTransformation = suffix?.let { SuffixTransformation(" $it") } ?: VisualTransformation.None,
         modifier = Modifier
             .fillMaxWidth()
             .semantics { contentDescription = label },
         decorationBox = { innerTextField ->
-            Row(
-                verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top,
-                horizontalArrangement = Arrangement.spacedBy(SuffixGap),
+            Box(
+                contentAlignment = if (singleLine) Alignment.CenterStart else Alignment.TopStart,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = minHeight)
@@ -309,11 +312,22 @@ private fun BoxField(
                     .border(BorderStroke(FieldBorder, borderColor), shape)
                     .padding(FieldPadding)
             ) {
-                Box(modifier = if (suffix == null) Modifier.weight(1f) else Modifier) { innerTextField() }
-                if (suffix != null) Text(text = suffix, style = style)
+                innerTextField()
             }
         }
     )
+}
+
+/** Muestra [suffix] después del valor, como "30 min", sin que forme parte del texto editable. */
+private class SuffixTransformation(private val suffix: String) : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        if (text.isEmpty()) return TransformedText(text, OffsetMapping.Identity)
+        val offsets = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int = offset
+            override fun transformedToOriginal(offset: Int): Int = minOf(offset, text.length)
+        }
+        return TransformedText(AnnotatedString(text.text + suffix), offsets)
+    }
 }
 
 // Medidas del Figma 557:2693. No son de formulario, así que no van en FormMetrics.
@@ -331,7 +345,6 @@ private val PreparationHeight = 100.dp
 private val FieldRadius = 12.dp
 private val FieldBorder = 1.dp
 private val FieldPadding = 12.dp
-private val SuffixGap = 4.dp
 
 @Preview(showBackground = true, heightDp = 900)
 @Composable

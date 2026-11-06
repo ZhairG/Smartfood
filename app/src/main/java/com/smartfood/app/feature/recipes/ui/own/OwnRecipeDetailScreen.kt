@@ -64,7 +64,7 @@ fun OwnRecipeDetailScreen(
         SmartFoodTopBar(
             title = recipe?.name ?: stringResource(id = R.string.own_detail_title),
             onBack = onBack,
-            action = recipe?.let { { FavoriteButton(isFavorite = state.isFavorite, onClick = onFavoriteToggled) } }
+            action = recipe?.let { { FavoriteButton(isFavorite = state.isFavorite, onClick = onFavoriteToggled, showPill = true) } }
         )
         when {
             state.isLoading -> Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {

@@ -95,6 +95,7 @@ fun RecipeDetailScreen(
                 FavoriteButton(
                     isFavorite = state.isFavorite,
                     onClick = { onEvent(RecipeDetailEvent.FavoriteToggled) },
+                    showPill = true,
                 )
             }
         )

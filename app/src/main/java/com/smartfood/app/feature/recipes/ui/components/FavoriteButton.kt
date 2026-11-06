@@ -24,8 +24,8 @@ import com.smartfood.app.core.designsystem.theme.GreenCheck
  * @param isFavorite `true` si la receta ya está marcada como favorita.
  * @param onClick Se invoca cuando la persona toca el ♡.
  * @param modifier Modificador opcional.
- * @param showPill `true` para dibujar el ♡ dentro de una píldora blanca (tarjeta de lista).
- *   `false` para mostrar solo el corazón (barra superior del detalle).
+ * @param showPill `true` para dibujar el ♡ dentro de una píldora blanca: en las tarjetas y en la barra verde del detalle,
+ *   donde el corazón verde no se vería sin ella.
  */
 @Composable
 fun FavoriteButton(
