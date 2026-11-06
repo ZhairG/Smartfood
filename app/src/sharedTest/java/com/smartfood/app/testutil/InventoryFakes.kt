@@ -20,6 +20,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDate
 
@@ -82,7 +83,13 @@ class FakeInventoryRepository(private val log: CallLog = CallLog()) : InventoryR
     val photoSets = mutableListOf<Pair<String, ItemPhoto?>>()
     private var nextId = 0
 
-    override fun observeItems(): Flow<List<InventoryItem>> = items
+    /** Si no es `null`, [observeItems] falla con este error, como al cerrar sesión con la pantalla abierta. */
+    var observeFailure: Throwable? = null
+
+    override fun observeItems(): Flow<List<InventoryItem>> = flow {
+        observeFailure?.let { throw it }
+        emitAll(items)
+    }
 
     override suspend fun getItem(id: String): Result<InventoryItem> =
         items.value.firstOrNull { it.id == id }?.let { Result.success(it) }
