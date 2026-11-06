@@ -77,13 +77,14 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-01 | U `GetAiContextUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest`, I `RecipesDiscoverScreenTest` |
 | CA-RIA-02-02 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-03 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
-| CA-RIA-02-04 | U `MealPlannerTest` (contra fuerza bruta, también con productos repetidos y recetas con muchos faltantes, T038) |
+| CA-RIA-02-04 | U `MealPlannerTest` (contra fuerza bruta, también con productos repetidos y recetas con muchos faltantes, T038), U `AlgorithmComparisonTest` |
 | CA-RIA-02-05 | U `MealPlannerTest` |
 | CA-RIA-02-06 | U `PlanExplainerTest`, U `GeneratePlanUseCaseTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-07 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, U `RecipesDiscoverViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-08 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `MealPlannerCatalogTest`, U `GetAiContextUseCaseTest`, U `GeneratePlanUseCaseTest` |
 | CA-RIA-02-10 | U `MealPlannerPerformanceTest`, M (release: 62 ms el peor caso, `docs/ia/evaluacion-agente.md`) |
+| CA-RIA-02-11 | U `AiPlanViewModelTest` |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |
 | CA-RIA-04-02 | U `RecipeDetailViewModelTest` |
@@ -94,7 +95,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-04-07 | U `RecipeDetailViewModelTest`, I `RecipeDetailScreenTest` |
 | RNF-RIA-01 | U `MealPlannerTest` (mismo resultado dos veces) |
 | RNF-RIA-02 | U `MealPlannerPerformanceTest`, M |
-| RNF-RIA-03 | U `AgentEvaluationTest` |
+| RNF-RIA-03 | U `AgentEvaluationTest`, U `AlgorithmComparisonTest` |
 | RNF-RIA-04 | R |
 | RNF-RIA-05 | U `RecipeCatalogTest` (cada foto tiene fuente), revisión del PR |
 
