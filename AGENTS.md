@@ -55,41 +55,7 @@ El profesor evalúa que la app funcione **exactamente como el prototipo**, como 
 
 ### Si el MCP de Figma no está configurado
 
-Antes de implementar, la IA comprueba si tiene herramientas de Figma disponibles. **Si no las tiene, no implementa el diseño**: identifica el entorno y el modelo en que está corriendo y muestra **solo** los pasos de ese entorno, tal como aparecen abajo. Si no puede identificarlo, pregunta cuál es.
-
-Hay dos servidores. Usar el **remoto** salvo que el entorno no permita iniciar sesión con OAuth:
-
-| Servidor | URL | Requisito |
-|---|---|---|
-| Remoto (recomendado) | `https://mcp.figma.com/mcp` | Cuenta de Figma con acceso al archivo. Las cuentas gratuitas tienen un límite bajo de llamadas al mes. |
-| Escritorio | `http://127.0.0.1:3845/mcp` | App de escritorio de Figma abierta, Dev Mode, *Enable desktop MCP server*. Requiere un asiento Dev o Full de un plan pago. |
-
-**Gemini CLI**
-1. Ejecutar `gemini mcp add --transport http figma https://mcp.figma.com/mcp` (o agregar en `~/.gemini/settings.json`: `"mcpServers": { "figma": { "httpUrl": "https://mcp.figma.com/mcp" } }`).
-2. Abrir `gemini` y ejecutar `/mcp auth figma`; autorizar en el navegador con la cuenta de Figma.
-3. Comprobar con `/mcp` que `figma` aparece conectado con sus herramientas.
-
-**Gemini en Android Studio**
-1. *Settings → Tools → AI → MCP Servers* → activar *Enable MCP Servers*.
-2. En el `mcp.json` que abre, agregar `"mcpServers": { "figma": { "httpUrl": "https://mcp.figma.com/mcp" } }`. Si la versión no permite iniciar sesión, usar el servidor de escritorio: `"httpUrl": "http://127.0.0.1:3845/mcp"` con la app de Figma abierta.
-3. Aplicar y comprobar en el chat del agente (modo *Agent*) que aparecen las herramientas de Figma.
-
-**Claude Code**
-1. Ejecutar `claude mcp add --transport http figma https://mcp.figma.com/mcp`.
-2. En la sesión, ejecutar `/mcp`, elegir `figma` → *Authenticate* y autorizar en el navegador.
-
-**VS Code (GitHub Copilot, modo Agent)**
-1. Crear `.vscode/mcp.json` con `{ "servers": { "figma": { "type": "http", "url": "https://mcp.figma.com/mcp" } } }`.
-2. Pulsar *Start* sobre el servidor en ese archivo y autorizar en el navegador.
-3. En el chat, modo *Agent* → icono de herramientas → comprobar que figuran las de Figma.
-
-**Cursor**
-1. *Settings → MCP → Add new MCP server*, o en `~/.cursor/mcp.json`: `{ "mcpServers": { "figma": { "url": "https://mcp.figma.com/mcp" } } }`.
-2. Pulsar *Connect* / *Login* junto a `figma` y autorizar en el navegador.
-
-**Otro entorno:** buscar en su configuración la sección "MCP servers", agregar un servidor HTTP con la URL remota y autenticarse. Si el entorno no admite MCP, decirlo y pedir al usuario que exporte el frame (captura + medidas de Dev Mode) mientras tanto.
-
-Después de configurarlo, reiniciar la sesión del agente y pedirle que lea un frame del archivo para confirmar la conexión.
+Antes de implementar, la IA comprueba si tiene herramientas de Figma disponibles. **Si no las tiene, no implementa el diseño**: identifica el entorno y el modelo en que está corriendo y muestra **solo** los pasos de ese entorno, tal como aparecen en [`docs/figma-mcp.md`](docs/figma-mcp.md) (Gemini CLI, Gemini en Android Studio, Claude Code, VS Code, Cursor y otros). Si no puede identificarlo, pregunta cuál es.
 
 ## Flujo de trabajo en GitHub (ramas y pull requests)
 
