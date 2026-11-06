@@ -9,6 +9,9 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.feature.recipes.domain.model.DeletedOwnRecipe
+import com.smartfood.app.feature.recipes.domain.model.OwnRecipe
+import com.smartfood.app.feature.recipes.domain.model.RecipeCategory
 import com.smartfood.app.feature.recipes.domain.model.SavedFilter
 import com.smartfood.app.feature.recipes.domain.model.SavedRecipeCard
 import org.junit.Assert.assertEquals
@@ -178,6 +181,41 @@ class SavedRecipesScreenTest {
         composeTestRule.onNodeWithText("Aún no creas recetas").assertDoesNotExist()
         assertTrue(eventos.isEmpty())
     }
+
+    @Test
+    fun caSav0503_elAvisoMuestraLaRecetaYLaCuenta() {
+        mostrar(conEliminada(segundos = 8))
+
+        composeTestRule.onNodeWithText("Receta eliminada").assertIsDisplayed()
+        composeTestRule.onNodeWithText("“Pasta verde rápida” se eliminó.").assertIsDisplayed()
+    }
+
+    @Test
+    fun caSav0504_deshacerEmiteUndoClicked() {
+        mostrar(conEliminada(segundos = 5))
+
+        composeTestRule.onNodeWithContentDescription("Deshacer la eliminación").performClick()
+
+        assertEquals(listOf<SavedRecipesEvent>(SavedRecipesEvent.UndoClicked), eventos)
+    }
+
+    @Test
+    fun caSav0506_detrasDelAvisoSeVeElVacio() {
+        mostrar(conEliminada(segundos = 8))
+
+        composeTestRule.onNodeWithText("Aún no creas recetas").assertIsDisplayed()
+    }
+
+    private fun conEliminada(segundos: Int) = SavedRecipesUiState(
+        isLoading = false,
+        isEmptyOverall = true,
+        undoSecondsLeft = segundos,
+        deleted = DeletedOwnRecipe(
+            recipe = OwnRecipe("r1", "Pasta verde rápida", RecipeCategory.PASTAS, emptyList(), 20, "Cocinar", 1L, 1L),
+            wasFavorite = false,
+            favoriteSavedAtMillis = 0L,
+        ),
+    )
 
     private fun conTarjetas() = SavedRecipesUiState(
         isLoading = false,

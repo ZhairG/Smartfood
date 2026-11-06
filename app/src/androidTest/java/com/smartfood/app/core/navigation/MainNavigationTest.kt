@@ -8,6 +8,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -102,12 +103,73 @@ class MainNavigationTest {
     }
 
     @Test
-    fun caSav0210_nuevaRecetaAbreSuPantallaSinBarraInferior() {
+    fun caSav0210_nuevaRecetaAbreSuPantallaConGuardadasResaltada() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
         composeTestRule.runOnUiThread { navController.navigate(Route.OwnRecipeEditor()) }
         composeTestRule.waitForIdle()
 
         composeTestRule.onNode(hasText("Nueva receta") and isHeading()).assertIsDisplayed()
-        composeTestRule.onNodeWithText("Guardadas").assertDoesNotExist()
+        composeTestRule.onNode(hasText("Guardadas") and isSelected()).assertIsDisplayed()
+    }
+
+    @Test
+    fun caSav0404_laFlechaDelEditorVuelveAGuardadas() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread { navController.navigate(Route.OwnRecipeEditor()) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithContentDescription("Volver").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.Saved>() == true)
+    }
+
+    @Test
+    fun caSav0307_crearOtraAbreNuevaRecetaSinApilar() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread { navController.navigate(Route.OwnRecipeSaved("r1", "Arepas", false)) }
+        composeTestRule.waitForIdle()
+        val pantallas = pantallasEnLaPila()
+
+        composeTestRule.onNodeWithText("Crear otra").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.OwnRecipeEditor>() == true)
+        assertEquals(pantallas, pantallasEnLaPila())
+    }
+
+    @Test
+    fun caSav0307_verRecetaAbreElDetalleYLaFlechaVuelveAGuardadas() {
+        composeTestRule.runOnUiThread { navController.navigate(Route.Saved) }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread { navController.navigate(Route.OwnRecipeSaved("r1", "Arepas", false)) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Ver receta").performClick()
+        composeTestRule.waitForIdle()
+        assertTrue(navController.currentDestination?.hasRoute<Route.OwnRecipeDetail>() == true)
+
+        composeTestRule.onNodeWithContentDescription("Volver").performClick()
+        composeTestRule.waitForIdle()
+        assertTrue(navController.currentDestination?.hasRoute<Route.Saved>() == true)
+    }
+
+    @Test
+    fun caSav0502_cancelarVuelveAlEditor() {
+        composeTestRule.runOnUiThread {
+            navController.navigate(Route.Saved)
+            navController.navigate(Route.OwnRecipeEditor("r1"))
+            navController.navigate(Route.DeleteOwnRecipe("r1", "Arepas"))
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Cancelar").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(navController.currentDestination?.hasRoute<Route.OwnRecipeEditor>() == true)
     }
 
     @Test

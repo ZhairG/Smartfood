@@ -6,14 +6,20 @@ import com.smartfood.app.feature.recipes.domain.model.Recipe
 import com.smartfood.app.feature.recipes.domain.model.SavedFilter
 import com.smartfood.app.feature.recipes.domain.model.SavedSort
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
+import com.smartfood.app.feature.recipes.domain.usecase.DeletedRecipeStore
 import com.smartfood.app.feature.recipes.domain.usecase.ObserveSavedRecipesUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.RestoreOwnRecipeUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.ToggleFavoriteUseCase
+import com.smartfood.app.feature.recipes.domain.model.DeletedOwnRecipe
 import com.smartfood.app.testutil.FakeFavoritesRepository
+import com.smartfood.app.testutil.ownRecipe
 import com.smartfood.app.testutil.FakeOwnRecipesRepository
 import com.smartfood.app.testutil.MainDispatcherRule
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -51,9 +57,14 @@ class SavedRecipesViewModelTest {
         steps = emptyList(),
     )
 
+    private val recetasPropias = FakeOwnRecipesRepository()
+    private val eliminadas = DeletedRecipeStore()
+
     private fun viewModel() = SavedRecipesViewModel(
         toggleFavorite = ToggleFavoriteUseCase(favoritas),
-        observeSavedRecipes = ObserveSavedRecipesUseCase(favoritas, FakeCatalog(listOf(recipe)), FakeOwnRecipesRepository()),
+        observeSavedRecipes = ObserveSavedRecipesUseCase(favoritas, FakeCatalog(listOf(recipe)), recetasPropias),
+        restoreRecipe = RestoreOwnRecipeUseCase(recetasPropias, favoritas),
+        deletedStore = eliminadas,
     )
 
     /** Mantiene el estado observado, como la pantalla, y espera a que carguen las tarjetas. */
@@ -137,6 +148,39 @@ class SavedRecipesViewModelTest {
 
         assertTrue(state.hasError)
         assertFalse(state.isEmptyOverall)
+    }
+
+    @Test
+    fun `CA-SAV-05-03 el aviso cuenta de 8 a 1 y se cierra solo`() = runTest {
+        val viewModel = cargado(viewModel())
+
+        eliminadas.publish(DeletedOwnRecipe(ownRecipe(id = "r1"), wasFavorite = false, favoriteSavedAtMillis = 0L))
+        runCurrent()
+        assertEquals(8, viewModel.uiState.value.undoSecondsLeft)
+        assertEquals("r1", viewModel.uiState.value.deleted?.recipe?.id)
+
+        advanceTimeBy(7_000)
+        runCurrent()
+        assertEquals(1, viewModel.uiState.value.undoSecondsLeft)
+
+        advanceTimeBy(1_000)
+        runCurrent()
+        assertEquals(null, viewModel.uiState.value.deleted)
+        assertTrue("CA-SAV-05-05: la eliminación queda definitiva", recetasPropias.recipes.value.isEmpty())
+    }
+
+    @Test
+    fun `CA-SAV-05-04 deshacer devuelve la receta y cierra el aviso`() = runTest {
+        val viewModel = cargado(viewModel())
+        eliminadas.publish(DeletedOwnRecipe(ownRecipe(id = "r1"), wasFavorite = true, favoriteSavedAtMillis = 5L))
+        runCurrent()
+
+        viewModel.onEvent(SavedRecipesEvent.UndoClicked)
+        runCurrent()
+
+        assertEquals(null, viewModel.uiState.value.deleted)
+        assertEquals(listOf("r1"), recetasPropias.recipes.value.map { it.id })
+        assertEquals(FavoriteSource.OWN, favoritas.setCalls.last().source)
     }
 
     private class FakeCatalog(private val recipes: List<Recipe>) : RecipeCatalog {

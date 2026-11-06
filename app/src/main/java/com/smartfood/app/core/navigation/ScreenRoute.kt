@@ -32,6 +32,7 @@ enum class ScreenRoute(val routeName: String) {
     OWN_RECIPE_EDITOR("own_recipe_editor"),
     OWN_RECIPE_SAVED("own_recipe_saved"),
     OWN_RECIPE_DETAIL("own_recipe_detail"),
+    DELETE_OWN_RECIPE("delete_own_recipe"),
     AI_PLAN("ai_plan"),
     AI_HELP("ai_help"),
     RECIPE_DETAIL("recipe_detail"),

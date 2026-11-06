@@ -10,6 +10,9 @@ import com.smartfood.app.feature.recipes.domain.model.OwnRecipeException
 import com.smartfood.app.feature.recipes.domain.model.RecipeCategory
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
 import com.smartfood.app.feature.recipes.domain.repository.FavoritesRepository
+import com.smartfood.app.feature.recipes.domain.model.Ingredient
+import com.smartfood.app.feature.recipes.domain.model.Recipe
+import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -132,6 +135,12 @@ class FakeOwnRecipesRepository : OwnRecipesRepository {
     }
 
     data class SaveRecipeCall(val recipe: OwnRecipe, val isNew: Boolean)
+}
+
+/** Catálogo vacío para las pruebas que no dependen de recetas ni ingredientes. */
+object EmptyRecipeCatalog : RecipeCatalog {
+    override suspend fun recipes(): List<Recipe> = emptyList()
+    override suspend fun ingredients(): Map<String, Ingredient> = emptyMap()
 }
 
 /** Receta propia mínima para pruebas. */

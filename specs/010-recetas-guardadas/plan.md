@@ -152,7 +152,7 @@ interface OwnRecipesRepository {
 | `ValidateOwnRecipeUseCase` | `operator fun invoke(draft: OwnRecipeDraft): Result<Unit>` | Reglas de CA-SAV-03-05. Falla con `OwnRecipeException(Invalid(campo))` del **primer** campo inválido, en el orden NAME, CATEGORY, INGREDIENTS, COOK_MINUTES, PREPARATION. |
 | `SaveOwnRecipeUseCase` | `suspend operator fun invoke(id: String?, draft: OwnRecipeDraft): Result<SavedOwnRecipe>` | Valida, arma `OwnRecipe` (con `trim`) y lo guarda. Si es nueva, también la marca favorita (CA-SAV-03-09). `SavedOwnRecipe(recipe, outcome)`. |
 | `GetOwnRecipeUseCase` | `suspend operator fun invoke(id: String): Result<OwnRecipe>` | Carga una receta para el editor y el detalle. |
-| `DeleteOwnRecipeUseCase` | `suspend operator fun invoke(id: String): Result<DeletedOwnRecipe>` | Lee la receta y si era favorita, borra las dos y devuelve la copia para deshacer. `DeletedOwnRecipe(recipe, wasFavorite, favoriteSavedAtMillis)`. |
+| `DeleteOwnRecipeUseCase` | `suspend operator fun invoke(id: String): Result<DeletedOwnRecipe>` | Lee la receta y si era favorita, borra las dos y devuelve la copia para deshacer. `DeletedOwnRecipe(recipe, wasFavorite, favoriteSavedAtMillis)`. La copia llega a Guardadas por `DeletedRecipeStore` (singleton), porque no cabe en el `savedStateHandle` sin serializarla. |
 | `RestoreOwnRecipeUseCase` | `suspend operator fun invoke(deleted: DeletedOwnRecipe): Result<WriteOutcome>` | Vuelve a escribir la receta (mismo id y `createdAt`) y su ♡. |
 | `CountSavedRecipesUseCase` | `operator fun invoke(): Flow<Int>` | El tamaño de la unión de los ids favoritos (sin huérfanos) y los ids propios. |
 
@@ -174,7 +174,7 @@ En `core/navigation/Routes.kt` y `ScreenRoute.kt`:
 - `MainTabScaffold.kt`:
   - `MainTab.SAVED` pasa a `enabled = true`;
   - `navigateToTab` lleva a `Route.Saved`;
-  - `Route.Saved` y sus pantallas internas marcan la pestaña "Guardadas". El detalle del catálogo es compartido:
+  - `Route.Saved` y sus pantallas internas marcan la pestaña "Guardadas" y conservan la barra inferior, como en el Figma. El detalle del catálogo es compartido:
     `Route.RecipeDetail(recipeId, fromSaved = true)` lo marca cuando se abre desde Guardadas.
 - `RecipesNavGraph.kt`: una función nueva `savedDestinations(navController)` registra las 5 rutas. `MainNavGraph.kt`
   la llama.
@@ -190,7 +190,7 @@ En `core/navigation/Routes.kt` y `ScreenRoute.kt`:
 
 | Pantalla | Estado (`XUiState`) | Eventos principales |
 |---|---|---|
-| `SavedRecipesScreen` | `isLoading`, `hasError`, `filter`, `query`, `sort`, `cards`, `isEmptyOverall`, `hasPendingSync`, `isSortMenuOpen`; el #131 agrega `deleted: DeletedOwnRecipe?` y `undoSecondsLeft` | `FilterChanged`, `QueryChanged`, `ClearQuery`, `SortClicked`, `SortDismissed`, `SortChanged`, `FavoriteToggled(id)`, `CardClicked`, `AddClicked`; el #131 agrega `UndoClicked`. Efectos: `OpenRecipe`, `OpenOwnRecipe`, `OpenNewRecipe` |
+| `SavedRecipesScreen` | `isLoading`, `hasError`, `filter`, `query`, `sort`, `cards`, `isEmptyOverall`, `hasPendingSync`, `isSortMenuOpen`; `deleted: DeletedOwnRecipe?` y `undoSecondsLeft` | `FilterChanged`, `QueryChanged`, `ClearQuery`, `SortClicked`, `SortDismissed`, `SortChanged`, `FavoriteToggled(id)`, `CardClicked`, `AddClicked`, `UndoClicked`. Efectos: `OpenRecipe`, `OpenOwnRecipe`, `OpenNewRecipe` |
 | `OwnRecipeEditorScreen` | `isNew`, `draft`, `error: OwnRecipeError?` (los campos en rojo **se derivan** de `error`), `isSaving`, `isCategorySheetOpen`, `ingredientSheet: IngredientSheetState?` | `NameChanged`, `CategoryPicked`, `IngredientAdded/Updated/Removed`, `CookMinutesChanged`, `PreparationChanged`, `SaveClicked`, `DiscardClicked`, `DeleteClicked` |
 | `OwnRecipeSavedScreen` | sin ViewModel: recibe `name` y `edited` | `ViewRecipe`, `CreateAnother`, `Back` |
 | `DeleteOwnRecipeScreen` | `isDeleting`, `error` | `ConfirmClicked`, `CancelClicked` |

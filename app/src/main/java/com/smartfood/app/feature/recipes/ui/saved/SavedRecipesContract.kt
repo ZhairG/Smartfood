@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.recipes.ui.saved
 
+import com.smartfood.app.feature.recipes.domain.model.DeletedOwnRecipe
 import com.smartfood.app.feature.recipes.domain.model.SavedFilter
 import com.smartfood.app.feature.recipes.domain.model.SavedRecipeCard
 import com.smartfood.app.feature.recipes.domain.model.SavedSort
@@ -8,8 +9,8 @@ import com.smartfood.app.feature.recipes.domain.model.SavedSort
  * Nombre: SavedRecipesContract.kt
  * Autor: SmartFood Team
  * Fecha: Noviembre 2026
- * Descripción: Estado, eventos y efectos de la pantalla Guardadas (spec 010, HU-SAV-02, T007). El aviso de deshacer se
- * agrega en el #131 (T019).
+ * Descripción: Estado, eventos y efectos de la pantalla Guardadas (spec 010, HU-SAV-02, T007) y su aviso de deshacer
+ * (HU-SAV-05, T019).
  */
 
 /**
@@ -24,6 +25,8 @@ import com.smartfood.app.feature.recipes.domain.model.SavedSort
  * @property isEmptyOverall `true` si no hay ninguna receta guardada (CA-SAV-02-07).
  * @property hasPendingSync `true` si hay cambios que esperan sincronizarse (CA-SAV-02-09).
  * @property isSortMenuOpen `true` si el menú "Ordenar" está abierto.
+ * @property deleted Receta recién eliminada que aún se puede recuperar (CA-SAV-05-03).
+ * @property undoSecondsLeft Segundos que quedan para deshacer.
  */
 data class SavedRecipesUiState(
     val isLoading: Boolean = true,
@@ -35,6 +38,8 @@ data class SavedRecipesUiState(
     val isEmptyOverall: Boolean = false,
     val hasPendingSync: Boolean = false,
     val isSortMenuOpen: Boolean = false,
+    val deleted: DeletedOwnRecipe? = null,
+    val undoSecondsLeft: Int = 0,
 )
 
 /** Acciones de la persona en Guardadas. */
@@ -66,6 +71,9 @@ sealed interface SavedRecipesEvent {
 
     /** Tocó "+" o "Crear receta". */
     data object AddClicked : SavedRecipesEvent
+
+    /** Tocó "DESHACER" en el aviso (CA-SAV-05-04). */
+    data object UndoClicked : SavedRecipesEvent
 }
 
 /** Efectos de navegación de Guardadas. */

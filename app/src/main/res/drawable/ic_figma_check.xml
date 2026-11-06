@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícono check-rounded del Figma (nodo 666:3711), sin la sombra. Se tiñe desde el código. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="50dp"
+    android:height="36dp"
+    android:viewportWidth="50.26"
+    android:viewportHeight="36.49">
+    <group android:translateX="-4">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M21.1875,28.5187L48.7312,0.975001C49.3812,0.325001 50.1396,0 51.0063,0C51.8729,0 52.6312,0.325001 53.2812,0.975001C53.9312,1.625 54.2563,2.39742 54.2563,3.29225C54.2563,4.18708 53.9312,4.95842 53.2812,5.60625L23.4625,35.5062C22.8125,36.1562 22.0542,36.4813 21.1875,36.4813C20.3208,36.4813 19.5625,36.1562 18.9125,35.5062L4.9375,21.5312C4.2875,20.8813 3.9755,20.1099 4.0015,19.2173C4.0275,18.3246 4.36658,17.5522 5.01875,16.9C5.67092,16.2478 6.44333,15.9228 7.336,15.925C8.22867,15.9272 9,16.2522 9.65,16.9L21.1875,28.5187Z" />
+    </group>
+</vector>

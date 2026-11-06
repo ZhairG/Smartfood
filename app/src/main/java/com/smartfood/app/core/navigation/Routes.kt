@@ -150,6 +150,12 @@ sealed interface Route {
     }
 
     @Serializable
+    data class DeleteOwnRecipe(val recipeId: String, val name: String) : Route {
+        override val screenRoute: ScreenRoute get() = ScreenRoute.DELETE_OWN_RECIPE
+    }
+
+    /** Detalle de una receta propia (spec 010, CA-SAV-04-05). */
+    @Serializable
     data class OwnRecipeDetail(val recipeId: String) : Route {
         override val screenRoute: ScreenRoute get() = ScreenRoute.OWN_RECIPE_DETAIL
     }

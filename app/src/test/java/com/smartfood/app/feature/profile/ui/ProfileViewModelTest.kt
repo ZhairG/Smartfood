@@ -16,7 +16,14 @@ import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
 import com.smartfood.app.core.designsystem.theme.ThemeMode
 import com.smartfood.app.feature.recipes.domain.model.CookingRecord
 import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
+import com.smartfood.app.feature.recipes.domain.model.FavoriteSource
+import com.smartfood.app.feature.recipes.domain.usecase.CountSavedRecipesUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetMonthlySavingsUseCase
+import com.smartfood.app.testutil.EmptyRecipeCatalog
+import com.smartfood.app.testutil.FakeFavoritesRepository
+import com.smartfood.app.testutil.FakeOwnRecipesRepository
+import com.smartfood.app.testutil.ownRecipe
+import com.smartfood.app.testutil.savedFavorite
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
@@ -74,6 +81,9 @@ class ProfileViewModelTest {
             Result.success(WriteOutcome.SYNCED)
     }
 
+    private val favoritas = FakeFavoritesRepository()
+    private val recetasPropias = FakeOwnRecipesRepository()
+
     private fun crearViewModel(repository: InventoryRepository = inventoryRepository) = ProfileViewModel(
         observeProfile = ObserveProfileUseCase(profileRepository),
         syncProfileEmail = SyncProfileEmailUseCase(authRepository, profileRepository),
@@ -85,8 +95,17 @@ class ProfileViewModelTest {
         ),
         hasPendingChanges = HasPendingChangesUseCase(repository, photoSync),
         themePreferences = themePreferences,
-        getMonthlySavings = GetMonthlySavingsUseCase(FakeHistoryRepo(), fixedClock(LocalDate.of(2026, 10, 20)))
+        getMonthlySavings = GetMonthlySavingsUseCase(FakeHistoryRepo(), fixedClock(LocalDate.of(2026, 10, 20))),
+        countSavedRecipes = CountSavedRecipesUseCase(favoritas, recetasPropias, EmptyRecipeCatalog),
     )
+
+    @Test
+    fun `CA-SAV-06-01 la tarjeta cuenta las recetas guardadas sin repetir`() {
+        recetasPropias.recipes.value = listOf(ownRecipe(id = "r1"), ownRecipe(id = "r2"))
+        favoritas.favorites.value = listOf(savedFavorite("r1", FavoriteSource.OWN))
+
+        assertEquals(2, crearViewModel().uiState.value.savedRecipesCount)
+    }
 
     @Test
     fun `CA-05-01 saluda con el primer nombre del perfil`() {

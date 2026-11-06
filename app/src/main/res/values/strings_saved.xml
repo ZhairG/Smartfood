@@ -20,5 +20,90 @@
     <string name="saved_offline_body">Tus recetas guardadas siguen disponibles. Los cambios se sincronizarán después.</string>
     <string name="saved_new_recipe_title">Nueva receta</string>
     <string name="cd_saved_add">Crear receta</string>
+    <string name="cd_saved_undo">Deshacer la eliminación</string>
+
+    <!-- Aviso de receta eliminada (spec 010, T019) -->
+    <string name="saved_deleted_title">Receta eliminada</string>
+    <string name="saved_deleted_body">“%1$s” se eliminó.</string>
+    <string name="saved_deleted_undo">DESHACER · %1$d s</string>
+
+    <!-- Editor de receta propia (spec 010, T013) -->
+    <string name="own_edit_title">Editar receta</string>
+    <string name="own_action_save">Guardar</string>
+    <string name="own_action_delete">Eliminar</string>
+    <string name="own_name_label_required">Nombre de la receta *</string>
+    <string name="own_name_label">Nombre</string>
+    <string name="own_name_placeholder">Ej. Arepas rellenas de vegetales</string>
+    <string name="own_category_label_required">Categoría *</string>
+    <string name="own_category_label">Categoría</string>
+    <string name="own_category_placeholder">Selecciona una categoría</string>
+    <string name="own_ingredients_label">Ingredientes</string>
+    <string name="own_add_ingredient">＋ Añadir ingrediente</string>
+    <string name="own_time_label">Tiempo de cocción *</string>
+    <string name="own_time_suffix">min</string>
+    <string name="own_preparation_label">Preparación *</string>
+    <string name="own_required_note">Los campos con * son obligatorios. Revisa antes de guardar.</string>
+    <string name="own_save_button">Guardar receta</string>
+    <string name="own_discard_button">Descartar cambios</string>
+    <string name="own_error_title">⚠ No pudimos guardar los cambios</string>
+    <string name="own_error_reason_name">Revisa el nombre. Debe tener entre 2 y 60 caracteres.</string>
+    <string name="own_error_reason_category">Elige una categoría para tu receta.</string>
+    <string name="own_error_reason_ingredients">Revisa los ingredientes. Puedes agregar hasta 20, sin repetir.</string>
+    <string name="own_error_reason_time_low">Revisa el tiempo de cocción. Debe ser mayor a 0 minutos.</string>
+    <string name="own_error_reason_time_high">Revisa el tiempo de cocción. Debe ser de 240 minutos o menos.</string>
+    <string name="own_error_reason_preparation">Revisa la preparación. Es obligatoria y admite hasta 2.000 caracteres.</string>
+    <string name="own_error_field_name">Escribe un nombre de 2 a 60 caracteres.</string>
+    <string name="own_error_field_category">Selecciona una categoría.</string>
+    <string name="own_error_field_ingredients">Agrega hasta 20 ingredientes, sin repetir.</string>
+    <string name="own_error_field_time">Ingresa un valor entre 1 y 240 minutos.</string>
+    <string name="own_error_field_preparation">Escribe la preparación, hasta 2.000 caracteres.</string>
+    <string name="own_error_not_found">No encontramos esta receta.</string>
+    <string name="own_error_network">Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="own_error_session">Inicia sesión de nuevo para continuar.</string>
+    <string name="own_error_unknown">Ocurrió un problema. Inténtalo de nuevo.</string>
+
+    <!-- Categorías (spec 010 §7) -->
+    <string name="own_category_arepas">Arepas</string>
+    <string name="own_category_arroces">Arroces</string>
+    <string name="own_category_carnes">Carnes</string>
+    <string name="own_category_pollo">Pollo</string>
+    <string name="own_category_pescados">Pescados y mariscos</string>
+    <string name="own_category_pastas">Pastas</string>
+    <string name="own_category_sopas">Sopas</string>
+    <string name="own_category_ensaladas">Ensaladas</string>
+    <string name="own_category_desayunos">Desayunos</string>
+    <string name="own_category_postres">Postres</string>
+    <string name="own_category_otras">Otras</string>
+
+    <!-- Hoja de ingrediente (spec 010, CA-SAV-03-03) -->
+    <string name="own_sheet_title">Añadir ingrediente</string>
+    <string name="own_sheet_search">Buscar ingrediente...</string>
+    <string name="own_sheet_quantity">Cantidad</string>
+    <string name="own_sheet_quantity_error">Escribe una cantidad mayor a 0.</string>
+    <string name="own_sheet_confirm">Agregar</string>
+    <string name="own_sheet_update">Guardar</string>
+    <string name="own_sheet_remove">Quitar</string>
+    <string name="own_sheet_empty">No encontramos ese ingrediente.</string>
+
+    <!-- ¡Receta guardada! (spec 010, T014) -->
+    <string name="own_saved_heading">¡Receta guardada!</string>
+    <string name="own_saved_created">“%1$s” ya está en Creadas por mí.</string>
+    <string name="own_saved_updated">“%1$s” ha sido actualizada.</string>
+    <string name="own_saved_view">Ver receta</string>
+    <string name="own_saved_another">Crear otra</string>
+
+    <!-- Detalle (spec 010, CA-SAV-04-05) -->
+    <string name="own_detail_title">Mi receta</string>
+    <string name="own_detail_meta">%1$s · %2$d porciones · %3$d min</string>
+    <string name="own_detail_edit">Editar</string>
+    <string name="own_detail_preparation">Preparación</string>
+    <string name="own_detail_no_ingredients">Esta receta no tiene ingredientes.</string>
+
+    <!-- Eliminar (spec 010, T018) -->
+    <string name="own_delete_title">Eliminar receta</string>
+    <string name="own_delete_heading">¿Eliminar “%1$s”?</string>
+    <string name="own_delete_body">Esta acción quitará la receta de tus creaciones. No afecta los ingredientes del inventario.</string>
+    <string name="own_delete_cancel">Cancelar</string>
+    <string name="own_delete_confirm">Sí, eliminar</string>
     <string name="cd_saved_loading">Cargando recetas guardadas</string>
 </resources>

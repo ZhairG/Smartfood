@@ -141,7 +141,7 @@ solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
 |---|---|
 | "2 opciones para ti" pasa a **"Tu plan de 3 días"** con Día 1, 2 y 3, con el mismo estilo de tarjetas. | Formulación del agente como plan de 3 días (decisión de Zhair). |
 | "Antes de empezar" sin video ni "Omitir video": muestra la foto de la receta. | No hay videos; quedan fuera de alcance. |
-| Las tarjetas de recetas no muestran el ♡ y la pestaña Guardadas sigue gris (como en la spec 006). Aprobada el 2026-10-19. | Las recetas guardadas pasan al próximo módulo (#117). La [spec 010](../010-recetas-guardadas/spec.md) §9 anula esta desviación al implementarse. |
+| ~~Las tarjetas de recetas no muestran el ♡ y la pestaña Guardadas sigue gris (como en la spec 006).~~ Cerrada por la spec 010. Aprobada el 2026-10-19. | Las recetas guardadas pasan al próximo módulo (#117). La [spec 010](../010-recetas-guardadas/spec.md) §9 anula esta desviación al implementarse. |
 | El cierre de la cocina guiada pregunta "¿Cocinaste esta receta?". | Necesario para descontar el inventario sin errores. |
 | La cocina guiada no tiene el enlace "¿Necesitas ayuda? Ver técnica de sofrito" (aprobada por Zhair el 2026-10-21). | El catálogo no tiene técnicas; quedan fuera de alcance, como el video. |
 | Cada paso de la cocina guiada muestra la foto de la receta (aprobada por Zhair el 2026-10-21). | El catálogo tiene una foto por receta, no por paso. |

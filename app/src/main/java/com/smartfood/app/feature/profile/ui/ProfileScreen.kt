@@ -125,7 +125,7 @@ fun ProfileScreen(
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(dimens.statGap), modifier = Modifier.fillMaxWidth()) {
                     StatCard(
-                        value = stringResource(id = R.string.profile_stat_recipes_value),
+                        value = state.savedRecipesCount.toString(),
                         label = stringResource(id = R.string.profile_stat_recipes),
                         dimens = dimens,
                         modifier = Modifier.weight(1f)

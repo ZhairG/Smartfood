@@ -79,20 +79,20 @@
 - [x] T016 **Navegación del flujo:** crear → éxito → "Ver receta" / "Crear otra" / flecha, en `MainNavigationTest`.
 
 ## Issue 3: Eliminar con deshacer y contador del Perfil (intermedia, #131)
-- [ ] T017 **Casos de uso** (CA-SAV-05-03, 05-04): `DeleteOwnRecipeUseCase` y `RestoreOwnRecipeUseCase`, con sus
+- [x] T017 **Casos de uso** (CA-SAV-05-03, 05-04): `DeleteOwnRecipeUseCase` y `RestoreOwnRecipeUseCase`, con sus
   pruebas (la receta vuelve con el mismo id, su `createdAt` y su ♡).
-- [ ] T018 **Confirmación** (CA-SAV-05-01, 05-02): `…/ui/own/DeleteOwnRecipeScreen.kt` con su ViewModel, la ruta
+- [x] T018 **Confirmación** (CA-SAV-05-01, 05-02): `…/ui/own/DeleteOwnRecipeScreen.kt` con su ViewModel, la ruta
   `DeleteOwnRecipe` y las pruebas `DeleteOwnRecipeViewModelTest` y `DeleteOwnRecipeScreenTest`.
-- [ ] T019 **Aviso con cuenta regresiva** (CA-SAV-05-03 a 05-06, RNF-SAV-04):
+- [x] T019 **Aviso con cuenta regresiva** (CA-SAV-05-03 a 05-06, RNF-SAV-04):
   - `DeletedRecipeBanner.kt` sobre Guardadas (patrón `EditorResultHost`);
   - la cuenta de 8 a 1 y "Deshacer" en `SavedRecipesViewModel`;
   - pruebas con `advanceTimeBy` en `SavedRecipesViewModelTest` y casos en `SavedRecipesScreenTest`.
-- [ ] T020 **Contador** (CA-SAV-06-01, 06-02):
+- [x] T020 **Contador** (CA-SAV-06-01, 06-02):
   - `CountSavedRecipesUseCase` y su prueba;
   - `ProfileViewModel` y `ProfileContract` reciben el número;
   - `ProfileScreen.kt` deja de usar `profile_stat_recipes_value` (se borra de `strings_profile.xml`);
   - actualiza `ProfileViewModelTest` y `ProfileScreenTest`.
-- [ ] T021 **Spec 008 y 009:**
+- [x] T021 **Spec 008 y 009:**
   - en la 008, CA-PER-01-02 y la desviación de §9 apuntan a la 010;
   - en la 009, se cierra la desviación del ♡ y de Guardadas.
 
@@ -137,16 +137,16 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-SAV-04-01 | I `OwnRecipeEditorScreenTest` |
 | CA-SAV-04-02 | U `OwnRecipeEditorViewModelTest`, I `OwnRecipeSavedScreenTest` |
 | CA-SAV-04-03 | U `OwnRecipeEditorViewModelTest`, I `OwnRecipeEditorScreenTest` |
-| CA-SAV-04-04 | U `OwnRecipeEditorViewModelTest` |
+| CA-SAV-04-04 | U `OwnRecipeEditorViewModelTest`, I `OwnRecipeEditorScreenTest`, I `MainNavigationTest` |
 | CA-SAV-04-05 | I `OwnRecipeDetailScreenTest` |
 | CA-SAV-05-01 | I `DeleteOwnRecipeScreenTest` |
-| CA-SAV-05-02 | U `DeleteOwnRecipeViewModelTest` |
+| CA-SAV-05-02 | U `DeleteOwnRecipeViewModelTest`, I `DeleteOwnRecipeScreenTest`, I `MainNavigationTest` |
 | CA-SAV-05-03 | U `DeleteOwnRecipeUseCaseTest`, U `SavedRecipesViewModelTest`, I `SavedRecipesScreenTest` |
-| CA-SAV-05-04 | U `RestoreOwnRecipeUseCaseTest`, U `SavedRecipesViewModelTest` |
+| CA-SAV-05-04 | U `DeleteOwnRecipeUseCaseTest`, U `SavedRecipesViewModelTest`, I `SavedRecipesScreenTest` |
 | CA-SAV-05-05 | U `SavedRecipesViewModelTest` |
 | CA-SAV-05-06 | I `SavedRecipesScreenTest` |
-| CA-SAV-06-01 | U `CountSavedRecipesUseCaseTest`, I `ProfileScreenTest` |
-| CA-SAV-06-02 | U `ProfileViewModelTest`, M |
+| CA-SAV-06-01 | U `DeleteOwnRecipeUseCaseTest`, U `ProfileViewModelTest`, I `ProfileScreenTest` |
+| CA-SAV-06-02 | U `DeleteOwnRecipeUseCaseTest`, M |
 | RNF-SAV-01 | R |
 | RNF-SAV-04 | I (semántica del ♡ y del aviso) |
 | RNF-SAV-05 | M (capturas Figma vs app) |

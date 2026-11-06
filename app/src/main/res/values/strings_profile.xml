@@ -8,7 +8,6 @@
     <string name="cd_profile_change_photo">Cambiar foto de perfil</string>
 
     <!-- Tarjetas de cifras: solo "Ingredientes en inventario" es real por ahora. -->
-    <string name="profile_stat_recipes_value">0</string>
     <string name="profile_stat_recipes">Recetas guardadas</string>
     <string name="profile_stat_ingredients">Ingredientes en inventario</string>
     <string name="profile_stat_savings">Ahorrados este mes</string>

@@ -87,6 +87,14 @@ fun SavedRecipesScreen(
                 null
             }
         )
+        state.deleted?.let { deleted ->
+            DeletedRecipeBanner(
+                name = deleted.recipe.name,
+                secondsLeft = state.undoSecondsLeft,
+                onUndo = { onEvent(SavedRecipesEvent.UndoClicked) },
+                modifier = Modifier.padding(start = ContentPadding, end = ContentPadding, top = ContentPadding)
+            )
+        }
         Box(
             modifier = Modifier
                 .weight(1f)

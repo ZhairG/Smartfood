@@ -142,5 +142,18 @@ sealed interface OwnRecipeError {
     data class Unknown(val code: String? = null) : OwnRecipeError
 }
 
+/**
+ * Copia de una receta eliminada, para deshacer (spec 010, CA-SAV-05-04).
+ *
+ * @property recipe Receta tal como estaba.
+ * @property wasFavorite `true` si también tenía ♡.
+ * @property favoriteSavedAtMillis Fecha de la favorita, o 0 si no lo era.
+ */
+data class DeletedOwnRecipe(
+    val recipe: OwnRecipe,
+    val wasFavorite: Boolean,
+    val favoriteSavedAtMillis: Long,
+)
+
 /** Excepción de dominio usada para transportar [OwnRecipeError]. */
 class OwnRecipeException(val error: OwnRecipeError) : Exception()

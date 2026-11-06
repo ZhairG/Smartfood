@@ -3,14 +3,13 @@ package com.smartfood.app.feature.recipes.ui
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.DisposableEffect
+import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.Composable
+import com.smartfood.app.feature.recipes.ui.own.DeleteOwnRecipeScreen
+import com.smartfood.app.feature.recipes.ui.own.DeleteOwnRecipeViewModel
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,7 +19,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.navigation.MainTab
 import com.smartfood.app.core.navigation.MainTabScaffold
 import com.smartfood.app.core.navigation.NavTransitions
@@ -235,26 +233,78 @@ fun NavGraphBuilder.savedDestinations(navController: NavHostController) {
     }
     composable<Route.OwnRecipeEditor> { entry ->
         val route = entry.toRoute<Route.OwnRecipeEditor>()
-        val viewModel: OwnRecipeEditorViewModel = hiltViewModel()
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
-        LaunchedEffect(route.recipeId) { viewModel.initialize(route.recipeId) }
-        ObserveEffects(viewModel.effects) { effect ->
-            when (effect) {
-                is OwnRecipeEditorEffect.Saved -> navController.navigate(Route.OwnRecipeSaved(effect.recipeId, effect.name, effect.edited))
+        SavedTabScaffold(navController) {
+            val viewModel: OwnRecipeEditorViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            val toSaved = { navController.popBackStack<Route.Saved>(inclusive = false) }
+            LaunchedEffect(route.recipeId) { viewModel.initialize(route.recipeId) }
+            BackHandler { toSaved() }
+            ObserveEffects(viewModel.effects) { effect ->
+                when (effect) {
+                    is OwnRecipeEditorEffect.Saved ->
+                        navController.navigate(Route.OwnRecipeSaved(effect.recipeId, effect.name, effect.edited)) {
+                            popUpTo<Route.Saved>()
+                        }
+                    OwnRecipeEditorEffect.Close -> toSaved()
+                    is OwnRecipeEditorEffect.OpenDelete ->
+                        navController.navigate(Route.DeleteOwnRecipe(effect.recipeId, effect.name))
+                }
             }
+            OwnRecipeEditorScreen(state = state, onEvent = viewModel::onEvent)
         }
-        OwnRecipeEditorScreen(state = state, onEvent = viewModel::onEvent)
     }
     composable<Route.OwnRecipeSaved> { entry ->
         val route = entry.toRoute<Route.OwnRecipeSaved>()
-        OwnRecipeSavedScreen(route.name, route.edited,
-            onView = { navController.navigate(Route.OwnRecipeDetail(route.recipeId)) },
-            onCreateAnother = { navController.navigate(Route.OwnRecipeEditor()) },
-            onBack = { navController.popBackStack<Route.Saved>(inclusive = false) })
+        SavedTabScaffold(navController) {
+            OwnRecipeSavedScreen(
+                name = route.name,
+                edited = route.edited,
+                onView = {
+                    navController.navigate(Route.OwnRecipeDetail(route.recipeId)) { popUpTo<Route.Saved>() }
+                },
+                onCreateAnother = {
+                    navController.navigate(Route.OwnRecipeEditor()) { popUpTo<Route.Saved>() }
+                },
+                onBack = { navController.popBackStack<Route.Saved>(inclusive = false) },
+            )
+        }
     }
     composable<Route.OwnRecipeDetail> { entry ->
-        val viewModel: OwnRecipeDetailViewModel = hiltViewModel()
-        val recipe by viewModel.recipe.collectAsStateWithLifecycle()
-        recipe?.let { value -> OwnRecipeDetailScreen(value, onEdit = { navController.navigate(Route.OwnRecipeEditor(value.id)) }, onBack = { navController.popBackStack() }) }
+        val route = entry.toRoute<Route.OwnRecipeDetail>()
+        SavedTabScaffold(navController) {
+            val viewModel: OwnRecipeDetailViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            OwnRecipeDetailScreen(
+                state = state,
+                onFavoriteToggled = viewModel::onFavoriteToggled,
+                onEdit = { navController.navigate(Route.OwnRecipeEditor(route.recipeId)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
     }
+    composable<Route.DeleteOwnRecipe> { entry ->
+        val route = entry.toRoute<Route.DeleteOwnRecipe>()
+        SavedTabScaffold(navController) {
+            val viewModel: DeleteOwnRecipeViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            ObserveEffects(viewModel.deleted) { navController.popBackStack<Route.Saved>(inclusive = false) }
+            DeleteOwnRecipeScreen(
+                name = route.name,
+                state = state,
+                onConfirm = viewModel::onConfirm,
+                onCancel = { navController.popBackStack() },
+            )
+        }
+    }
+}
+
+/** Las pantallas internas de recetas propias conservan la barra con Guardadas resaltada, como en el Figma. */
+@Composable
+private fun SavedTabScaffold(navController: NavHostController, content: @Composable () -> Unit) {
+    MainTabScaffold(
+        currentTab = MainTab.SAVED,
+        onTabSelected = navController::navigateToTab,
+        onCurrentTabReselected = { navController.popBackStack<Route.Saved>(inclusive = false) },
+        content = content,
+    )
 }
