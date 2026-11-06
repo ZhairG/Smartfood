@@ -9,6 +9,7 @@ import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import com.smartfood.app.feature.recipes.domain.usecase.ObserveSavedRecipesUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.ToggleFavoriteUseCase
 import com.smartfood.app.testutil.FakeFavoritesRepository
+import com.smartfood.app.testutil.FakeOwnRecipesRepository
 import com.smartfood.app.testutil.MainDispatcherRule
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -52,7 +53,7 @@ class SavedRecipesViewModelTest {
 
     private fun viewModel() = SavedRecipesViewModel(
         toggleFavorite = ToggleFavoriteUseCase(favoritas),
-        observeSavedRecipes = ObserveSavedRecipesUseCase(favoritas, FakeCatalog(listOf(recipe))),
+        observeSavedRecipes = ObserveSavedRecipesUseCase(favoritas, FakeCatalog(listOf(recipe)), FakeOwnRecipesRepository()),
     )
 
     /** Mantiene el estado observado, como la pantalla, y espera a que carguen las tarjetas. */

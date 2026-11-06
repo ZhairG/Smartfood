@@ -99,3 +99,48 @@ data class SavedRecipesData(
     val isEmptyOverall: Boolean,
     val hasPendingSync: Boolean,
 )
+
+/** Categorías disponibles para una receta creada por la persona (RF-SAV-02). */
+enum class RecipeCategory {
+    AREPAS, ARROCES, CARNES, POLLO, PESCADOS, PASTAS, SOPAS, ENSALADAS, DESAYUNOS, POSTRES, OTRAS,
+}
+
+/** Receta propia persistida en `users/{uid}/recipes/{recipeId}`. */
+data class OwnRecipe(
+    val id: String,
+    val name: String,
+    val category: RecipeCategory,
+    val ingredients: List<RecipeIngredient>,
+    val cookMinutes: Int,
+    val preparation: String,
+    val createdAtMillis: Long,
+    val updatedAtMillis: Long,
+    val isPendingSync: Boolean = false,
+) {
+    companion object { const val SERVINGS = 2 }
+}
+
+/** Datos sin validar que provienen del formulario de receta propia. */
+data class OwnRecipeDraft(
+    val name: String = "",
+    val category: RecipeCategory? = null,
+    val ingredients: List<RecipeIngredient> = emptyList(),
+    val cookMinutes: String = "",
+    val preparation: String = "",
+)
+
+/** Campo que origina el primer error de validación del editor. */
+enum class OwnRecipeField { NAME, CATEGORY, INGREDIENTS, COOK_MINUTES, PREPARATION }
+
+/** Errores tipados de recetas propias. */
+sealed interface OwnRecipeError {
+    data class Invalid(val field: OwnRecipeField) : OwnRecipeError
+    data object NotFound : OwnRecipeError
+    data object Network : OwnRecipeError
+    data object PermissionDenied : OwnRecipeError
+    data object NotAuthenticated : OwnRecipeError
+    data class Unknown(val code: String? = null) : OwnRecipeError
+}
+
+/** Excepción de dominio usada para transportar [OwnRecipeError]. */
+class OwnRecipeException(val error: OwnRecipeError) : Exception()

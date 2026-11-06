@@ -3,6 +3,12 @@ package com.smartfood.app.testutil
 import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.recipes.domain.model.Favorite
 import com.smartfood.app.feature.recipes.domain.model.FavoriteSource
+import com.smartfood.app.feature.recipes.domain.model.OwnRecipe
+import com.smartfood.app.feature.recipes.domain.repository.OwnRecipesRepository
+import com.smartfood.app.feature.recipes.domain.model.OwnRecipeError
+import com.smartfood.app.feature.recipes.domain.model.OwnRecipeException
+import com.smartfood.app.feature.recipes.domain.model.RecipeCategory
+import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
 import com.smartfood.app.feature.recipes.domain.repository.FavoritesRepository
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
@@ -92,3 +98,51 @@ class FakeFavoritesRepository : FavoritesRepository {
         val favorite: Boolean,
     )
 }
+
+/** Fake de recetas propias para pruebas de dominio y ViewModel (spec 010, T009). */
+class FakeOwnRecipesRepository : OwnRecipesRepository {
+    val recipes = MutableStateFlow<List<OwnRecipe>>(emptyList())
+    var outcome: WriteOutcome = WriteOutcome.SYNCED
+    var pendingWrites: Boolean = false
+    var getResult: Result<OwnRecipe>? = null
+    var saveResult: Result<WriteOutcome>? = null
+    var deleteResult: Result<WriteOutcome>? = null
+    var nextId: String = "own-recipe-1"
+    val saveCalls = mutableListOf<SaveRecipeCall>()
+
+    override fun observeRecipes(): Flow<List<OwnRecipe>> = recipes
+
+    override suspend fun getRecipe(id: String): Result<OwnRecipe> =
+        getResult ?: recipes.value.firstOrNull { it.id == id }?.let { Result.success(it) }
+        ?: Result.failure(OwnRecipeException(OwnRecipeError.NotFound))
+
+    override fun newRecipeId(): String = nextId
+
+    override suspend fun saveRecipe(recipe: OwnRecipe, isNew: Boolean): Result<WriteOutcome> {
+        saveCalls += SaveRecipeCall(recipe, isNew)
+        saveResult?.let { return it }
+        recipes.value = recipes.value.filterNot { it.id == recipe.id } + recipe.copy(isPendingSync = pendingWrites)
+        return Result.success(outcome)
+    }
+
+    override suspend fun deleteRecipe(id: String): Result<WriteOutcome> {
+        deleteResult?.let { return it }
+        recipes.value = recipes.value.filterNot { it.id == id }
+        return Result.success(outcome)
+    }
+
+    data class SaveRecipeCall(val recipe: OwnRecipe, val isNew: Boolean)
+}
+
+/** Receta propia mínima para pruebas. */
+fun ownRecipe(
+    id: String = "own-1",
+    name: String = "Arroz casero",
+    category: RecipeCategory = RecipeCategory.ARROCES,
+    ingredients: List<RecipeIngredient> = listOf(RecipeIngredient("arroz", 200.0)),
+    cookMinutes: Int = 30,
+    preparation: String = "Cocinar y servir.",
+    createdAtMillis: Long = 1_000L,
+    updatedAtMillis: Long = 1_000L,
+    isPendingSync: Boolean = false,
+) = OwnRecipe(id, name, category, ingredients, cookMinutes, preparation, createdAtMillis, updatedAtMillis, isPendingSync)
