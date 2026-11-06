@@ -2,9 +2,12 @@ package com.smartfood.app.feature.recipes.domain.agent
 
 import com.smartfood.app.feature.recipes.data.catalog.AssetsRecipeCatalog
 import com.smartfood.app.feature.recipes.data.catalog.RecipeAssetSource
+import com.smartfood.app.feature.recipes.domain.model.DietRule
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.PantryItem
+import com.smartfood.app.feature.recipes.domain.model.PlanContext
 import com.smartfood.app.feature.recipes.domain.model.Recipe
+import com.smartfood.app.feature.recipes.domain.model.Store
 import java.io.File
 import kotlin.math.round
 import kotlin.random.Random
@@ -68,6 +71,45 @@ internal object RealCatalog {
                 .take(4 + random.nextInt(5))
             (expiring + extraExpiring).map { item(n, it, random.nextInt(0, 4), random) } +
                 later.map { item(n, it, random.nextInt(4, 21), random) }
+        }
+    }
+
+    /**
+     * Un usuario de la evaluación: sus inventarios y sus datos del plan.
+     *
+     * @property name Nombre del perfil en la tabla.
+     * @property context Presupuesto, porciones y restricciones.
+     * @property inventories Inventarios de prueba.
+     */
+    data class EvaluationProfile(val name: String, val context: PlanContext, val inventories: List<List<PantryItem>>)
+
+    /**
+     * Usuarios con características diferentes, reproducibles con [seed] (spec 009, RNF-RIA-03). No cambia
+     * [syntheticInventories], para que los resultados de `AgentEvaluationTest` se mantengan.
+     */
+    fun evaluationProfiles(count: Int = 6, seed: Int = 2026): List<EvaluationProfile> {
+        val base = PlanContext(budgetCop = 100_000, servings = 4, store = Store.D1)
+        val normal = syntheticInventories(count, seed)
+        return listOf(
+            EvaluationProfile("Sin restricciones", base, normal),
+            EvaluationProfile("Vegetariano", base.copy(diet = setOf(DietRule.VEGETARIAN)), normal),
+            EvaluationProfile("Vegano sin lactosa", base.copy(diet = setOf(DietRule.VEGAN, DietRule.LACTOSE_FREE)), normal),
+            EvaluationProfile("Alérgico: sin gluten ni frutos secos", base.copy(diet = setOf(DietRule.GLUTEN_FREE, DietRule.NUT_FREE)), normal),
+            EvaluationProfile("Poco presupuesto (COP 25.000, 2 porciones)", base.copy(budgetCop = 25_000, servings = 2), normal),
+            EvaluationProfile("Poco tiempo (30 min)", base.copy(maxMinutes = 30), normal),
+            EvaluationProfile("Inventario enorme", base, largeInventories(count, seed)),
+            EvaluationProfile("Nada por vencer", base, normal.map { pantry -> pantry.map { it.copy(daysToExpire = it.daysToExpire + 10) } }),
+            EvaluationProfile("Sin plan posible (COP 2.000)", base.copy(budgetCop = 2_000), normal),
+        )
+    }
+
+    /** Todos los ingredientes que se compran, con 8 productos por vencer. */
+    private fun largeInventories(count: Int, seed: Int): List<List<PantryItem>> {
+        val random = Random(seed + 1)
+        return List(count) { n ->
+            val all = shoppable.shuffled(random)
+            all.take(8).map { item(n, it, random.nextInt(0, 4), random) } +
+                all.drop(8).map { item(n, it, random.nextInt(4, 21), random) }
         }
     }
 
