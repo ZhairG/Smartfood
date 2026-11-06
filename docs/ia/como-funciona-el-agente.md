@@ -176,6 +176,9 @@ asignar(día, elegidas, inventario, presupuesto que queda):
         asignar(día + 1, elegidas + candidata, inventario − lo que usa, presupuesto − su costo)
 ```
 
+> La cota es la heurística del agente. Su admisibilidad y la comparación con A\* y recocido simulado están en
+> [`evaluacion-agente.md` §6](evaluacion-agente.md#6-problema-de-búsqueda-y-heurísticas-2026-11-05).
+
 **¿La poda puede perder el mejor plan?** No. El "mejor caso" de una rama es optimista: suma **todo** el rescate que el
 inventario todavía puede dar en los días que faltan y no resta costo ni desperdicio, así que **nunca se queda corto**.
 Si ni así alcanza, esa rama no puede ganar. `MealPlannerTest` lo comprueba comparando con una búsqueda que revisa
