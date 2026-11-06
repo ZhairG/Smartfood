@@ -553,5 +553,82 @@
     "etiquetas": ["origen_animal"],
     "empaque": {"cantidad": 500, "etiqueta": "500 g"},
     "precios": {"exito": 8980, "carulla": 9900, "olimpica": 15460, "d1": 12710}
+  },
+  {
+    "id": "salsa-soya",
+    "nombre": "Salsa de soya",
+    "sinonimos": ["salsa soya", "soya"],
+    "seccion": "Otros",
+    "unidad": "ml",
+    "vidaUtilDias": 365,
+    "etiquetas": ["gluten"],
+    "empaque": {"cantidad": 155, "etiqueta": "155 ml"},
+    "precios": {"exito": 4488, "carulla": 4960, "olimpica": 3890, "d1": 1610}
+  },
+  {
+    "id": "jengibre",
+    "nombre": "Jengibre",
+    "sinonimos": ["jengibre fresco"],
+    "seccion": "Verduras",
+    "unidad": "g",
+    "vidaUtilDias": 21,
+    "etiquetas": [],
+    "empaque": {"cantidad": 150, "etiqueta": "150 g"},
+    "precios": {"carulla": 2450, "olimpica": 3600, "d1": 3100}
+  },
+  {
+    "id": "aceite-oliva",
+    "nombre": "Aceite de oliva",
+    "sinonimos": ["aceite oliva"],
+    "seccion": "Otros",
+    "unidad": "ml",
+    "vidaUtilDias": 365,
+    "etiquetas": [],
+    "empaque": {"cantidad": 500, "etiqueta": "500 ml"},
+    "precios": {"exito": 27483, "carulla": 16950, "olimpica": 31780, "d1": 16950}
+  },
+  {
+    "id": "oregano",
+    "nombre": "Orégano",
+    "sinonimos": ["oregano seco"],
+    "seccion": "Otros",
+    "unidad": "g",
+    "vidaUtilDias": 365,
+    "etiquetas": [],
+    "empaque": {"cantidad": 20, "etiqueta": "20 g"},
+    "precios": {"exito": 1970, "carulla": 2250, "olimpica": 2560, "d1": 1990}
+  },
+  {
+    "id": "curry",
+    "nombre": "Curry en polvo",
+    "sinonimos": ["curry"],
+    "seccion": "Otros",
+    "unidad": "g",
+    "vidaUtilDias": 365,
+    "etiquetas": [],
+    "empaque": {"cantidad": 28, "etiqueta": "28 g"},
+    "precios": {"exito": 4504, "carulla": 4980, "olimpica": 8660, "d1": 1990}
+  },
+  {
+    "id": "aceitunas",
+    "nombre": "Aceitunas",
+    "sinonimos": ["aceituna"],
+    "seccion": "Otros",
+    "unidad": "g",
+    "vidaUtilDias": 180,
+    "etiquetas": [],
+    "empaque": {"cantidad": 200, "etiqueta": "200 g"},
+    "precios": {"exito": 11040, "carulla": 11240, "olimpica": 4190, "d1": 4990}
+  },
+  {
+    "id": "harina-trigo",
+    "nombre": "Harina de trigo",
+    "sinonimos": ["harina todo uso"],
+    "seccion": "Cereales",
+    "unidad": "g",
+    "vidaUtilDias": 180,
+    "etiquetas": ["gluten"],
+    "empaque": {"cantidad": 500, "etiqueta": "500 g"},
+    "precios": {"exito": 1840, "carulla": 2100, "olimpica": 1700, "d1": 1700}
   }
 ]

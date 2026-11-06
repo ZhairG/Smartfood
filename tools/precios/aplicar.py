@@ -74,6 +74,7 @@ def escribir_markdown(tabla):
         "sueltas se venden por kilo; las que se venden por unidad usan un peso aproximado por unidad.",
         "- **Vacío:** la tienda no lo tiene en línea; la app usa la tienda más barata y la nombra.",
         "- **Básico de despensa:** no suma al costo de la receta ni al presupuesto del agente.",
+        *([f"- **Agregados después:** {tabla['agregados']}"] if tabla.get("agregados") else []),
         "",
         "| Ingrediente | Presentación | Básico | Éxito | Carulla | Olímpica | D1 |",
         "|---|---|---|---|---|---|---|",

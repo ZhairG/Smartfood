@@ -1183,6 +1183,178 @@
      "producto": "Champiñón 250 g"
     }
    }
+  },
+  "salsa-soya": {
+   "empaque": {
+    "cantidad": 155,
+    "etiqueta": "155 ml"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 4488,
+     "producto": "Salsa soya BARY botella (155 ml)"
+    },
+    "carulla": {
+     "precio": 4960,
+     "producto": "Salsa soya BARY botella (155 ml)"
+    },
+    "olimpica": {
+     "precio": 3890,
+     "producto": "SALSA SOYA EL REY 155 ML"
+    },
+    "d1": {
+     "precio": 1610,
+     "producto": "Salsa de Soya Zev 178 Ml ($1.850)"
+    }
+   }
+  },
+  "jengibre": {
+   "empaque": {
+    "cantidad": 150,
+    "etiqueta": "150 g"
+   },
+   "basico": false,
+   "precios": {
+    "carulla": {
+     "precio": 2450,
+     "producto": "Jengibre a granel por kg ($16.320)"
+    },
+    "olimpica": {
+     "precio": 3600,
+     "producto": "Jengibre X Kg ($24.000)"
+    },
+    "d1": {
+     "precio": 3100,
+     "producto": "Jengibre 150 G"
+    }
+   }
+  },
+  "aceite-oliva": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 ml"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 27483,
+     "producto": "Aceite de oliva OLITALIA orujo (500 ml)"
+    },
+    "carulla": {
+     "precio": 16950,
+     "producto": "Aceite de oliva FRESCAMPO extra virgen (500 ml)"
+    },
+    "olimpica": {
+     "precio": 31780,
+     "producto": "ACEITE OLIVA SELECTO 250ML ($15.890)"
+    },
+    "d1": {
+     "precio": 16950,
+     "producto": "Aceite Oliva Extravir Castell D F 500 Ml"
+    }
+   }
+  },
+  "oregano": {
+   "empaque": {
+    "cantidad": 20,
+    "etiqueta": "20 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 1970,
+     "producto": "Orégano COMARRICO molido (20 gr)"
+    },
+    "carulla": {
+     "precio": 2250,
+     "producto": "OREGANO BOLSA 50 gr ($5.620)"
+    },
+    "olimpica": {
+     "precio": 2560,
+     "producto": "OREGANO FRESC 50 GR ($6.400)"
+    },
+    "d1": {
+     "precio": 1990,
+     "producto": "Oregano Speciaria 20 G"
+    }
+   }
+  },
+  "curry": {
+   "empaque": {
+    "cantidad": 28,
+    "etiqueta": "28 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 4504,
+     "producto": "Curry BADIA en polvo (28 gr)"
+    },
+    "carulla": {
+     "precio": 4980,
+     "producto": "Curry BADIA en polvo (56.7 gr) ($10.080)"
+    },
+    "olimpica": {
+     "precio": 8660,
+     "producto": "Curry Mccormick en Polvo 49 G ($15.150)"
+    },
+    "d1": {
+     "precio": 1990,
+     "producto": "Curry en Polvo Speciaria 28 G"
+    }
+   }
+  },
+  "aceitunas": {
+   "empaque": {
+    "cantidad": 200,
+    "etiqueta": "200 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 11040,
+     "producto": "Aceitunas FRESCAMPO manzanillas (140 gr) ($7.730)"
+    },
+    "carulla": {
+     "precio": 11240,
+     "producto": "Aceitunas CORUNA deshuesadas (290 gr) ($16.300)"
+    },
+    "olimpica": {
+     "precio": 4190,
+     "producto": "Aceituna Medalla de Oro Deshuesado 200 G"
+    },
+    "d1": {
+     "precio": 4990,
+     "producto": "Aceituna en Lata Ainoa 200 Gr"
+    }
+   }
+  },
+  "harina-trigo": {
+   "empaque": {
+    "cantidad": 500,
+    "etiqueta": "500 g"
+   },
+   "basico": false,
+   "precios": {
+    "exito": {
+     "precio": 1840,
+     "producto": "Harina de trigo LA NIEVE tradicional (500 gr)"
+    },
+    "carulla": {
+     "precio": 2100,
+     "producto": "Harina de trigo LA MONJITA fortificada (500 gr)"
+    },
+    "olimpica": {
+     "precio": 1700,
+     "producto": "Harina Olimpica de Trigo 500 G"
+    },
+    "d1": {
+     "precio": 1700,
+     "producto": "Harina de Trigo Quicksy X 500 G"
+    }
+   }
   }
- }
+ },
+ "agregados": "Salsa de soya, jengibre, aceite de oliva, orégano, curry, aceitunas y harina de trigo se consultaron el 2026-11-06 (spec 011)."
 }

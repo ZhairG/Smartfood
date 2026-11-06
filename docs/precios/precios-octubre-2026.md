@@ -5,6 +5,7 @@ Consulta puntual del **2026-10-20** en los buscadores públicos de cada tienda (
 - **Presentación:** la que se compra en el mercado. Si la tienda vende otro tamaño, el precio se lleva a la presentación de referencia y se anota el producto real con su precio entre paréntesis. Las verduras y frutas sueltas se venden por kilo; las que se venden por unidad usan un peso aproximado por unidad.
 - **Vacío:** la tienda no lo tiene en línea; la app usa la tienda más barata y la nombra.
 - **Básico de despensa:** no suma al costo de la receta ni al presupuesto del agente.
+- **Agregados después:** Salsa de soya, jengibre, aceite de oliva, orégano, curry, aceitunas y harina de trigo se consultaron el 2026-11-06 (spec 011).
 
 | Ingrediente | Presentación | Básico | Éxito | Carulla | Olímpica | D1 |
 |---|---|---|---|---|---|---|
@@ -58,6 +59,13 @@ Consulta puntual del **2026-10-20** en los buscadores públicos de cada tienda (
 | arveja | 500 g |  | $1.850 | $1.850 | $1.700 | — |
 | habichuela | 500 g |  | $3.510 | — | — | — |
 | champinones | 250 g |  | $6.220 | — | $9.900 | $7.900 |
+| salsa-soya | 155 ml |  | $4.488 | $4.960 | $3.890 | $1.610 |
+| jengibre | 150 g |  | — | $2.450 | $3.600 | $3.100 |
+| aceite-oliva | 500 ml |  | $27.483 | $16.950 | $31.780 | $16.950 |
+| oregano | 20 g |  | $1.970 | $2.250 | $2.560 | $1.990 |
+| curry | 28 g |  | $4.504 | $4.980 | $8.660 | $1.990 |
+| aceitunas | 200 g |  | $11.040 | $11.240 | $4.190 | $4.990 |
+| harina-trigo | 500 g |  | $1.840 | $2.100 | $1.700 | $1.700 |
 
 ## Productos usados
 
@@ -111,3 +119,10 @@ Consulta puntual del **2026-10-20** en los buscadores públicos de cada tienda (
 - **arveja** (500 g): Éxito: Arveja verde Frescampo 500 g; Carulla: Arveja verde Frescampo 500 g; Olímpica: Arveja verde Olímpica 500 g
 - **habichuela** (500 g): Éxito: Habichuela Ekono 500 g
 - **champinones** (250 g): Éxito: Champiñones frescos 1000 g ($24.864); Olímpica: Champiñón tajado La Giralda 250 g; D1: Champiñón 250 g
+- **salsa-soya** (155 ml): Éxito: Salsa soya BARY botella (155 ml); Carulla: Salsa soya BARY botella (155 ml); Olímpica: SALSA SOYA EL REY 155 ML; D1: Salsa de Soya Zev 178 Ml ($1.850)
+- **jengibre** (150 g): Carulla: Jengibre a granel por kg ($16.320); Olímpica: Jengibre X Kg ($24.000); D1: Jengibre 150 G
+- **aceite-oliva** (500 ml): Éxito: Aceite de oliva OLITALIA orujo (500 ml); Carulla: Aceite de oliva FRESCAMPO extra virgen (500 ml); Olímpica: ACEITE OLIVA SELECTO 250ML ($15.890); D1: Aceite Oliva Extravir Castell D F 500 Ml
+- **oregano** (20 g): Éxito: Orégano COMARRICO molido (20 gr); Carulla: OREGANO BOLSA 50 gr ($5.620); Olímpica: OREGANO FRESC 50 GR ($6.400); D1: Oregano Speciaria 20 G
+- **curry** (28 g): Éxito: Curry BADIA en polvo (28 gr); Carulla: Curry BADIA en polvo (56.7 gr) ($10.080); Olímpica: Curry Mccormick en Polvo 49 G ($15.150); D1: Curry en Polvo Speciaria 28 G
+- **aceitunas** (200 g): Éxito: Aceitunas FRESCAMPO manzanillas (140 gr) ($7.730); Carulla: Aceitunas CORUNA deshuesadas (290 gr) ($16.300); Olímpica: Aceituna Medalla de Oro Deshuesado 200 G; D1: Aceituna en Lata Ainoa 200 Gr
+- **harina-trigo** (500 g): Éxito: Harina de trigo LA NIEVE tradicional (500 gr); Carulla: Harina de trigo LA MONJITA fortificada (500 gr); Olímpica: Harina Olimpica de Trigo 500 G; D1: Harina de Trigo Quicksy X 500 G
