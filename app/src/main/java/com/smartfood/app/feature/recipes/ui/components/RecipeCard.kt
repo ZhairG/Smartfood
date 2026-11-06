@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,12 +28,30 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.theme.GreenDark
 import com.smartfood.app.core.designsystem.theme.GreenSoft
 import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.SurfaceLight
+import com.smartfood.app.core.designsystem.util.figmaShadow
 import com.smartfood.app.feature.recipes.ui.discover.RecipeCardUi
 import com.smartfood.app.feature.recipes.ui.components.formatCop
+
+/**
+ * Sombra de las tarjetas de recetas del Figma (`557:3051`, `666:3452`): `0 3 12` verde oscuro al 9,4 %. El desenfoque
+ * de [figmaShadow] es la mitad del de Figma.
+ */
+internal fun Modifier.recipeCardShadow(): Modifier = figmaShadow(
+    color = GreenDark.copy(alpha = RecipeCardShadowAlpha),
+    borderRadius = RecipeCardShadowRadius,
+    blurRadius = RecipeCardShadowBlur,
+    offsetY = RecipeCardShadowOffsetY,
+)
+
+private const val RecipeCardShadowAlpha = 0.094f
+private val RecipeCardShadowRadius = 20.dp
+private val RecipeCardShadowBlur = 6.dp
+private val RecipeCardShadowOffsetY = 3.dp
 
 /**
  * Tarjeta de receta del Figma (`557:3051`) con ♡ para marcar favorita.
@@ -56,19 +73,22 @@ fun RecipeCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(elevation = CardElevation, shape = shape)
+            .recipeCardShadow()
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .then(
+                if (highlighted) Modifier.border(1.dp, MaterialTheme.colorScheme.secondary, shape) else Modifier
+            )
             .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(PhotoAspectRatio)
-                .clip(shape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             RecipePhoto(
                 photo = card.photo,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().aspectRatio(PhotoAspectRatio)
             )
             FavoriteButton(
                 isFavorite = isFavorite,
@@ -77,13 +97,6 @@ fun RecipeCard(
                     .align(Alignment.BottomEnd)
                     .offset(FavoriteButtonCardOffset, FavoriteButtonCardOffset),
                 showPill = true,
-            )
-        }
-        if (highlighted) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, MaterialTheme.colorScheme.secondary, shape)
             )
         }
         Column(
@@ -126,7 +139,6 @@ fun RecipeCard(
 
 // Medidas del Figma 557:3028. No son de formulario, así que no van en FormMetrics.
 private val CardRadius = 20.dp
-private val CardElevation = 3.dp
 // La foto de la tarjeta se ve de 173 × 111 en el Figma (557:3028).
 private val PhotoAspectRatio = 173f / 111f
 private val CardTextSidePadding = 10.dp

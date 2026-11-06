@@ -45,10 +45,12 @@ fun SavedRecipeCard(
     onFavoriteToggled: () -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .recipeCardShadow(),
         shape = RoundedCornerShape(CardRadius),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = CardElevation),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(modifier = Modifier.clickable(role = Role.Button, onClick = onClick)) {
             Box(modifier = Modifier.fillMaxWidth()) {
@@ -94,7 +96,6 @@ fun SavedRecipeCard(
 
 // Medidas del Figma 633:2723. No son de formulario, así que no van en FormMetrics.
 private val CardRadius = 20.dp
-private val CardElevation = 3.dp
 private val PhotoAspectRatio = 173f / 111f
 private val CardTextSidePadding = 10.dp
 private val CardTextVerticalPadding = 8.dp

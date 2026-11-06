@@ -52,6 +52,7 @@ import com.smartfood.app.feature.recipes.ui.components.RecipeFilterPill
 import com.smartfood.app.feature.recipes.ui.components.RecipeSearchField
 import com.smartfood.app.feature.recipes.ui.components.RecipesHeader
 import com.smartfood.app.feature.recipes.ui.components.SavedRecipeCard
+import com.smartfood.app.feature.recipes.ui.components.recipeCardShadow
 
 /**
  * Nombre: SavedRecipesScreen.kt
@@ -277,9 +278,11 @@ private fun EmptySavedState(onCreate: () -> Unit) {
 @Composable
 private fun OfflineCard() {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .recipeCardShadow(),
         colors = CardDefaults.cardColors(containerColor = GreenSoft),
-        elevation = CardDefaults.cardElevation(defaultElevation = OfflineElevation),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(OfflineRadius),
     ) {
         Column(
@@ -339,7 +342,6 @@ private val EmptyGap = 14.dp
 private val EmptyIconSize = 74.dp
 private val EmptyBodyLineHeight = 19.sp
 private val OfflineRadius = 20.dp
-private val OfflineElevation = 3.dp
 private val OfflinePadding = 16.dp
 private val OfflineGap = 8.dp
 private val MessageVerticalPadding = 32.dp
