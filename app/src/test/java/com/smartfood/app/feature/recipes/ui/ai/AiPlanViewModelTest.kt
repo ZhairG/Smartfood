@@ -1,6 +1,10 @@
 package com.smartfood.app.feature.recipes.ui.ai
 
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
+import com.smartfood.app.feature.profile.domain.model.FoodPreferences
+import com.smartfood.app.feature.recipes.domain.agent.MealPlanner
+import com.smartfood.app.feature.recipes.domain.model.DietRule
+import com.smartfood.app.feature.recipes.domain.model.PlanContext
 import com.smartfood.app.feature.recipes.domain.model.PlanSuggestion
 import com.smartfood.app.feature.recipes.domain.usecase.AiFixtures
 import com.smartfood.app.testutil.MainDispatcherRule
@@ -21,7 +25,8 @@ import org.junit.Test
  * Fecha: Octubre 2026
  * Descripción: Pruebas de [AiPlanViewModel] (spec 009, T014) con el catálogo real: el contexto cargado (CA-RIA-02-01),
  * "Analizando opciones" al menos 1,5 s y "Cancelar" (CA-RIA-02-02), el plan con sus razones (CA-RIA-02-03, 02-06),
- * "Sin coincidencias" (CA-RIA-02-07) y "Ajustar" con los mismos datos (CA-RIA-02-08).
+ * "Sin coincidencias" (CA-RIA-02-07), "Ajustar" con los mismos datos (CA-RIA-02-08) y el contexto siempre al día
+ * (CA-RIA-02-11).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AiPlanViewModelTest {
@@ -113,5 +118,63 @@ class AiPlanViewModelTest {
         assertEquals(45, state.maxMinutes)
         assertTrue(state.noSpicy)
         assertNull(state.sheet)
+    }
+
+    @Test(timeout = 20_000)
+    fun `CA-RIA-02-11 si el inventario cambia lo detectado se actualiza sin salir de la pantalla`() = runTest {
+        val fixtures = AiFixtures()
+        val viewModel = viewModel(fixtures)
+        viewModel.uiState.first { !it.isLoadingContext }
+
+        fixtures.inventory.items.value = fixtures.inventory.items.value.filterNot { it.id == "pollo" }
+        runCurrent()
+
+        val state = viewModel.uiState.value
+        assertTrue("Pollo sigue en lo detectado", state.detected.none { it.name == "Pollo" })
+        assertEquals("Tomate", state.firstExpiring?.name)
+        assertEquals(setOf("tomate"), state.expiringIds)
+    }
+
+    @Test(timeout = 20_000)
+    fun `CA-RIA-02-11 al generar usa las restricciones actuales del Perfil`() = runTest {
+        val fixtures = AiFixtures()
+        val viewModel = viewModel(fixtures)
+        viewModel.uiState.first { !it.isLoadingContext }
+        fixtures.profile.preferences = FoodPreferences(restrictions = setOf(DietaryRestriction.VEGETARIAN))
+
+        viewModel.onEvent(AiEvent.BudgetChanged(100_000))
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        val state = viewModel.uiState.first { it.step == AiStep.Plan || it.step == AiStep.NoPlan }
+
+        assertEquals(setOf(DietaryRestriction.VEGETARIAN), state.restrictions)
+        val vegetarian = PlanContext(budgetCop = 100_000, servings = 2, diet = setOf(DietRule.VEGETARIAN))
+        val planner = MealPlanner(state.ingredients)
+        assertTrue(state.plan?.days.orEmpty().all { planner.fitsDiet(it.recipe, vegetarian) })
+    }
+
+    @Test(timeout = 20_000)
+    fun `CA-RIA-02-11 si el inventario no se puede leer la pantalla no se cierra`() = runTest {
+        val fixtures = AiFixtures()
+        fixtures.inventory.observeFailure = IllegalStateException("PERMISSION_DENIED")
+
+        val state = viewModel(fixtures).uiState.first { !it.isLoadingContext }
+
+        assertTrue(state.detected.isEmpty())
+    }
+
+    @Test(timeout = 20_000)
+    fun `CA-RIA-02-11 un cambio del inventario no borra el plan que ya se ve`() = runTest {
+        val fixtures = AiFixtures()
+        val viewModel = viewModel(fixtures)
+        viewModel.uiState.first { !it.isLoadingContext }
+        viewModel.onEvent(AiEvent.BudgetChanged(100_000))
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        val plan = viewModel.uiState.first { it.step == AiStep.Plan }.plan
+
+        fixtures.inventory.items.value = fixtures.inventory.items.value.filterNot { it.id == "pollo" }
+        runCurrent()
+
+        assertEquals(AiStep.Plan, viewModel.uiState.value.step)
+        assertEquals(plan, viewModel.uiState.value.plan)
     }
 }

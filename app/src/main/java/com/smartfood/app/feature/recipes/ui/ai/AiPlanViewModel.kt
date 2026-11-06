@@ -3,6 +3,7 @@ package com.smartfood.app.feature.recipes.ui.ai
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartfood.app.core.common.safeRunCatching
 import com.smartfood.app.feature.recipes.domain.model.AiContext
 import com.smartfood.app.feature.recipes.domain.model.AiPlanOutcome
 import com.smartfood.app.feature.recipes.domain.usecase.GeneratePlanUseCase
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -56,24 +58,33 @@ class AiPlanViewModel @Inject constructor(
     private var generation: Job? = null
 
     init {
+        // Esta pantalla sigue viva al cambiar de pestaña o al abrir una receta: el contexto se mantiene al día, porque
+        // el inventario puede cambiar por detrás (CA-RIA-02-11). Si deja de poder leerse (por ejemplo, al cerrar sesión),
+        // se conserva el último contexto en lugar de cerrar la app.
         viewModelScope.launch {
-            val loaded = getAiContext()
-            context = loaded
-            val today = LocalDate.now(clock)
-            val daysById = loaded.items.associate { it.id to ChronoUnit.DAYS.between(today, it.expiresOn).toInt() }
-            val expiring = loaded.items.filter { (daysById.getValue(it.id)) in 0..EXPIRING_DAYS }
-            _uiState.update {
-                it.copy(
-                    isLoadingContext = false,
-                    detected = loaded.items,
-                    expiringIds = expiring.mapTo(HashSet()) { item -> item.id },
-                    firstExpiring = expiring.firstOrNull(),
-                    firstExpiringDays = expiring.firstOrNull()?.let { item -> daysById.getValue(item.id) } ?: 0,
-                    restrictions = loaded.restrictions,
-                    store = loaded.store,
-                    ingredients = loaded.ingredients,
-                )
-            }
+            getAiContext.observe()
+                .catch { _uiState.update { it.copy(isLoadingContext = false) } }
+                .collect(::showContext)
+        }
+    }
+
+    /** Guarda [loaded] para generar el plan y lo muestra, sin tocar el plan ni el paso actual. */
+    private fun showContext(loaded: AiContext) {
+        context = loaded
+        val today = LocalDate.now(clock)
+        val daysById = loaded.items.associate { it.id to ChronoUnit.DAYS.between(today, it.expiresOn).toInt() }
+        val expiring = loaded.items.filter { (daysById.getValue(it.id)) in 0..EXPIRING_DAYS }
+        _uiState.update {
+            it.copy(
+                isLoadingContext = false,
+                detected = loaded.items,
+                expiringIds = expiring.mapTo(HashSet()) { item -> item.id },
+                firstExpiring = expiring.firstOrNull(),
+                firstExpiringDays = expiring.firstOrNull()?.let { item -> daysById.getValue(item.id) } ?: 0,
+                restrictions = loaded.restrictions,
+                store = loaded.store,
+                ingredients = loaded.ingredients,
+            )
         }
     }
 
@@ -100,11 +111,14 @@ class AiPlanViewModel @Inject constructor(
     }
 
     private fun generate() {
-        val loaded = context ?: return
+        val current = context ?: return
         if (_uiState.value.step == AiStep.Loading) return
         _uiState.update { it.copy(step = AiStep.Loading, plan = null, reasons = emptyList(), suggestions = emptyList()) }
         val state = _uiState.value
         generation = viewModelScope.launch {
+            // Las restricciones del Perfil no avisan cuando cambian: se leen otra vez justo antes de buscar (CA-RIA-02-11).
+            val loaded = safeRunCatching { getAiContext() }.getOrDefault(current)
+            showContext(loaded)
             val outcome = coroutineScope {
                 val result = async {
                     val started = System.nanoTime()
