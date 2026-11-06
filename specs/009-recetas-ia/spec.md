@@ -59,6 +59,7 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 | CA-RIA-02-08 | **Dado** "Ajustar" en el plan, **entonces** vuelvo al contexto con los mismos datos para cambiarlos. |
 | CA-RIA-02-09 | **Dado** que tengo restricciones en Preferencias alimentarias (CA-PER-03-01), **entonces** ninguna receta del plan contiene un ingrediente que esas restricciones excluyen. |
 | CA-RIA-02-10 | **Dado** 50 recetas en el catálogo, **entonces** el plan se calcula en 2 segundos o menos en el teléfono (meta del Avance 2). |
+| CA-RIA-02-11 | **Dado** que cambié mi inventario o mis restricciones después de abrir "Sugerencia con IA", **entonces** la pantalla muestra el inventario actual y, **cuando** genero el plan, se usan el inventario y las restricciones actuales; un plan que ya estoy viendo no se borra solo. |
 
 ### HU-RIA-03: Entender cómo decide la IA
 | Código | Criterio |
