@@ -50,6 +50,7 @@ enum class DietRule(val forbidden: Set<FoodTag>) {
  * @property days Días del plan (spec §2: 3).
  * @property diet Restricciones alimentarias del Perfil; son duras y nunca se sugiere quitarlas (CA-RIA-02-09).
  * @property store Supermercado de los precios ("Mi supermercado" del Perfil, CA-RIA-04-07); D1 por defecto.
+ * @property cuisines Cocinas favoritas del Perfil; vacío si acepta todas (spec 011, RF-COC-02). Es una restricción dura.
  */
 data class PlanContext(
     val budgetCop: Long,
@@ -60,6 +61,7 @@ data class PlanContext(
     val days: Int = 3,
     val diet: Set<DietRule> = emptySet(),
     val store: Store = Store.D1,
+    val cuisines: Set<RecipeCuisine> = emptySet(),
 )
 
 /**
@@ -149,6 +151,9 @@ sealed interface PlanSuggestion {
 
     /** Con este tiempo máximo sí habría plan. */
     data class AllowMoreTime(val minutes: Int) : PlanSuggestion
+
+    /** Quitando las cocinas favoritas sí habría plan (spec 011, CA-COC-03-02). */
+    data object RemoveCuisine : PlanSuggestion
 
     /** El catálogo no tiene suficientes recetas que cumplan el contexto, aun sin presupuesto. */
     data object NotEnoughRecipes : PlanSuggestion

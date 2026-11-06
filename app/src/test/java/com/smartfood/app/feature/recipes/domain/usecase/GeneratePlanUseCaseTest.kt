@@ -1,11 +1,14 @@
 package com.smartfood.app.feature.recipes.domain.usecase
 
+import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
+import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.recipes.domain.agent.MealPlanner
 import com.smartfood.app.feature.recipes.domain.agent.PlanExplainer
 import com.smartfood.app.feature.recipes.domain.agent.RealCatalog
 import com.smartfood.app.feature.recipes.domain.model.AiPlanOutcome
 import com.smartfood.app.feature.recipes.domain.model.PlanContext
+import com.smartfood.app.feature.recipes.domain.model.RecipeCuisine
 import com.smartfood.app.feature.recipes.domain.model.PlanSuggestion
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -37,6 +40,20 @@ class GeneratePlanUseCaseTest {
         found.plan.days.forEach { assertTrue("${it.recipe.id} no es vegana", planner.fitsDiet(it.recipe, diet)) }
         assertTrue(found.reasons.any { it is PlanExplainer.Reason.UsesPantry })
         assertTrue(found.reasons.any { it is PlanExplainer.Reason.BudgetLeft })
+    }
+
+    @Test
+    fun `CA-COC-02-02 la cocina del Perfil llega al agente`() = runTest {
+        val fixtures = AiFixtures()
+        fixtures.profile.preferences = FoodPreferences(cuisines = setOf(Cuisine.ITALIAN, Cuisine.COLOMBIAN))
+        val context = fixtures.getAiContext()
+
+        val outcome = fixtures.generatePlan(context, budgetCop = 100_000, servings = 4, maxMinutes = null, noSpicy = false)
+
+        assertTrue("Esperaba un plan: $outcome", outcome is AiPlanOutcome.Found)
+        (outcome as AiPlanOutcome.Found).plan.days.forEach {
+            assertTrue(it.recipe.id, it.recipe.cuisine in setOf(RecipeCuisine.ITALIAN, RecipeCuisine.COLOMBIAN))
+        }
     }
 
     @Test
