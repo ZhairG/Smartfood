@@ -204,6 +204,14 @@ private fun ContextContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
                 style = BodyStyle()
             )
         }
+        if (state.cuisines.isNotEmpty()) {
+            val names = state.cuisines.map { stringResource(id = it.titleRes) }.joinToString(", ")
+            Text(
+                text = stringResource(id = R.string.recipes_ai_cuisines, names),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = BodyStyle()
+            )
+        }
     }
     WhiteCard {
         Text(

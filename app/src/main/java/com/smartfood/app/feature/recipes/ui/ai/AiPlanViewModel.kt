@@ -82,6 +82,7 @@ class AiPlanViewModel @Inject constructor(
                 firstExpiring = expiring.firstOrNull(),
                 firstExpiringDays = expiring.firstOrNull()?.let { item -> daysById.getValue(item.id) } ?: 0,
                 restrictions = loaded.restrictions,
+                cuisines = loaded.cuisines,
                 store = loaded.store,
                 ingredients = loaded.ingredients,
             )

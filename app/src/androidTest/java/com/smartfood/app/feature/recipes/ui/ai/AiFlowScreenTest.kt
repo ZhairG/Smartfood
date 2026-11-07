@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performScrollTo
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
+import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.recipes.domain.agent.PlanExplainer
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
@@ -114,6 +115,27 @@ class AiFlowScreenTest {
         mostrar(contexto.copy(restrictions = setOf(DietaryRestriction.VEGAN)))
 
         composeTestRule.onNodeWithText("Según tus preferencias: Vegano").assertIsDisplayed()
+    }
+
+    @Test
+    fun caCoc0301_conCocinasMuestraCocinaFavorita() {
+        mostrar(contexto.copy(cuisines = setOf(Cuisine.ITALIAN, Cuisine.MEXICAN)))
+
+        composeTestRule.onNodeWithText("Cocina favorita: Italiana, Mexicana").assertIsDisplayed()
+    }
+
+    @Test
+    fun caCoc0301_sinCocinasNoMuestraLaLinea() {
+        mostrar(contexto)
+
+        composeTestRule.onNodeWithText("Cocina favorita", substring = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun caCoc0302_sinPlanSugiereQuitarLaCocina() {
+        mostrar(contexto.copy(step = AiStep.NoPlan, suggestions = listOf(PlanSuggestion.RemoveCuisine)))
+
+        composeTestRule.onNodeWithText("Quita tu cocina favorita en el Perfil", substring = true).assertIsDisplayed()
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.smartfood.app.feature.recipes.domain.model.FoodTag
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.Recipe
+import com.smartfood.app.feature.recipes.domain.model.RecipeCuisine
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
 import com.smartfood.app.feature.recipes.domain.model.RecipeStep
 import com.smartfood.app.feature.recipes.domain.model.Store
@@ -56,12 +57,13 @@ internal data class PasoDto(
     val minutos: Int? = null,
 )
 
-/** Receta tal como viene en `recetas.json`. */
+/** Receta tal como viene en `recetas.json`. `cocina` es obligatoria (spec 011, CA-COC-01-02). */
 @Serializable
 internal data class RecetaDto(
     val id: String,
     val nombre: String,
     val foto: String? = null,
+    val cocina: String,
     val porciones: Int,
     val prepMin: Int,
     val coccionMin: Int,
@@ -104,7 +106,18 @@ internal fun RecetaDto.toDomain(): Recipe = Recipe(
     ingredients = ingredientes.map { RecipeIngredient(it.id, it.cantidad) },
     beforeStarting = antesDeEmpezar,
     steps = pasos.map { RecipeStep(it.titulo, it.texto, it.minutos) },
+    cuisine = cocinaARecipeCuisine(cocina, id),
 )
+
+/** Traduce `cocina` del JSON a [RecipeCuisine] (spec 011, RF-COC-01). */
+internal fun cocinaARecipeCuisine(cocina: String, recipeId: String): RecipeCuisine = when (cocina) {
+    "colombiana" -> RecipeCuisine.COLOMBIAN
+    "italiana" -> RecipeCuisine.ITALIAN
+    "asiatica" -> RecipeCuisine.ASIAN
+    "mexicana" -> RecipeCuisine.MEXICAN
+    "mediterranea" -> RecipeCuisine.MEDITERRANEAN
+    else -> throw IllegalArgumentException("Cocina desconocida '$cocina' en la receta '$recipeId'")
+}
 
 /** Traduce `g`/`ml`/`und` del JSON a la unidad base del dominio. */
 internal fun unidadAUnidad(unidad: String, ingredientId: String): IngredientUnit = when (unidad) {

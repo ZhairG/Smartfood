@@ -1,4 +1,4 @@
-# Evaluación del agente de recetas (spec 009)
+# Evaluación del agente de recetas (specs 009 y 011)
 
 Resultados para el informe del curso de Inteligencia Artificial (spec 009, RNF-RIA-02, RNF-RIA-03, CA-RIA-02-10, T029).
 Se reproducen con:
@@ -7,7 +7,7 @@ Se reproducen con:
 ./gradlew :app:testDebugUnitTest --tests "*AgentEvaluationTest" --tests "*MealPlannerPerformanceTest"
 ```
 
-La comparación con otros algoritmos, la heurística y su admisibilidad están en la §6. La guía para estudiar la sustentación
+La comparación con otros algoritmos, la heurística y su admisibilidad están en la §6; los resultados con 70 recetas y Cocina Favorita, en la §7. La guía para estudiar la sustentación
 está en [`sustentacion-agente.md`](sustentacion-agente.md).
 
 ## 1. Formulación
@@ -213,6 +213,72 @@ empatan (3 de 6 inventarios con plan, en todos). Con COP 2.000 ninguno arma plan
 | ¿Y con otros usuarios? | 9 perfiles: dietas, alergias, poco presupuesto o tiempo, inventario enorme, nada por vencer y sin plan. |
 | ¿Dónde falla? | Con inventarios enormes supera 2 s en un portátil modesto (§6.5). |
 
+## 7. Catálogo de 70 recetas y Cocina Favorita (2026-11-06, spec 011)
+
+El catálogo pasó de 50 a 70 recetas: 5 italianas, 5 asiáticas, 5 mexicanas y 5 mediterráneas nuevas, más las 8 anteriores que se
+clasificaron en esas cocinas. La Cocina Favorita es una **restricción dura de una sola receta**: se aplica en la consistencia de
+nodo, junto a la dieta. Sin cocinas elegidas no filtra nada. Las secciones anteriores se conservan con sus fechas: no son
+comparables con estas cifras, porque cambió el catálogo y los inventarios sintéticos salen de él.
+
+### 7.1 Resultados con el catálogo nuevo
+
+| Método | Planes completos | Aprovechamiento del plan | Aprovechamiento del Día 1 | En presupuesto | Desperdicio medio | Costo medio |
+|---|---|---|---|---|---|---|
+| **Agente CSP** | 30/30 | **88,9 %** | 56,2 % | 100 % | **0,80** | **COP 18.696** |
+| Línea base: coincidencias | 30/30 | 74,7 % | 64,8 % | 100 % | 1,21 | COP 47.813 |
+| Línea base: vencimiento | 30/30 | 85,0 % | 65,4 % | 100 % | 0,94 | COP 51.305 |
+
+**Meta RNF-RIA-03 cumplida:** ≥ 80 % y por encima de las dos líneas base. El aprovechamiento bajó frente a §3 (97,2 %), pero las
+dos cifras salen de inventarios distintos, así que no se atribuye esa baja solo a las recetas nuevas.
+
+### 7.2 Planes por cocina
+
+Mismos 6 inventarios sintéticos, COP 100.000 y 4 porciones. Todos los métodos exactos hallan el mismo óptimo.
+
+| Cocina elegida | Inventarios con plan | Costo medio |
+|---|---|---|
+| Italiana | 3 de 6 | COP 58.743 |
+| Mediterránea | 2 de 6 | COP 34.310 |
+| Asiática | 1 de 6 | COP 42.100 |
+| Mexicana | 1 de 6 | COP 51.800 |
+| Italiana y mexicana | 4 de 6 | COP 54.028 |
+| Asiática y vegetariano | 0 de 6 | — |
+
+**Limitación aceptada por Zhair (2026-11-06):** cada cocina tiene pocas recetas y el agente admite máximo 3 ingredientes por
+comprar al día, así que la restricción dura deja a menudo sin plan. Se mantiene porque el agente nunca rompe una restricción y
+dice qué cambiar con la sugerencia "Quita tu cocina favorita en el Perfil". Por eso 12 de las recetas nuevas se simplificaron.
+
+### 7.3 Rendimiento
+
+| Caso | Peor caso | Promedio |
+|---|---|---|
+| JVM, 30 inventarios normales (`MealPlannerPerformanceTest`) | 537 ms | 138 ms |
+| JVM en frío, inventario enorme (6 inventarios) | — | **8,3 s** |
+
+**El inventario enorme no cumple la meta de 2 s en este portátil:** promedió 8,3 s, con 219.521 nodos, frente a 2,5 s y 86.683
+nodos con 50 recetas. Es un caso extremo: todos los ingredientes en el inventario y 8 por vencer. Se midió con 7,3 GB de RAM y
+poca memoria libre, **y no se pudo medir en el teléfono**, así que no hay dato de ese caso en el dispositivo. La mejora natural
+sigue siendo una cota más ajustada, revisada contra `MealPlannerTest`.
+
+### 7.4 Comparación de algoritmos
+
+| Perfil | Agente: nodos / ms | A\*: nodos / frontera / ms | Recocido: brecha / ms | Voraz: brecha / ms |
+|---|---|---|---|---|
+| Sin restricciones | 992 / 165 | 230 / 6.972 / 137 | 0,012 / 61 | 0,147 / 5,2 |
+| Vegetariano | 811 / 48 | 160 / 2.839 / 52 | 0 / 40 | 0,147 / 0,7 |
+| Alérgico | 853 / 58 | 176 / 3.981 / 58 | 0,013 / 51 | 0,117 / 1,1 |
+| Poco presupuesto | 1.492 / 60 | 202 / 1.415 / 61 | 0,004 / 43 | 0,073 / 0,8 |
+| Poco tiempo | 301 / 10 | 58 / 470 / 9 | 0,040 / 30 | 0,303 / 0,5 |
+| Inventario enorme | 219.521 / 8.338 | 4.493 / 286.714 / 9.122 | 0 / 233 | 0,065 / 5,3 |
+| Nada por vencer | 28 / 13 | 20 / 581 / 10 | 0,021 / 42 | 0,034 / 1,4 |
+
+- **El agente sigue hallando el óptimo** y es la opción con memoria mínima; A\* lo iguala con menos nodos, pero guardó hasta
+  286.714 estados en la frontera.
+- **El recocido perdió terreno:** con 70 recetas no llegó al óptimo en 5 de estos 7 perfiles, aunque sigue siendo unas 36 veces
+  más rápido con el inventario enorme.
+- **Con cocinas elegidas** el dominio es tan pequeño que la búsqueda tarda menos de 1 ms. En "Italiana y mexicana", el recocido
+  encontró plan en 3 de 6 inventarios y los exactos en 4 de 6.
+
 ## Anexo: tablas completas por perfil (2026-11-05)
 
 ### Sin restricciones (6 inventarios)
@@ -320,6 +386,86 @@ empatan (3 de 6 inventarios con plan, en todos). Con COP 2.000 ninguno arma plan
 | Voraz | 6/6 | -0.504 | 0.045 | — | 0.00 | 16797 | 3 | 0 | 0.8 |
 
 ### Sin plan posible (COP 2.000) (6 inventarios)
+
+| Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | Frontera | ms |
+|---|---|---|---|---|---|---|---|---|---|
+| Agente CSP (orden + FC + poda) | 0/6 | — | — | — | — | — | 1 | 0 | 0.0 |
+| Backtracking puro | 0/6 | — | — | — | — | — | 1 | 0 | 0.0 |
+| Backtracking + FC | 0/6 | — | — | — | — | — | 1 | 0 | 0.0 |
+| Backtracking + FC + orden | 0/6 | — | — | — | — | — | 1 | 0 | 0.0 |
+| Backtracking + FC + poda + LCV | 0/6 | — | — | — | — | — | 1 | 0 | 0.0 |
+| A* | 0/6 | — | — | — | — | — | 1 | 1 | 0.0 |
+| Recocido simulado | 0/6 | — | — | — | — | — | 0 | 0 | 0.0 |
+| Voraz | 0/6 | — | — | — | — | — | 1 | 0 | 0.0 |
+
+## Anexo 2: tablas por cocina (2026-11-06)
+
+### Cocina italiana (6 inventarios)
+
+| Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | Frontera | ms |
+|---|---|---|---|---|---|---|---|---|---|
+| Agente CSP (orden + FC + poda) | 3/6 | -2.186 | 0.000 | 50.0 % | 1.60 | 58743 | 6 | 0 | 0.2 |
+| Backtracking puro | 3/6 | -2.186 | 0.000 | 50.0 % | 1.60 | 58743 | 6 | 0 | 0.2 |
+| Backtracking + FC | 3/6 | -2.186 | 0.000 | 50.0 % | 1.60 | 58743 | 6 | 0 | 0.2 |
+| Backtracking + FC + orden | 3/6 | -2.186 | 0.000 | 50.0 % | 1.60 | 58743 | 6 | 0 | 0.2 |
+| Backtracking + FC + poda + LCV | 3/6 | -2.186 | 0.000 | 50.0 % | 1.60 | 58743 | 6 | 0 | 0.3 |
+| A* | 3/6 | -2.186 | 0.000 | 50.0 % | 1.60 | 58743 | 4 | 3 | 0.3 |
+| Recocido simulado | 3/6 | -2.186 | 0.000 | 50.0 % | 1.60 | 58743 | 2012 | 0 | 19.4 |
+| Voraz | 2/6 | -2.723 | 0.000 | 25.0 % | 1.95 | 58860 | 2 | 0 | 0.1 |
+
+### Cocina asiática (6 inventarios)
+
+| Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | Frontera | ms |
+|---|---|---|---|---|---|---|---|---|---|
+| Agente CSP (orden + FC + poda) | 1/6 | -1.662 | 0.000 | 100.0 % | 0.90 | 42100 | 3 | 0 | 0.1 |
+| Backtracking puro | 1/6 | -1.662 | 0.000 | 100.0 % | 0.90 | 42100 | 3 | 0 | 0.1 |
+| Backtracking + FC | 1/6 | -1.662 | 0.000 | 100.0 % | 0.90 | 42100 | 3 | 0 | 0.1 |
+| Backtracking + FC + orden | 1/6 | -1.662 | 0.000 | 100.0 % | 0.90 | 42100 | 3 | 0 | 0.1 |
+| Backtracking + FC + poda + LCV | 1/6 | -1.662 | 0.000 | 100.0 % | 0.90 | 42100 | 3 | 0 | 0.1 |
+| A* | 1/6 | -1.662 | 0.000 | 100.0 % | 0.90 | 42100 | 2 | 2 | 0.1 |
+| Recocido simulado | 1/6 | -1.662 | 0.000 | 100.0 % | 0.90 | 42100 | 1867 | 0 | 14.7 |
+| Voraz | 1/6 | -1.662 | 0.000 | 100.0 % | 0.90 | 42100 | 2 | 0 | 0.1 |
+
+### Cocina mexicana (6 inventarios)
+
+| Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | Frontera | ms |
+|---|---|---|---|---|---|---|---|---|---|
+| Agente CSP (orden + FC + poda) | 1/6 | -2.661 | 0.000 | 33.3 % | 2.74 | 51800 | 2 | 0 | 0.1 |
+| Backtracking puro | 1/6 | -2.661 | 0.000 | 33.3 % | 2.74 | 51800 | 2 | 0 | 0.1 |
+| Backtracking + FC | 1/6 | -2.661 | 0.000 | 33.3 % | 2.74 | 51800 | 2 | 0 | 0.1 |
+| Backtracking + FC + orden | 1/6 | -2.661 | 0.000 | 33.3 % | 2.74 | 51800 | 2 | 0 | 0.1 |
+| Backtracking + FC + poda + LCV | 1/6 | -2.661 | 0.000 | 33.3 % | 2.74 | 51800 | 2 | 0 | 0.1 |
+| A* | 1/6 | -2.661 | 0.000 | 33.3 % | 2.74 | 51800 | 2 | 1 | 0.1 |
+| Recocido simulado | 1/6 | -2.661 | 0.000 | 33.3 % | 2.74 | 51800 | 2145 | 0 | 15.0 |
+| Voraz | 1/6 | -2.661 | 0.000 | 33.3 % | 2.74 | 51800 | 1 | 0 | 0.1 |
+
+### Cocina mediterránea (6 inventarios)
+
+| Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | Frontera | ms |
+|---|---|---|---|---|---|---|---|---|---|
+| Agente CSP (orden + FC + poda) | 2/6 | -2.230 | 0.000 | 25.0 % | 2.44 | 34310 | 7 | 0 | 0.2 |
+| Backtracking puro | 2/6 | -2.230 | 0.000 | 25.0 % | 2.44 | 34310 | 9 | 0 | 0.2 |
+| Backtracking + FC | 2/6 | -2.230 | 0.000 | 25.0 % | 2.44 | 34310 | 9 | 0 | 0.2 |
+| Backtracking + FC + orden | 2/6 | -2.230 | 0.000 | 25.0 % | 2.44 | 34310 | 9 | 0 | 0.2 |
+| Backtracking + FC + poda + LCV | 2/6 | -2.230 | 0.000 | 25.0 % | 2.44 | 34310 | 9 | 0 | 0.3 |
+| A* | 2/6 | -2.230 | 0.000 | 25.0 % | 2.44 | 34310 | 5 | 6 | 0.2 |
+| Recocido simulado | 2/6 | -2.230 | 0.000 | 25.0 % | 2.44 | 34310 | 1914 | 0 | 15.2 |
+| Voraz | 2/6 | -2.230 | 0.000 | 25.0 % | 2.44 | 34310 | 3 | 0 | 0.1 |
+
+### Varias cocinas (italiana y mexicana) (6 inventarios)
+
+| Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | Frontera | ms |
+|---|---|---|---|---|---|---|---|---|---|
+| Agente CSP (orden + FC + poda) | 4/6 | -2.047 | 0.000 | 62.5 % | 1.43 | 54028 | 12 | 0 | 0.6 |
+| Backtracking puro | 4/6 | -2.047 | 0.000 | 62.5 % | 1.43 | 54028 | 16 | 0 | 0.6 |
+| Backtracking + FC | 4/6 | -2.047 | 0.000 | 62.5 % | 1.43 | 54028 | 16 | 0 | 0.6 |
+| Backtracking + FC + orden | 4/6 | -2.047 | 0.000 | 62.5 % | 1.43 | 54028 | 16 | 0 | 0.5 |
+| Backtracking + FC + poda + LCV | 4/6 | -2.047 | 0.000 | 62.5 % | 1.43 | 54028 | 13 | 0 | 1.1 |
+| A* | 4/6 | -2.047 | 0.000 | 62.5 % | 1.43 | 54028 | 6 | 11 | 0.7 |
+| Recocido simulado | 3/6 | -2.071 | 0.109 | 50.0 % | 1.60 | 54910 | 2420 | 0 | 23.5 |
+| Voraz | 4/6 | -2.052 | 0.005 | 62.5 % | 1.47 | 52535 | 2 | 0 | 0.3 |
+
+### Cocina asiática y vegetariano (6 inventarios)
 
 | Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | Frontera | ms |
 |---|---|---|---|---|---|---|---|---|---|

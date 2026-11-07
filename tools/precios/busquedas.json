@@ -774,5 +774,92 @@
    "deshidrat",
    "pizza"
   ]
+ },
+ "salsa-soya": {
+  "busqueda": "salsa soya",
+  "debe_empezar_con": [
+   "salsa"
+  ],
+  "excluir": [
+   "teriyaki",
+   "agridulce",
+   "ajo",
+   "bbq",
+   "negra"
+  ]
+ },
+ "jengibre": {
+  "busqueda": "jengibre",
+  "debe_empezar_con": [
+   "jengibre"
+  ],
+  "excluir": [
+   "polvo",
+   "bebida",
+   "te",
+   "galleta",
+   "encurtid",
+   "aroma"
+  ]
+ },
+ "aceite-oliva": {
+  "busqueda": "aceite de oliva",
+  "debe_empezar_con": [
+   "aceite"
+  ],
+  "excluir": [
+   "spray",
+   "aerosol",
+   "aceituna"
+  ]
+ },
+ "oregano": {
+  "busqueda": "oregano",
+  "debe_empezar_con": [
+   "oregano",
+   "orégano"
+  ],
+  "excluir": [
+   "salsa",
+   "aceite"
+  ]
+ },
+ "curry": {
+  "busqueda": "curry en polvo",
+  "debe_empezar_con": [
+   "curry"
+  ],
+  "excluir": [
+   "salsa",
+   "pasta",
+   "pollo"
+  ]
+ },
+ "aceitunas": {
+  "busqueda": "aceitunas",
+  "debe_empezar_con": [
+   "aceituna"
+  ],
+  "excluir": [
+   "pasta",
+   "rellena",
+   "aceite"
+  ]
+ },
+ "harina-trigo": {
+  "busqueda": "harina de trigo",
+  "debe_empezar_con": [
+   "harina"
+  ],
+  "excluir": [
+   "maiz",
+   "integral",
+   "arepa",
+   "hojaldre",
+   "pan de",
+   "almendra",
+   "avena",
+   "autoleudante"
+  ]
  }
 }

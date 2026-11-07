@@ -6,6 +6,7 @@ import com.smartfood.app.feature.recipes.domain.model.AiContext
 import com.smartfood.app.feature.recipes.domain.model.AiPlanOutcome
 import com.smartfood.app.feature.recipes.domain.model.PlanContext
 import com.smartfood.app.feature.recipes.domain.model.PlanResult
+import com.smartfood.app.feature.recipes.domain.model.RecipeCuisine
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,7 @@ class GeneratePlanUseCase @Inject constructor(
                 noSpicy = noSpicy,
                 diet = context.diet,
                 store = context.store,
+                cuisines = context.cuisines.mapTo(LinkedHashSet()) { RecipeCuisine.valueOf(it.name) },
             )
             when (val result = MealPlanner(ingredients).plan(recipes, context.pantry, planContext)) {
                 is PlanResult.Found -> AiPlanOutcome.Found(result.plan, PlanExplainer().explain(result.plan, context.pantry))

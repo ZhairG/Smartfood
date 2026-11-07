@@ -10,7 +10,7 @@ optimización (COP)**: no solo busca un plan válido, sino el de mayor utilidad.
 
 `U = 1,0·rescate − 0,3·(costo / 10.000) − 0,5·desperdicio`
 
-**Variables:** `D1`, `D2`, `D3`. **Dominio:** las 50 recetas que cumplen tiempo, picante, dieta y presupuesto.
+**Variables:** `D1`, `D2`, `D3`. **Dominio:** las 70 recetas que cumplen tiempo, picante, dieta, cocina y presupuesto.
 **Restricciones:** recetas distintas, inventario compartido, presupuesto total, máximo 3 ingredientes por comprar y dieta.
 
 | Lo que pidió el profesor | Dónde está |
@@ -205,3 +205,30 @@ empatan (3 de 6 inventarios con plan, en todos). Con COP 2.000 ninguno arma plan
 | ¿Es un simple filtro? | No: el voraz, que es lo más parecido a filtrar, queda lejos del óptimo en casi todos los perfiles. |
 | ¿Y con otros usuarios? | 9 perfiles: dietas, alergias, poco presupuesto o tiempo, inventario enorme, nada por vencer y sin plan. |
 | ¿Dónde falla? | Con inventarios enormes supera 2 s en un portátil modesto (punto 6). |
+
+## 8. Cocina Favorita y 70 recetas (2026-11-06)
+
+**Qué cambió:** el catálogo pasó de 50 a 70 recetas y el agente ahora respeta la Cocina Favorita del Perfil.
+
+- **Es una restricción dura de una sola receta:** va en la consistencia de nodo, igual que la dieta. Por eso no cambia la función
+  de utilidad, la cota ni su admisibilidad. Solo se reduce el dominio.
+- **Reglas:** sin cocinas elegidas no filtra; con varias, sirve cualquiera; la dieta siempre manda.
+- **Si no hay plan:** el agente comprueba con la misma búsqueda si quitando la cocina lo habría, y solo entonces sugiere "Quita tu
+  cocina favorita en el Perfil".
+- **Resultados:** 88,9 % de aprovechamiento, sobre la meta del 80 % y por encima de las dos líneas base (85,0 % y 74,7 %).
+
+**Lo que no debes prometer:**
+
+- Que cada cocina siempre da plan. Con 6 inventarios sintéticos: Italiana 3, Mediterránea 2, Asiática 1, Mexicana 1 y Asiática con
+  vegetariano 0. La causa es que hay pocas recetas por cocina y máximo 3 ingredientes por comprar. Zhair decidió mantenerlo.
+- Que el agente cumple 2 s en todos los casos. Con el inventario enorme promedió **8,3 s** en el portátil, y ese caso **no se midió
+  en el teléfono**. Con inventarios normales, el peor plan tardó 537 ms.
+- Que el 88,9 % empeora por las recetas nuevas. No se compara directo con el 97,2 % anterior, porque también cambiaron los
+  inventarios sintéticos.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿La cocina cambia la heurística? | No. Reduce el dominio antes de buscar; la cota sigue siendo admisible. |
+| ¿Por qué dura y no blanda? | Es más fácil de explicar, no cambia los pesos justificados y nunca rompe lo que pidió la persona. |
+| ¿Por qué hay recetas tan sencillas? | Porque con más de 3 faltantes una receta no entra al plan con una despensa típica. |
+| ¿Qué pasa si elijo una cocina y soy vegano? | Se aplican las dos. Si no hay plan, nunca se sugiere quitar la dieta. |

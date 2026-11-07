@@ -2,6 +2,7 @@ package com.smartfood.app.feature.recipes.data.catalog
 
 import com.smartfood.app.feature.recipes.domain.model.FoodTag
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
+import com.smartfood.app.feature.recipes.domain.model.RecipeCuisine
 import com.smartfood.app.feature.recipes.domain.model.Store
 import com.smartfood.app.feature.recipes.domain.model.StorePrice
 import kotlinx.coroutines.test.runTest
@@ -46,6 +47,34 @@ class AssetsRecipeCatalogTest {
         assertEquals(listOf("Corta el pollo en presas"), recipe.beforeStarting)
         assertEquals("Dora el pollo", recipe.steps.first().title)
         assertEquals(8, recipe.steps.first().minutes)
+    }
+
+    @Test
+    fun `CA-COC-01-02 la cocina del JSON llega a la receta`() = runTest {
+        assertEquals(RecipeCuisine.ITALIAN, catalog().recipes().single().cuisine)
+    }
+
+    @Test
+    fun `CA-COC-01-02 una cocina desconocida falla con IllegalArgumentException`() = runTest {
+        val catalog = AssetsRecipeCatalog(
+            FakeRecipeAssetSource(recetas = RECETAS.replace("\"italiana\"", "\"marciana\"")),
+            json,
+        )
+
+        val error = runCatching { catalog.recipes() }.exceptionOrNull()
+
+        assertTrue("Se esperaba IllegalArgumentException y fue $error", error is IllegalArgumentException)
+        assertTrue(error!!.message!!.contains("marciana"))
+    }
+
+    @Test
+    fun `CA-COC-01-02 una receta sin cocina no carga`() = runTest {
+        val catalog = AssetsRecipeCatalog(
+            FakeRecipeAssetSource(recetas = RECETAS.replace("\"cocina\": \"italiana\",", "")),
+            json,
+        )
+
+        assertTrue(runCatching { catalog.recipes() }.isFailure)
     }
 
     @Test
@@ -166,6 +195,7 @@ class AssetsRecipeCatalogTest {
                 "id": "pollo-guisado",
                 "nombre": "Pollo guisado",
                 "foto": "receta_pollo_guisado",
+                "cocina": "italiana",
                 "porciones": 4,
                 "prepMin": 15,
                 "coccionMin": 25,

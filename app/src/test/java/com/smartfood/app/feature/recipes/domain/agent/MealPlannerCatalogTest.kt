@@ -4,6 +4,7 @@ import com.smartfood.app.feature.recipes.domain.model.DietRule
 import com.smartfood.app.feature.recipes.domain.model.PantryItem
 import com.smartfood.app.feature.recipes.domain.model.PlanContext
 import com.smartfood.app.feature.recipes.domain.model.PlanResult
+import com.smartfood.app.feature.recipes.domain.model.RecipeCuisine
 import com.smartfood.app.feature.recipes.domain.model.Store
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -44,6 +45,20 @@ class MealPlannerCatalogTest {
                 assertTrue("$diet: ${day.recipe.id} no cumple la dieta", planner.fitsDiet(day.recipe, context(diet)))
             }
             assertTrue("$diet: el plan supera el presupuesto", plan.totalCostCop <= 100_000)
+        }
+    }
+
+    @Test
+    fun `CA-COC-02-02 con el catálogo real cada cocina tiene plan y todas sus recetas son de ella`() {
+        val planner = MealPlanner(RealCatalog.ingredients)
+
+        RecipeCuisine.entries.forEach { cocina ->
+            val contexto = context(emptySet()).copy(cuisines = setOf(cocina))
+            val result = planner.plan(RealCatalog.recipes, despensa, contexto)
+            assertTrue("Sin plan con la cocina $cocina: $result", result is PlanResult.Found)
+            (result as PlanResult.Found).plan.days.forEach {
+                assertEquals("$cocina: ${it.recipe.id}", cocina, it.recipe.cuisine)
+            }
         }
     }
 }
