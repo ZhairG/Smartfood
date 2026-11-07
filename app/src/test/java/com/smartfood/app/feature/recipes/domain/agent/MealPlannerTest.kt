@@ -9,6 +9,7 @@ import com.smartfood.app.feature.recipes.domain.model.PlanResult
 import com.smartfood.app.feature.recipes.domain.model.PlanSuggestion
 import com.smartfood.app.feature.recipes.domain.model.PlannerWeights
 import com.smartfood.app.feature.recipes.domain.model.Recipe
+import com.smartfood.app.feature.recipes.domain.model.RecipeCuisine
 import com.smartfood.app.feature.recipes.domain.model.Store
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -22,7 +23,7 @@ import org.junit.Test
  * Fecha: Octubre 2026
  * Descripción: Pruebas unitarias del agente [MealPlanner] (spec 009 §2, plan §3.4, T011): cada restricción del CSP, la
  * optimalidad del plan contra una búsqueda exhaustiva (fuerza bruta) en catálogos aleatorios con semilla fija, el
- * determinismo, las sugerencias cuando no hay plan y las restricciones alimentarias (T012a).
+ * determinismo, las sugerencias cuando no hay plan, las restricciones alimentarias (T012a) y la Cocina Favorita (spec 011).
  */
 class MealPlannerTest {
 
@@ -60,6 +61,19 @@ class MealPlannerTest {
     ) = PlanContext(budgetCop = budget, servings = 4, maxMinutes = maxMinutes, noSpicy = noSpicy, diet = diet)
 
     private fun found(result: PlanResult): MealPlan = (result as PlanResult.Found).plan
+
+    private val conCocinas = catalogo.map { receta ->
+        receta.copy(
+            cuisine = when (receta.id) {
+                "arroz-pollo" -> RecipeCuisine.ASIAN
+                "pollo-picante" -> RecipeCuisine.MEXICAN
+                else -> RecipeCuisine.ITALIAN
+            }
+        )
+    }
+
+    private fun ctxCocinas(vararg cocinas: RecipeCuisine, diet: Set<DietRule> = emptySet()) =
+        ctx(diet = diet).copy(cuisines = cocinas.toSet())
 
     @Test
     fun `CA-RIA-02-03 CA-RIA-02-05 el plan tiene 3 recetas distintas que cumplen tiempo, picante, faltantes y presupuesto`() {
@@ -243,6 +257,85 @@ class MealPlannerTest {
         assertEquals(listOf(PlanSuggestion.NotEnoughRecipes), (resultado as PlanResult.NoPlan).suggestions)
     }
 
+    @Test
+    fun `CA-COC-02-01 RNF-COC-01 sin cocinas elegidas la cocina de las recetas no cambia el plan`() {
+        val sinCocinas = found(planner.plan(catalogo, despensa, ctx()))
+        val conCatalogoClasificado = found(planner.plan(conCocinas, despensa, ctx()))
+
+        assertEquals(sinCocinas.days.map { it.recipe.id }, conCatalogoClasificado.days.map { it.recipe.id })
+        assertEquals(sinCocinas.utility, conCatalogoClasificado.utility, 1e-9)
+    }
+
+    @Test
+    fun `CA-COC-02-02 con una cocina todas las recetas del plan son de esa cocina`() {
+        val plan = found(planner.plan(conCocinas, despensa, ctxCocinas(RecipeCuisine.ITALIAN)))
+
+        assertEquals(setOf(RecipeCuisine.ITALIAN), plan.days.map { it.recipe.cuisine }.toSet())
+    }
+
+    @Test
+    fun `CA-COC-02-03 con varias cocinas cada receta es de cualquiera de ellas`() {
+        val plan = found(planner.plan(conCocinas, despensa, ctxCocinas(RecipeCuisine.ITALIAN, RecipeCuisine.ASIAN)))
+
+        assertTrue(plan.days.all { it.recipe.cuisine in setOf(RecipeCuisine.ITALIAN, RecipeCuisine.ASIAN) })
+        assertTrue("usa el pollo que vence con la receta asiática", plan.days.any { it.recipe.id == "arroz-pollo" })
+    }
+
+    @Test
+    fun `CA-COC-02-04 el plan cumple la cocina y la dieta a la vez`() {
+        val contexto = ctxCocinas(RecipeCuisine.ITALIAN, RecipeCuisine.ASIAN, diet = setOf(DietRule.VEGETARIAN))
+
+        val plan = found(planner.plan(conCocinas, despensa, contexto))
+
+        plan.days.forEach {
+            assertEquals(RecipeCuisine.ITALIAN, it.recipe.cuisine)
+            assertTrue(planner.fitsDiet(it.recipe, contexto))
+        }
+    }
+
+    @Test
+    fun `CA-COC-02-05 con cocinas el plan es el de mayor utilidad comparado contra la fuerza bruta`() {
+        val cocinas = RecipeCuisine.entries
+        var withPlan = 0
+        repeat(30) { seed ->
+            val base = randomScenario(seed, recipeCount = 8 + seed % 5)
+            val recetas = base.recipes.mapIndexed { i, receta -> receta.copy(cuisine = cocinas[i % 3]) }
+            val s = RandomScenario(base.ingredients, recetas, base.pantry)
+            val context = PlanContext(
+                budgetCop = 150_000,
+                servings = 4,
+                cuisines = setOf(cocinas[seed % 3], cocinas[(seed + 1) % 3]),
+            )
+            val expected = bruteForce(s, context)
+            val actual = MealPlanner(s.ingredients).search(s.recipes, s.pantry, context)
+
+            if (expected == null) {
+                assertNull("semilla $seed: no debería haber plan", actual)
+            } else {
+                withPlan++
+                assertEquals("semilla $seed: utilidad", expected.first, actual!!.utility, 1e-9)
+                assertEquals("semilla $seed: plan", expected.second, actual.days.map { it.recipe.id })
+            }
+        }
+        assertTrue("escenarios con plan: $withPlan de 30", withPlan >= 15)
+    }
+
+    @Test
+    fun `CA-COC-03-02 sin plan por la cocina sugiere quitarla`() {
+        val resultado = planner.plan(conCocinas, despensa, ctxCocinas(RecipeCuisine.MEXICAN))
+
+        assertTrue(PlanSuggestion.RemoveCuisine in (resultado as PlanResult.NoPlan).suggestions)
+    }
+
+    @Test
+    fun `CA-COC-03-03 no sugiere quitar la cocina si eso no arregla el plan o no hay cocinas`() {
+        val vegano = ctxCocinas(RecipeCuisine.MEXICAN, diet = setOf(DietRule.VEGAN))
+        val sinCocinas = ctx(budget = 1_000_000, diet = setOf(DietRule.VEGAN))
+
+        assertFalse(PlanSuggestion.RemoveCuisine in (planner.plan(conCocinas, despensa, vegano) as PlanResult.NoPlan).suggestions)
+        assertFalse(PlanSuggestion.RemoveCuisine in (planner.plan(conCocinas, despensa, sinCocinas) as PlanResult.NoPlan).suggestions)
+    }
+
     /**
      * Búsqueda exhaustiva: prueba todas las secuencias de recetas distintas, simulando el inventario y el presupuesto
      * día a día con el mismo evaluador. Devuelve la utilidad máxima y sus ids (desempate por ids menores).
@@ -265,6 +358,7 @@ class MealPlannerTest {
                 if (seq.any { it.id == r.id }) continue
                 if (context.maxMinutes != null && r.totalMinutes > context.maxMinutes) continue
                 if (context.noSpicy && r.spicy) continue
+                if (context.cuisines.isNotEmpty() && r.cuisine !in context.cuisines) continue
                 val forbidden = context.diet.flatMap { it.forbidden }
                 if (r.ingredients.any { ri -> scenario.ingredients.getValue(ri.ingredientId).tags.any { it in forbidden } }) continue
                 val e = evaluator.evaluate(r, context.servings, seq.size + 1, stock, context.store)

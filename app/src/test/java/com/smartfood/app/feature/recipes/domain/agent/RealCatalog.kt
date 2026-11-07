@@ -7,6 +7,7 @@ import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.PantryItem
 import com.smartfood.app.feature.recipes.domain.model.PlanContext
 import com.smartfood.app.feature.recipes.domain.model.Recipe
+import com.smartfood.app.feature.recipes.domain.model.RecipeCuisine
 import com.smartfood.app.feature.recipes.domain.model.Store
 import java.io.File
 import kotlin.math.round
@@ -100,6 +101,20 @@ internal object RealCatalog {
             EvaluationProfile("Inventario enorme", base, largeInventories(count, seed)),
             EvaluationProfile("Nada por vencer", base, normal.map { pantry -> pantry.map { it.copy(daysToExpire = it.daysToExpire + 10) } }),
             EvaluationProfile("Sin plan posible (COP 2.000)", base.copy(budgetCop = 2_000), normal),
+            EvaluationProfile("Cocina italiana", base.copy(cuisines = setOf(RecipeCuisine.ITALIAN)), normal),
+            EvaluationProfile("Cocina asiática", base.copy(cuisines = setOf(RecipeCuisine.ASIAN)), normal),
+            EvaluationProfile("Cocina mexicana", base.copy(cuisines = setOf(RecipeCuisine.MEXICAN)), normal),
+            EvaluationProfile("Cocina mediterránea", base.copy(cuisines = setOf(RecipeCuisine.MEDITERRANEAN)), normal),
+            EvaluationProfile(
+                "Varias cocinas (italiana y mexicana)",
+                base.copy(cuisines = setOf(RecipeCuisine.ITALIAN, RecipeCuisine.MEXICAN)),
+                normal,
+            ),
+            EvaluationProfile(
+                "Cocina asiática y vegetariano",
+                base.copy(cuisines = setOf(RecipeCuisine.ASIAN), diet = setOf(DietRule.VEGETARIAN)),
+                normal,
+            ),
         )
     }
 

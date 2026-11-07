@@ -56,6 +56,10 @@ class MealPlanner(
         return recipe.ingredients.none { ri -> ingredients[ri.ingredientId]?.tags.orEmpty().any { it in forbidden } }
     }
 
+    /** `true` si no hay cocinas elegidas o [recipe] es de alguna de ellas (spec 011, RF-COC-02). */
+    fun fitsCuisine(recipe: Recipe, context: PlanContext): Boolean =
+        context.cuisines.isEmpty() || recipe.cuisine in context.cuisines
+
     /** El plan de mayor utilidad que cumple todas las restricciones, o `null` si no existe. */
     fun search(recipes: List<Recipe>, pantry: List<PantryItem>, context: PlanContext): MealPlan? {
         val full = PantryStock.of(pantry)
@@ -65,6 +69,7 @@ class MealPlanner(
             .filter { context.maxMinutes == null || it.totalMinutes <= context.maxMinutes }
             .filter { !(context.noSpicy && it.spicy) }
             .filter { fitsDiet(it, context) }
+            .filter { fitsCuisine(it, context) }
             .filter {
                 evaluator.evaluate(it, context.servings, day = 1, stock = full, store = context.store).costCop <= context.budgetCop
             }
@@ -166,7 +171,8 @@ class MealPlanner(
 
     /**
      * Qué cambiar para que exista un plan (CA-RIA-02-07): el presupuesto mínimo (el plan más barato, buscado con la
-     * misma búsqueda y pesos que solo miran el costo), quitar "Sin picante" o subir el tiempo máximo.
+     * misma búsqueda y pesos que solo miran el costo), quitar "Sin picante", subir el tiempo máximo o quitar las cocinas
+     * favoritas (spec 011, CA-COC-03-02). Nunca propone quitar la dieta.
      */
     private fun suggestions(recipes: List<Recipe>, pantry: List<PantryItem>, context: PlanContext): List<PlanSuggestion> {
         val cheapest = MealPlanner(ingredients, CHEAPEST)
@@ -178,6 +184,9 @@ class MealPlanner(
             search(recipes, pantry, context.copy(maxMinutes = null))?.let { plan ->
                 out += PlanSuggestion.AllowMoreTime(plan.days.maxOf { it.recipe.totalMinutes })
             }
+        }
+        if (context.cuisines.isNotEmpty() && search(recipes, pantry, context.copy(cuisines = emptySet())) != null) {
+            out += PlanSuggestion.RemoveCuisine
         }
         return out.ifEmpty { listOf(PlanSuggestion.NotEnoughRecipes) }
     }

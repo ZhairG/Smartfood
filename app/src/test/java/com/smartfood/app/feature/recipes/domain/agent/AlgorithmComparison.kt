@@ -43,6 +43,7 @@ internal class PlanSearchProblem(
         .filter { context.maxMinutes == null || it.totalMinutes <= context.maxMinutes }
         .filter { !(context.noSpicy && it.spicy) }
         .filter { planner.fitsDiet(it, context) }
+        .filter { planner.fitsCuisine(it, context) }
         .filter { evaluate(it, day = 1, start).costCop <= context.budgetCop }
         .sortedBy { it.id }
 

@@ -15,6 +15,7 @@ El proyecto sigue Spec Driven Development: ninguna funcionalidad se programa sin
 | 008 Perfil                          | [`specs/008-perfil`](../specs/008-perfil/spec.md) | ✅ Implementado |
 | 009 Recetas + IA                    | [`specs/009-recetas-ia`](../specs/009-recetas-ia/spec.md) | ✅ Implementado (agente CSP de plan de 3 días; [evaluación](ia/evaluacion-agente.md)) |
 | 010 Recetas guardadas               | [`specs/010-recetas-guardadas`](../specs/010-recetas-guardadas/spec.md) | Implementada (#117, #130 y #131) |
+| 011 Cocinas del mundo               | [`specs/011-cocinas-del-mundo`](../specs/011-cocinas-del-mundo/spec.md) | ✅ Implementada (70 recetas y Cocina Favorita en el agente) |
 
 ## Metodología: Spec Driven Development
 

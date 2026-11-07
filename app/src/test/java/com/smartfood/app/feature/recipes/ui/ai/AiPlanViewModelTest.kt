@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.recipes.ui.ai
 
+import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.recipes.domain.agent.MealPlanner
@@ -49,6 +50,16 @@ class AiPlanViewModelTest {
         assertEquals(setOf(DietaryRestriction.VEGETARIAN), state.restrictions)
         assertEquals(AiUiState.DEFAULT_BUDGET_COP, state.budgetCop)
         assertNull("El tiempo arranca en Sin límite", state.maxMinutes)
+    }
+
+    @Test
+    fun `CA-COC-03-01 carga las cocinas favoritas para mostrarlas`() = runTest {
+        val fixtures = AiFixtures()
+        fixtures.profile.preferences = FoodPreferences(cuisines = setOf(Cuisine.MEXICAN))
+
+        val state = viewModel(fixtures).uiState.first { !it.isLoadingContext }
+
+        assertEquals(setOf(Cuisine.MEXICAN), state.cuisines)
     }
 
     @Test

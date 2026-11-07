@@ -10,7 +10,7 @@ import org.junit.Test
  * Nombre: MealPlannerPerformanceTest.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Rendimiento del agente (spec 009, CA-RIA-02-10, RNF-RIA-02, T013): con las 50 recetas del catálogo real,
+ * Descripción: Rendimiento del agente (spec 009, CA-RIA-02-10, RNF-RIA-02, T013): con las 70 recetas del catálogo real,
  * el plan de cada uno de los 30 inventarios sintéticos se calcula en 2 segundos o menos. En la JVM es orientativo; la
  * medición real se hace en el teléfono con el APK release (T028).
  */
@@ -20,10 +20,10 @@ class MealPlannerPerformanceTest {
     private val context = PlanContext(budgetCop = 100_000, servings = 4, store = Store.D1)
 
     @Test
-    fun `CA-RIA-02-10 RNF-RIA-02 con 50 recetas cada plan se calcula en 2 segundos o menos`() {
+    fun `CA-RIA-02-10 RNF-RIA-02 RNF-COC-02 con 70 recetas cada plan se calcula en 2 segundos o menos`() {
         val recipes = RealCatalog.recipes
         val inventories = RealCatalog.syntheticInventories()
-        assertEquals(50, recipes.size)
+        assertEquals(70, recipes.size)
         planner.plan(recipes, inventories.first(), context) // Calentamiento de la JVM.
 
         val millis = inventories.map { pantry ->

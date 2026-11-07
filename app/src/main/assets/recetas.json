@@ -3,6 +3,7 @@
     "id": "arroz-con-pollo",
     "nombre": "Arroz con pollo",
     "foto": "receta_arroz_con_pollo",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 35,
@@ -37,6 +38,7 @@
     "id": "pollo-guisado",
     "nombre": "Pollo guisado con arroz",
     "foto": "receta_pollo_guisado",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 25,
@@ -71,6 +73,7 @@
     "id": "sudado-de-pollo",
     "nombre": "Sudado de pollo",
     "foto": "receta_sudado_de_pollo",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 30,
@@ -104,6 +107,7 @@
     "id": "pechuga-plancha",
     "nombre": "Pechuga a la plancha con ensalada",
     "foto": "receta_pechuga_plancha",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 10,
     "coccionMin": 15,
@@ -135,6 +139,7 @@
     "id": "lentejas-guisadas",
     "nombre": "Lentejas guisadas",
     "foto": "receta_lentejas_guisadas",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 35,
@@ -167,6 +172,7 @@
     "id": "frijoles-guisados",
     "nombre": "Fríjoles guisados",
     "foto": "receta_frijoles_guisados",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 40,
@@ -199,6 +205,7 @@
     "id": "garbanzos-guisados",
     "nombre": "Garbanzos guisados",
     "foto": "receta_garbanzos_guisados",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 35,
@@ -231,6 +238,7 @@
     "id": "arroz-con-huevo",
     "nombre": "Arroz con huevo",
     "foto": "receta_arroz_con_huevo",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 5,
     "coccionMin": 15,
@@ -259,6 +267,7 @@
     "id": "huevos-pericos",
     "nombre": "Huevos pericos",
     "foto": "receta_huevos_pericos",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 5,
     "coccionMin": 10,
@@ -287,6 +296,7 @@
     "id": "tortilla-de-verduras",
     "nombre": "Tortilla de verduras",
     "foto": "receta_tortilla_de_verduras",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 10,
     "coccionMin": 15,
@@ -317,6 +327,7 @@
     "id": "arepas-con-queso",
     "nombre": "Arepas con queso",
     "foto": "receta_arepas_con_queso",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 20,
@@ -345,6 +356,7 @@
     "id": "arepas-rellenas",
     "nombre": "Arepas rellenas de carne",
     "foto": "receta_arepas_rellenas",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 20,
     "coccionMin": 25,
@@ -378,6 +390,7 @@
     "id": "bistec-con-papas",
     "nombre": "Bistec con papas",
     "foto": "receta_bistec_con_papas",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 10,
     "coccionMin": 20,
@@ -409,6 +422,7 @@
     "id": "carne-molida-con-arroz",
     "nombre": "Carne molida con arroz",
     "foto": "receta_carne_molida_con_arroz",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 25,
@@ -442,6 +456,7 @@
     "id": "espagueti-con-carne",
     "nombre": "Espagueti con carne",
     "foto": "receta_espagueti_con_carne",
+    "cocina": "italiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 25,
@@ -474,6 +489,7 @@
     "id": "pasta-con-tomate",
     "nombre": "Pasta con tomate y albahaca",
     "foto": "receta_pasta_con_tomate",
+    "cocina": "italiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 20,
@@ -504,6 +520,7 @@
     "id": "macarrones-con-queso",
     "nombre": "Macarrones con queso",
     "foto": "receta_macarrones_con_queso",
+    "cocina": "italiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 20,
@@ -533,6 +550,7 @@
     "id": "sopa-de-verduras",
     "nombre": "Sopa de verduras",
     "foto": "receta_sopa_de_verduras",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 30,
@@ -565,6 +583,7 @@
     "id": "sopa-de-pollo",
     "nombre": "Sopa de pollo",
     "foto": "receta_sopa_de_pollo",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 35,
@@ -596,6 +615,7 @@
     "id": "ajiaco-sencillo",
     "nombre": "Ajiaco sencillo",
     "foto": "receta_ajiaco_sencillo",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 20,
     "coccionMin": 40,
@@ -627,6 +647,7 @@
     "id": "sancocho-de-pollo",
     "nombre": "Sancocho de pollo",
     "foto": "receta_sancocho_de_pollo",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 20,
     "coccionMin": 45,
@@ -660,6 +681,7 @@
     "id": "pescado-con-patacon",
     "nombre": "Pescado con patacón",
     "foto": "receta_pescado_con_patacon",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 15,
     "coccionMin": 20,
@@ -689,6 +711,7 @@
     "id": "arroz-con-atun",
     "nombre": "Arroz con atún",
     "foto": "receta_arroz_con_atun",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 5,
     "coccionMin": 15,
@@ -718,6 +741,7 @@
     "id": "ensalada-de-atun",
     "nombre": "Ensalada de atún",
     "foto": "receta_ensalada_de_atun",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 10,
     "coccionMin": 0,
@@ -748,6 +772,7 @@
     "id": "ensalada-de-pollo",
     "nombre": "Ensalada de pollo",
     "foto": "receta_ensalada_de_pollo",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 10,
     "coccionMin": 15,
@@ -778,6 +803,7 @@
     "id": "wrap-de-pollo",
     "nombre": "Wrap de pollo",
     "foto": "receta_wrap_de_pollo",
+    "cocina": "mexicana",
     "porciones": 2,
     "prepMin": 10,
     "coccionMin": 15,
@@ -809,6 +835,7 @@
     "id": "tostadas-con-aguacate",
     "nombre": "Tostadas con aguacate y huevo",
     "foto": "receta_tostadas_con_aguacate",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 5,
     "coccionMin": 10,
@@ -839,6 +866,7 @@
     "id": "avena-con-frutas",
     "nombre": "Avena con frutas",
     "foto": "receta_avena_con_frutas",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 5,
     "coccionMin": 10,
@@ -868,6 +896,7 @@
     "id": "batido-de-banano",
     "nombre": "Batido de banano y avena",
     "foto": "receta_batido_de_banano",
+    "cocina": "colombiana",
     "porciones": 2,
     "prepMin": 5,
     "coccionMin": 0,
@@ -895,6 +924,7 @@
     "id": "pollo-picante",
     "nombre": "Pollo picante con arroz",
     "foto": "receta_pollo_picante",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 25,
@@ -927,6 +957,7 @@
     "id": "arepas-con-hogao",
     "nombre": "Arepas con hogao",
     "foto": "receta_arepas_con_hogao",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 20,
@@ -956,6 +987,7 @@
     "id": "patacones-con-hogao",
     "nombre": "Patacones con hogao",
     "foto": "receta_patacones_con_hogao",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 25,
@@ -986,6 +1018,7 @@
     "id": "crema-de-ahuyama",
     "nombre": "Crema de ahuyama",
     "foto": "receta_crema_de_ahuyama",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 25,
@@ -1016,6 +1049,7 @@
     "id": "arroz-con-verduras",
     "nombre": "Arroz con verduras",
     "foto": "receta_arroz_con_verduras",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 25,
@@ -1048,6 +1082,7 @@
     "id": "ensalada-de-aguacate",
     "nombre": "Ensalada de aguacate y tomate",
     "foto": "receta_ensalada_de_aguacate",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 0,
@@ -1078,6 +1113,7 @@
     "id": "champinones-con-arroz",
     "nombre": "Champiñones salteados con arroz",
     "foto": "receta_champinones_con_arroz",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 25,
@@ -1108,6 +1144,7 @@
     "id": "sopa-de-arveja",
     "nombre": "Sopa de arveja",
     "foto": "receta_sopa_de_arveja",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 35,
@@ -1139,6 +1176,7 @@
     "id": "calentado-con-huevo",
     "nombre": "Calentado con huevo",
     "foto": "receta_calentado_con_huevo",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 15,
@@ -1169,6 +1207,7 @@
     "id": "arepa-de-choclo",
     "nombre": "Arepas de choclo con queso",
     "foto": "receta_arepa_de_choclo",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 15,
@@ -1198,6 +1237,7 @@
     "id": "huevos-rancheros",
     "nombre": "Huevos rancheros",
     "foto": "receta_huevos_rancheros",
+    "cocina": "mexicana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 15,
@@ -1229,6 +1269,7 @@
     "id": "tortilla-de-papa",
     "nombre": "Tortilla de papa",
     "foto": "receta_tortilla_de_papa",
+    "cocina": "mediterranea",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 25,
@@ -1257,6 +1298,7 @@
     "id": "changua",
     "nombre": "Changua",
     "foto": "receta_changua",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 5,
     "coccionMin": 15,
@@ -1286,6 +1328,7 @@
     "id": "pasta-con-champinones",
     "nombre": "Pasta con champiñones y queso",
     "foto": "receta_pasta_con_champinones",
+    "cocina": "italiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 15,
@@ -1317,6 +1360,7 @@
     "id": "arroz-con-queso-y-maduro",
     "nombre": "Arroz con queso y maduro",
     "foto": "receta_arroz_con_queso_y_maduro",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 25,
@@ -1346,6 +1390,7 @@
     "id": "albondigas-en-salsa",
     "nombre": "Albóndigas en salsa",
     "foto": "receta_albondigas_en_salsa",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 20,
     "coccionMin": 25,
@@ -1378,6 +1423,7 @@
     "id": "pollo-al-horno-con-papas",
     "nombre": "Pollo al horno con papas",
     "foto": "receta_pollo_al_horno_con_papas",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 50,
@@ -1409,6 +1455,7 @@
     "id": "carne-desmechada",
     "nombre": "Carne desmechada",
     "foto": "receta_carne_desmechada",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 60,
@@ -1441,6 +1488,7 @@
     "id": "pescado-al-ajillo",
     "nombre": "Pescado al ajillo",
     "foto": "receta_pescado_al_ajillo",
+    "cocina": "mediterranea",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 15,
@@ -1471,6 +1519,7 @@
     "id": "arroz-atollado",
     "nombre": "Arroz atollado de pollo",
     "foto": "receta_arroz_atollado",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 15,
     "coccionMin": 35,
@@ -1504,6 +1553,7 @@
     "id": "sopa-de-pasta-con-pollo",
     "nombre": "Sopa de pasta con pollo",
     "foto": "receta_sopa_de_pasta_con_pollo",
+    "cocina": "colombiana",
     "porciones": 4,
     "prepMin": 10,
     "coccionMin": 30,
@@ -1529,6 +1579,667 @@
       { "titulo": "Haz el caldo", "texto": "Cocina el pollo en agua con la cebolla larga, el ajo y sal.", "minutos": 15 },
       { "titulo": "Agrega las verduras", "texto": "Saca el pollo, desmenúzalo y agrega al caldo la papa y la zanahoria.", "minutos": 8 },
       { "titulo": "Agrega la pasta", "texto": "Incorpora la pasta y el pollo y cocina hasta que la pasta esté blanda; termina con cilantro.", "minutos": 8 }
+    ]
+  },
+  {
+    "id": "minestrone",
+    "nombre": "Minestrone",
+    "foto": "receta_minestrone",
+    "cocina": "italiana",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 60,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 380,
+    "ingredientes": [
+      { "id": "frijoles", "cantidad": 200 },
+      { "id": "pasta", "cantidad": 200 },
+      { "id": "tomate", "cantidad": 300 },
+      { "id": "zanahoria", "cantidad": 150 },
+      { "id": "calabacin", "cantidad": 200 },
+      { "id": "cebolla", "cantidad": 120 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite-oliva", "cantidad": 30 },
+      { "id": "oregano", "cantidad": 3 },
+      { "id": "sal", "cantidad": 6 },
+      { "id": "pimienta", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Remoja los fríjoles desde la noche anterior",
+      "Pica el tomate, la zanahoria, el calabacín, la cebolla y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Sofríe las verduras", "texto": "Calienta el aceite de oliva en una olla y sofríe la cebolla, el ajo y la zanahoria.", "minutos": 8 },
+      { "titulo": "Cocina los fríjoles", "texto": "Agrega el tomate, los fríjoles escurridos, el orégano y 2 litros de agua; cocina tapado hasta que los fríjoles ablanden.", "minutos": 40 },
+      { "titulo": "Termina la sopa", "texto": "Añade la pasta y el calabacín, cocina hasta que la pasta esté al dente y ajusta la sal y la pimienta.", "minutos": 12 }
+    ]
+  },
+  {
+    "id": "pasta-al-pesto",
+    "nombre": "Pasta al pesto",
+    "foto": "receta_pasta_al_pesto",
+    "cocina": "italiana",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 12,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 620,
+    "ingredientes": [
+      { "id": "pasta", "cantidad": 400 },
+      { "id": "albahaca", "cantidad": 50 },
+      { "id": "almendras", "cantidad": 40 },
+      { "id": "queso", "cantidad": 80 },
+      { "id": "ajo", "cantidad": 6 },
+      { "id": "aceite-oliva", "cantidad": 80 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Pon agua a hervir con sal",
+      "Lava la albahaca y ralla el queso"
+    ],
+    "pasos": [
+      { "titulo": "Cocina la pasta", "texto": "Hierve la pasta hasta que quede al dente; guarda media taza del agua y escúrrela.", "minutos": 10 },
+      { "titulo": "Haz el pesto", "texto": "Licúa la albahaca, las almendras, el ajo, el queso y el aceite de oliva hasta tener una salsa espesa.", "minutos": 3 },
+      { "titulo": "Mezcla", "texto": "Revuelve la pasta con el pesto y un poco del agua de cocción hasta que quede cremosa.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "risotto-de-champinones",
+    "nombre": "Risotto de champiñones",
+    "foto": "receta_risotto_de_champinones",
+    "cocina": "italiana",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 30,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 540,
+    "ingredientes": [
+      { "id": "arroz", "cantidad": 320 },
+      { "id": "champinones", "cantidad": 300 },
+      { "id": "cebolla", "cantidad": 100 },
+      { "id": "ajo", "cantidad": 6 },
+      { "id": "mantequilla", "cantidad": 50 },
+      { "id": "queso", "cantidad": 100 },
+      { "id": "aceite-oliva", "cantidad": 15 },
+      { "id": "sal", "cantidad": 6 },
+      { "id": "pimienta", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Pon a calentar 1 litro de agua con sal",
+      "Limpia y tajea los champiñones; pica la cebolla y el ajo; ralla el queso"
+    ],
+    "pasos": [
+      { "titulo": "Dora los champiñones", "texto": "Calienta el aceite de oliva en una olla ancha, dora los champiñones y resérvalos.", "minutos": 6 },
+      { "titulo": "Tuesta el arroz", "texto": "En la mitad de la mantequilla, sofríe la cebolla y el ajo; agrega el arroz y revuelve 2 minutos.", "minutos": 5 },
+      { "titulo": "Agrega el agua poco a poco", "texto": "Añade el agua caliente de a un cucharón, revolviendo, hasta que el arroz quede cremoso y al dente.", "minutos": 18 },
+      { "titulo": "Termina", "texto": "Apaga el fuego; mezcla los champiñones, el queso, el resto de la mantequilla y la pimienta.", "minutos": 1 }
+    ]
+  },
+  {
+    "id": "noquis-con-tomate",
+    "nombre": "Ñoquis con tomate",
+    "foto": "receta_noquis_con_tomate",
+    "cocina": "italiana",
+    "porciones": 4,
+    "prepMin": 30,
+    "coccionMin": 30,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 520,
+    "ingredientes": [
+      { "id": "papa", "cantidad": 800 },
+      { "id": "harina-trigo", "cantidad": 200 },
+      { "id": "huevo", "cantidad": 2 },
+      { "id": "tomate", "cantidad": 500 },
+      { "id": "cebolla", "cantidad": 80 },
+      { "id": "ajo", "cantidad": 6 },
+      { "id": "aceite-oliva", "cantidad": 30 },
+      { "id": "albahaca", "cantidad": 10 },
+      { "id": "queso", "cantidad": 60 },
+      { "id": "sal", "cantidad": 6 }
+    ],
+    "antesDeEmpezar": [
+      "Pela la papa y pica el tomate, la cebolla y el ajo",
+      "Enharina la mesa y ralla el queso"
+    ],
+    "pasos": [
+      { "titulo": "Cocina la papa", "texto": "Hierve la papa en agua con sal hasta que ablande, escúrrela y hazla puré.", "minutos": 20 },
+      { "titulo": "Forma los ñoquis", "texto": "Mezcla el puré con el huevo y la harina de trigo, forma tiras y córtalas en trozos pequeños.", "minutos": 10 },
+      { "titulo": "Haz la salsa", "texto": "Sofríe la cebolla y el ajo en el aceite de oliva, agrega el tomate y la albahaca y cocina hasta que espese.", "minutos": 10 },
+      { "titulo": "Hierve y sirve", "texto": "Hierve los ñoquis hasta que floten, mézclalos con la salsa y sirve con el queso.", "minutos": 3 }
+    ]
+  },
+  {
+    "id": "ensalada-caprese",
+    "nombre": "Ensalada caprese",
+    "foto": "receta_ensalada_caprese",
+    "cocina": "italiana",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 0,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 310,
+    "ingredientes": [
+      { "id": "tomate", "cantidad": 600 },
+      { "id": "queso", "cantidad": 300 },
+      { "id": "albahaca", "cantidad": 25 },
+      { "id": "aceite-oliva", "cantidad": 40 },
+      { "id": "sal", "cantidad": 4 },
+      { "id": "pimienta", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Lava el tomate y la albahaca",
+      "Saca el queso de la nevera unos minutos antes"
+    ],
+    "pasos": [
+      { "titulo": "Corta", "texto": "Corta el tomate y el queso en rodajas del mismo grosor.", "minutos": 2 },
+      { "titulo": "Arma el plato", "texto": "Intercala las rodajas en un plato y pon las hojas de albahaca entre ellas.", "minutos": 2 },
+      { "titulo": "Aliña", "texto": "Rocía el aceite de oliva y termina con la sal y la pimienta.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "arroz-frito-con-pollo",
+    "nombre": "Arroz frito con pollo",
+    "foto": "receta_arroz_frito_con_pollo",
+    "cocina": "asiatica",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 30,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 560,
+    "ingredientes": [
+      { "id": "arroz", "cantidad": 320 },
+      { "id": "pollo", "cantidad": 320 },
+      { "id": "huevo", "cantidad": 2 },
+      { "id": "zanahoria", "cantidad": 120 },
+      { "id": "cebolla", "cantidad": 100 },
+      { "id": "salsa-soya", "cantidad": 45 },
+      { "id": "ajo", "cantidad": 6 },
+      { "id": "aceite", "cantidad": 25 },
+      { "id": "sal", "cantidad": 3 }
+    ],
+    "antesDeEmpezar": [
+      "Corta el pollo en cubos y pica la zanahoria, la cebolla y el ajo",
+      "Bate el huevo con una pizca de sal"
+    ],
+    "pasos": [
+      { "titulo": "Cocina el arroz", "texto": "Cocina el arroz con agua y sal hasta que quede suelto y déjalo enfriar destapado.", "minutos": 18 },
+      { "titulo": "Haz el huevo", "texto": "Calienta un poco de aceite en un wok o sartén grande, cuaja el huevo, córtalo y resérvalo.", "minutos": 2 },
+      { "titulo": "Saltea", "texto": "Saltea el pollo con el ajo; agrega la zanahoria y la cebolla y cocina a fuego alto.", "minutos": 7 },
+      { "titulo": "Une todo", "texto": "Agrega el arroz, el huevo y la salsa de soya; revuelve hasta que todo esté caliente.", "minutos": 3 }
+    ]
+  },
+  {
+    "id": "pollo-teriyaki",
+    "nombre": "Pollo teriyaki",
+    "foto": "receta_pollo_teriyaki",
+    "cocina": "asiatica",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 30,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 540,
+    "ingredientes": [
+      { "id": "pollo", "cantidad": 600 },
+      { "id": "salsa-soya", "cantidad": 80 },
+      { "id": "azucar", "cantidad": 30 },
+      { "id": "jengibre", "cantidad": 15 },
+      { "id": "ajo", "cantidad": 6 },
+      { "id": "arroz", "cantidad": 320 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 3 }
+    ],
+    "antesDeEmpezar": [
+      "Corta el pollo en trozos medianos",
+      "Ralla el jengibre y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Cocina el arroz", "texto": "Cocina el arroz con agua y sal hasta que quede suelto.", "minutos": 18 },
+      { "titulo": "Dora el pollo", "texto": "Calienta el aceite en una sartén y dora el pollo por todos lados.", "minutos": 8 },
+      { "titulo": "Glasea", "texto": "Mezcla la salsa de soya, el azúcar, el jengibre y el ajo; viértelo sobre el pollo y cocina hasta que espese.", "minutos": 4 },
+      { "titulo": "Sirve", "texto": "Sirve el pollo sobre el arroz con la salsa que quedó en la sartén.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "salteado-de-carne",
+    "nombre": "Salteado de carne",
+    "foto": "receta_salteado_de_carne",
+    "cocina": "asiatica",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 30,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 580,
+    "ingredientes": [
+      { "id": "carne", "cantidad": 500 },
+      { "id": "cebolla", "cantidad": 150 },
+      { "id": "zanahoria", "cantidad": 200 },
+      { "id": "salsa-soya", "cantidad": 50 },
+      { "id": "jengibre", "cantidad": 15 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "arroz", "cantidad": 320 },
+      { "id": "aceite", "cantidad": 25 },
+      { "id": "sal", "cantidad": 3 }
+    ],
+    "antesDeEmpezar": [
+      "Corta la carne en tiras delgadas",
+      "Corta la cebolla y la zanahoria en tiras; ralla el jengibre y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Cocina el arroz", "texto": "Cocina el arroz con agua y sal hasta que quede suelto.", "minutos": 18 },
+      { "titulo": "Sella la carne", "texto": "Calienta el aceite en un wok o sartén grande y sella la carne a fuego alto; resérvala.", "minutos": 4 },
+      { "titulo": "Saltea las verduras", "texto": "Saltea la cebolla y la zanahoria con el ajo y el jengibre; deben quedar crujientes.", "minutos": 5 },
+      { "titulo": "Une todo", "texto": "Devuelve la carne, agrega la salsa de soya y cocina hasta que brille; sirve con el arroz.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "fideos-salteados",
+    "nombre": "Fideos salteados",
+    "foto": "receta_fideos_salteados",
+    "cocina": "asiatica",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 15,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 480,
+    "ingredientes": [
+      { "id": "pasta", "cantidad": 400 },
+      { "id": "zanahoria", "cantidad": 250 },
+      { "id": "cebolla", "cantidad": 120 },
+      { "id": "salsa-soya", "cantidad": 60 },
+      { "id": "jengibre", "cantidad": 10 },
+      { "id": "ajo", "cantidad": 6 },
+      { "id": "aceite", "cantidad": 25 },
+      { "id": "sal", "cantidad": 4 }
+    ],
+    "antesDeEmpezar": [
+      "Corta la zanahoria y la cebolla en tiras",
+      "Ralla el jengibre y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Cocina los fideos", "texto": "Hierve la pasta en agua con sal hasta que quede al dente y escúrrela.", "minutos": 9 },
+      { "titulo": "Saltea las verduras", "texto": "Calienta el aceite en un wok o sartén grande y saltea el ajo, el jengibre, la zanahoria y la cebolla.", "minutos": 4 },
+      { "titulo": "Une todo", "texto": "Agrega los fideos y la salsa de soya; saltea hasta que todo se mezcle.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "curry-de-garbanzos",
+    "nombre": "Curry de garbanzos",
+    "foto": "receta_curry_de_garbanzos",
+    "cocina": "asiatica",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 65,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 530,
+    "ingredientes": [
+      { "id": "garbanzos", "cantidad": 400 },
+      { "id": "tomate", "cantidad": 300 },
+      { "id": "cebolla", "cantidad": 150 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "jengibre", "cantidad": 15 },
+      { "id": "curry", "cantidad": 12 },
+      { "id": "arroz", "cantidad": 320 },
+      { "id": "aceite", "cantidad": 25 },
+      { "id": "sal", "cantidad": 6 }
+    ],
+    "antesDeEmpezar": [
+      "Remoja los garbanzos desde la noche anterior",
+      "Pica el tomate y la cebolla; ralla el jengibre y el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Cocina los garbanzos", "texto": "Cocina los garbanzos escurridos en agua con sal hasta que ablanden.", "minutos": 40 },
+      { "titulo": "Haz la base", "texto": "Sofríe la cebolla en el aceite; agrega el ajo, el jengibre y el curry y revuelve 1 minuto; suma el tomate y cocina hasta que espese.", "minutos": 8 },
+      { "titulo": "Une y cocina", "texto": "Agrega los garbanzos con un poco de su agua y cocina a fuego bajo. Mientras tanto, cocina el arroz.", "minutos": 17 },
+      { "titulo": "Sirve", "texto": "Sirve el curry bien caliente con el arroz.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "tacos-de-carne",
+    "nombre": "Tacos de carne",
+    "foto": "receta_tacos_de_carne",
+    "cocina": "mexicana",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 15,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 520,
+    "ingredientes": [
+      { "id": "tortilla", "cantidad": 200 },
+      { "id": "carne", "cantidad": 500 },
+      { "id": "cebolla", "cantidad": 120 },
+      { "id": "tomate", "cantidad": 200 },
+      { "id": "limon", "cantidad": 60 },
+      { "id": "ajo", "cantidad": 6 },
+      { "id": "comino", "cantidad": 3 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Corta la carne en tiras pequeñas",
+      "Pica el tomate, la cebolla y el ajo; corta el limón en cascos"
+    ],
+    "pasos": [
+      { "titulo": "Cocina la carne", "texto": "Calienta el aceite y dora la carne a fuego alto con el ajo, el comino y la sal.", "minutos": 8 },
+      { "titulo": "Haz la salsa", "texto": "Mezcla el tomate y la cebolla con unas gotas de limón.", "minutos": 2 },
+      { "titulo": "Calienta las tortillas", "texto": "Calienta cada tortilla en una sartén seca por los dos lados.", "minutos": 4 },
+      { "titulo": "Arma los tacos", "texto": "Rellena las tortillas con la carne y la salsa y sirve con el limón.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "quesadillas-de-pollo",
+    "nombre": "Quesadillas de pollo",
+    "foto": "receta_quesadillas_de_pollo",
+    "cocina": "mexicana",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 20,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 600,
+    "ingredientes": [
+      { "id": "tortilla", "cantidad": 250 },
+      { "id": "pollo", "cantidad": 400 },
+      { "id": "queso", "cantidad": 200 },
+      { "id": "cebolla", "cantidad": 100 },
+      { "id": "comino", "cantidad": 2 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 4 }
+    ],
+    "antesDeEmpezar": [
+      "Corta el pollo en cubos pequeños",
+      "Pica la cebolla; ralla el queso"
+    ],
+    "pasos": [
+      { "titulo": "Cocina el relleno", "texto": "Calienta el aceite y dora el pollo con la cebolla, el comino y la sal.", "minutos": 10 },
+      { "titulo": "Rellena", "texto": "Pon queso y relleno sobre la mitad de cada tortilla y dóblala.", "minutos": 2 },
+      { "titulo": "Dora", "texto": "Dora las tortillas dobladas en una sartén por los dos lados, hasta que el queso se funda.", "minutos": 8 }
+    ]
+  },
+  {
+    "id": "chili-con-carne",
+    "nombre": "Chili con carne",
+    "foto": "receta_chili_con_carne",
+    "cocina": "mexicana",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 75,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": true,
+    "kcal": 540,
+    "ingredientes": [
+      { "id": "carne", "cantidad": 500 },
+      { "id": "frijoles", "cantidad": 300 },
+      { "id": "tomate", "cantidad": 400 },
+      { "id": "cebolla", "cantidad": 150 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aji", "cantidad": 20 },
+      { "id": "comino", "cantidad": 4 },
+      { "id": "aceite", "cantidad": 20 },
+      { "id": "sal", "cantidad": 6 }
+    ],
+    "antesDeEmpezar": [
+      "Remoja los fríjoles desde la noche anterior",
+      "Pica el tomate, la cebolla, el ajo y el ají"
+    ],
+    "pasos": [
+      { "titulo": "Cocina los fríjoles", "texto": "Cocina los fríjoles escurridos en agua hasta que ablanden.", "minutos": 45 },
+      { "titulo": "Dora la carne", "texto": "Calienta el aceite en una olla y dora la carne con la cebolla y el ajo.", "minutos": 8 },
+      { "titulo": "Haz el guiso", "texto": "Agrega el tomate, el ají, el comino y la sal, y cocina hasta que espese.", "minutos": 10 },
+      { "titulo": "Une todo", "texto": "Suma los fríjoles con un poco de su agua y cocina a fuego bajo.", "minutos": 12 }
+    ]
+  },
+  {
+    "id": "enfrijoladas",
+    "nombre": "Enfrijoladas",
+    "foto": "receta_enfrijoladas",
+    "cocina": "mexicana",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 60,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 520,
+    "ingredientes": [
+      { "id": "tortilla", "cantidad": 250 },
+      { "id": "frijoles", "cantidad": 300 },
+      { "id": "queso", "cantidad": 120 },
+      { "id": "cebolla", "cantidad": 100 },
+      { "id": "ajo", "cantidad": 6 },
+      { "id": "comino", "cantidad": 2 },
+      { "id": "aceite", "cantidad": 20 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Remoja los fríjoles desde la noche anterior",
+      "Pica la cebolla y el ajo; desmorona el queso"
+    ],
+    "pasos": [
+      { "titulo": "Cocina los fríjoles", "texto": "Cocina los fríjoles escurridos en agua hasta que ablanden.", "minutos": 45 },
+      { "titulo": "Haz la salsa", "texto": "Sofríe la cebolla y el ajo en el aceite; licúa con los fríjoles, el comino, la sal y un poco de su agua.", "minutos": 8 },
+      { "titulo": "Calienta la salsa", "texto": "Pon la salsa en una sartén y déjala hervir suave hasta que cubra una cuchara.", "minutos": 4 },
+      { "titulo": "Arma el plato", "texto": "Pasa cada tortilla por la salsa, dóblala y sirve con el queso encima.", "minutos": 3 }
+    ]
+  },
+  {
+    "id": "burrito-de-frijoles",
+    "nombre": "Burrito de fríjoles",
+    "foto": "receta_burrito_de_frijoles",
+    "cocina": "mexicana",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 60,
+    "reposoMin": 0,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 640,
+    "ingredientes": [
+      { "id": "tortilla", "cantidad": 250 },
+      { "id": "frijoles", "cantidad": 300 },
+      { "id": "arroz", "cantidad": 160 },
+      { "id": "tomate", "cantidad": 150 },
+      { "id": "cebolla", "cantidad": 80 },
+      { "id": "aguacate", "cantidad": 200 },
+      { "id": "comino", "cantidad": 3 },
+      { "id": "aceite", "cantidad": 15 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Remoja los fríjoles desde la noche anterior",
+      "Pica el tomate y la cebolla; corta el aguacate"
+    ],
+    "pasos": [
+      { "titulo": "Cocina los fríjoles", "texto": "Cocina los fríjoles escurridos en agua hasta que ablanden; aplasta la mitad.", "minutos": 45 },
+      { "titulo": "Cocina el arroz", "texto": "Cocina el arroz con agua y sal hasta que quede suelto.", "minutos": 18 },
+      { "titulo": "Sazona", "texto": "Sofríe la cebolla en el aceite, agrega los fríjoles y el comino y cocina hasta que sequen un poco.", "minutos": 5 },
+      { "titulo": "Arma los burritos", "texto": "Rellena las tortillas calientes con arroz, fríjoles, tomate y aguacate, y enróllalas.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "hummus-con-pan",
+    "nombre": "Hummus con pan",
+    "foto": "receta_hummus_con_pan",
+    "cocina": "mediterranea",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 60,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 430,
+    "ingredientes": [
+      { "id": "garbanzos", "cantidad": 300 },
+      { "id": "limon", "cantidad": 80 },
+      { "id": "ajo", "cantidad": 6 },
+      { "id": "aceite-oliva", "cantidad": 50 },
+      { "id": "comino", "cantidad": 2 },
+      { "id": "sal", "cantidad": 4 },
+      { "id": "pan", "cantidad": 300 }
+    ],
+    "antesDeEmpezar": [
+      "Remoja los garbanzos desde la noche anterior",
+      "Exprime el limón y pela el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Cocina los garbanzos", "texto": "Cocina los garbanzos escurridos en agua hasta que estén muy blandos; guarda un poco de su agua.", "minutos": 55 },
+      { "titulo": "Licúa", "texto": "Licúa los garbanzos con el limón, el ajo, el comino, la sal, la mitad del aceite de oliva y el agua necesaria.", "minutos": 2 },
+      { "titulo": "Sirve", "texto": "Sirve con el resto del aceite de oliva encima y acompaña con el pan tostado.", "minutos": 3 }
+    ]
+  },
+  {
+    "id": "ensalada-griega",
+    "nombre": "Ensalada griega",
+    "foto": "receta_ensalada_griega",
+    "cocina": "mediterranea",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 0,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 290,
+    "ingredientes": [
+      { "id": "tomate", "cantidad": 400 },
+      { "id": "pepino", "cantidad": 300 },
+      { "id": "cebolla", "cantidad": 80 },
+      { "id": "aceitunas", "cantidad": 100 },
+      { "id": "queso", "cantidad": 150 },
+      { "id": "aceite-oliva", "cantidad": 40 },
+      { "id": "limon", "cantidad": 30 },
+      { "id": "oregano", "cantidad": 3 },
+      { "id": "sal", "cantidad": 3 }
+    ],
+    "antesDeEmpezar": [
+      "Lava el tomate y el pepino",
+      "Exprime el limón"
+    ],
+    "pasos": [
+      { "titulo": "Corta", "texto": "Corta el tomate y el pepino en trozos grandes y la cebolla en plumas delgadas.", "minutos": 2 },
+      { "titulo": "Haz el aderezo", "texto": "Mezcla el aceite de oliva, el limón, el orégano y la sal.", "minutos": 2 },
+      { "titulo": "Sirve", "texto": "Mezcla las verduras con las aceitunas y el aderezo, y pon el queso en cubos encima.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "shakshuka",
+    "nombre": "Shakshuka",
+    "foto": "receta_shakshuka",
+    "cocina": "mediterranea",
+    "porciones": 4,
+    "prepMin": 10,
+    "coccionMin": 25,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 400,
+    "ingredientes": [
+      { "id": "huevo", "cantidad": 8 },
+      { "id": "tomate", "cantidad": 600 },
+      { "id": "pimenton", "cantidad": 200 },
+      { "id": "cebolla", "cantidad": 120 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "comino", "cantidad": 3 },
+      { "id": "aceite", "cantidad": 25 },
+      { "id": "pan", "cantidad": 200 },
+      { "id": "sal", "cantidad": 5 }
+    ],
+    "antesDeEmpezar": [
+      "Pica el tomate, el pimentón, la cebolla y el ajo",
+      "Ten listos el huevo y el pan"
+    ],
+    "pasos": [
+      { "titulo": "Haz la base", "texto": "Sofríe la cebolla, el pimentón y el ajo en el aceite, con el comino.", "minutos": 7 },
+      { "titulo": "Cocina el tomate", "texto": "Agrega el tomate y la sal, y cocina a fuego medio hasta que espese.", "minutos": 10 },
+      { "titulo": "Cuaja los huevos", "texto": "Abre huecos en la salsa, pon un huevo en cada uno y tapa hasta que la clara cuaje.", "minutos": 7 },
+      { "titulo": "Sirve", "texto": "Sirve en la sartén, con el pan para mojar.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "falafel",
+    "nombre": "Falafel",
+    "foto": "receta_falafel",
+    "cocina": "mediterranea",
+    "porciones": 4,
+    "prepMin": 20,
+    "coccionMin": 15,
+    "reposoMin": 30,
+    "dificultad": "Media",
+    "picante": false,
+    "kcal": 480,
+    "ingredientes": [
+      { "id": "garbanzos", "cantidad": 400 },
+      { "id": "cebolla", "cantidad": 100 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "comino", "cantidad": 4 },
+      { "id": "harina-trigo", "cantidad": 40 },
+      { "id": "aceite", "cantidad": 80 },
+      { "id": "sal", "cantidad": 5 },
+      { "id": "pan", "cantidad": 200 },
+      { "id": "tomate", "cantidad": 150 }
+    ],
+    "antesDeEmpezar": [
+      "Remoja los garbanzos desde la noche anterior; no los cocines",
+      "Pica la cebolla y el ajo; corta el tomate en rodajas"
+    ],
+    "pasos": [
+      { "titulo": "Haz la mezcla", "texto": "Muele los garbanzos escurridos con la cebolla, el ajo, el comino y la sal.", "minutos": 5 },
+      { "titulo": "Deja reposar", "texto": "Agrega la harina de trigo, mezcla y deja la masa en la nevera.", "minutos": 30 },
+      { "titulo": "Fríe", "texto": "Forma bolitas y dóralas en el aceite caliente por todos lados, por tandas.", "minutos": 12 },
+      { "titulo": "Sirve", "texto": "Sirve el falafel con el pan y el tomate.", "minutos": 2 }
+    ]
+  },
+  {
+    "id": "pescado-al-horno-con-limon",
+    "nombre": "Pescado al horno con limón",
+    "foto": "receta_pescado_al_horno_con_limon",
+    "cocina": "mediterranea",
+    "porciones": 4,
+    "prepMin": 15,
+    "coccionMin": 35,
+    "reposoMin": 0,
+    "dificultad": "Fácil",
+    "picante": false,
+    "kcal": 430,
+    "ingredientes": [
+      { "id": "pescado", "cantidad": 800 },
+      { "id": "limon", "cantidad": 150 },
+      { "id": "ajo", "cantidad": 8 },
+      { "id": "aceite-oliva", "cantidad": 40 },
+      { "id": "papa", "cantidad": 600 },
+      { "id": "sal", "cantidad": 6 },
+      { "id": "pimienta", "cantidad": 2 }
+    ],
+    "antesDeEmpezar": [
+      "Calienta el horno a 200 °C",
+      "Corta la papa y el limón en rodajas delgadas; pica el ajo"
+    ],
+    "pasos": [
+      { "titulo": "Hornea la papa", "texto": "Pon la papa en una bandeja con la mitad del aceite de oliva y sal, y hornea.", "minutos": 20 },
+      { "titulo": "Prepara el pescado", "texto": "Pon el pescado sobre la papa; cúbrelo con el ajo, la pimienta, el resto del aceite de oliva y el limón.", "minutos": 3 },
+      { "titulo": "Hornea el pescado", "texto": "Hornea hasta que el pescado se desmenuce con un tenedor.", "minutos": 15 }
     ]
   }
 ]

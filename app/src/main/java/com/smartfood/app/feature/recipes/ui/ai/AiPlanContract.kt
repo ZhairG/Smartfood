@@ -2,6 +2,7 @@ package com.smartfood.app.feature.recipes.ui.ai
 
 import androidx.compose.runtime.Immutable
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
+import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.recipes.domain.agent.PlanExplainer
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
@@ -33,6 +34,7 @@ enum class AiSheet { Servings, Time }
  * @property firstExpiring El que vence antes, si vence en 0 a 3 días: "⚠ El pollo vence mañana." (CA-RIA-02-01).
  * @property firstExpiringDays Días que le faltan a [firstExpiring] (0 = hoy).
  * @property restrictions Restricciones del Perfil para "Según tus preferencias" (no se cambian aquí).
+ * @property cuisines Cocinas favoritas para "Cocina favorita: …" (spec 011, CA-COC-03-01).
  * @property store Supermercado de los precios, para "COP $50.000 · D1".
  * @property budgetCop Presupuesto máximo (CA-RIA-02-01: de $2.000 a $100.000).
  * @property servings Porciones de cada receta.
@@ -53,6 +55,7 @@ data class AiUiState(
     val firstExpiring: InventoryItem? = null,
     val firstExpiringDays: Int = 0,
     val restrictions: Set<DietaryRestriction> = emptySet(),
+    val cuisines: Set<Cuisine> = emptySet(),
     val store: Store = Store.D1,
     val budgetCop: Long = DEFAULT_BUDGET_COP,
     val servings: Int = DEFAULT_SERVINGS,

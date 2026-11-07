@@ -1,6 +1,7 @@
 package com.smartfood.app.feature.recipes.domain.model
 
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
+import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.recipes.domain.agent.PlanExplainer
 
@@ -21,6 +22,7 @@ import com.smartfood.app.feature.recipes.domain.agent.PlanExplainer
  * @property restrictions Restricciones alimentarias del Perfil, para "Según tus preferencias".
  * @property diet Las mismas restricciones como reglas del agente.
  * @property store Supermercado de los precios ("Mi supermercado").
+ * @property cuisines Cocinas favoritas del Perfil; vacío si no eligió ninguna (spec 011).
  */
 data class AiContext(
     val pantry: List<PantryItem>,
@@ -29,6 +31,7 @@ data class AiContext(
     val restrictions: Set<DietaryRestriction>,
     val diet: Set<DietRule>,
     val store: Store,
+    val cuisines: Set<Cuisine> = emptySet(),
 )
 
 /** Resultado del agente con su explicación (CA-RIA-02-03, 02-06, 02-07). */

@@ -54,6 +54,7 @@ fun PlanExplainer.Reason.text(ingredients: Map<String, Ingredient>, items: List<
 fun PlanSuggestion.text(): String = when (this) {
     is PlanSuggestion.RaiseBudget -> stringResource(id = R.string.recipes_ai_suggest_budget, formatCop(minimumBudgetCop))
     PlanSuggestion.AllowSpicy -> stringResource(id = R.string.recipes_ai_suggest_spicy)
+    PlanSuggestion.RemoveCuisine -> stringResource(id = R.string.recipes_ai_suggest_cuisine)
     is PlanSuggestion.AllowMoreTime -> stringResource(id = R.string.recipes_ai_suggest_time, minutes)
     PlanSuggestion.NotEnoughRecipes -> stringResource(id = R.string.recipes_ai_suggest_inventory)
 }

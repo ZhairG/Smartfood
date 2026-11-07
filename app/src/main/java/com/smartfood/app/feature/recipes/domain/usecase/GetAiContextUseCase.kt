@@ -18,8 +18,9 @@ import javax.inject.Inject
  * Fecha: Octubre 2026
  * Descripción: Arma el contexto de "Sugerencia con IA" (spec 009, CA-RIA-02-01 y 02-09, T014): los productos del
  * inventario que usan las recetas, ya emparejados con el catálogo; las restricciones alimentarias del Perfil, también
- * como reglas del agente (`DietRule` tiene los mismos nombres que `DietaryRestriction`), y la tienda de los precios. Si
- * las preferencias no se pueden leer, el contexto sigue sin restricciones, como [GetPreferredStoreUseCase]. [observe]
+ * como reglas del agente (`DietRule` tiene los mismos nombres que `DietaryRestriction`), las cocinas favoritas (spec 011)
+ * y la tienda de los precios. Si las preferencias no se pueden leer, el contexto sigue sin restricciones ni cocinas,
+ * como [GetPreferredStoreUseCase] (CA-COC-03-04). [observe]
  * lo mantiene al día mientras la pantalla sigue en la pila (CA-RIA-02-11).
  *
  * @param catalog Recetas e ingredientes.
@@ -46,7 +47,8 @@ class GetAiContextUseCase @Inject constructor(
         val ingredients = catalog.ingredients()
         val pantry = matcher.match(inventory, ingredients)
         val matchedIds = pantry.mapTo(HashSet()) { it.itemId }
-        val restrictions = getFoodPreferences().getOrNull()?.restrictions.orEmpty()
+        val preferences = getFoodPreferences().getOrNull()
+        val restrictions = preferences?.restrictions.orEmpty()
         return AiContext(
             pantry = pantry,
             items = inventory.filter { it.id in matchedIds }.sortedWith(compareBy({ it.expiresOn }, { it.name })),
@@ -54,6 +56,7 @@ class GetAiContextUseCase @Inject constructor(
             restrictions = restrictions,
             diet = restrictions.mapTo(LinkedHashSet()) { DietRule.valueOf(it.name) },
             store = getPreferredStore(),
+            cuisines = preferences?.cuisines.orEmpty(),
         )
     }
 }
