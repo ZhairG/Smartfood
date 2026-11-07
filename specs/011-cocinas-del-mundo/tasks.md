@@ -12,7 +12,7 @@
 - [x] T006 **Agente** (RF-COC-02, RF-COC-04, HU-COC-02, CA-COC-03-02, 03-03): `PlanContext.cuisines`, `fitsCuisine`,
   `PlanSuggestion.RemoveCuisine`, `GetAiContextUseCase` y `GeneratePlanUseCase`.
 - [x] T007 **Flujo de la IA** (CA-COC-03-01, 03-04): `AiUiState`, `AiPlanViewModel`, `AiFlowScreen`, `AiReasonText` y textos.
-- [ ] T008 **Evaluación** (RNF-COC-02): repetir las pruebas del agente y agregar una sección fechada en
+- [x] T008 **Evaluación** (RNF-COC-02): repetir las pruebas del agente y agregar una sección fechada en
   `docs/ia/evaluacion-agente.md` y `docs/ia/sustentacion-agente.md`.
 
 ## Matriz de trazabilidad
@@ -30,8 +30,8 @@
 
 ### Checklist de verificación manual
 
-- [ ] Elegir Italiana en el Perfil: el plan solo trae recetas italianas y el contexto muestra "Cocina favorita: Italiana".
-- [ ] Elegir Italiana y Mexicana: el plan mezcla solo esas dos.
-- [ ] Sin cocinas: el plan puede traer cualquier cocina.
-- [ ] Vegano más una cocina con presupuesto bajo: sin plan, aparece "Quita tu cocina favorita en el Perfil".
-- [ ] Las 20 recetas nuevas abren con su foto en Recetas.
+- [x] Elegir Italiana en el Perfil: el plan solo trae recetas italianas y el contexto muestra "Cocina favorita: Italiana".
+- [x] Elegir Italiana y Mexicana: el plan mezcla solo esas dos.
+- [x] Sin cocinas: el plan puede traer cualquier cocina.
+- [x] Vegano más una cocina con presupuesto bajo: sin plan, aparece "Quita tu cocina favorita en el Perfil".
+- [x] Las 20 recetas nuevas abren con su foto en Recetas.

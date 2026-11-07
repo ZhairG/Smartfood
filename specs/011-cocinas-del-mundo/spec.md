@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Feature | `011-cocinas-del-mundo` |
-| Estado | En desarrollo |
+| Estado | Implementada |
 | Fecha | 2026-11-06 |
 | Depende de | 008-perfil (Cocina Favorita), 009-recetas-ia (catálogo y agente) |
 | Afecta | `assets/recetas.json`, `assets/ingredientes.json`, fotos de recetas, `MealPlanner`, flujo de la IA |
@@ -72,7 +72,7 @@ ingredientes y más usuarios, así que el pedido queda registrado como decisión
 | Código | Requisito |
 |---|---|
 | RNF-COC-01 | Sin cocinas elegidas, el agente da el mismo plan que daría sin este filtro. |
-| RNF-COC-02 | Rendimiento: se repite `MealPlannerPerformanceTest` con 70 recetas contra la meta de 2 s, y el resultado va en `docs/ia/evaluacion-agente.md`. |
+| RNF-COC-02 | Rendimiento: se repite `MealPlannerPerformanceTest` con 70 recetas contra la meta de 2 s, y el resultado va en `docs/ia/evaluacion-agente.md`. Con inventarios normales cumple; el inventario enorme es una limitación aceptada (§9). |
 | RNF-COC-03 | Las fotos siguen en `drawable-nodpi` como webp de 800 px de ancho; `res/raw/keep.xml` las conserva en release. |
 | RNF-COC-04 | Funciona desde Android 7.0 (API 24). R8 no cambia: `cocina` va en el DTO `@Serializable` existente. |
 
@@ -104,6 +104,9 @@ usa la lista existente de "Prueba una de estas opciones" (`recipes_ai_*`).
 |---|---|
 | Línea "Cocina favorita: …" en el contexto de la IA, que no está en el Figma. | La persona debe saber por qué el plan solo trae esas cocinas. |
 | Sugerencia "Quita tu cocina favorita en el Perfil", que no está en el Figma. | Cada cocina tiene pocas recetas y sin esta salida la persona quedaría sin plan. |
+
+La restricción dura deja a menudo sin plan y el inventario enorme supera los 2 s en el portátil. Zhair aceptó las dos
+limitaciones el 2026-11-06; los datos están en `docs/ia/evaluacion-agente.md` §7.
 
 ## 10. Plan de entrega
 
