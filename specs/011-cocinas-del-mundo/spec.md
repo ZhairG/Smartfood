@@ -102,6 +102,7 @@ usa la lista existente de "Prueba una de estas opciones" (`recipes_ai_*`).
 
 | Desviación | Motivo |
 |---|---|
+| La píldora de precios del detalle de receta dice "D1 · precios de octubre y noviembre 2026" y no "octubre 2026" (aprobada el 2026-11-07). | Los 50 ingredientes originales son del 20 de octubre y los 7 de esta spec, del 6 de noviembre; con "octubre" el texto sería inexacto. |
 | Línea "Cocina favorita: …" en el contexto de la IA, que no está en el Figma. | La persona debe saber por qué el plan solo trae esas cocinas. |
 | Sugerencia "Quita tu cocina favorita en el Perfil", que no está en el Figma. | Cada cocina tiene pocas recetas y sin esta salida la persona quedaría sin plan. |
 

@@ -26,7 +26,7 @@
     <string name="recipes_minutes">%1$d min</string>
     <string name="recipes_ingredients">Ingredientes</string>
     <string name="recipes_in_inventory">En tu inventario</string>
-    <string name="recipes_store_prices">%1$s · precios de octubre 2026</string>
+    <string name="recipes_store_prices">%1$s · precios de octubre y noviembre 2026</string>
     <string name="recipes_pantry_basic">Básico de despensa</string>
     <string name="recipes_pack">%1$s %2$s</string>
     <string name="recipes_packs">%1$d × %2$s %3$s</string>

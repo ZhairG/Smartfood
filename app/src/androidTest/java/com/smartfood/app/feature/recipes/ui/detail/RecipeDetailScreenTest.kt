@@ -70,7 +70,7 @@ class RecipeDetailScreenTest {
         composeTestRule.onNodeWithText("0 min").assertIsDisplayed()
         composeTestRule.onNodeWithText("Dificultad").assertIsDisplayed()
         composeTestRule.onNodeWithText("Media").assertIsDisplayed()
-        composeTestRule.onNodeWithText("D1 · precios de octubre 2026").assertIsDisplayed()
+        composeTestRule.onNodeWithText("D1 · precios de octubre y noviembre 2026").assertIsDisplayed()
     }
 
     @Test
@@ -170,7 +170,7 @@ class RecipeDetailScreenTest {
             .copy(store = Store.EXITO, packs = 2, packLabel = "500 g", costCop = 3_200)
         mostrar(detalle().copy(store = Store.OLIMPICA, groups = listOf(RecipeIngredientGroup("Verduras", listOf(tomate)))))
 
-        composeTestRule.onNodeWithText("Olímpica · precios de octubre 2026").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Olímpica · precios de octubre y noviembre 2026").assertIsDisplayed()
         // Olímpica no lo tiene en línea: la fila dice de qué tienda es el precio y cuántos empaques.
         composeTestRule.onNodeWithText("2 × Tomate 500 g").assertIsDisplayed()
         composeTestRule.onNodeWithText("Éxito · COP $3.200").assertIsDisplayed()

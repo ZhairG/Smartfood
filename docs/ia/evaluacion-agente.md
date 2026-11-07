@@ -19,7 +19,7 @@ inventario, priorizando lo que vence primero, dentro de un **presupuesto total**
 | Elemento | Definición |
 |---|---|
 | Variables | `D1`, `D2`, `D3`: la receta de cada día. |
-| Dominio | Las 50 recetas del catálogo que cumplen las restricciones de una sola receta (consistencia de nodo): tiempo máximo, "Sin picante", restricciones alimentarias del Perfil y costo ≤ presupuesto. |
+| Dominio | Las recetas del catálogo (50 en la spec 009, 70 desde la spec 011) que cumplen las restricciones de una sola receta (consistencia de nodo): tiempo máximo, "Sin picante", restricciones alimentarias del Perfil, Cocina Favorita (spec 011) y costo ≤ presupuesto. |
 | Restricciones | Las tres recetas son distintas; el inventario es compartido entre los días (lo que usa el Día 1 ya no está el Día 2); las compras de los tres días suman ≤ presupuesto; ninguna receta necesita más de 3 ingredientes por comprar; ninguna incumple la dieta. Las compras son por empaques completos y el sobrante queda para los días siguientes. |
 | Objetivo | Maximizar `U = 1,0·rescate − 0,3·(costo / 10.000) − 0,5·desperdicio`. *Rescate*: fracción usada de cada producto que vence en ≤ 3 días, ponderada por la urgencia `1/(días + 1)`. *Desperdicio*: lo que vence en ≤ 3 días y el plan no usa. |
 | Búsqueda | Backtracking día por día con *forward checking* (inventario y presupuesto restantes), candidatas ordenadas por utilidad de un paso, **ramificación y poda** con una cota optimista que nunca subestima y desempate por id (determinista). |
@@ -35,7 +35,7 @@ Código: `app/src/main/java/com/smartfood/app/feature/recipes/domain/agent/` (`M
 - **Escenarios:** 30 inventarios sintéticos con semilla fija (`RealCatalog.syntheticInventories`). Cada uno parte de una
   receta al azar, de la que toma 1 a 3 ingredientes que vencen en 0 a 3 días, más 4 a 8 productos que vencen después;
   en 3 de cada 10, aproximadamente, se agrega otro producto por vencer al azar.
-- **Contexto:** catálogo real (50 recetas, 50 ingredientes con precios de supermercado), COP $100.000, 4 porciones,
+- **Contexto:** catálogo real de la spec 009 (50 recetas, 50 ingredientes con precios de supermercado; el actual tiene 70 y 57, ver §7), COP $100.000, 4 porciones,
   tienda D1, sin restricciones de tiempo, picante ni dieta.
 - **Líneas base** (Avance 2): arman el plan día por día con las mismas restricciones duras, pero ordenando por un solo
   criterio y sin búsqueda:
@@ -43,6 +43,8 @@ Código: `app/src/main/java/com/smartfood/app/feature/recipes/domain/agent/` (`M
   - **Por vencimiento:** la receta que usa el producto que vence antes.
 
 ## 3. Resultados (2026-10-23)
+
+> Cifras con el catálogo de 50 recetas. Con el de 70 recetas, ver §7.1.
 
 | Método | Planes completos | Aprovechamiento del plan | Aprovechamiento del Día 1 | En presupuesto | Desperdicio medio | Costo medio |
 |---|---|---|---|---|---|---|
@@ -61,6 +63,8 @@ Código: `app/src/main/java/com/smartfood/app/feature/recipes/domain/agent/` (`M
   día por separado.
 
 ## 4. Rendimiento (CA-RIA-02-10, RNF-RIA-02: ≤ 2 s con 50 recetas)
+
+> Mediciones con 50 recetas. Con 70, ver §7.3.
 
 | Dónde | Peor caso | Promedio |
 |---|---|---|
