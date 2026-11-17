@@ -129,5 +129,6 @@ de seguridad).
 - [Backend](docs/backend.md): Cloud Functions, despliegue, emuladores y modo demo.
 - [Evaluación del agente de IA](docs/ia/evaluacion-agente.md) y [guía de sustentación](docs/ia/sustentacion-agente.md).
 - [Especificaciones](specs/constitution.md) (SDD) y su [estado](docs/metodologia.md).
+- [Trabajo pendiente](docs/pendientes.md): lista ordenada de lo que sigue después de la entrega.
 - [Configuración del equipo](docs/equipo.md): pasos de cada integrante para ejecutar la app contra el Firebase del proyecto.
 - [Diseño en Figma](https://www.figma.com/design/z1AoQvluQcmx98gjP4vHF6/SmartFood).

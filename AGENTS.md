@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code), Gemini or any other
 
 App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, paquete `com.smartfood.app`. Proyecto universitario (UTADEO 2026-2) para reducir el desperdicio de comida en hogares: inventario + vencimientos + presupuesto, con un agente de recomendación de recetas. Hoy están implementados la autenticación (módulo 1), el **inventario** (spec 006), con uso sin conexión, el **perfil** (spec 008), **recetas + IA** (spec 009) y las **recetas guardadas** (spec 010).
 
+Trabajo pendiente después de la entrega, en orden: [`docs/pendientes.md`](docs/pendientes.md).
+
 `compileSdk`/`targetSdk` 37, `minSdk` 24, Java 11. Todas las dependencias van en `gradle/libs.versions.toml`.
 
 ## Flujo de trabajo: Spec Driven Development (obligatorio)
