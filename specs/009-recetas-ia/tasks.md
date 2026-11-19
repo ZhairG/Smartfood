@@ -59,7 +59,7 @@
   - Revisión aparte: 0 diferencias en 23.000 escenarios. Las métricas de `AgentEvaluationTest` no cambiaron y el
     peor caso de `MealPlannerPerformanceTest` sigue por debajo de 2 s.
 - [x] T039 La dieta no se pierde si falla la lectura del perfil (2026-11-19, punto 2 de `docs/pendientes.md`): CA-RIA-02-12 y su desviación en la spec, y CA-COC-03-04 de la spec 011 remite a él.
-- [ ] T040 `AiContext.preferencesKnown`: `GetAiContextUseCase` distingue "sin restricciones" de "perfil desconocido"; prueba con perfil `VEGAN` y la lectura fallida (CA-RIA-02-12).
+- [x] T040 `AiContext.preferencesKnown`: `GetAiContextUseCase` distingue "sin restricciones" de "perfil desconocido"; prueba con perfil `VEGAN` y la lectura fallida (CA-RIA-02-12).
 - [ ] T041 `AiPlanViewModel` no genera con el perfil desconocido y "Reintentar" lo vuelve a leer; `AiFlowScreen` muestra el aviso y deshabilita "Generar plan" (CA-RIA-02-12).
 
 ## Cierre (en el mismo PR)

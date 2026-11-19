@@ -19,9 +19,10 @@ import javax.inject.Inject
  * Descripción: Arma el contexto de "Sugerencia con IA" (spec 009, CA-RIA-02-01 y 02-09, T014): los productos del
  * inventario que usan las recetas, ya emparejados con el catálogo; las restricciones alimentarias del Perfil, también
  * como reglas del agente (`DietRule` tiene los mismos nombres que `DietaryRestriction`), las cocinas favoritas (spec 011)
- * y la tienda de los precios. Si las preferencias no se pueden leer, el contexto sigue sin restricciones ni cocinas,
- * como [GetPreferredStoreUseCase] (CA-COC-03-04). [observe]
- * lo mantiene al día mientras la pantalla sigue en la pila (CA-RIA-02-11).
+ * y la tienda de los precios. Si las preferencias no se pueden leer, el contexto lo dice con
+ * `preferencesKnown = false` en lugar de pasar por "sin restricciones", para que no se arme un plan sin la dieta
+ * (CA-RIA-02-12, CA-COC-03-04); la tienda sí sigue en su valor por defecto, como en [GetPreferredStoreUseCase].
+ * [observe] lo mantiene al día mientras la pantalla sigue en la pila (CA-RIA-02-11).
  *
  * @param catalog Recetas e ingredientes.
  * @param observeInventory Inventario de la persona con sesión.
@@ -57,6 +58,7 @@ class GetAiContextUseCase @Inject constructor(
             diet = restrictions.mapTo(LinkedHashSet()) { DietRule.valueOf(it.name) },
             store = getPreferredStore(),
             cuisines = preferences?.cuisines.orEmpty(),
+            preferencesKnown = preferences != null,
         )
     }
 }
