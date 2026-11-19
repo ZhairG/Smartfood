@@ -283,6 +283,27 @@ sigue siendo una cota más ajustada, revisada contra `MealPlannerTest`.
 - **Con cocinas elegidas** el dominio es tan pequeño que la búsqueda tarda menos de 1 ms. En "Italiana y mexicana", el recocido
   encontró plan en 3 de 6 inventarios y los exactos en 4 de 6.
 
+## 8. Cocina Favorita relajada (2026-11-19, punto 5 de `docs/pendientes.md`)
+
+§7.2 mostró que la restricción dura dejaba sin plan a la mayoría de los inventarios con una sola cocina (asiática y
+vegetariano: 0 de 6). La Cocina Favorita deja de ser una restricción de una sola receta y pasa a ser una **restricción global
+con un mínimo**: el plan debe tener al menos `minCuisineRecipes` recetas de las cocinas elegidas (spec 011, CA-COC-02-06).
+
+- **Búsqueda escalonada:** `MealPlanner.plan` busca con el mínimo en 3 (todas, como antes), luego en 2 y luego en 1, y entrega
+  el plan del primer nivel que lo tenga. Así se respeta la preferencia lo más posible y, dentro de cada nivel, el objetivo
+  sigue siendo la utilidad.
+- **Poda:** una rama se descarta si las recetas de la cocina ya elegidas más los días que faltan no alcanzan el mínimo. Es una
+  forma de *forward checking* para la restricción global; no cambia la cota de ramificación y poda.
+- **Lo que no se relaja:** la dieta, el tiempo, el picante y el presupuesto siguen en la consistencia de nodo (CA-COC-02-07).
+- **Sin plan ni con una receta:** se mantiene la sugerencia "Quita tu cocina favorita en el Perfil" (CA-COC-03-02).
+- **Costo:** en el peor caso son 3 búsquedas en lugar de una; con el mínimo bajo, el dominio vuelve a ser todo el catálogo que
+  cumple la dieta. `MealPlannerPerformanceTest` incluye este caso.
+- **Verificación:** `MealPlannerTest` compara 100 escenarios aleatorios con cocinas y mínimos de 1 a 3 contra la fuerza bruta,
+  que aprende la misma restricción.
+
+Las cifras de esta sección (planes por cocina como en §7.2 y tiempos) se miden en la ronda final de pruebas, al cerrar los 10
+puntos de `docs/pendientes.md`, y se agregan aquí con su fecha.
+
 ## Anexo: tablas completas por perfil (2026-11-05)
 
 ### Sin restricciones (6 inventarios)

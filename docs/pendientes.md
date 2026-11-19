@@ -13,7 +13,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | 2 | La dieta se pierde si falla la lectura del perfil | 009 | Pendiente | — |
 | 3 | Cierre de cocina: precio y reintentos | 009 | Pendiente | — |
 | 4 | Guardado pendiente o confirmado en el Perfil | 008 | Pendiente | — |
-| 5 | Cocina Favorita sin plan posible | 011 | Pendiente | — |
+| 5 | Cocina Favorita sin plan posible | 011 (CA-COC-02-06, 02-07, 03-05) | Implementado, pruebas en la ronda final | — |
 | 6 | Revisión del modo oscuro | 002 (enmienda) o 013 | Pendiente | — |
 | 7 | Animaciones y transiciones | 007 | Pendiente | — |
 | 8 | Correcciones de documentación y medición del agente | 009 | Pendiente | — |
