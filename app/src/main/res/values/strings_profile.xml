@@ -83,6 +83,9 @@
     <string name="preferences_saving">Guardando cambios…</string>
     <string name="preferences_saved">Guardado</string>
     <string name="preferences_saved_body">Preferencias se actualizó</string>
+    <!-- Guardado sin conexión en Editar información y Preferencias (CA-PER-02-14, 03-06) -->
+    <string name="profile_saved_on_phone">Guardado en tu teléfono</string>
+    <string name="profile_saved_on_phone_body">Se subirá cuando vuelva la conexión.</string>
     <!-- Notificaciones (spec 008, HU-PER-04) -->
     <string name="notification_empty_inventory_title">Tu inventario está vacío</string>
     <string name="notification_empty_inventory_body">Registra tus alimentos para no perder de vista sus fechas</string>

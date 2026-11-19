@@ -39,8 +39,9 @@ sealed interface EditProfileDialog {
      * "Guardado" (Figma `369:905`, CA-PER-02-04), que se cierra solo.
      *
      * @property emailChangedTo Correo nuevo de la cuenta si el correo cambió, o `null` (CA-PER-02-12).
+     * @property onPhone Sin conexión: "Guardado en tu teléfono" (CA-PER-02-14).
      */
-    data class Saved(val emailChangedTo: String? = null) : EditProfileDialog
+    data class Saved(val emailChangedTo: String? = null, val onPhone: Boolean = false) : EditProfileDialog
 }
 
 /**
