@@ -1,5 +1,7 @@
 package com.smartfood.app.feature.auth.ui.register
 
+import com.smartfood.app.core.backend.GetBackendModeUseCase
+import com.smartfood.app.testutil.FakeBackendModeProvider
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthField
 import com.smartfood.app.feature.auth.domain.model.authFailure
@@ -36,7 +38,13 @@ class RegisterViewModelTest {
     fun prepararEntornoTest() {
         authRepository = FakeAuthRepository()
         val validatePassword = ValidatePasswordUseCase()
-        val register = RegisterUseCase(authRepository, FakeUserRepository(), ValidateEmailUseCase(), validatePassword)
+        val register = RegisterUseCase(
+            authRepository,
+            FakeUserRepository(),
+            ValidateEmailUseCase(),
+            validatePassword,
+            GetBackendModeUseCase(FakeBackendModeProvider())
+        )
         viewModel = RegisterViewModel(register, validatePassword)
     }
 

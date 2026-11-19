@@ -58,6 +58,15 @@ class FakeAuthRepository : AuthRepository {
         return Result.success(Unit)
     }
 
+    /** Resultado de [sendEmailVerification] y llamadas recibidas (spec 012). */
+    var sendVerificationResult: Result<Unit> = Result.success(Unit)
+    var sendVerificationCalls = 0
+
+    override suspend fun sendEmailVerification(): Result<Unit> {
+        sendVerificationCalls++
+        return sendVerificationResult
+    }
+
     override fun logout() {
         logoutCalls++
         signedInUserId = null
