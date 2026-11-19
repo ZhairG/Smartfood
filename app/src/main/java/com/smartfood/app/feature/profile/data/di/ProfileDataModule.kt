@@ -1,7 +1,7 @@
 package com.smartfood.app.feature.profile.data.di
 
 import com.smartfood.app.feature.profile.data.local.DataStoreNotificationSettings
-import com.smartfood.app.feature.profile.data.repository.FirebaseStorageProfilePhotoRepository
+import com.smartfood.app.feature.profile.data.repository.ModeAwareProfilePhotoRepository
 import com.smartfood.app.feature.profile.data.repository.ModeAwareEmailChangeRepository
 import com.smartfood.app.feature.profile.data.repository.FirestoreProfileRepository
 import com.smartfood.app.feature.profile.domain.repository.EmailChangeRepository
@@ -34,7 +34,7 @@ abstract class ProfileDataModule {
     /** Foto de perfil en Cloud Storage (RF-PER-02, T006). */
     @Binds
     @Singleton
-    abstract fun bindProfilePhotoRepository(impl: FirebaseStorageProfilePhotoRepository): ProfilePhotoRepository
+    abstract fun bindProfilePhotoRepository(impl: ModeAwareProfilePhotoRepository): ProfilePhotoRepository
 
     /** Cambio de correo con código por las Cloud Functions (RF-PER-03, T009b). */
     @Binds

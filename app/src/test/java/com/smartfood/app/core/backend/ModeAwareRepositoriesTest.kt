@@ -4,6 +4,8 @@ import com.smartfood.app.feature.auth.data.repository.ModeAwarePasswordRecoveryR
 import com.smartfood.app.feature.inventory.data.repository.ModeAwarePhotoRepository
 import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
 import com.smartfood.app.feature.profile.data.repository.ModeAwareEmailChangeRepository
+import com.smartfood.app.feature.profile.data.repository.ModeAwareProfilePhotoRepository
+import com.smartfood.app.testutil.FakeProfilePhotoRepository
 import com.smartfood.app.testutil.FakePhotoRepository
 import com.smartfood.app.testutil.FakeEmailChangeRepository
 import com.smartfood.app.testutil.FakeBackendModeProvider
@@ -90,5 +92,23 @@ class ModeAwareRepositoriesTest {
         mode.mode = BackendMode.FREE
         assertTrue(repository.delete("users/uid1/inventory/item1/otra.jpg").isSuccess)
         assertEquals(listOf("users/uid1/inventory/item1/foto.jpg"), storage.deletedPaths)
+    }
+
+    @Test
+    fun `CA-SPK-05-02 la foto del perfil sube segun el modo y borra segun la ruta`() = runTest {
+        val mode = FakeBackendModeProvider(BackendMode.FREE)
+        val storage = FakeProfilePhotoRepository()
+        val firestore = FakeProfilePhotoRepository()
+        val repository = ModeAwareProfilePhotoRepository(mode, blaze = storage, free = firestore)
+
+        repository.upload("/fotos/perfil.jpg")
+        assertEquals(listOf("/fotos/perfil.jpg"), firestore.uploads)
+        assertTrue(storage.uploads.isEmpty())
+
+        // Sin Blaze, la foto anterior que sigue en Storage no se toca (CA-SPK-05-05).
+        assertTrue(repository.delete("users/uid1/profile/vieja.jpg").isSuccess)
+        assertTrue(storage.deletes.isEmpty())
+        assertTrue(repository.delete("users/uid1/media/profile-1").isSuccess)
+        assertEquals(listOf("users/uid1/media/profile-1"), firestore.deletes)
     }
 }
