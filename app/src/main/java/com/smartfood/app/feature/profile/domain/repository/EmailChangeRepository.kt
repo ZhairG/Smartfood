@@ -12,6 +12,12 @@ import kotlin.time.Duration
 interface EmailChangeRepository {
 
     /**
+     * `true` si el cambio se confirma con el código de 4 dígitos; `false` si [requestCode] envía un enlace de Firebase
+     * y el correo cambia al abrirlo (spec 012, modo gratuito, CA-SPK-03-01).
+     */
+    val usesCode: Boolean get() = true
+
+    /**
      * Envía el código a [newEmail]. Requiere un inicio de sesión reciente (reautenticar justo antes).
      *
      * @return Espera antes de poder pedir otro código.

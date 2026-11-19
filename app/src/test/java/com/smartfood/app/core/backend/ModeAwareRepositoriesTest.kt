@@ -1,6 +1,8 @@
 package com.smartfood.app.core.backend
 
 import com.smartfood.app.feature.auth.data.repository.ModeAwarePasswordRecoveryRepository
+import com.smartfood.app.feature.profile.data.repository.ModeAwareEmailChangeRepository
+import com.smartfood.app.testutil.FakeEmailChangeRepository
 import com.smartfood.app.testutil.FakeBackendModeProvider
 import com.smartfood.app.testutil.FakePasswordRecoveryRepository
 import kotlinx.coroutines.test.runTest
@@ -33,5 +35,22 @@ class ModeAwareRepositoriesTest {
         assertTrue(repository.usesCode)
         repository.requestCode("demo@smartfood.com")
         assertEquals(1, codigo.requestCodeCalls)
+    }
+
+    @Test
+    fun `CA-SPK-03-01 el cambio de correo usa el codigo en Blaze y el enlace en el modo gratuito`() = runTest {
+        val mode = FakeBackendModeProvider(BackendMode.FREE)
+        val codigo = FakeEmailChangeRepository(usesCode = true)
+        val enlace = FakeEmailChangeRepository(usesCode = false)
+        val repository = ModeAwareEmailChangeRepository(mode, blaze = codigo, free = enlace)
+
+        assertFalse(repository.usesCode)
+        repository.requestCode("nuevo@correo.com")
+        assertEquals(listOf("nuevo@correo.com"), enlace.requested)
+
+        mode.mode = BackendMode.BLAZE
+        assertTrue(repository.usesCode)
+        repository.requestCode("otro@correo.com")
+        assertEquals(listOf("otro@correo.com"), codigo.requested)
     }
 }
