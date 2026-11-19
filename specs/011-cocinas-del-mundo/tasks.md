@@ -20,7 +20,7 @@
 
 - [x] T009 Enmienda de CA-COC-02-02, 02-03 y 03-02; CA-COC-02-06, 02-07 y 03-05 con su desviación; §8 de `docs/ia/evaluacion-agente.md`.
 - [x] T010 **Agente:** `PlanContext.minCuisineRecipes`, búsqueda escalonada 3 → 2 → 1 en `MealPlanner.plan` y `PlanResult.Found.cuisineRecipes`; `MealPlannerTest` contra fuerza bruta y `MealPlannerPerformanceTest` (CA-COC-02-06, 02-07).
-- [ ] T011 **Aviso en el plan:** `AiPlanOutcome.Found.cuisineShortfall`, `AiUiState.cuisineNotice`, `AiReasonText` y `AiFlowScreen` (CA-COC-03-05).
+- [x] T011 **Aviso en el plan:** `AiPlanOutcome.Found.cuisineShortfall`, `AiUiState.cuisineNotice`, `AiReasonText` y `AiFlowScreen` (CA-COC-03-05).
 
 ## Matriz de trazabilidad
 

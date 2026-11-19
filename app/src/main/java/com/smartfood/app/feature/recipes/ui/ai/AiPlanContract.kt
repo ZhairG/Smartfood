@@ -42,6 +42,8 @@ enum class AiSheet { Servings, Time }
  * @property noSpicy "Sin picante" activo.
  * @property sheet Hoja de opciones abierta.
  * @property plan Plan encontrado (paso [AiStep.Plan]).
+ * @property cuisineRecipes Si el plan se completó con otras cocinas, cuántas recetas son de las favoritas; `null` si
+ *   no hizo falta. Muestra el aviso bajo "Tu plan de 3 días" (spec 011, CA-COC-03-05).
  * @property reasons Razones de "¿Por qué te conviene?" (CA-RIA-02-06).
  * @property suggestions Sugerencias de "Sin coincidencias" (CA-RIA-02-07).
  * @property ingredients Ingredientes del catálogo por `id`, para escribir las razones con su nombre y unidad.
@@ -63,6 +65,7 @@ data class AiUiState(
     val noSpicy: Boolean = false,
     val sheet: AiSheet? = null,
     val plan: MealPlan? = null,
+    val cuisineRecipes: Int? = null,
     val reasons: List<PlanExplainer.Reason> = emptyList(),
     val suggestions: List<PlanSuggestion> = emptyList(),
     val ingredients: Map<String, Ingredient> = emptyMap(),
