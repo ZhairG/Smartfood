@@ -10,7 +10,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | # | Punto | Spec | Estado | PR |
 |---|---|---|---|---|
 | 1 | Modo sin facturación (sin plan Blaze) | 012 (nueva) | Pendiente | — |
-| 2 | La dieta se pierde si falla la lectura del perfil | 009 | Pendiente | — |
+| 2 | La dieta se pierde si falla la lectura del perfil | 009 (CA-RIA-02-12) | Implementado, pruebas en la ronda final | — |
 | 3 | Cierre de cocina: precio y reintentos | 009 | Pendiente | — |
 | 4 | Guardado pendiente o confirmado en el Perfil | 008 | Pendiente | — |
 | 5 | Cocina Favorita sin plan posible | 011 | Pendiente | — |
