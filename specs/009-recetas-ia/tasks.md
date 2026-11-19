@@ -60,7 +60,7 @@
     peor caso de `MealPlannerPerformanceTest` sigue por debajo de 2 s.
 - [x] T042 Cierre de cocina sin perder el precio ni descontar dos veces (2026-11-19, punto 3 de `docs/pendientes.md`): CA-RIA-04-08 y 04-09 en la spec y el contrato de `CookingRepository` en el plan §6.
 - [x] T043 `CookingRepository` con `WriteBatch` (cantidades, borrados y `cookings` en un lote) y `FinishCookingUseCase` con `operationId`; pruebas en `FinishCookingUseCaseTest` (CA-RIA-04-08, 04-09).
-- [ ] T044 `CookingViewModel` crea el `operationId` una vez en `SavedStateHandle` y lo usa en cada intento (CA-RIA-04-09).
+- [x] T044 `CookingViewModel` crea el `operationId` una vez en `SavedStateHandle` y lo usa en cada intento (CA-RIA-04-09).
 - [ ] T045 `rules-test`: un lote válido del cierre se acepta y uno que repite `cookings/{id}` se rechaza entero (CA-RIA-04-09).
 
 ## Cierre (en el mismo PR)

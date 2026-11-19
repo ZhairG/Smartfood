@@ -3,6 +3,7 @@ package com.smartfood.app.feature.recipes.ui.cooking
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartfood.app.core.common.safeRunCatching
 import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.inventory.domain.model.toInventoryError
 import com.smartfood.app.feature.recipes.domain.usecase.FinishCookingUseCase
@@ -27,7 +28,9 @@ import javax.inject.Inject
  * Descripción: ViewModel de la cocina guiada (spec 009, HU-RIA-04, T019, T020, T021). Carga la receta por ID con
  * [GetRecipeDetailUseCase], gestiona el avance de pasos, el temporizador y el cierre con [FinishCookingUseCase]:
  * "¿Cocinaste esta receta?" → guardando → "Guardado" (o "Guardado en tu teléfono" sin conexión) durante
- * [RESULT_DIALOG_MILLIS] y vuelta al detalle. Si falla, muestra el error y la persona puede volver a terminar.
+ * [RESULT_DIALOG_MILLIS] y vuelta al detalle. Si falla, muestra el error y la persona puede volver a terminar: cada
+ * intento usa el mismo id de operación, guardado en [SavedStateHandle], para que nada se descuente dos veces
+ * (CA-RIA-04-09).
  *
  * @param savedStateHandle Contiene `recipeId` y `servings` de `Route.CookingIntro` o `Route.Cooking`.
  * @param getRecipeDetail Lectura de la receta del catálogo.
@@ -35,7 +38,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CookingViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val getRecipeDetail: GetRecipeDetailUseCase,
     private val finishCookingUseCase: FinishCookingUseCase,
 ) : ViewModel() {
@@ -111,7 +114,9 @@ class CookingViewModel @Inject constructor(
         stopAlarm()
         _uiState.update { it.copy(dialog = CookingDialog.Saving) }
         viewModelScope.launch {
-            finishCookingUseCase(recipeId, servings, finishCookingUseCase.newOperationId()).fold(
+            val result = safeRunCatching { operationId() }
+                .fold(onSuccess = { finishCookingUseCase(recipeId, servings, it) }, onFailure = { Result.failure(it) })
+            result.fold(
                 onSuccess = { outcome ->
                     _uiState.update { it.copy(dialog = CookingDialog.Saved(onPhone = outcome == WriteOutcome.PENDING)) }
                     delay(RESULT_DIALOG_MILLIS)
@@ -126,6 +131,14 @@ class CookingViewModel @Inject constructor(
             )
         }
     }
+
+    /**
+     * Id del cierre: se crea en el primer intento y se repite en los siguientes, también si Android recrea el proceso
+     * (CA-RIA-04-09).
+     */
+    private fun operationId(): String =
+        savedStateHandle.get<String>(OPERATION_ID_KEY)
+            ?: finishCookingUseCase.newOperationId().also { savedStateHandle[OPERATION_ID_KEY] = it }
 
     private fun startTimer() {
         if (_uiState.value.isTimerRunning || _uiState.value.timerSecondsRemaining <= 0) return
@@ -202,6 +215,9 @@ class CookingViewModel @Inject constructor(
     companion object {
         const val RECIPE_ID_KEY = "recipeId"
         const val SERVINGS_KEY = "servings"
+
+        /** Id del cierre en curso, el mismo en cada intento (CA-RIA-04-09). */
+        const val OPERATION_ID_KEY = "cookingOperationId"
         const val DEFAULT_SERVINGS = 2
 
         /** Lo mismo que suena [TimerAlarm]: pasado ese tiempo la tarjeta deja de decir "¡Tiempo!". */

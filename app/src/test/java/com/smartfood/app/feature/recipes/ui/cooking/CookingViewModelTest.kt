@@ -311,4 +311,44 @@ class CookingViewModelTest {
         advanceUntilIdle()
         assertEquals(null, viewModel.uiState.value.dialog)
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `CA-RIA-04-09 reintentar despues de un fallo usa la misma operacion y descuenta una sola vez`() = runTest {
+        inventoryRepository.createItem(
+            InventoryItem("item1", "Arepa de maíz", FoodCategory.GRAINS, today.plusDays(1), Quantity(5.0, QuantityUnit.UNITS))
+        )
+        val handle = SavedStateHandle(mapOf("recipeId" to "arepas_hogao", "servings" to 2))
+        val viewModel = CookingViewModel(handle, getRecipeDetailUseCase, finishCookingUseCase)
+        runCurrent()
+        cookingRepository.failure = IllegalStateException("sin red")
+        viewModel.onEvent(CookingEvent.ConfirmFinishClicked)
+        advanceUntilIdle()
+        val firstId = handle.get<String>(CookingViewModel.OPERATION_ID_KEY)
+
+        cookingRepository.failure = null
+        viewModel.onEvent(CookingEvent.ConfirmFinishClicked)
+        advanceUntilIdle()
+
+        assertEquals(listOf(firstId), cookingRepository.records.map { it.id })
+        assertEquals(listOf(firstId), cookingRepository.operationIds)
+        val arepa = inventoryRepository.items.value.single { it.id == "item1" }
+        assertEquals(3.0, arepa.quantity!!.amount, 0.001)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `CA-RIA-04-09 si Android recrea la pantalla el cierre sigue con la misma operacion`() = runTest {
+        val handle = SavedStateHandle(
+            mapOf("recipeId" to "arepas_hogao", "servings" to 2, CookingViewModel.OPERATION_ID_KEY to "op-guardada")
+        )
+        val viewModel = CookingViewModel(handle, getRecipeDetailUseCase, finishCookingUseCase)
+        runCurrent()
+
+        viewModel.onEvent(CookingEvent.ConfirmFinishClicked)
+        advanceUntilIdle()
+
+        assertEquals(listOf("op-guardada"), cookingRepository.records.map { it.id })
+        assertTrue("No se crea otra operación", cookingRepository.operationIds.isEmpty())
+    }
 }
