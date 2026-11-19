@@ -1,7 +1,10 @@
 package com.smartfood.app.core.backend
 
 import com.smartfood.app.feature.auth.data.repository.ModeAwarePasswordRecoveryRepository
+import com.smartfood.app.feature.inventory.data.repository.ModeAwarePhotoRepository
+import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
 import com.smartfood.app.feature.profile.data.repository.ModeAwareEmailChangeRepository
+import com.smartfood.app.testutil.FakePhotoRepository
 import com.smartfood.app.testutil.FakeEmailChangeRepository
 import com.smartfood.app.testutil.FakeBackendModeProvider
 import com.smartfood.app.testutil.FakePasswordRecoveryRepository
@@ -52,5 +55,40 @@ class ModeAwareRepositoriesTest {
         assertTrue(repository.usesCode)
         repository.requestCode("otro@correo.com")
         assertEquals(listOf("otro@correo.com"), codigo.requested)
+    }
+
+    @Test
+    fun `CA-SPK-05-01 la foto de un producto sube a Storage en Blaze y a Firestore en el modo gratuito`() = runTest {
+        val mode = FakeBackendModeProvider(BackendMode.FREE)
+        val storage = FakePhotoRepository()
+        val firestore = FakePhotoRepository()
+        val repository = ModeAwarePhotoRepository(mode, blaze = storage, free = firestore)
+
+        repository.upload("item1", LocalPhoto("/fotos/a.jpg"))
+        assertEquals(1, firestore.uploads.size)
+
+        mode.mode = BackendMode.BLAZE
+        repository.upload("item1", LocalPhoto("/fotos/b.jpg"))
+        assertEquals(1, storage.uploads.size)
+    }
+
+    @Test
+    fun `CA-SPK-05-03 CA-SPK-05-05 borrar decide por la ruta y no toca Storage en el modo gratuito`() = runTest {
+        val mode = FakeBackendModeProvider(BackendMode.FREE)
+        val storage = FakePhotoRepository()
+        val firestore = FakePhotoRepository()
+        val repository = ModeAwarePhotoRepository(mode, blaze = storage, free = firestore)
+
+        // Una foto de media se borra en Firestore en cualquier modo.
+        assertTrue(repository.delete("users/uid1/media/inv-item1-a").isSuccess)
+        mode.mode = BackendMode.BLAZE
+        assertTrue(repository.delete("users/uid1/media/inv-item1-b").isSuccess)
+        assertEquals(listOf("users/uid1/media/inv-item1-a", "users/uid1/media/inv-item1-b"), firestore.deletedPaths)
+
+        // Una foto de Storage se borra en Blaze y, sin Blaze, termina bien sin tocar Storage.
+        assertTrue(repository.delete("users/uid1/inventory/item1/foto.jpg").isSuccess)
+        mode.mode = BackendMode.FREE
+        assertTrue(repository.delete("users/uid1/inventory/item1/otra.jpg").isSuccess)
+        assertEquals(listOf("users/uid1/inventory/item1/foto.jpg"), storage.deletedPaths)
     }
 }
