@@ -24,7 +24,7 @@ class GetBackendModeUseCase @Inject constructor(private val provider: BackendMod
   `minimumFetchIntervalInSeconds` de 3600 en release y 0 en debug. Si `BuildConfig.FORCED_BACKEND_MODE` es `"blaze"` o
   `"free"`, devuelve ese modo sin leer Remote Config.
 - `SmartfoodApp.onCreate()` llama a `refresh()`. Cada operación lee `current()` al empezar.
-- `CoreDataModule` provee `FirebaseRemoteConfig` y enlaza el provider.
+- `BackendModeModule` (en `core/backend/data`) provee `FirebaseRemoteConfig` y enlaza el provider.
 - Gradle: `firebase-config` (BOM) y `buildConfigField("String", "FORCED_BACKEND_MODE", …)` con la propiedad
   `-PbackendMode` en debug y `""` en release.
 
@@ -63,7 +63,7 @@ users/{uid}/media/{mediaId}   data (bytes ≤ 900 KB), contentType ('image/jpeg'
 ## 4. Pantallas
 
 - **Recuperación:** `RecoveryStep.LINK_SENT`. `PasswordRecoveryUiState.isLinkMode` viene de
-  `PasswordRecoveryRepository.usesCode` a través de `GetRecoveryModeUseCase`. Con el enlace, `sendCode()` pasa a
+  `PasswordRecoveryRepository.usesCode` a través de `RequestRecoveryCodeUseCase.usesCode`. Con el enlace, `sendCode()` pasa a
   `LINK_SENT` y arranca la misma espera de 60 s; «Reenviar enlace» repite `sendCode()`.
 - **Editar información:** si `EmailChangeRepository.usesCode` es `false`, `save()` no abre `EmailCode`: abre
   `Saved(emailChangedTo = null, emailLinkSentTo = correo)`.

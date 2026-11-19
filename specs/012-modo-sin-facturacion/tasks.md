@@ -4,34 +4,35 @@
 > escriben con cada tarea y se corren en la ronda final de [`docs/pendientes.md`](../../docs/pendientes.md).
 
 - [x] T001 La spec, el plan, las tareas y las enmiendas en las specs 003, 004, 006 y 008.
-- [ ] T002 **Interruptor** (RF-SPK-01, HU-SPK-01): `BackendMode`, `RemoteConfigBackendModeProvider`,
-  `GetBackendModeUseCase`, `CoreDataModule`, Gradle y `SmartfoodApp`.
-- [ ] T003 **Recuperación con enlace** (RF-SPK-03, HU-SPK-02): `LinkPasswordRecoveryRepository`, modo en
+- [x] T002 **Interruptor** (RF-SPK-01, HU-SPK-01): `BackendMode`, `RemoteConfigBackendModeProvider`,
+  `GetBackendModeUseCase`, `BackendModeModule`, Gradle y `SmartfoodApp`.
+- [x] T003 **Recuperación con enlace** (RF-SPK-03, HU-SPK-02): `LinkPasswordRecoveryRepository`, modo en
   `AuthDataModule`, `PasswordRecoveryViewModel`, `LinkSentStep` y textos.
-- [ ] T004 **Correo con enlace** (RF-SPK-04, HU-SPK-03): `LinkEmailChangeRepository`, `ProfileDataModule`,
+- [x] T004 **Correo con enlace** (RF-SPK-04, HU-SPK-03): `LinkEmailChangeRepository`, `ProfileDataModule`,
   `EditProfileViewModel` y el aviso.
-- [ ] T005 **Verificación al registrarse** (RF-SPK-05, HU-SPK-04): `AuthRepository.sendEmailVerification` y
+- [x] T005 **Verificación al registrarse** (RF-SPK-05, HU-SPK-04): `AuthRepository.sendEmailVerification` y
   `RegisterUseCase`.
-- [ ] T006 **Almacén de media y Coil** (RF-SPK-06): `FirestoreMediaStore`, `MediaUrls`, `MediaFetcher` y `SmartfoodApp`.
-- [ ] T007 **Fotos del inventario** (CA-SPK-05-01, 05-03 a 05-06): `compressToFit`, `FirestorePhotoRepository` y
+- [x] T006 **Almacén de media y Coil** (RF-SPK-06): `FirestoreMediaStore`, `MediaUrls`, `MediaFetcher` y `SmartfoodApp`.
+- [x] T007 **Fotos del inventario** (CA-SPK-05-01, 05-03 a 05-06): `compressToFit`, `FirestorePhotoRepository` y
   `ModeAwarePhotoRepository`.
-- [ ] T008 **Foto del perfil** (CA-SPK-05-02): `FirestoreProfilePhotoRepository` y `ModeAwareProfilePhotoRepository`.
-- [ ] T009 **Reglas** (RNF-SPK-03): `media` y `photoPath` del perfil en `firestore.rules`, con sus pruebas.
-- [ ] T010 **Migración** (RF-SPK-07, HU-SPK-06): `functions/scripts/migrar-storage-a-firestore.mjs`.
-- [ ] T011 **Documentación**: `AGENTS.md`, `docs/backend.md` y `docs/pendientes.md`.
+- [x] T008 **Foto del perfil** (CA-SPK-05-02): `FirestoreProfilePhotoRepository` y `ModeAwareProfilePhotoRepository`.
+- [x] T009 **Reglas** (RNF-SPK-03): `media` y `photoPath` del perfil en `firestore.rules`, con sus pruebas.
+- [x] T010 **Migración** (RF-SPK-07, HU-SPK-06): `functions/scripts/migrar-storage-a-firestore.mjs`.
+- [x] T011 **Documentación**: `AGENTS.md`, `docs/backend.md` y `docs/pendientes.md`.
 
 ## Matriz de trazabilidad
 
 | CA | Prueba |
 |---|---|
-| CA-SPK-01-01, 01-02, 01-04 | `ModeAwareRepositoriesTest` (U) |
+| CA-SPK-01-01, 01-02 | `ModeAwareRepositoriesTest`, `BackendModeTest` (U) |
+| CA-SPK-01-04 | `BackendModeTest` (U) |
 | CA-SPK-01-03 | M |
-| CA-SPK-02-01 a 02-03, 02-05 | `PasswordRecoveryViewModelTest` (U), `PasswordRecoveryScreenTest` (I) |
+| CA-SPK-02-01 a 02-03, 02-05 | `PasswordRecoveryLinkViewModelTest` (U), `PasswordRecoveryScreenTest` (I) |
 | CA-SPK-02-04 | M |
 | CA-SPK-03-01, 03-02 | `EditProfileViewModelTest` (U) |
-| CA-SPK-03-03, 03-04 | `ProfileUseCasesTest` (U), M |
+| CA-SPK-03-03, 03-04 | M |
 | CA-SPK-04-01 a 04-03 | `RegisterUseCaseTest` (U) |
-| CA-SPK-05-01, 05-02 | `MediaUrlsTest` (U), `PhotoCompressorTest` (I), M |
+| CA-SPK-05-01, 05-02 | `MediaUrlsTest`, `ModeAwareRepositoriesTest` (U), `PhotoCompressorTest` (I), M |
 | CA-SPK-05-03, 05-05 | `ModeAwareRepositoriesTest` (U) |
 | CA-SPK-05-04, 05-06 | M |
 | RNF-SPK-03 | `rules-test/firestore.test.js` |

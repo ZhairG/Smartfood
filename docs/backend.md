@@ -63,3 +63,42 @@ contraseña. Solo existe en debug; release usa siempre la versión real.
 |---|---|
 | Correos con cuenta | `demo@smartfood.com`, `prueba@smartfood.com` |
 | Código de verificación | `1234` |
+
+## Modo sin facturación (spec 012)
+
+El proyecto deja el plan Blaze en noviembre de 2026. En el plan Spark no funcionan las Cloud Functions ni Storage, así
+que la app tiene un modo gratuito que se elige con el parámetro **`blaze_activo`** de Remote Config:
+
+| `blaze_activo` | Recuperación | Cambio de correo | Al registrarse | Fotos |
+|---|---|---|---|---|
+| `true` (Blaze) | Código por las funciones (spec 003) | Código por las funciones (spec 008) | Correo de bienvenida (spec 004) | Storage |
+| `false` o sin leer | Enlace de Firebase | Enlace de Firebase al correo nuevo | Correo de verificación de Firebase | `users/{uid}/media` en Firestore |
+
+- **Cambiar el modo:** consola de Firebase → Remote Config → `blaze_activo` → Publicar. La app lo toma al abrirse,
+  como tarde una hora después (en debug, en cada apertura).
+- **Probar en debug:** `./gradlew :app:installDebug -PbackendMode=free` (o `blaze`) fuerza el modo sin tocar la consola.
+- **Plantillas de Authentication:** los correos del enlace usan las plantillas de Authentication → Plantillas, en
+  español.
+
+### Antes de quitar la facturación: migrar las fotos
+
+Con Blaze todavía activo, copia las fotos de Storage a Firestore. Necesita credenciales de administrador del proyecto:
+
+```bash
+gcloud auth application-default login
+node functions/scripts/migrar-storage-a-firestore.mjs             # simulación: solo lista
+node functions/scripts/migrar-storage-a-firestore.mjs --aplicar   # copia y cambia photoPath y photoUrl
+```
+
+Es idempotente y no borra nada de Storage. Las fotos de más de 900 KB se saltan con un aviso. Después, publica las
+reglas (`firebase deploy --only firestore:rules`) y deja `blaze_activo = false`.
+
+### Volver a Blaze
+
+1. Consola de Google Cloud → Facturación → vincular `smartfood-f62a1`.
+2. Volver a guardar los secretos si se perdieron: `firebase functions:secrets:set SMTP_USER` y `SMTP_PASS`.
+3. `firebase deploy --only functions,firestore:rules,storage`.
+4. Remote Config → `blaze_activo = true` → Publicar.
+5. En un teléfono, reabrir la app pasada una hora (o con un build debug) y probar la recuperación con código y una foto.
+
+Las fotos guardadas en `media` se siguen mostrando, porque su URL `smartfood-media://` dice de dónde leerlas.
