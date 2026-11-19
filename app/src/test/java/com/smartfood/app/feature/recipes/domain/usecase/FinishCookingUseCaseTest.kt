@@ -1,35 +1,33 @@
 package com.smartfood.app.feature.recipes.domain.usecase
 
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
+import com.smartfood.app.feature.inventory.domain.model.InventoryError
+import com.smartfood.app.feature.inventory.domain.model.InventoryException
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
-import com.smartfood.app.feature.inventory.domain.model.LocalPhoto
+import com.smartfood.app.feature.inventory.domain.model.ItemPhoto
 import com.smartfood.app.feature.inventory.domain.model.Quantity
 import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
 import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
-import com.smartfood.app.feature.inventory.domain.repository.PhotoSync
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
-import com.smartfood.app.feature.inventory.domain.usecase.DeleteItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
-import com.smartfood.app.feature.inventory.domain.usecase.UpdateItemUseCase
-import com.smartfood.app.feature.inventory.domain.usecase.ValidateItemUseCase
 import com.smartfood.app.feature.profile.domain.usecase.GetFoodPreferencesUseCase
 import com.smartfood.app.feature.recipes.domain.agent.IngredientMatcher
-import com.smartfood.app.feature.recipes.domain.model.CookingRecord
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
+import com.smartfood.app.feature.recipes.domain.model.InventoryChange
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.Recipe
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
 import com.smartfood.app.feature.recipes.domain.model.RecipeStep
 import com.smartfood.app.feature.recipes.domain.model.Store
-import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
+import com.smartfood.app.testutil.FakeCookingRepository
 import com.smartfood.app.testutil.FakeInventoryRepository
+import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.FakeProfileRepository
 import com.smartfood.app.testutil.fixedClock
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -41,7 +39,9 @@ import java.time.LocalDate
  * Fecha: Octubre 2026
  * Descripción: Pruebas unitarias de [FinishCookingUseCase] (spec 009, CA-RIA-04-05, CA-RIA-04-06, T021): descuenta en la
  * unidad original (kg incluido), borra lo que queda en 0 o no tenía cantidad, cuenta como rescatado solo lo que vence
- * en 0 a 3 días y devuelve `PENDING` si algo quedó en la cola sin conexión.
+ * en 0 a 3 días y devuelve `PENDING` si algo quedó en la cola sin conexión. Desde el punto 3 de `docs/pendientes.md`:
+ * el producto conserva su precio y su foto (CA-RIA-04-08), y un cierre fallido o repetido no descuenta dos veces
+ * (CA-RIA-04-09).
  */
 class FinishCookingUseCaseTest {
 
@@ -67,43 +67,22 @@ class FinishCookingUseCaseTest {
         override suspend fun ingredients(): Map<String, Ingredient> = this@FinishCookingUseCaseTest.ingredients
     }
 
-    private class FakeCookingHistoryRepository : CookingHistoryRepository {
-        val saved = mutableListOf<CookingRecord>()
-        var outcome = WriteOutcome.SYNCED
-        override fun observeHistory(): Flow<List<CookingRecord>> = flowOf(saved)
-        override fun newRecordId(): String = "record1"
-        override suspend fun saveRecord(record: CookingRecord): Result<WriteOutcome> {
-            saved.add(record)
-            return Result.success(outcome)
-        }
-    }
-
-    private class NoOpPhotoSync : PhotoSync {
-        override fun cancelUpload(itemId: String) {}
-        override fun enqueueUpload(itemId: String, photo: LocalPhoto, replacedPath: String?) {}
-        override fun enqueueDelete(path: String) {}
-        override fun pendingPhotos(): Flow<Map<String, String>> = flowOf(emptyMap())
-        override fun hasPending(): Boolean = false
-        override fun clearAll() {}
-    }
-
     private lateinit var inventoryRepository: FakeInventoryRepository
-    private lateinit var historyRepository: FakeCookingHistoryRepository
+    private lateinit var cookingRepository: FakeCookingRepository
+    private lateinit var photoSync: FakePhotoSync
     private lateinit var finishCookingUseCase: FinishCookingUseCase
 
     @Before
     fun setUp() {
         inventoryRepository = FakeInventoryRepository()
-        historyRepository = FakeCookingHistoryRepository()
-
-        val photoSync = NoOpPhotoSync()
+        cookingRepository = FakeCookingRepository(inventoryRepository)
+        photoSync = FakePhotoSync()
         finishCookingUseCase = FinishCookingUseCase(
             getRecipeDetail = GetRecipeDetailUseCase(FakeCatalog()),
             observeInventory = ObserveInventoryUseCase(inventoryRepository, photoSync, ClassifyExpiryUseCase(clock)),
             getPreferredStore = GetPreferredStoreUseCase(GetFoodPreferencesUseCase(FakeProfileRepository())),
-            updateItemUseCase = UpdateItemUseCase(inventoryRepository, photoSync, ValidateItemUseCase(clock)),
-            deleteItemUseCase = DeleteItemUseCase(inventoryRepository, photoSync),
-            cookingHistoryRepository = historyRepository,
+            cookingRepository = cookingRepository,
+            photoSync = photoSync,
             ingredientMatcher = IngredientMatcher(clock),
             clock = clock
         )
@@ -113,11 +92,11 @@ class FinishCookingUseCaseTest {
     fun `CA-RIA-04-05 descuenta inventario y guarda registro con valor rescatado`() = runTest {
         inventoryRepository.createItem(item("item1", "Arepa de maíz", Quantity(5.0, QuantityUnit.UNITS), days = 1))
 
-        val result = finishCookingUseCase("arepas_hogao", 2)
+        val result = finishCookingUseCase("arepas_hogao", 2, "op1")
 
         assertEquals(WriteOutcome.SYNCED, result.getOrNull())
         assertEquals(3.0, quantityOf("item1"), 0.001)
-        val record = historyRepository.saved.single()
+        val record = cookingRepository.records.single()
         assertEquals("arepas_hogao", record.recipeId)
         assertEquals(2, record.servings)
         assertEquals(clock.millis(), record.cookedAt)
@@ -129,7 +108,7 @@ class FinishCookingUseCaseTest {
     fun `CA-RIA-04-05 borra el producto que queda en 0`() = runTest {
         inventoryRepository.createItem(item("item1", "Arepa de maíz", Quantity(2.0, QuantityUnit.UNITS), days = 1))
 
-        finishCookingUseCase("arepas_hogao", 2)
+        finishCookingUseCase("arepas_hogao", 2, "op1")
 
         assertEquals(listOf("item1"), inventoryRepository.deletedIds)
     }
@@ -138,7 +117,7 @@ class FinishCookingUseCaseTest {
     fun `CA-RIA-04-05 borra el producto que no tenia cantidad`() = runTest {
         inventoryRepository.createItem(item("item1", "Arepa de maíz", quantity = null, days = 1))
 
-        finishCookingUseCase("arepas_hogao", 2)
+        finishCookingUseCase("arepas_hogao", 2, "op1")
 
         assertEquals(listOf("item1"), inventoryRepository.deletedIds)
     }
@@ -147,7 +126,7 @@ class FinishCookingUseCaseTest {
     fun `CA-RIA-04-05 descuenta en la unidad original del producto (kg)`() = runTest {
         inventoryRepository.createItem(item("papa1", "Papa", Quantity(1.0, QuantityUnit.KILOGRAMS), days = 10))
 
-        finishCookingUseCase("papas_cocidas", 2)
+        finishCookingUseCase("papas_cocidas", 2, "op1")
 
         val papa = inventoryRepository.items.value.single { it.id == "papa1" }
         assertEquals(QuantityUnit.KILOGRAMS, papa.quantity?.unit)
@@ -158,20 +137,101 @@ class FinishCookingUseCaseTest {
     fun `CA-RIA-04-06 lo que vence en mas de 3 dias no cuenta como rescatado`() = runTest {
         inventoryRepository.createItem(item("papa1", "Papa", Quantity(1.0, QuantityUnit.KILOGRAMS), days = 10))
 
-        finishCookingUseCase("papas_cocidas", 2)
+        finishCookingUseCase("papas_cocidas", 2, "op1")
 
-        assertEquals(0, historyRepository.saved.single().rescuedValueCop)
+        assertEquals(0, cookingRepository.records.single().rescuedValueCop)
     }
 
     @Test
     fun `CA-RIA-04-05 sin conexion devuelve PENDING para mostrar Guardado en tu telefono`() = runTest {
         inventoryRepository.createItem(item("item1", "Arepa de maíz", Quantity(5.0, QuantityUnit.UNITS), days = 1))
-        historyRepository.outcome = WriteOutcome.PENDING
+        cookingRepository.outcome = WriteOutcome.PENDING
 
-        val result = finishCookingUseCase("arepas_hogao", 2)
+        val result = finishCookingUseCase("arepas_hogao", 2, "op1")
 
         assertTrue(result.isSuccess)
         assertEquals(WriteOutcome.PENDING, result.getOrNull())
+    }
+
+    @Test
+    fun `CA-RIA-04-08 al descontar el producto conserva su precio, su foto y su vencimiento`() = runTest {
+        val foto = ItemPhoto("users/u/inventory/item1/a.jpg", "https://foto/a.jpg")
+        val arepa = item("item1", "Arepa de maíz", Quantity(5.0, QuantityUnit.UNITS), days = 1)
+            .copy(price = 3_000L, photo = foto)
+        inventoryRepository.createItem(arepa)
+
+        finishCookingUseCase("arepas_hogao", 2, "op1")
+
+        val change = cookingRepository.batches.single().second.single()
+        assertTrue("Solo cambia la cantidad", change is InventoryChange.UpdateQuantity)
+        val after = inventoryRepository.items.value.single { it.id == "item1" }
+        assertEquals(3_000L, after.price)
+        assertEquals(foto, after.photo)
+        assertEquals(arepa.expiresOn, after.expiresOn)
+        assertEquals(arepa.category, after.category)
+        assertEquals(3.0, after.quantity!!.amount, 0.001)
+        assertTrue("Una foto que se conserva no se borra", photoSync.deletes.isEmpty())
+    }
+
+    @Test
+    fun `CA-RIA-04-09 si el guardado falla no se descuenta nada`() = runTest {
+        inventoryRepository.createItem(item("item1", "Arepa de maíz", Quantity(5.0, QuantityUnit.UNITS), days = 1))
+        cookingRepository.failure = InventoryException(InventoryError.Network)
+
+        val result = finishCookingUseCase("arepas_hogao", 2, "op1")
+
+        assertTrue(result.isFailure)
+        assertEquals(5.0, quantityOf("item1"), 0.001)
+        assertTrue(cookingRepository.records.isEmpty())
+    }
+
+    @Test
+    fun `CA-RIA-04-09 reintentar despues de un fallo descuenta una sola vez`() = runTest {
+        inventoryRepository.createItem(item("item1", "Arepa de maíz", Quantity(5.0, QuantityUnit.UNITS), days = 1))
+        cookingRepository.failure = InventoryException(InventoryError.Network)
+        finishCookingUseCase("arepas_hogao", 2, "op1")
+
+        cookingRepository.failure = null
+        val result = finishCookingUseCase("arepas_hogao", 2, "op1")
+
+        assertTrue(result.isSuccess)
+        assertEquals(3.0, quantityOf("item1"), 0.001)
+        assertEquals(1, cookingRepository.records.size)
+    }
+
+    @Test
+    fun `CA-RIA-04-09 repetir un cierre ya aplicado no vuelve a descontar`() = runTest {
+        inventoryRepository.createItem(item("item1", "Arepa de maíz", Quantity(5.0, QuantityUnit.UNITS), days = 1))
+        finishCookingUseCase("arepas_hogao", 2, "op1")
+
+        val again = finishCookingUseCase("arepas_hogao", 2, "op1")
+
+        assertTrue(again.isSuccess)
+        assertEquals(3.0, quantityOf("item1"), 0.001)
+        assertEquals(listOf("op1"), cookingRepository.records.map { it.id })
+    }
+
+    @Test
+    fun `CA-RIA-04-09 el registro usa el id de la operacion`() = runTest {
+        inventoryRepository.createItem(item("item1", "Arepa de maíz", Quantity(5.0, QuantityUnit.UNITS), days = 1))
+
+        finishCookingUseCase("arepas_hogao", 2, "op-estable")
+
+        assertEquals("op-estable", cookingRepository.records.single().id)
+    }
+
+    @Test
+    fun `CA-RIA-04-05 al borrar un producto con foto se encola el borrado de la foto`() = runTest {
+        val foto = ItemPhoto("users/u/inventory/item1/a.jpg", "https://foto/a.jpg")
+        inventoryRepository.createItem(
+            item("item1", "Arepa de maíz", Quantity(2.0, QuantityUnit.UNITS), days = 1).copy(photo = foto)
+        )
+
+        finishCookingUseCase("arepas_hogao", 2, "op1")
+
+        assertEquals(listOf("item1"), inventoryRepository.deletedIds)
+        assertEquals(listOf(foto.path), photoSync.deletes)
+        assertFalse(cookingRepository.records.isEmpty())
     }
 
     private fun recipe(id: String, ingredient: RecipeIngredient) = Recipe(

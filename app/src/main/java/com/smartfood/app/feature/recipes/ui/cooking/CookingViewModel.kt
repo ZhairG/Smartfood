@@ -111,7 +111,7 @@ class CookingViewModel @Inject constructor(
         stopAlarm()
         _uiState.update { it.copy(dialog = CookingDialog.Saving) }
         viewModelScope.launch {
-            finishCookingUseCase(recipeId, servings).fold(
+            finishCookingUseCase(recipeId, servings, finishCookingUseCase.newOperationId()).fold(
                 onSuccess = { outcome ->
                     _uiState.update { it.copy(dialog = CookingDialog.Saved(onPhone = outcome == WriteOutcome.PENDING)) }
                     delay(RESULT_DIALOG_MILLIS)
