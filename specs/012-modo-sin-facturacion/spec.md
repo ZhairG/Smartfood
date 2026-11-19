@@ -128,7 +128,11 @@ sin publicar otra versión. No se borra nada de `functions/` ni del código de S
 
 ## 7. Supuestos
 
-- La protección contra la enumeración de correos de Authentication está activa (es el valor por defecto).
+- La protección contra la enumeración de correos de Authentication está **desactivada** desde el 2026-11-19 (decisión de
+  Zhair). Con ella activa, `verifyBeforeUpdateEmail` responde éxito sin enviar nada cuando el correo nuevo ya tiene
+  cuenta, y la app no podría cumplir CA-SPK-03-04. Consecuencia: se puede averiguar si un correo tiene cuenta, y el
+  inicio de sesión con un correo inexistente vuelve a mostrar «No existe una cuenta registrada…». La recuperación sigue
+  respondiendo igual exista o no la cuenta, porque `LinkPasswordRecoveryRepository` calla ese error (CA-REC-01-02).
 - Las fotos comprimidas a 1080 px y JPEG 80 pesan unos 300 KB, así que caben en un solo documento.
 - Zhair corre la migración con credenciales de administrador mientras Blaze sigue activo.
 

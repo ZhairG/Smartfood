@@ -79,6 +79,9 @@ que la app tiene un modo gratuito que se elige con el parámetro **`blaze_activo
 - **Probar en debug:** `./gradlew :app:installDebug -PbackendMode=free` (o `blaze`) fuerza el modo sin tocar la consola.
 - **Plantillas de Authentication:** los correos del enlace usan las plantillas de Authentication → Plantillas, en
   español.
+- **Protección contra la enumeración de correos:** desactivada (Authentication → Configuración). Con ella activa,
+  Firebase no avisa que el correo nuevo ya tiene cuenta y no envía el enlace, pero la app diría que sí lo envió
+  (spec 012 §7, CA-SPK-03-04).
 
 ### Antes de quitar la facturación: migrar las fotos
 
