@@ -146,7 +146,7 @@ class EditProfileViewModel @Inject constructor(
                 validateProfile(state.fullName, state.phone, state.birthDate).getOrThrow()
                 val wait = newEmail?.let { requestEmailChange(it, state.currentPassword).getOrThrow() }
                 val edits = ProfileEdits(state.fullName, state.phone, state.birthDate, state.newPhotoPath)
-                val saved = if (state.hasProfileChanges) updateProfile(original, edits).getOrThrow() else original
+                val saved = if (state.hasProfileChanges) updateProfile(original, edits).getOrThrow().profile else original
                 saved to wait
             }
             result

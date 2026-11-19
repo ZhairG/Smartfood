@@ -9,6 +9,7 @@ import com.smartfood.app.feature.profile.domain.usecase.ProfileEdits
 import com.smartfood.app.feature.profile.domain.usecase.RequestEmailChangeUseCase
 import com.smartfood.app.feature.profile.domain.usecase.SyncProfileEmailUseCase
 import com.smartfood.app.feature.profile.domain.usecase.UpdateProfileUseCase
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.profile.domain.usecase.ValidateProfileUseCase
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeEmailChangeRepository
@@ -75,7 +76,7 @@ class ProfileUseCasesTest {
         val conFoto = current.copy(photoPath = "users/u/profile/vieja.jpg", photoUrl = "https://vieja")
 
         val guardado = update(conFoto, ProfileEdits("Ana María", "3001234567", today.minusYears(20), "/cache/profile/n.jpg"))
-            .getOrThrow()
+            .getOrThrow().profile
 
         assertEquals(listOf("/cache/profile/n.jpg"), photos.uploads)
         assertEquals("users/uid-123/profile/foto-1.jpg", guardado.photoPath)
@@ -100,8 +101,20 @@ class ProfileUseCasesTest {
         val conFoto = current.copy(photoPath = "p", photoUrl = "u")
         val guardado = update(conFoto, ProfileEdits("Ana", "", null)).getOrThrow()
 
-        assertEquals("p", guardado.photoPath)
+        assertEquals("p", guardado.profile.photoPath)
+        assertEquals(WriteOutcome.SYNCED, guardado.outcome)
         assertTrue(photos.uploads.isEmpty() && photos.deletes.isEmpty())
+    }
+
+    @Test
+    fun `CA-PER-02-14 sin conexion los datos quedan en el telefono y el resultado es PENDING`() = runTest {
+        repository.outcome = WriteOutcome.PENDING
+
+        val guardado = update(current, ProfileEdits("Ana María", "", null)).getOrThrow()
+
+        assertEquals(WriteOutcome.PENDING, guardado.outcome)
+        assertEquals("Ana María", guardado.profile.fullName)
+        assertEquals(guardado.profile, repository.updates.single())
     }
 
     @Test

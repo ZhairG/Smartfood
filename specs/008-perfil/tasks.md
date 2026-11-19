@@ -41,7 +41,7 @@
 
 ## Correcciones después de la entrega
 - [x] T027 Guardado pendiente o confirmado en el Perfil (2026-11-19, punto 4 de `docs/pendientes.md`): CA-PER-02-14, 03-06 y su desviación.
-- [ ] T028 `ProfileRepository.updateProfile` y `savePreferences` devuelven `WriteOutcome`; `UpdateProfileUseCase` devuelve `SavedProfile` (CA-PER-02-14, 03-06).
+- [x] T028 `ProfileRepository.updateProfile` y `savePreferences` devuelven `WriteOutcome`; `UpdateProfileUseCase` devuelve `SavedProfile` (CA-PER-02-14, 03-06).
 - [ ] T029 "Guardado en tu teléfono" en "Editar información" y "Preferencias alimentarias" (CA-PER-02-14, 03-06).
 
 ## Cierre (en el mismo PR)
