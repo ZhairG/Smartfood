@@ -257,6 +257,10 @@ con `firebase emulators:exec --only firestore,storage "npm --prefix rules-test t
 
 ### Cloud Storage
 
+> **Enmienda (spec 012):** esto aplica al modo Blaze. Con `blaze_activo = false` las fotos van a
+> `users/{uid}/media/{mediaId}` en Firestore ([spec 012](../012-modo-sin-facturacion/spec.md), HU-SPK-05); el flujo de
+> `PhotoSync` y los workers no cambia.
+
 ```
 users/{uid}/inventory/{itemId}/{uuid}.jpg
 ```

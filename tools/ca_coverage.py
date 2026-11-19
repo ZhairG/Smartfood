@@ -21,7 +21,7 @@ ROOTS = ["app/src/test", "app/src/androidTest"]
 # Nombre de cada prueba: la función que sigue a @Test, entre comillas invertidas o en camelCase/snake_case.
 TEST_NAME = re.compile(r"@Test\s*(?:@[\w.()\"= ]+\s*)*fun\s+(`[^`]+`|[\w]+)")
 
-AREAS = {"inv": "INV", "ui": "UI", "rec": "REC", "leg": "LEG", "mail": "MAIL", "per": "PER", "ria": "RIA", "sav": "SAV", "coc": "COC"}
+AREAS = {"inv": "INV", "ui": "UI", "rec": "REC", "leg": "LEG", "mail": "MAIL", "per": "PER", "ria": "RIA", "sav": "SAV", "coc": "COC", "spk": "SPK"}
 
 # Un código puede seguir con más números de la misma área: `caInv0101_0102` son CA-INV-01-01 y CA-INV-01-02, y
 # `ca0103_0105`, CA-01-03 y CA-01-05 (#105, pruebas por flujo).
