@@ -11,6 +11,7 @@ import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -27,7 +28,8 @@ import org.junit.runner.RunWith
  * - el tiempo de cada búsqueda (promedio y peor caso), los nodos y si terminó;
  * - la memoria: el máximo del heap de Java que se usó por encima del de antes de buscar, muestreado cada 2 ms (es una
  *   aproximación: incluye la basura que el recolector todavía no liberó);
- * - con el límite, la brecha con el plan sin límite.
+ * - con el límite, la brecha con el plan sin límite (solo en los inventarios normales).
+ * El estrés sin límite se corta a los 60 s, porque en el APK debug puede tardar minutos.
  *
  * Es una prueba del APK debug, sin R8: el tiempo que vive el usuario se mide además con el APK release y el registro
  * de `AiPlanViewModel`. Solo afirma lo que no depende del equipo: con el límite, ninguna búsqueda pasa de 2 s más un
@@ -55,25 +57,34 @@ class AgentDevicePerformanceTest {
         measure(normal.first(), limited = false) // Calentamiento: carga clases y JIT.
 
         report("Normales sin límite", normal.map { measure(it, limited = false) })
-        report("Estrés sin límite", stress.map { measure(it, limited = false) })
+        // En el APK debug una búsqueda de estrés sin límite puede tardar minutos: se corta a los 60 s y se cuenta cuántas
+        // no terminaron (el reporte dice "terminaron n/6").
+        report("Estrés sin límite (tope de 60 s)", stress.map { measure(it, limit = STRESS_CAP) })
     }
 
     @Test
     fun caRia0213_conElLimiteNingunaBusquedaPasaDeDosSegundos() {
-        val cases = catalog.syntheticInventories() + catalog.largeInventories(count = 6, seed = 2026)
+        val normal = catalog.syntheticInventories()
+        val cases = normal + catalog.largeInventories(count = 6, seed = 2026)
         measure(cases.first(), limited = false) // Calentamiento.
 
         val limited = cases.map { measure(it, limited = true) }
-        val unlimited = cases.map { planner.search(catalog.recipes, it, context)?.utility }
         report("Normales y estrés con límite de 2 s", limited)
-        val gaps = limited.zip(unlimited).mapNotNull { (m, best) -> if (m.utility != null && best != null) best - m.utility else null }
+        // La brecha solo en los normales: el óptimo del estrés tardaría minutos en el APK debug.
+        val unlimited = normal.map { planner.search(catalog.recipes, it, context)?.utility }
+        val gaps = limited.take(normal.size).zip(unlimited)
+            .mapNotNull { (m, best) -> if (m.utility != null && best != null) best - m.utility else null }
         log("Brecha con el óptimo (con límite): media ${fmt(gaps.average(), 4)}, peor ${fmt(gaps.maxOrNull() ?: 0.0, 4)}")
 
         limited.forEach { assertTrue("Con el límite tardó ${it.millis} ms", it.millis <= LIMIT_MARGIN_MILLIS) }
         gaps.forEach { assertTrue("El plan con límite no supera al óptimo", it >= -1e-9) }
     }
 
-    private fun measure(pantry: List<PantryItem>, limited: Boolean): Measure {
+    private fun measure(pantry: List<PantryItem>, limited: Boolean): Measure =
+        measure(pantry, limit = if (limited) PLAN_LIMIT else null)
+
+    /** Mide una búsqueda con un límite de tiempo, o sin límite si [limit] es `null`. */
+    private fun measure(pantry: List<PantryItem>, limit: Duration?): Measure {
         val runtime = Runtime.getRuntime()
         System.gc()
         val baseline = runtime.totalMemory() - runtime.freeMemory()
@@ -85,7 +96,7 @@ class AgentDevicePerformanceTest {
                 Thread.sleep(SAMPLE_MILLIS)
             }
         }
-        val deadline = if (limited) SearchDeadline.after(2.seconds) else SearchDeadline.NONE
+        val deadline = limit?.let { SearchDeadline.after(it) } ?: SearchDeadline.NONE
         val started = System.nanoTime()
         val outcome = planner.searchOutcome(catalog.recipes, pantry, context, deadline)
         val millis = (System.nanoTime() - started) / 1_000_000.0
@@ -115,5 +126,7 @@ class AgentDevicePerformanceTest {
         const val TAG = "SmartFoodIA"
         const val SAMPLE_MILLIS = 2L
         const val LIMIT_MARGIN_MILLIS = 2_500.0
+        val PLAN_LIMIT = 2.seconds
+        val STRESS_CAP = 60.seconds
     }
 }
