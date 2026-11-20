@@ -133,15 +133,21 @@ class AlgorithmComparisonTest {
         val total = profile.inventories.size
         return buildString {
             append("\n### ${profile.name} ($total inventarios)\n\n")
-            append("| Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | Frontera | ms |\n")
-            append("|---|---|---|---|---|---|---|---|---|---|\n")
+            // "Frontera": la media, entre inventarios, del máximo de estados que A* guardó a la vez, y el mayor de esos
+            // máximos. Son estados, no bytes (informe de IA, T042).
+            append(
+                "| Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | " +
+                    "Frontera (media de máximos) | Frontera máxima | ms |\n",
+            )
+            append("|---|---|---|---|---|---|---|---|---|---|---|\n")
             rows.forEach { row ->
                 val found = row.results.filter { it.result.ids != null }
                 val gaps = found.mapNotNull { m -> m.optimum?.let { it - m.result.utility } }
                 append("| ${row.name} | ${found.size}/$total | ${n(found.map { it.result.utility }, 3)} | ${n(gaps, 3)} | ")
                 append("${percent(shares.getValue(row.name))} | ${n(wastes.getValue(row.name), 2)} | ")
                 append("${n(costs.getValue(row.name), 0)} | ${n(row.results.map { it.result.nodes.toDouble() }, 0)} | ")
-                append("${n(row.results.map { it.result.peakFrontier.toDouble() }, 0)} | ")
+                append("${n(row.results.map { it.result.peakFrontier.toDouble() }, 1)} | ")
+                append("${row.results.maxOfOrNull { it.result.peakFrontier } ?: "—"} | ")
                 append("${n(row.results.map { it.millis }, 1)} |\n")
             }
         }
