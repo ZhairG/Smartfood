@@ -59,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.components.AnimatedMessage
 import com.smartfood.app.core.designsystem.components.SmartFoodConfirmDialog
 import com.smartfood.app.core.designsystem.components.SmartFoodLoadingDialog
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
@@ -244,10 +245,10 @@ private fun EditorFields(
 /** Aviso de error y botón (Figma `476:3688` y `476:3687`). */
 @Composable
 private fun EditorBottom(state: ProductEditorUiState, onEvent: (ProductEditorEvent) -> Unit, errorText: String?) {
-    if (errorText != null) {
-        // Aviso rojo centrado encima del botón, en SemiBold de 15 sp, como el Figma.
+    // Aviso rojo centrado encima del botón, en SemiBold de 15 sp, como el Figma; aparece y se va en 150 ms.
+    AnimatedMessage(message = errorText) { text ->
         Text(
-            text = errorText,
+            text = text,
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
             textAlign = TextAlign.Center,
