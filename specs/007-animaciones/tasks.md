@@ -23,7 +23,7 @@
 - [x] T009 `SmartFoodBottomSheet`; `OptionSheet`, `PhotoSourceSheet` e `IngredientSheet` lo usan (CA-ANI-04-01).
 - [x] T010 Errores en línea de formularios y editores con 150 ms (CA-ANI-04-03).
 - [x] T011 Avisos de resultado (CA-ANI-04-04): los del editor y "Guardado" del Perfil son diálogos de resultado y su entrada ya se anima con T008; la barra de deshacer de Guardadas usa `AnimatedMessage` con 300 ms.
-- [ ] T012 `VoiceSearchOverlay`: cambios de estado con 300 ms (CA-ANI-04-05).
+- [x] T012 `VoiceSearchOverlay`: cambios de estado con 300 ms (CA-ANI-04-05).
 
 ## Fase 5: Listas, chips, botones y recetas
 - [ ] T013 Lista del inventario: esqueleto → contenido con `Crossfade` y filas con `animateItem` (CA-ANI-05-01, 05-02).
