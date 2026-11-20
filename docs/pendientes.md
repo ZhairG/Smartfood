@@ -125,6 +125,13 @@ fusionó. Hoy está en el *stash* local «On docs/007-animaciones: borrador spec
 - T024 de la spec 010.
 - Prueba intermitente `AiFlowScreenTest.caRia0207`.
 
+**Avance (rama `fix/009-010-pendientes-menores`, 2026-11-20):**
+- **Prueba intermitente:** la causa es externa. La ventana emergente de Truecaller se abrió encima de la prueba en el
+  V2436 y la dejó en pausa («No compose hierarchies found»). No hay que corregir código: la precaución quedó en
+  [`instalacion.md`](instalacion.md) y en la T046 de la spec 009.
+- **T024:** se hace en la ronda final, sobre `master` con todo fusionado. La tabla Figma vs app y el checklist están
+  en `disenos-figma/Modulo 5 - Recetas guardadas/comparacion/README.md`.
+
 ## 10. Persistencia local con Room (opcional)
 
 *Origen: informe de Aplicaciones Móviles (unidad 6 del curso).*
