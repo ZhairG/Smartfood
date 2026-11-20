@@ -8,7 +8,7 @@
 
 ## Fase 1: Tokens y medición
 - [x] T002 `core/designsystem/theme/Motion.kt` con duraciones, curvas y especificaciones. Prueba `SmartFoodMotionTest` (RF-ANI-01, CA-ANI-01-01).
-- [ ] T003 `tools/medir_fluidez.py`: primer cuadro, hueco más largo y cuadros lentos de una transición con `gfxinfo framestats` (RNF-ANI-01).
+- [x] T003 `tools/medir_fluidez.py`: primer cuadro, hueco más largo y cuadros lentos de una transición con `gfxinfo framestats` (RNF-ANI-01).
 
 ## Fase 2: Navegación
 - [ ] T004 `NavTransitions`: empuje de 300 ms ease-in-out y disolvencia de 100 ms entre las cuatro pestañas (Guardadas incluida). Ajustar `AppNavigationTest` y `MainNavigationTest` (CA-ANI-02-01 a 02-05, CA-ANI-06-01).
