@@ -19,7 +19,7 @@
 - [ ] T007 Editor de producto, búsqueda y editor de receta propia: el campo enfocado no salta al abrir el teclado (CA-ANI-03-05).
 
 ## Fase 4: Diálogos, hojas y avisos
-- [ ] T008 `Dialogs.kt`: entrada y salida animadas con velo en Compose; `onDismiss` al terminar la salida (CA-ANI-04-02).
+- [x] T008 `Dialogs.kt`: entrada y salida animadas con velo en Compose; `onDismiss` al terminar la salida (CA-ANI-04-02).
 - [ ] T009 `SmartFoodBottomSheet`; `OptionSheet`, `PhotoSourceSheet` e `IngredientSheet` lo usan (CA-ANI-04-01).
 - [ ] T010 Errores en línea de formularios y editores con 150 ms (CA-ANI-04-03).
 - [ ] T011 Avisos de resultado: editor, "Guardado" del Perfil y deshacer de Guardadas con 300 ms (CA-ANI-04-04).

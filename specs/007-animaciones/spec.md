@@ -163,6 +163,11 @@ ahora y se corren en la ronda final de los 10 puntos.
 
 - **Teclado:** el Figma no muestra el teclado. El encabezado sigue la animación del sistema (CA-ANI-03-02), como en
   las apps de referencia.
+- **Diálogos que quita la pantalla:** los de resultado, carga y "Sin conexión" los quita la pantalla cuando cambia su
+  estado; al salir de la composición desaparecen sin animación de salida. Los que cierra la persona (confirmar, aviso,
+  guardar cambios) sí animan la salida y ejecutan la acción al terminarla.
+- **Velo de los diálogos:** se conserva el de la ventana con desenfoque (spec 002, CA-UI-07-06), que se disuelve con
+  ella; no se dibuja en Compose.
 - **Diálogos con *back*:** algunos diálogos del prototipo usan "Ease in and out back" (rebote leve). Se aplica solo a la
   escala del diálogo (CA-ANI-04-02), nunca al velo.
 

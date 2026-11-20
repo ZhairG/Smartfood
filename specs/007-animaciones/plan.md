@@ -76,6 +76,8 @@ object SmartFoodMotion {
 
 ## 5. Diálogos y hojas (HU-ANI-04)
 
+- **Diálogos — implementado (T008):** `AnimatedDialogContent` y `DialogMotion` envuelven el contenido; el velo de la
+  ventana se conserva (spec §8). Lo que sigue es el diseño original.
 - **Diálogos (`Dialogs.kt`):** el contenido va dentro de un `AnimatedVisibility` con `MutableTransitionState`:
   - entrada: `fadeIn(standard()) + scaleIn(emphasizedEnter(), initialScale = 0.92f)`;
   - salida: `fadeOut(standard()) + scaleOut(standard(), targetScale = 0.92f)`;
