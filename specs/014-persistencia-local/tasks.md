@@ -14,7 +14,7 @@
 - [x] T005 **Recientes en Descubrir** (CA-LOC-02-01, 02-02, 02-04 a 02-07): `SmartFoodRecentSearches`,
   `strings_search.xml`, `RecipeSearchField`, contrato, ViewModel y pantalla; `RecipesDiscoverViewModelTest`,
   `RecentSearchesTest` y `RecipesDiscoverScreenTest`.
-- [ ] T006 **Recientes en el Inventario** (CA-LOC-02-01 a 02-07): contrato, ViewModel (también la voz) y pantalla;
+- [x] T006 **Recientes en el Inventario** (CA-LOC-02-01 a 02-07): contrato, ViewModel (también la voz) y pantalla;
   `InventorySearchViewModelTest` e `InventorySearchScreenTest`.
 - [ ] T007 **Documentación**: `AGENTS.md` (arquitectura y lista de specs), `README.md`, matriz al día,
   `tools/ca_coverage.py` y su línea base, y `docs/pendientes.md`.

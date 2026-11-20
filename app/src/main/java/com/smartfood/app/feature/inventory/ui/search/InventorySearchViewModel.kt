@@ -10,6 +10,10 @@ package com.smartfood.app.feature.inventory.ui.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartfood.app.core.search.domain.ClearRecentSearchesUseCase
+import com.smartfood.app.core.search.domain.ObserveRecentSearchesUseCase
+import com.smartfood.app.core.search.domain.RecordRecentSearchUseCase
+import com.smartfood.app.core.search.domain.SearchScope
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.SpeechError
 import com.smartfood.app.feature.inventory.domain.model.SpeechEvent
@@ -36,6 +40,9 @@ import javax.inject.Inject
  * @param searchInventoryUseCase Filtrado por texto y categoría (RF-INV-05).
  * @param speechToText Reconocimiento de voz del sistema (CA-INV-07-01).
  * @param parseSpokenIngredientsUseCase Convierte el dictado en ingredientes (CA-INV-07-03).
+ * @param observeRecentSearches Búsquedas recientes del Inventario (spec 014, CA-LOC-02-01).
+ * @param recordRecentSearch Guarda la búsqueda al tocar un resultado, pulsar «Buscar» o dictar (CA-LOC-02-02, 02-03).
+ * @param clearRecentSearches «Borrar» de «Recientes» (CA-LOC-02-06).
  */
 @HiltViewModel
 class InventorySearchViewModel @Inject constructor(
@@ -43,6 +50,9 @@ class InventorySearchViewModel @Inject constructor(
     private val searchInventoryUseCase: SearchInventoryUseCase,
     private val speechToText: SpeechToText,
     private val parseSpokenIngredientsUseCase: ParseSpokenIngredientsUseCase,
+    observeRecentSearches: ObserveRecentSearchesUseCase,
+    private val recordRecentSearch: RecordRecentSearchUseCase,
+    private val clearRecentSearches: ClearRecentSearchesUseCase,
 ) : ViewModel() {
 
     private val query = MutableStateFlow("")
@@ -70,8 +80,10 @@ class InventorySearchViewModel @Inject constructor(
         observeInventoryUseCase().catch { emit(emptyList()) },
         query,
         selectedCategory,
-        voice
-    ) { sections, text, category, voiceState ->
+        voice,
+        // Si las búsquedas recientes no se pueden leer, la barra funciona como antes (spec 014).
+        observeRecentSearches(SearchScope.INVENTORY).catch { emit(emptyList()) }
+    ) { sections, text, category, voiceState, recents ->
         val statusById = buildMap {
             sections.forEach { section ->
                 section.items.forEach { put(it.id, section.status) }
@@ -84,7 +96,8 @@ class InventorySearchViewModel @Inject constructor(
             selectedCategory = category,
             results = results,
             isVoiceAvailable = isVoiceAvailable,
-            voice = voiceState
+            voice = voiceState,
+            recentSearches = recents
         )
     }.stateIn(
         scope = viewModelScope,
@@ -96,6 +109,13 @@ class InventorySearchViewModel @Inject constructor(
         when (event) {
             is InventorySearchEvent.QueryChanged -> query.value = event.query
             InventorySearchEvent.ClearQuery -> query.value = ""
+            InventorySearchEvent.SearchSubmitted -> record(query.value)
+            is InventorySearchEvent.RecentClicked -> {
+                query.value = event.text
+                record(event.text)
+            }
+            InventorySearchEvent.ClearRecents ->
+                viewModelScope.launch { clearRecentSearches(SearchScope.INVENTORY) }
             is InventorySearchEvent.CategorySelected -> selectedCategory.value = event.category
             InventorySearchEvent.VoiceClicked -> send(InventorySearchEffect.RequestMicPermission)
             is InventorySearchEvent.VoicePermissionResult ->
@@ -103,7 +123,11 @@ class InventorySearchViewModel @Inject constructor(
 
             InventorySearchEvent.VoiceRetry -> startListening()
             InventorySearchEvent.VoiceDismissed -> dismissVoice()
-            is InventorySearchEvent.ResultClicked -> send(InventorySearchEffect.NavigateToEditor(event.id))
+            is InventorySearchEvent.ResultClicked -> {
+                // Tocar un resultado es usar la búsqueda (spec 014, CA-LOC-02-02); el caso de uso ignora la barra vacía.
+                record(query.value)
+                send(InventorySearchEffect.NavigateToEditor(event.id))
+            }
             InventorySearchEvent.BackClicked -> send(InventorySearchEffect.NavigateBack)
         }
     }
@@ -138,9 +162,17 @@ class InventorySearchViewModel @Inject constructor(
                 ingredients.joinToString(" ") { word -> word.replaceFirstChar { it.titlecase() } }
             )
             delay(RecognizedVisibleMillis)
-            query.value = ingredients.joinToString(IngredientSeparator)
+            val spoken = ingredients.joinToString(IngredientSeparator)
+            query.value = spoken
             voice.value = VoiceUiState.Hidden
+            // Lo dictado también queda en «Recientes» (spec 014, CA-LOC-02-03).
+            recordRecentSearch(SearchScope.INVENTORY, spoken)
         }
+    }
+
+    /** Guarda [text] como búsqueda reciente del Inventario (CA-LOC-02-02). */
+    private fun record(text: String) {
+        viewModelScope.launch { recordRecentSearch(SearchScope.INVENTORY, text) }
     }
 
     /** Cancela la escucha y cierra el aviso sin cambiar la barra (CA-INV-07-07). */
