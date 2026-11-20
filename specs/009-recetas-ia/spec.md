@@ -58,8 +58,10 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 | CA-RIA-02-07 | **Dado** que ningún plan cumple las restricciones, **entonces** veo "Sin coincidencias" (Figma `557:2515`) con el presupuesto que usé y sugerencias calculadas (por ejemplo, el presupuesto mínimo con el que sí habría plan; nunca quitar mis restricciones alimentarias), "Ajustar contexto" (vuelve al contexto) y "Ver recetas económicas" (Descubrir con el filtro "Económicas"). |
 | CA-RIA-02-08 | **Dado** "Ajustar" en el plan, **entonces** vuelvo al contexto con los mismos datos para cambiarlos. |
 | CA-RIA-02-09 | **Dado** que tengo restricciones en Preferencias alimentarias (CA-PER-03-01), **entonces** ninguna receta del plan contiene un ingrediente que esas restricciones excluyen. |
-| CA-RIA-02-10 | **Dado** 50 recetas en el catálogo, **entonces** el plan se calcula en 2 segundos o menos en el teléfono (meta del Avance 2). |
+| CA-RIA-02-10 | **Dado** el catálogo de 70 recetas (spec 011), **entonces** en los inventarios normales el plan se calcula en 2 segundos o menos en el teléfono, con el APK release (meta del Avance 2, medida antes con 50 recetas; enmienda del 2026-11-20). |
 | CA-RIA-02-11 | **Dado** que cambié mi inventario o mis restricciones después de abrir "Sugerencia con IA", **entonces** la pantalla muestra el inventario actual y, **cuando** genero el plan, se usan el inventario y las restricciones actuales; un plan que ya estoy viendo no se borra solo. |
+| CA-RIA-02-12 | **Dado** que la búsqueda llega a 2 segundos sin revisar todas las combinaciones y ya encontró un plan válido, **entonces** veo el mejor plan encontrado hasta ese momento, que cumple todas las restricciones, con el aviso "No alcancé a revisar todas las combinaciones" (enmienda del 2026-11-20). |
+| CA-RIA-02-13 | **Dado** que la búsqueda llega a 2 segundos sin haber encontrado ningún plan, **entonces** veo "Sin coincidencias" con el mensaje "La búsqueda tardó demasiado" y "Ajustar contexto", sin sugerencias calculadas y nunca la de quitar mis restricciones alimentarias (enmienda del 2026-11-20). |
 
 ### HU-RIA-03: Entender cómo decide la IA
 | Código | Criterio |
@@ -92,7 +94,7 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 | Código | Requisito |
 |---|---|
 | RNF-RIA-01 | El agente vive en `domain` (Kotlin puro) y es determinista: el mismo inventario y contexto dan el mismo plan. |
-| RNF-RIA-02 | Rendimiento: ≤ 2 s con 50 recetas en el teléfono (CA-RIA-02-10). |
+| RNF-RIA-02 | Rendimiento: ≤ 2 s con el catálogo de 70 recetas en el teléfono para los inventarios normales (CA-RIA-02-10). La búsqueda nunca pasa de 2 s: al llegar al límite devuelve el mejor plan encontrado o avisa que no terminó (CA-RIA-02-12 y 02-13). Se mide en el teléfono el tiempo, los nodos y la memoria, también en el caso de estrés. |
 | RNF-RIA-03 | Evaluación (métricas del Avance 2): en 30 inventarios sintéticos, el agente supera en aprovechamiento a las dos líneas base (ordenar solo por coincidencia de ingredientes y solo por vencimiento), y el plan de 3 días usa antes de que venzan ≥ 80 % de los ingredientes que vencen en ≤ 3 días y alguna receta usa. El Avance 2 medía la receta del Día 1 porque recomendaba una sola receta; con el plan, lo que vence en 2 o 3 días puede cocinarse el Día 2 o el 3 sin perderse, así que el Día 1 se reporta sin meta (decisión de Zhair del 2026-10-20). |
 | RNF-RIA-04 | Seguridad: reglas de Firestore para `cookings` (solo el dueño, datos validados) probadas en `rules-test/`. |
 | RNF-RIA-05 | Las fotos del catálogo son propias o de licencia libre, con su fuente anotada en `docs/licenses/`. |
@@ -156,6 +158,7 @@ solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
 | "Tu plan de 3 días" muestra las tres tarjetas a lo ancho, una debajo de otra, con la etiqueta "Día N" donde el Figma dice "Mejor opción" (aprobada por Zhair el 2026-10-21). | Son tres recetas, no dos; lado a lado no caben. |
 | "Sin coincidencias" lista las sugerencias que calcula el agente (subir el presupuesto a COP $X, permitir picante, subir el tiempo, agregar productos al inventario) en lugar del texto fijo del Figma; no hay "sustituciones económicas". | Las sugerencias deben salir de datos reales (CA-RIA-02-07); el agente no hace sustituciones. |
 | "Contactar soporte" abre el correo a smartfood.equipo@gmail.com con el asunto "SmartFood: ayuda con la IA" (aprobada por Zhair el 2026-10-21). En la Ayuda, la barra inferior resalta Recetas (el Figma `557:2476` resalta Guardadas por error). | El Figma no define el correo; la Ayuda es parte de Recetas. |
+| Si la búsqueda llega a 2 s, el plan muestra bajo "¿Por qué te conviene?" el aviso "No alcancé a revisar todas las combinaciones", y "Sin coincidencias" puede decir "La búsqueda tardó demasiado" en lugar de las sugerencias (aprobada por Zhair el 2026-11-20, CA-RIA-02-12 y 02-13). | El Figma no define un límite de tiempo; el informe de IA pidió una respuesta clara si la búsqueda no termina. |
 
 ## 10. Plan de entrega
 

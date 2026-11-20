@@ -116,6 +116,19 @@ return mejor?.let(::Found) ?: NoPlan(sugerencias)
   tiempo daría plan.
 - `PlanExplainer` arma las frases de CA-RIA-02-06 a partir de los `IngredientUse` del plan.
 
+### 3.3.1 Límite de tiempo (enmienda del 2026-11-20, CA-RIA-02-12 y 02-13)
+- `MealPlanner.plan(recipes, pantry, context, deadline: SearchDeadline = SearchDeadline.NONE)`. `SearchDeadline` es
+  una `fun interface { fun expired(): Boolean }` de Kotlin puro; `assign` la consulta al entrar y, si venció, corta la
+  rama y marca la búsqueda como incompleta.
+- `PlanResult.Found(plan, complete = true)`: con `complete = false` el plan es el mejor encontrado hasta el límite y
+  cumple todas las restricciones duras, pero no se garantiza el óptimo.
+- `PlanResult.TimedOut`: venció sin ningún plan. No se calculan sugerencias, porque también buscan.
+- `GeneratePlanUseCase` arma el límite con un `TimeSource` inyectado (`TimeSource.Monotonic` en la app,
+  `TestTimeSource` en las pruebas) y `PLAN_TIME_LIMIT = 2 s`. Devuelve `AiPlanOutcome.Found(plan, reasons, complete)` o
+  `AiPlanOutcome.TimedOut`.
+- `AiPlanViewModel`: `AiUiState.planComplete` y `AiUiState.timedOut`. El log `SmartFoodIA` dice si la búsqueda terminó.
+- Sin límite (`SearchDeadline.NONE`) el resultado es idéntico al anterior: `MealPlannerTest` contra fuerza bruta no cambia.
+
 ### 3.4 Pruebas del agente
 - `MealPlannerTest`: restricciones (tiempo, picante, distintas, presupuesto, faltantes) y **optimalidad contra fuerza
   bruta** en catálogos pequeños aleatorios con semilla fija (CA-RIA-02-04, 02-05).
