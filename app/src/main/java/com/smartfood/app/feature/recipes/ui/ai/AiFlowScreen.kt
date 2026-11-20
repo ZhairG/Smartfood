@@ -1,5 +1,8 @@
 package com.smartfood.app.feature.recipes.ui.ai
 
+import androidx.compose.animation.animateColorAsState
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
+import androidx.compose.runtime.getValue
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -314,20 +317,34 @@ private fun Pill(
     toggle: Boolean = false,
     onClick: (() -> Unit)? = null,
 ) {
-    val container = when {
-        selected -> MaterialTheme.colorScheme.primary
-        highlighted -> MaterialTheme.smartFoodColors.highlight
-        else -> MaterialTheme.colorScheme.surfaceVariant
-    }
-    val content = when {
-        selected -> MaterialTheme.colorScheme.onPrimary
-        highlighted -> MaterialTheme.smartFoodColors.onHighlight
-        else -> MaterialTheme.colorScheme.onSurface
-    }
+    // Los colores cambian en 300 ms (spec 007, CA-ANI-05-03).
+    val container by animateColorAsState(
+        when {
+            selected -> MaterialTheme.colorScheme.primary
+            highlighted -> MaterialTheme.smartFoodColors.highlight
+            else -> MaterialTheme.colorScheme.surfaceVariant
+        },
+        SmartFoodMotion.standard(),
+        label = "fondoDePildora"
+    )
+    val content by animateColorAsState(
+        when {
+            selected -> MaterialTheme.colorScheme.onPrimary
+            highlighted -> MaterialTheme.smartFoodColors.onHighlight
+            else -> MaterialTheme.colorScheme.onSurface
+        },
+        SmartFoodMotion.standard(),
+        label = "textoDePildora"
+    )
+    val border by animateColorAsState(
+        if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.smartFoodColors.divider,
+        SmartFoodMotion.standard(),
+        label = "bordeDePildora"
+    )
     val base = Modifier
         .clip(CircleShape)
         .background(container)
-        .border(1.dp, if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.smartFoodColors.divider, CircleShape)
+        .border(1.dp, border, CircleShape)
     val interactive = when {
         onClick == null -> base
         toggle -> base.toggleable(value = selected, role = Role.Switch, onValueChange = { onClick() })

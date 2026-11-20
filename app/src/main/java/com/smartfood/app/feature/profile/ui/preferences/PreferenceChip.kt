@@ -1,5 +1,8 @@
 package com.smartfood.app.feature.profile.ui.preferences
 
+import androidx.compose.animation.animateColorAsState
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -33,6 +36,9 @@ fun PreferenceChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val container by animateColorAsState(if (selected) MaterialTheme.smartFoodColors.checkedFill else MaterialTheme.colorScheme.surfaceVariant, SmartFoodMotion.standard(), label = "container")
+    val label by animateColorAsState(if (selected) MaterialTheme.smartFoodColors.onCheckedFill else MaterialTheme.colorScheme.onSurface, SmartFoodMotion.standard(), label = "label")
+    val border by animateColorAsState(if (selected) MaterialTheme.smartFoodColors.checkedFill else MaterialTheme.colorScheme.outline, SmartFoodMotion.standard(), label = "border")
     FilterChip(
         selected = selected,
         onClick = onClick,
@@ -45,16 +51,17 @@ fun PreferenceChip(
         },
         shape = CircleShape,
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            labelColor = MaterialTheme.colorScheme.onSurface,
-            selectedContainerColor = MaterialTheme.smartFoodColors.checkedFill,
-            selectedLabelColor = MaterialTheme.smartFoodColors.onCheckedFill
+            // Los colores cambian en 300 ms (spec 007, CA-ANI-05-03).
+            containerColor = container,
+            labelColor = label,
+            selectedContainerColor = container,
+            selectedLabelColor = label
         ),
         border = FilterChipDefaults.filterChipBorder(
             enabled = true,
             selected = selected,
-            borderColor = MaterialTheme.colorScheme.outline,
-            selectedBorderColor = MaterialTheme.smartFoodColors.checkedFill
+            borderColor = border,
+            selectedBorderColor = border
         ),
         modifier = modifier
     )

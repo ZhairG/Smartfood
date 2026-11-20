@@ -10,6 +10,7 @@
  */
 package com.smartfood.app.feature.inventory.ui.search
 
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -129,10 +130,19 @@ fun InventorySearchScreen(
 
                         else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
                             items(items = state.results, key = { it.item.id }) { result ->
-                                SearchResultRow(
-                                    result = result,
-                                    onClick = { id -> onEvent(InventorySearchEvent.ResultClicked(id)) }
-                                )
+                                // Los resultados se reacomodan con 300 ms al filtrar o escribir (CA-ANI-05-02, 05-03).
+                                Box(
+                                    modifier = Modifier.animateItem(
+                                        fadeInSpec = SmartFoodMotion.standard(),
+                                        placementSpec = SmartFoodMotion.standard(),
+                                        fadeOutSpec = SmartFoodMotion.standard()
+                                    )
+                                ) {
+                                    SearchResultRow(
+                                        result = result,
+                                        onClick = { id -> onEvent(InventorySearchEvent.ResultClicked(id)) }
+                                    )
+                                }
                             }
                         }
                     }

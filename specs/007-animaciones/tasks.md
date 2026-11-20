@@ -27,7 +27,7 @@
 
 ## Fase 5: Listas, chips, botones y recetas
 - [x] T013 Lista del inventario: esqueleto → contenido con `Crossfade` y filas con `animateItem` (CA-ANI-05-01, 05-02).
-- [ ] T014 Búsqueda del inventario y chips de inventario, Recetas, Guardadas, Preferencias e IA con 300 ms (CA-ANI-05-02, 05-03).
+- [x] T014 Búsqueda del inventario y chips de inventario, Recetas, Guardadas, Preferencias e IA con 300 ms (CA-ANI-05-02, 05-03).
 - [ ] T015 Botones con estado de carga e indicador de pasos con los tokens (CA-ANI-05-04, 05-05).
 - [ ] T016 IA, cocina guiada y rejillas de Recetas y Guardadas (CA-ANI-06-02 a 06-04).
 
