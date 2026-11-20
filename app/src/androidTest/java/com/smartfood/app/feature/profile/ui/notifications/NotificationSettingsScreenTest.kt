@@ -83,16 +83,24 @@ class NotificationSettingsScreenTest {
     }
 
     @Test
-    fun caPer0406_elAvisoDelPermisoPermiteAbrirAjustesOCancelar() {
+    fun caPer0406_elAvisoDelPermisoPermiteCancelar() {
         mostrar(estado(dialog = NotificationSettingsDialog.PermissionDenied))
 
         composeTestRule.onNodeWithText("Notificaciones desactivadas").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cancelar").performClick()
-        composeTestRule.onNodeWithText("Abrir ajustes").performClick()
+        composeTestRule.waitForIdle()
 
-        assertEquals(
-            listOf(NotificationSettingsEvent.DialogDismissed, NotificationSettingsEvent.OpenSettingsClicked),
-            eventos
-        )
+        assertEquals(listOf<NotificationSettingsEvent>(NotificationSettingsEvent.DialogDismissed), eventos)
+    }
+
+    // El diálogo anima la salida y la acción llega al terminarla (spec 007, CA-ANI-04-02): cada botón en su prueba.
+    @Test
+    fun caPer0406_elAvisoDelPermisoPermiteAbrirAjustes() {
+        mostrar(estado(dialog = NotificationSettingsDialog.PermissionDenied))
+
+        composeTestRule.onNodeWithText("Abrir ajustes").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(listOf<NotificationSettingsEvent>(NotificationSettingsEvent.OpenSettingsClicked), eventos)
     }
 }

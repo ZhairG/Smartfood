@@ -126,6 +126,7 @@ class ProfileScreenTest {
 
         composeTestRule.onNodeWithText("Oscuro").performClick()
         composeTestRule.onNode(hasText("Guardar") and hasClickAction()).performClick()
+        composeTestRule.waitForIdle()
 
         assertEquals(listOf<ProfileEvent>(ProfileEvent.ThemeSelected(ThemeMode.DARK)), eventos)
     }
@@ -135,6 +136,7 @@ class ProfileScreenTest {
         mostrar(isThemeSheetVisible = true)
 
         composeTestRule.onNode(hasText("Cancelar") and hasClickAction()).performClick()
+        composeTestRule.waitForIdle()
 
         assertEquals(listOf<ProfileEvent>(ProfileEvent.ThemeSheetDismissed), eventos)
     }
@@ -149,7 +151,7 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun ca0503_elAvisoDeCerrarSesionDelFigmaOfreceCerrarOCancelar() {
+    fun ca0503_elAvisoDeCerrarSesionDelFigmaOfreceCancelar() {
         mostrar(dialog = ProfileDialog.ConfirmLogout(hasPendingChanges = false))
 
         composeTestRule.onNodeWithText("¿Cerrar sesión?").assertIsDisplayed()
@@ -157,9 +159,20 @@ class ProfileScreenTest {
             .onNodeWithText("Tendrás que iniciar sesión nuevamente para acceder a tu inventario y tus recetas guardadas.")
             .assertIsDisplayed()
         composeTestRule.onNodeWithText("Cancelar").performClick()
-        composeTestRule.onNodeWithText("Cerrar sesión").performClick()
+        composeTestRule.waitForIdle()
 
-        assertEquals(listOf(ProfileEvent.DialogDismissed, ProfileEvent.LogoutConfirmed), eventos)
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.DialogDismissed), eventos)
+    }
+
+    // El diálogo anima la salida y la acción llega al terminarla (spec 007, CA-ANI-04-02): cada botón en su prueba.
+    @Test
+    fun ca0503_elAvisoDeCerrarSesionDelFigmaOfreceCerrar() {
+        mostrar(dialog = ProfileDialog.ConfirmLogout(hasPendingChanges = false))
+
+        composeTestRule.onNodeWithText("Cerrar sesión").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(listOf<ProfileEvent>(ProfileEvent.LogoutConfirmed), eventos)
     }
 
     @Test

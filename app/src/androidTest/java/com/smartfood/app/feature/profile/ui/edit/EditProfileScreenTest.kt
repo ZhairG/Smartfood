@@ -96,14 +96,25 @@ class EditProfileScreenTest {
     }
 
     @Test
-    fun caPer0203_elAvisoDeGuardarOfreceGuardarYCancelar() {
+    fun caPer0203_elAvisoDeGuardarOfreceCancelar() {
         mostrar(estado(fullName = "Pepito José", dialog = EditProfileDialog.ConfirmSave))
 
         composeTestRule.onNodeWithText("¿Desea guardar los cambios?").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cancelar").performClick()
-        composeTestRule.onAllNodes(hasText("Guardar") and hasClickAction())[1].performClick()
+        composeTestRule.waitForIdle()
 
-        assertEquals(listOf(EditProfileEvent.DialogDismissed, EditProfileEvent.SaveConfirmed), eventos)
+        assertEquals(listOf<EditProfileEvent>(EditProfileEvent.DialogDismissed), eventos)
+    }
+
+    // El diálogo anima la salida y la acción llega al terminarla (spec 007, CA-ANI-04-02): cada botón en su prueba.
+    @Test
+    fun caPer0203_elAvisoDeGuardarOfreceGuardar() {
+        mostrar(estado(fullName = "Pepito José", dialog = EditProfileDialog.ConfirmSave))
+
+        composeTestRule.onAllNodes(hasText("Guardar") and hasClickAction())[1].performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(listOf<EditProfileEvent>(EditProfileEvent.SaveConfirmed), eventos)
     }
 
     @Test
@@ -115,13 +126,25 @@ class EditProfileScreenTest {
     }
 
     @Test
-    fun caPer0208_tocarLaFotoEmitePhotoClicked_yLaHojaOfreceGaleriaYCamara() {
+    fun caPer0208_laHojaDeLaFotoOfreceGaleria() {
         mostrar(estado(dialog = EditProfileDialog.PhotoSourceSheet))
 
+        composeTestRule.onNodeWithText("Cámara").assertIsDisplayed()
         composeTestRule.onNodeWithText("Galería").performClick()
-        composeTestRule.onNodeWithText("Cámara").performClick()
+        composeTestRule.waitForIdle()
 
-        assertEquals(listOf(EditProfileEvent.GalleryChosen, EditProfileEvent.CameraChosen), eventos)
+        assertEquals(listOf<EditProfileEvent>(EditProfileEvent.GalleryChosen), eventos)
+    }
+
+    // La hoja anima la salida y la acción llega al terminarla (spec 007, CA-ANI-04-02): cada opción en su prueba.
+    @Test
+    fun caPer0208_laHojaDeLaFotoOfreceCamara() {
+        mostrar(estado(dialog = EditProfileDialog.PhotoSourceSheet))
+
+        composeTestRule.onNodeWithText("Cámara").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(listOf<EditProfileEvent>(EditProfileEvent.CameraChosen), eventos)
     }
 
     @Test
