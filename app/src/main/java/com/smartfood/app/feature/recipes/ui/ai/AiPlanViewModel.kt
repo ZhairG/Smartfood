@@ -136,6 +136,7 @@ class AiPlanViewModel @Inject constructor(
                 when (outcome) {
                     is AiPlanOutcome.Found -> it.copy(step = AiStep.Plan, plan = outcome.plan, reasons = outcome.reasons)
                     is AiPlanOutcome.NoPlan -> it.copy(step = AiStep.NoPlan, suggestions = outcome.suggestions)
+                    is AiPlanOutcome.TimedOut -> it.copy(step = AiStep.NoPlan, suggestions = emptyList())
                 }
             }
         }

@@ -37,9 +37,22 @@ data class AiContext(
 /** Resultado del agente con su explicación (CA-RIA-02-03, 02-06, 02-07). */
 sealed interface AiPlanOutcome {
 
-    /** El plan de 3 días y las razones de "¿Por qué te conviene?". */
-    data class Found(val plan: MealPlan, val reasons: List<PlanExplainer.Reason>) : AiPlanOutcome
+    /**
+     * El plan de 3 días y las razones de "¿Por qué te conviene?". Con [complete] en `false`, el límite de tiempo cortó
+     * la búsqueda y es el mejor plan encontrado hasta ese momento (CA-RIA-02-12).
+     *
+     * @property nodes Nodos que visitó la búsqueda, para el registro de la medición (RNF-RIA-02).
+     */
+    data class Found(
+        val plan: MealPlan,
+        val reasons: List<PlanExplainer.Reason>,
+        val complete: Boolean = true,
+        val nodes: Long = 0,
+    ) : AiPlanOutcome
 
     /** Ningún plan cumple; [suggestions] dice qué cambiar. */
     data class NoPlan(val suggestions: List<PlanSuggestion>) : AiPlanOutcome
+
+    /** El límite de tiempo venció sin ningún plan (CA-RIA-02-13). */
+    data class TimedOut(val nodes: Long) : AiPlanOutcome
 }

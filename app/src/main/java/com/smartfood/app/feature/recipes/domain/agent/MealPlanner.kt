@@ -32,6 +32,11 @@ import com.smartfood.app.feature.recipes.domain.model.Recipe
  *
  * Es determinista (RNF-RIA-01): ante utilidades iguales gana el plan con los ids de receta menores en orden.
  *
+ * **Límite de tiempo** (enmienda del 2026-11-20, CA-RIA-02-12 y 02-13): la búsqueda consulta un [SearchDeadline] en
+ * cada nodo. Si vence, corta las ramas que faltan y devuelve el mejor plan encontrado hasta ese momento, que cumple
+ * todas las restricciones pero no garantiza el óptimo (`PlanResult.Found.complete = false`), o [PlanResult.TimedOut]
+ * si todavía no había ninguno. Sin límite ([SearchDeadline.NONE]) el resultado es el de siempre.
+ *
  * @param ingredients Ingredientes del catálogo por `id`.
  * @param weights Pesos de la función de utilidad.
  */
@@ -41,10 +46,23 @@ class MealPlanner(
 ) {
     private val evaluator = RecipeEvaluator(ingredients, weights)
 
-    /** Busca el plan de mayor utilidad; si no hay ninguno válido, devuelve sugerencias (CA-RIA-02-03, 02-07). */
-    fun plan(recipes: List<Recipe>, pantry: List<PantryItem>, context: PlanContext): PlanResult =
-        search(recipes, pantry, context)?.let { PlanResult.Found(it) }
-            ?: PlanResult.NoPlan(suggestions(recipes, pantry, context))
+    /**
+     * Busca el plan de mayor utilidad; si no hay ninguno válido, devuelve sugerencias (CA-RIA-02-03, 02-07). Con
+     * [deadline], al vencer devuelve el mejor plan encontrado o [PlanResult.TimedOut] (CA-RIA-02-12, 02-13).
+     */
+    fun plan(
+        recipes: List<Recipe>,
+        pantry: List<PantryItem>,
+        context: PlanContext,
+        deadline: SearchDeadline = SearchDeadline.NONE,
+    ): PlanResult {
+        val outcome = searchOutcome(recipes, pantry, context, deadline)
+        return when {
+            outcome.plan != null -> PlanResult.Found(outcome.plan, outcome.complete, outcome.nodes)
+            !outcome.complete -> PlanResult.TimedOut(outcome.nodes)
+            else -> PlanResult.NoPlan(suggestions(recipes, pantry, context, deadline))
+        }
+    }
 
     /**
      * `true` si ningún ingrediente de [recipe] tiene una etiqueta que la dieta de [context] prohíbe (CA-RIA-02-09).
@@ -61,7 +79,25 @@ class MealPlanner(
         context.cuisines.isEmpty() || recipe.cuisine in context.cuisines
 
     /** El plan de mayor utilidad que cumple todas las restricciones, o `null` si no existe. */
-    fun search(recipes: List<Recipe>, pantry: List<PantryItem>, context: PlanContext): MealPlan? {
+    fun search(recipes: List<Recipe>, pantry: List<PantryItem>, context: PlanContext): MealPlan? =
+        searchOutcome(recipes, pantry, context).plan
+
+    /**
+     * Resultado de una búsqueda.
+     *
+     * @property plan El mejor plan encontrado, o `null` si no encontró ninguno.
+     * @property complete `true` si revisó todo el árbol (el plan es el óptimo); `false` si venció el [SearchDeadline].
+     * @property nodes Nodos visitados: cada asignación de un día, también la que completa el plan.
+     */
+    data class SearchOutcome(val plan: MealPlan?, val complete: Boolean, val nodes: Long)
+
+    /** Como [search], pero respeta [deadline] y dice si terminó y cuántos nodos visitó (CA-RIA-02-12, RNF-RIA-02). */
+    fun searchOutcome(
+        recipes: List<Recipe>,
+        pantry: List<PantryItem>,
+        context: PlanContext,
+        deadline: SearchDeadline = SearchDeadline.NONE,
+    ): SearchOutcome {
         val full = PantryStock.of(pantry)
         // Consistencia de nodo: las restricciones de una sola receta. Lo que cuesta sola con el inventario completo es lo
         // mínimo que el plan tiene que pagar por ella (los empaques se compran igual, en ese día o antes).
@@ -74,21 +110,23 @@ class MealPlanner(
                 evaluator.evaluate(it, context.servings, day = 1, stock = full, store = context.store).costCop <= context.budgetCop
             }
             .sortedBy { it.id }
-        if (domain.size < context.days) return null
+        if (domain.size < context.days) return SearchOutcome(plan = null, complete = true, nodes = 0)
 
-        val best = Best()
+        val best = Best(deadline)
         assign(day = 1, chosen = emptyList(), stock = full, budgetLeft = context.budgetCop, partial = 0.0, domain, context, best)
-        return best.plan
+        return SearchOutcome(best.plan, complete = !best.truncated, nodes = best.nodes)
     }
 
     /** Una receta asignada a un día, con su evaluación en ese momento de la búsqueda. */
     private data class Assigned(val recipe: Recipe, val evaluation: RecipeEvaluator.Evaluation)
 
-    /** Mejor plan encontrado hasta ahora. */
-    private class Best {
+    /** Mejor plan encontrado hasta ahora, nodos visitados y si el límite cortó la búsqueda. */
+    private class Best(val deadline: SearchDeadline) {
         var utility = Double.NEGATIVE_INFINITY
         var ids: List<String> = emptyList()
         var plan: MealPlan? = null
+        var nodes = 0L
+        var truncated = false
     }
 
     private fun assign(
@@ -101,6 +139,13 @@ class MealPlanner(
         context: PlanContext,
         best: Best,
     ) {
+        // Límite de tiempo (CA-RIA-02-12): una vez vencido, ninguna rama sigue.
+        if (best.truncated) return
+        if (best.deadline.expired()) {
+            best.truncated = true
+            return
+        }
+        best.nodes++
         if (day > context.days) {
             val utility = partial - weights.waste * evaluator.waste(stock)
             val ids = chosen.map { it.recipe.id }
@@ -173,19 +218,28 @@ class MealPlanner(
      * Qué cambiar para que exista un plan (CA-RIA-02-07): el presupuesto mínimo (el plan más barato, buscado con la
      * misma búsqueda y pesos que solo miran el costo), quitar "Sin picante", subir el tiempo máximo o quitar las cocinas
      * favoritas (spec 011, CA-COC-03-02). Nunca propone quitar la dieta.
+     *
+     * Las búsquedas respetan el mismo [deadline]: si vence, un plan encontrado sigue siendo válido (la sugerencia es
+     * cierta, aunque el presupuesto sugerido quizá no sea el mínimo) y las que no alcanzaron a buscarse se omiten.
      */
-    private fun suggestions(recipes: List<Recipe>, pantry: List<PantryItem>, context: PlanContext): List<PlanSuggestion> {
+    private fun suggestions(
+        recipes: List<Recipe>,
+        pantry: List<PantryItem>,
+        context: PlanContext,
+        deadline: SearchDeadline,
+    ): List<PlanSuggestion> {
         val cheapest = MealPlanner(ingredients, CHEAPEST)
         val unlimited = context.copy(budgetCop = UNLIMITED_BUDGET)
+        fun find(planner: MealPlanner, ctx: PlanContext) = planner.searchOutcome(recipes, pantry, ctx, deadline).plan
         val out = mutableListOf<PlanSuggestion>()
-        cheapest.search(recipes, pantry, unlimited)?.let { out += PlanSuggestion.RaiseBudget(roundUpToThousand(it.totalCostCop)) }
-        if (context.noSpicy && search(recipes, pantry, context.copy(noSpicy = false)) != null) out += PlanSuggestion.AllowSpicy
+        find(cheapest, unlimited)?.let { out += PlanSuggestion.RaiseBudget(roundUpToThousand(it.totalCostCop)) }
+        if (context.noSpicy && find(this, context.copy(noSpicy = false)) != null) out += PlanSuggestion.AllowSpicy
         if (context.maxMinutes != null) {
-            search(recipes, pantry, context.copy(maxMinutes = null))?.let { plan ->
+            find(this, context.copy(maxMinutes = null))?.let { plan ->
                 out += PlanSuggestion.AllowMoreTime(plan.days.maxOf { it.recipe.totalMinutes })
             }
         }
-        if (context.cuisines.isNotEmpty() && search(recipes, pantry, context.copy(cuisines = emptySet())) != null) {
+        if (context.cuisines.isNotEmpty() && find(this, context.copy(cuisines = emptySet())) != null) {
             out += PlanSuggestion.RemoveCuisine
         }
         return out.ifEmpty { listOf(PlanSuggestion.NotEnoughRecipes) }
