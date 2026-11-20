@@ -4,7 +4,7 @@
 > escriben con cada tarea y se corren en la ronda final de los pendientes (PR #138).
 
 - [x] T001 La spec, el plan y las tareas; la fila 10 de `docs/pendientes.md`.
-- [ ] T002 **Base local** (RF-LOC-01, RNF-LOC-01): dependencias de Room en `libs.versions.toml` y `app/build.gradle.kts`,
+- [x] T002 **Base local** (RF-LOC-01, RNF-LOC-01): dependencias de Room en `libs.versions.toml` y `app/build.gradle.kts`,
   `SmartFoodDatabase`, `CookingEntity`, `RecentSearchEntity`, `CookingDao`, `RecentSearchDao`, `DatabaseModule`,
   `@ApplicationScope` y el esquema en `app/schemas/`; `CookingDaoTest` y `RecentSearchDaoTest`.
 - [ ] T003 **Historial sin conexión** (HU-LOC-01): `CachedCookingHistoryRepository`, `RecipesDataModule`,

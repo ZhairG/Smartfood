@@ -32,7 +32,7 @@ feature/recipes/data/repository/   CachedCookingHistoryRepository (Room + Firest
   - `clear(uid, scope)`;
   - `deleteAll()`.
 - `DatabaseModule` provee la base (`Room.databaseBuilder(..., "smartfood.db")`), los dos DAO y `LocalUserData`.
-- `CoreDataModule` agrega `@ApplicationScope CoroutineScope` (`SupervisorJob() + Dispatchers.IO`).
+- `DatabaseModule` también provee `@ApplicationScope CoroutineScope` (`SupervisorJob() + Dispatchers.IO`); así no se toca `CoreDataModule`, que es compartido.
 
 ## 3. Historial con caché (HU-LOC-01)
 

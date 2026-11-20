@@ -67,6 +67,11 @@ android {
     }
 }
 
+// Esquema de Room versionado en app/schemas (spec 014, RNF-LOC-01).
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -116,6 +121,11 @@ dependencies {
 
     // Preferencias locales ("Recuérdame")
     implementation(libs.androidx.datastore.preferences)
+
+    // Base local con Room: historial de cocina y búsquedas recientes (spec 014)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     // Testing
     testImplementation(libs.junit)
