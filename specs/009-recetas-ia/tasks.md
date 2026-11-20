@@ -65,7 +65,7 @@ Rama `feature/009-evaluacion-agente`. Origen: informe de IA del 13/11/2026 ([`do
 - [x] T040 Límite de tiempo en el dominio: `SearchDeadline`, `MealPlanner.searchOutcome`, `PlanResult.Found.complete`, `PlanResult.TimedOut`, `AiPlanOutcome` y `GeneratePlanUseCase` con `TimeSource` (2 s), con sus pruebas (CA-RIA-02-12, 02-13).
 - [x] T041 `AiPlanViewModel` (`planComplete`, `timedOut`, registro de nodos), el aviso y el mensaje en `AiFlowScreen` (CA-RIA-02-12, 02-13).
 - [x] T042 Métricas con denominador: productos usados / elegibles (n/N) y cantidad consumida en `AgentEvaluationTest`; frontera media de máximos y máxima en `AlgorithmComparisonTest` (RNF-RIA-03).
-- [ ] T043 `AgentSensitivityTest`: sensibilidad de los pesos y recocido con 10 semillas e igual presupuesto de cómputo (RNF-RIA-03).
+- [x] T043 `AgentSensitivityTest`: sensibilidad de los pesos y recocido con 10 semillas e igual presupuesto de cómputo (RNF-RIA-03).
 - [ ] T044 `RealCatalog` en `sharedTest` y `AgentDevicePerformanceTest` en el teléfono: tiempo, nodos y memoria, normal y estrés (CA-RIA-02-10, RNF-RIA-02).
 - [ ] T045 Correcciones de `docs/ia/` (frontera de A\*, memoria del backtracking, denominador del aprovechamiento), §8 de la evaluación y objetivos del póster.
 

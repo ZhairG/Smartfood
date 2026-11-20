@@ -229,8 +229,10 @@ internal class PlanSearchProblem(
     /**
      * Recocido simulado: búsqueda local que cambia la receta de un día al azar. Acepta un plan peor con probabilidad
      * `exp(Δ/T)`, para poder salir de un óptimo local, y `T` baja en cada iteración. No garantiza el óptimo.
+     *
+     * @param iterations Vecinos que propone después del plan inicial: el presupuesto de cómputo (T043).
      */
-    fun simulatedAnnealing(seed: Int): Outcome {
+    fun simulatedAnnealing(seed: Int, iterations: Int = ANNEALING_ITERATIONS): Outcome {
         val random = Random(seed)
         var nodes = 0L
         val ids = domain.map { it.id }
@@ -252,7 +254,7 @@ internal class PlanSearchProblem(
         var bestPlan = plan
         var bestUtility = currentUtility
         var temperature = ANNEALING_START_TEMPERATURE
-        repeat(ANNEALING_ITERATIONS) {
+        repeat(iterations) {
             val day = random.nextInt(context.days)
             val replacement = ids[random.nextInt(ids.size)]
             if (replacement !in plan) {
