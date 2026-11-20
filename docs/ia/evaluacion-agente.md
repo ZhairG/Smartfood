@@ -303,65 +303,112 @@ sigue siendo una cota más ajustada, revisada contra `MealPlannerTest`.
 
 El informe de IA del 13/11/2026 pidió precisar el aprovechamiento y la memoria de A\*, un análisis de sensibilidad de
 los pesos, varias semillas del recocido, la medición con 70 recetas en un teléfono y una respuesta clara si la búsqueda
-no termina. Las cifras marcadas «ronda final» se llenan al correr las pruebas al final de los puntos pendientes.
+no termina. Cifras del 2026-11-20 (JVM en un portátil de 7,3 GB y teléfono V2436 con Android 16).
 
 ### 8.1 Aprovechamiento con su denominador
 
-Se reproduce con `AgentEvaluationTest`, que ahora imprime los productos usados sobre los elegibles (n/N) y la cantidad
-consumida.
+`AgentEvaluationTest`, 30 inventarios sintéticos, COP 100.000, 4 porciones, D1:
 
-| Método | Aprovechamiento (media por inventario) | Productos usados / elegibles | Cantidad consumida |
-|---|---|---|---|
-| Agente CSP | 88,9 % | ronda final | ronda final |
-| Línea base: coincidencias | 74,7 % | ronda final | ronda final |
-| Línea base: vencimiento | 85,0 % | ronda final | ronda final |
+| Método | Aprovechamiento (media por inventario) | Productos usados / elegibles | Cantidad consumida | Desperdicio medio | Costo medio |
+|---|---|---|---|---|---|
+| Agente CSP | 88,9 % | 63/68 | 62,7 % | 0,80 | COP 18.696 |
+| Línea base: coincidencias | 74,7 % | 52/68 | 46,8 % | 1,21 | COP 47.813 |
+| Línea base: vencimiento | 85,0 % | 58/68 | 61,2 % | 0,94 | COP 51.305 |
+
+- El agente usa al menos en parte 63 de los 68 productos elegibles (92,6 % en total; la media por inventario es 88,9 %
+  porque los inventarios con pocos productos pesan igual).
+- **Cantidad consumida:** el plan consume el 62,7 % de la cantidad de esos productos. La diferencia con el 92,6 %
+  muestra lo que el informe advirtió: usar un producto no es consumirlo entero.
+- El desperdicio es una suma de fracciones sin usar, no kilogramos.
 
 ### 8.2 Memoria de A\* y del backtracking
 
-- `AlgorithmComparisonTest` separa la frontera en dos columnas: la media de los máximos por inventario y el máximo
-  individual. Ninguna mide bytes.
+`AlgorithmComparisonTest` separa la frontera en la media de los máximos por inventario y el máximo individual:
+
+| Perfil | A\*: frontera (media de máximos) | A\*: frontera máxima | Agente: nodos |
+|---|---|---|---|
+| Sin restricciones | 6.971,5 | 15.172 | 992 |
+| Inventario enorme | 286.714,2 | 322.664 | 219.521 |
+
+- Son estados guardados a la vez, no bytes.
 - El backtracking no guarda «tres recetas»: guarda la rama actual (como mucho 3 decisiones) y, en cada nivel, el
   inventario y el presupuesto restantes y la lista de candidatas evaluadas. Su memoria crece con el dominio, no con el
-  árbol. La memoria real del agente se mide en el teléfono (§8.5).
+  árbol. En el teléfono, el heap extra de una búsqueda fue de 1 a 2 MB en promedio y 8 MB como máximo (§8.5).
 
 ### 8.3 Sensibilidad de los pesos
 
-`SMARTFOOD_SENSITIVITY=1 ./gradlew :app:testDebugUnitTest --tests "*AgentSensitivityTest"` cambia un peso a la vez a la
-mitad y al doble, en los 30 inventarios, y mide todo con los pesos base. El resultado queda en
-`app/build/sensibilidad-agente.md`. Ronda final: tabla y conclusión.
+`AgentSensitivityTest` cambia un peso a la vez a la mitad y al doble, en los 30 inventarios, y mide todo con los pesos
+base:
+
+| Pesos | Productos usados / elegibles | Cantidad consumida | Desperdicio medio | Costo medio | Utilidad (pesos base) | Iguales al base |
+|---|---|---|---|---|---|---|
+| Base (1,0 · 0,3 · 0,5) | 63/68 | 62,7 % | 0,80 | COP 18.696 | -0,309 | 30/30 |
+| Rescate × 0,5 | 63/68 | 61,5 % | 0,83 | COP 17.997 | -0,311 | 26/30 |
+| Rescate × 2 | 65/68 | 70,4 % | 0,71 | COP 21.818 | -0,326 | 24/30 |
+| Costo × 0,5 | 65/68 | 70,8 % | 0,70 | COP 22.262 | -0,332 | 23/30 |
+| Costo × 2 | 58/68 | 55,2 % | 0,99 | COP 15.427 | -0,363 | 20/30 |
+| Desperdicio × 0,5 | 63/68 | 60,9 % | 0,84 | COP 17.736 | -0,314 | 25/30 |
+| Desperdicio × 2 | 65/68 | 70,2 % | 0,71 | COP 21.384 | -0,321 | 25/30 |
+
+- Entre 20 y 26 de los 30 planes no cambian con ningún ajuste: la decisión es estable ante cambios moderados.
+- El peso que más mueve el plan es el del costo: al doble, el plan ahorra unos COP 3.300 pero usa 5 productos menos y
+  deja un 24 % más de desperdicio; a la mitad, pasa lo contrario.
+- Subir el rescate o el desperdicio tiene casi el mismo efecto que bajar el costo: más producto usado a cambio de unos
+  COP 3.000 más.
+- No hay calibración con usuarios reales: la tabla muestra la estabilidad, no cuál combinación prefieren las personas.
 
 ### 8.4 Recocido simulado con varias semillas
 
-El mismo archivo compara 10 semillas con 3.000 iteraciones y 10 con tantas iteraciones como nodos visitó el agente
-(igual presupuesto de cómputo): brecha media, desviación entre semillas, peor brecha y % de corridas que llegan al
-óptimo. Ronda final: tabla y conclusión.
+10 semillas por inventario (300 corridas por fila), con el mismo catálogo y la misma utilidad:
+
+| Presupuesto de cómputo | Brecha media | Desviación entre semillas | Peor brecha | Llega al óptimo |
+|---|---|---|---|---|
+| 3.000 iteraciones | 0,041 | 0,010 | 1,015 | 73,7 % |
+| Tantas iteraciones como nodos del agente (media 1.110) | 0,461 | 0,060 | 3,534 | 24,0 % |
+
+- Con 3.000 iteraciones el recocido llega al óptimo en 3 de cada 4 corridas, pero su peor caso queda lejos (1,0 de
+  utilidad).
+- Con el mismo presupuesto que usó el agente, solo llega al óptimo en el 24 % de las corridas: con igual cómputo, el
+  backtracking con poda es mejor y además garantiza el óptimo.
+- La desviación entre semillas es pequeña: el resultado no depende de una semilla afortunada.
 
 ### 8.5 Medición en el teléfono (V2436, 70 recetas)
 
-`AgentDevicePerformanceTest` (APK debug) corre en el teléfono los 30 inventarios normales y los 6 de estrés, con y sin
-límite, y registra tiempo, nodos, si terminó y el heap de Java usado. El tiempo que vive el usuario se mide además con el
-APK release y `adb logcat -s SmartFoodIA` (`AiPlanViewModel` registra milisegundos, nodos y si llegó al límite).
+`AgentDevicePerformanceTest`, APK debug, sin R8 y con una pantalla al frente:
 
-| Caso | Promedio | Peor caso | Nodos | Terminaron | Heap extra |
+| Caso | Promedio | Peor caso | Nodos (promedio / máx.) | Terminaron | Heap extra (promedio / máx.) |
 |---|---|---|---|---|---|
-| Normales sin límite (debug) | ronda final | ronda final | ronda final | ronda final | ronda final |
-| Estrés sin límite (debug) | ronda final | ronda final | ronda final | ronda final | ronda final |
-| Normales y estrés con límite de 2 s (debug) | ronda final | ronda final | ronda final | ronda final | ronda final |
-| Flujo normal, APK release | ronda final | ronda final | — | — | — |
+| Normales sin límite (30) | 586 ms | 2.948 ms | 1.110 / 10.426 | 30/30 | 1,1 MB / 5,6 MB |
+| Estrés sin límite (6, tope de 60 s) | 43,8 s | 50,8 s | 219.521 / 284.486 | 6/6 | 1,7 MB / 6,4 MB |
+| Normales y estrés con límite de 2 s (36) | 843 ms | 2.006 ms | 2.966 / 13.900 | 29/36 | 1,1 MB / 8,0 MB |
+
+En la JVM: inventarios normales con un promedio de 129 ms y un peor caso de 669 ms (`MealPlannerPerformanceTest`); el
+caso de estrés, unos 10,9 s por inventario.
+
+- **CA-RIA-02-10:** en el teléfono, el promedio de los inventarios normales cumple los 2 s, pero el peor caso del APK
+  debug (2,9 s) no. Con el límite de 2 s ninguna búsqueda pasa de 2,0 s.
+- **Estrés:** sin límite tarda unos 44 s en el teléfono; con el límite responde en 2 s con un plan válido.
+- **Memoria:** el heap extra es la diferencia antes y después de cada búsqueda; es una aproximación que puede perder picos.
+- El tiempo con el APK release (R8) se mide en el flujo real de la app con `adb logcat -s SmartFoodIA`
+  (`AiPlanViewModel`), que se registra aparte.
 
 ### 8.6 Límite de 2 s (CA-RIA-02-13 y 02-14)
 
 La búsqueda ya no puede pasar de 2 s. Al llegar al límite, la ramificación y poda devuelve el mejor plan encontrado
 hasta ese momento: cumple todas las restricciones duras, pero no garantiza el óptimo, y la app lo dice («No alcancé a
 revisar todas las combinaciones»). Si no había ningún plan, muestra «La búsqueda tardó demasiado» con «Ajustar
-contexto». Sin límite, el resultado es idéntico al anterior: `MealPlannerTest` contra fuerza bruta no cambió. Con el
-límite, la brecha con el óptimo en el caso de estrés se registra en §8.5 (ronda final).
+contexto». Sin límite, el resultado es idéntico al anterior: `MealPlannerTest` contra fuerza bruta no cambió.
+
+- En el teléfono, 7 de las 36 búsquedas llegaron al límite (las de estrés y alguna normal) y todas devolvieron un plan.
+- En los 30 inventarios normales, el plan con límite fue el óptimo (brecha 0).
 
 ### 8.7 Lo que sigue sin validarse
 
 - Usuarios y despensas reales: desperdicio físico evitado, costo real, satisfacción y factibilidad de las recetas.
 - Calibrar los pesos con prioridades observadas; la §8.3 solo muestra qué tan estable es el plan ante cambios.
 - Las cantidades que no se pueden convertir siguen tratándose como un producto completo (supuesto documentado).
+- La brecha con el límite en el caso de estrés no se calculó en el teléfono, porque el óptimo tarda unos 44 s por
+  inventario en el APK debug.
 
 ## Anexo: tablas completas por perfil (2026-11-05)
 

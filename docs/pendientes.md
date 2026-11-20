@@ -16,7 +16,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | 5 | Cocina Favorita sin plan posible | 011 | Pendiente | — |
 | 6 | Revisión del modo oscuro | 002 (enmienda) o 013 | Pendiente | — |
 | 7 | Animaciones y transiciones | 007 | Pendiente | — |
-| 8 | Correcciones de documentación y medición del agente | 009 (T047 a T053) | Implementado, cifras y pruebas en la ronda final | — |
+| 8 | Correcciones de documentación y medición del agente | 009 (T047 a T053) | Implementado y probado (ronda final del 2026-11-20) | — |
 | 9 | Pendientes menores | 009, 010 | Pendiente | — |
 | 10 | Persistencia local con Room (opcional) | por definir | Pendiente | — |
 
@@ -123,7 +123,7 @@ fusionó. Hoy está en el *stash* local «On docs/007-animaciones: borrador spec
 **Hecho (rama `feature/009-evaluacion-agente`, 2026-11-20):** límite de 2 s con el mejor plan encontrado (CA-RIA-02-13 y
 02-14), n/N y cantidad consumida, frontera media y máxima, `AgentSensitivityTest`, `AgentDevicePerformanceTest`,
 correcciones de [`ia/evaluacion-agente.md`](ia/evaluacion-agente.md) §8 y [`ia/poster-objetivos.md`](ia/poster-objetivos.md).
-Las cifras de §8 se llenan en la ronda final.
+Las cifras de §8 se midieron en la ronda final del 2026-11-20.
 
 ## 9. Pendientes menores
 
