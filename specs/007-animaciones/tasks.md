@@ -36,6 +36,12 @@
 - [ ] T018 Checklist manual, con y sin "Quitar animaciones" (CA-ANI-01-02, CA-ANI-01-03).
 - [ ] T019 Pruebas instrumentadas de las pantallas tocadas y matriz al día.
 - [ ] T020 (Solo si T017 encuentra un hueco > 50 ms) Baseline Profile con `androidx.profileinstaller` y el módulo `:baselineprofile` (RNF-ANI-01).
+- [x] T021 `RecipePhoto` con Coil: la foto se decodifica fuera del hilo principal, al tamaño de la tarjeta, con
+  disolvencia de 100 ms la primera vez (desviación §8; RNF-ANI-01). El trazado de Perfetto de T017 mostró tres
+  decodificaciones de unos 13 ms en el primer cuadro de Recetas.
+- [ ] T022 Trazados de Perfetto de Inventario, «Volver» y Perfil (ronda final, 2026-11-20): el primer cuadro gasta
+  37-53 ms en componer la pantalla desde cero dentro de `measure`, y al volver de la búsqueda el diseño se recalcula en
+  cada cuadro mientras se cierra el teclado. Los cambios se deciden en un plan aparte.
 
 ## Matriz de trazabilidad
 

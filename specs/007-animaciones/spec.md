@@ -170,6 +170,10 @@ ahora y se corren en la ronda final de los 10 puntos.
   ella; no se dibuja en Compose.
 - **Diálogos con *back*:** algunos diálogos del prototipo usan "Ease in and out back" (rebote leve). Se aplica solo a la
   escala del diálogo (CA-ANI-04-02), nunca al velo.
+- **Fotos de recetas (aprobada por Zhair el 2026-11-20):** la primera vez que se carga una foto de receta aparece con
+  una disolvencia de 100 ms sobre el fondo verde claro. Motivo: con `painterResource` cada foto de 800×600 se
+  decodificaba en el hilo principal (unos 13 ms en el V2436) y la pestaña Recetas saltaba cuadros (T017, T021); con
+  Coil se decodifica fuera del hilo principal y queda en caché.
 
 ## 9. Plan de entrega
 
