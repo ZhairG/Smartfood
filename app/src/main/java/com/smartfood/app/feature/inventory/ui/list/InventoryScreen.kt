@@ -9,6 +9,8 @@
  */
 package com.smartfood.app.feature.inventory.ui.list
 
+import androidx.compose.animation.Crossfade
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -75,12 +77,21 @@ fun InventoryScreen(
         InventoryTopBar(onSearchClicked = { onEvent(InventoryEvent.SearchClicked) })
         Box(modifier = Modifier.weight(1f)) {
             val error = state.error
-            when {
-                // Skeleton Screen en lugar de un indicador suelto (#45).
-                state.isLoading -> InventorySkeleton()
-                error != null -> ErrorState(error = error, onRetry = { onEvent(InventoryEvent.RetryClicked) })
-                state.isEmpty -> EmptyState(onAddClicked = { onEvent(InventoryEvent.AddClicked) })
-                else -> InventoryList(sections = state.sections, onEvent = onEvent)
+            val content = when {
+                state.isLoading -> ListContent.LOADING
+                error != null -> ListContent.ERROR
+                state.isEmpty -> ListContent.EMPTY
+                else -> ListContent.LIST
+            }
+            // El esqueleto da paso al contenido con una disolvencia de 300 ms (spec 007, CA-ANI-05-01).
+            Crossfade(targetState = content, animationSpec = SmartFoodMotion.standard(), label = "contenidoDelInventario") { shown ->
+                when (shown) {
+                    // Skeleton Screen en lugar de un indicador suelto (#45).
+                    ListContent.LOADING -> InventorySkeleton()
+                    ListContent.ERROR -> error?.let { ErrorState(error = it, onRetry = { onEvent(InventoryEvent.RetryClicked) }) }
+                    ListContent.EMPTY -> EmptyState(onAddClicked = { onEvent(InventoryEvent.AddClicked) })
+                    ListContent.LIST -> InventoryList(sections = state.sections, onEvent = onEvent)
+                }
             }
             FloatingActionButton(
                 onClick = { onEvent(InventoryEvent.AddClicked) },
@@ -173,15 +184,30 @@ private fun InventoryList(
                 // Figma 476:3095: unos 42 px entre el final de una sección y el encabezado de la siguiente.
                 ExpirySectionHeader(
                     status = section.status,
-                    modifier = if (index > 0) Modifier.padding(top = SectionGap) else Modifier
+                    modifier = Modifier
+                        .animateItem(
+                            fadeInSpec = SmartFoodMotion.standard(),
+                            placementSpec = SmartFoodMotion.standard(),
+                            fadeOutSpec = SmartFoodMotion.standard()
+                        )
+                        .then(if (index > 0) Modifier.padding(top = SectionGap) else Modifier)
                 )
             }
             items(items = section.items, key = { item -> item.id }) { item ->
-                InventoryItemRow(
-                    item = item,
-                    status = section.status,
-                    onEditClicked = { id -> onEvent(InventoryEvent.EditClicked(id)) }
-                )
+                // Las filas aparecen, se van y cambian de sección con 300 ms, sin saltos (CA-ANI-05-02).
+                Box(
+                    modifier = Modifier.animateItem(
+                        fadeInSpec = SmartFoodMotion.standard(),
+                        placementSpec = SmartFoodMotion.standard(),
+                        fadeOutSpec = SmartFoodMotion.standard()
+                    )
+                ) {
+                    InventoryItemRow(
+                        item = item,
+                        status = section.status,
+                        onEditClicked = { id -> onEvent(InventoryEvent.EditClicked(id)) }
+                    )
+                }
             }
         }
     }
@@ -329,3 +355,6 @@ private fun InventoryScreenErrorPreview() {
         )
     }
 }
+
+/** Qué muestra la lista: alterna con disolvencia (CA-ANI-05-01). */
+private enum class ListContent { LOADING, ERROR, EMPTY, LIST }
