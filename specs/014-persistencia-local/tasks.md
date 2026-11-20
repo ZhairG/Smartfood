@@ -9,7 +9,7 @@
   `@ApplicationScope` y el esquema en `app/schemas/`; `CookingDaoTest` y `RecentSearchDaoTest`.
 - [x] T003 **Historial sin conexión** (HU-LOC-01): `CachedCookingHistoryRepository`, `RecipesDataModule`,
   `LocalUserData` y `LogoutUseCase`; `CachedCookingHistoryRepositoryTest` y `SessionUseCasesTest` (`LogoutUseCase`).
-- [ ] T004 **Dominio de las búsquedas recientes** (RF-LOC-03): `SearchScope`, `RecentSearch`,
+- [x] T004 **Dominio de las búsquedas recientes** (RF-LOC-03): `SearchScope`,
   `RecentSearchesRepository`, los tres casos de uso y `RoomRecentSearchesRepository`; `RecentSearchUseCasesTest`.
 - [ ] T005 **Recientes en Descubrir** (CA-LOC-02-01, 02-02, 02-04 a 02-07): `SmartFoodRecentSearches`,
   `strings_search.xml`, `RecipeSearchField`, contrato, ViewModel y pantalla; `RecipesDiscoverViewModelTest`,
