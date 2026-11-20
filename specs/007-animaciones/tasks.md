@@ -32,10 +32,27 @@
 - [x] T016 IA, cocina guiada y rejillas de Recetas y Guardadas (CA-ANI-06-02 a 06-04).
 
 ## Fase 6: Cierre (ronda final)
-- [ ] T017 Medición de RNF-ANI-01 con el build release en el V2436 (`tools/medir_fluidez.py`); tabla en el PR.
+- [x] T017 Medición de RNF-ANI-01 con el build release en el V2436 (ronda final, 2026-11-20). **No se cumple.**
+  - Método: `gfxinfo` (cuadros con salto y percentil 90) y trazados de Perfetto (cuadro más largo del hilo principal),
+    con el APK release (R8) precompilado (`cmd package compile -m speed`). `tools/medir_fluidez.py` se corrigió: el
+    reloj de `/proc/uptime` cuenta el tiempo dormido y no se puede comparar con los vsync.
+  - Cada transición tiene 1 a 3 cuadros con salto; casi siempre es el primero, cuando se compone la pantalla nueva.
+    Del segundo cuadro en adelante, la animación de las pestañas gasta 3-7 ms por cuadro.
+
+    | Transición | Primer cuadro antes | Después de T021 y T023 | Composición y medida (`onMeasure`) |
+    |---|---|---|---|
+    | Recetas | 69 ms (3 fotos de 13 ms en el hilo principal) | 44-66 ms | 24-44 ms |
+    | Inventario | 73 ms | 57-69 ms | 42-51 ms |
+    | Perfil | 50 ms | 54-58 ms | 33-37 ms |
+    | Volver de la búsqueda | 72 ms | 64-94 ms | 50-70 ms, y después 15-20 ms por cuadro mientras se cierra el teclado |
+
+  - Lo que queda es componer y medir la pantalla desde cero en la CPU del V2436 (Navigation vuelve a crear la pestaña al
+    entrar; cada texto tarda 1-2 ms en medirse). Para quitarlo haría falta no recomponer al entrar (pestañas vivas), un
+    cambio de arquitectura que queda pendiente.
+  - T020 (Baseline Profile) se descarta: con la app precompilada entera los números no cambian.
 - [ ] T018 Checklist manual, con y sin "Quitar animaciones" (CA-ANI-01-02, CA-ANI-01-03).
 - [ ] T019 Pruebas instrumentadas de las pantallas tocadas y matriz al día.
-- [ ] T020 (Solo si T017 encuentra un hueco > 50 ms) Baseline Profile con `androidx.profileinstaller` y el módulo `:baselineprofile` (RNF-ANI-01).
+- [ ] ~~T020~~ (descartada, ver T017) Baseline Profile con `androidx.profileinstaller` y el módulo `:baselineprofile` (RNF-ANI-01).
 - [x] T021 `RecipePhoto` con Coil: la foto se decodifica fuera del hilo principal, al tamaño de la tarjeta, con
   disolvencia de 100 ms la primera vez (desviación §8; RNF-ANI-01). El trazado de Perfetto de T017 mostró tres
   decodificaciones de unos 13 ms en el primer cuadro de Recetas.
