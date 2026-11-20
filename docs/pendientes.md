@@ -14,7 +14,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | 3 | Cierre de cocina: precio y reintentos | 009 | Pendiente | — |
 | 4 | Guardado pendiente o confirmado en el Perfil | 008 | Pendiente | — |
 | 5 | Cocina Favorita sin plan posible | 011 | Pendiente | — |
-| 6 | Revisión del modo oscuro | 002 (enmienda) o 013 | Pendiente | — |
+| 6 | Revisión del modo oscuro | 013 (enmienda CA-UI-05-04) | Implementado, pruebas en la ronda final | — |
 | 7 | Animaciones y transiciones | 007 | Pendiente | — |
 | 8 | Correcciones de documentación y medición del agente | 009 | Pendiente | — |
 | 9 | Pendientes menores | 009, 010 | Pendiente | — |
