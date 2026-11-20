@@ -14,7 +14,7 @@
 - [x] T004 `NavTransitions`: empuje de 300 ms ease-in-out y disolvencia de 100 ms entre las cuatro pestañas (Guardadas incluida). Ajustar `AppNavigationTest` y `MainNavigationTest` (CA-ANI-02-01 a 02-05, CA-ANI-06-01).
 
 ## Fase 3: Campos y teclado
-- [ ] T005 Color del foco animado en `Inputs.kt`, `LineFrame` del editor y el editor de receta propia; ojo y checklist de contraseña con 150 ms (CA-ANI-03-01, 03-04).
+- [x] T005 Color del foco animado en `Inputs.kt`, `LineFrame` del editor y el editor de receta propia; ojo y checklist de contraseña con 150 ms (CA-ANI-03-01, 03-04).
 - [ ] T006 `AuthScreenScaffold`: encabezado de marca que sigue al teclado (CA-ANI-03-02, 03-03, RNF-ANI-02, RNF-ANI-04).
 - [ ] T007 Editor de producto, búsqueda y editor de receta propia: el campo enfocado no salta al abrir el teclado (CA-ANI-03-05).
 
