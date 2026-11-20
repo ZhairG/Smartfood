@@ -253,7 +253,8 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
   - **Colores por rol (spec 013):** las pantallas leen roles de Material o `MaterialTheme.smartFoodColors`
     (`theme/SmartFoodColors.kt`: encabezado, relleno marcado, superficie suave, divisor, verde suave, resaltado,
     etiqueta, ícono verde y velo). No se usan tokens de un solo modo (`White`, `SurfaceLight`, `GreenSoft`,
-    `YellowSoft`, `GreyDivider`) ni `if (LocalIsDarkTheme.current)` para elegir colores.
+    `YellowSoft`, `GreyDivider`) ni `if (LocalIsDarkTheme.current)` para elegir colores. La única excepción es
+    `ActionSuccessScreen`, que copia los frames de éxito claro y oscuro del Figma.
   - El tema XML es claro (`Base.Theme.Smartfood`, ventana `GreenLight`). `values-v31` hace que la pantalla de arranque de Android 12+ sea igual a la Splash (`splash_icon`).
 - **Fidelidad con Figma (spec 002, HU-UI-07):** referencia en los frames "_Claro" del archivo Figma `z1AoQvluQcmx98gjP4vHF6`.
   - Tipografía Poppins empaquetada en `res/font` (licencia en `docs/licenses/OFL-Poppins.txt`).

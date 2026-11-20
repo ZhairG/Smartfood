@@ -89,7 +89,7 @@ claras.
 | RF-OSC-01 | `core/designsystem/theme/SmartFoodColors.kt` define los roles propios de la app (encabezado, relleno marcado, superficie suave, divisor, verde suave, resaltado, etiqueta, ícono verde y velo) para claro y oscuro. `SmartfoodTheme` los provee con `LocalSmartFoodColors`. |
 | RF-OSC-02 | Las pantallas leen esos roles o los de Material. No usan tokens fijos de un solo modo, salvo los que el Figma pide iguales en los dos (naranja, rojo de error, `GreenCheck` en textos e íconos sobre fondo). |
 | RF-OSC-03 | En `DarkColorScheme` cambian tres roles: `onPrimary = GreenDark2`, `primaryContainer = GreenDark` y `onPrimaryContainer = GreenMain`. Los tokens de `Color.kt` no cambian. |
-| RF-OSC-04 | El modo sigue decidiéndose solo con `ThemeMode` (CA-UI-05-03). Las pantallas no consultan `LocalIsDarkTheme` para elegir colores; lo hacen los roles. |
+| RF-OSC-04 | El modo sigue decidiéndose solo con `ThemeMode` (CA-UI-05-03). Las pantallas no consultan `LocalIsDarkTheme` para elegir colores; lo hacen los roles. La excepción es `ActionSuccessScreen`, que ya copia sus frames claro y oscuro del Figma (`GreenLight` y `GreenDark2`). |
 
 ## 5. Requisitos no funcionales
 
