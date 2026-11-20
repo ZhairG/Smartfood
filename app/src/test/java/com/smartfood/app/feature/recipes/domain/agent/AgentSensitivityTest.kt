@@ -17,7 +17,7 @@ import org.junit.Test
  * Nombre: AgentSensitivityTest.kt
  * Autor: SmartFood Team
  * Fecha: Noviembre 2026
- * Descripción: Análisis de sensibilidad del agente (spec 009, RNF-RIA-03, T043), que pidió el informe de IA:
+ * Descripción: Análisis de sensibilidad del agente (spec 009, RNF-RIA-03, T051), que pidió el informe de IA:
  * - **Pesos de la utilidad** (`1,0 · 0,3 · 0,5`): cambia uno a la vez a la mitad y al doble (7 configuraciones) y mide,
  *   en los 30 inventarios de `AgentEvaluationTest`, los productos usados sobre los elegibles (n/N), la cantidad
  *   consumida, el desperdicio, el costo, la utilidad con los pesos base y cuántos planes son iguales al de los pesos base.

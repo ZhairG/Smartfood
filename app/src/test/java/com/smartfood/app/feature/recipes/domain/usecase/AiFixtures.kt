@@ -68,7 +68,7 @@ internal class AiFixtures(restrictions: Set<DietaryRestriction> = emptySet()) {
 
     val generatePlan = GeneratePlanUseCase(catalog)
 
-    /** [GeneratePlanUseCase] con un reloj de prueba para el límite de 2 s (CA-RIA-02-12, 02-13). */
+    /** [GeneratePlanUseCase] con un reloj de prueba para el límite de 2 s (CA-RIA-02-13, 02-14). */
     fun generatePlanWith(timeSource: TimeSource) = GeneratePlanUseCase(catalog, timeSource)
 
     private fun item(id: String, name: String, days: Long, quantity: Quantity?) = InventoryItem(
@@ -82,7 +82,7 @@ internal class AiFixtures(restrictions: Set<DietaryRestriction> = emptySet()) {
 
 /**
  * Reloj de prueba del límite de la búsqueda: cada consulta avanza [paso]. Con un paso de 50 ms, el límite de 2 s vence
- * en la consulta 40, es decir, a los 40 nodos (CA-RIA-02-12); con un paso de 3 s vence en la primera (CA-RIA-02-13).
+ * en la consulta 40, es decir, a los 40 nodos (CA-RIA-02-13); con un paso de 3 s vence en la primera (CA-RIA-02-14).
  */
 internal class RelojQueAvanza(private val paso: Duration) : TimeSource {
     override fun markNow(): TimeMark = object : TimeMark {

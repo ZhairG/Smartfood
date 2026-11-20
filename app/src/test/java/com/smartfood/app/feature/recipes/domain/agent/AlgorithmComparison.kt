@@ -230,7 +230,7 @@ internal class PlanSearchProblem(
      * Recocido simulado: búsqueda local que cambia la receta de un día al azar. Acepta un plan peor con probabilidad
      * `exp(Δ/T)`, para poder salir de un óptimo local, y `T` baja en cada iteración. No garantiza el óptimo.
      *
-     * @param iterations Vecinos que propone después del plan inicial: el presupuesto de cómputo (T043).
+     * @param iterations Vecinos que propone después del plan inicial: el presupuesto de cómputo (T051).
      */
     fun simulatedAnnealing(seed: Int, iterations: Int = ANNEALING_ITERATIONS): Outcome {
         val random = Random(seed)

@@ -17,8 +17,8 @@ import kotlinx.serialization.json.Json
 /**
  * Nombre: EvaluationCatalog.kt
  * Autor: SmartFood Team
- * Fecha: Octubre 2026 (en `sharedTest` desde noviembre de 2026, T044)
- * Descripción: Catálogo real de la app para evaluar el agente (spec 009, T013, T037 y T044), y los inventarios
+ * Fecha: Octubre 2026 (en `sharedTest` desde noviembre de 2026, T052)
+ * Descripción: Catálogo real de la app para evaluar el agente (spec 009, T013, T037 y T052), y los inventarios
  * sintéticos de la evaluación del Avance 2: cada uno parte de una receta al azar, de la que toma de 1 a 3 ingredientes
  * que vencen en 3 días o menos, y suma productos que vencen más tarde. Con semilla fija, siempre son los mismos, en la
  * JVM y en el teléfono. Vive en `sharedTest`: las pruebas unitarias lo leen de `src/main/assets` (`RealCatalog`) y la

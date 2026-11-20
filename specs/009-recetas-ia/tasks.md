@@ -61,13 +61,13 @@
 
 ## Punto 8 de los pendientes: evaluación y medición del agente (2026-11-20)
 Rama `feature/009-evaluacion-agente`. Origen: informe de IA del 13/11/2026 ([`docs/pendientes.md`](../../docs/pendientes.md) §8).
-- [x] T039 Enmienda de la spec: CA-RIA-02-10 con 70 recetas, CA-RIA-02-12 y 02-13 (límite de 2 s), RNF-RIA-02 y la desviación del aviso.
-- [x] T040 Límite de tiempo en el dominio: `SearchDeadline`, `MealPlanner.searchOutcome`, `PlanResult.Found.complete`, `PlanResult.TimedOut`, `AiPlanOutcome` y `GeneratePlanUseCase` con `TimeSource` (2 s), con sus pruebas (CA-RIA-02-12, 02-13).
-- [x] T041 `AiPlanViewModel` (`planComplete`, `timedOut`, registro de nodos), el aviso y el mensaje en `AiFlowScreen` (CA-RIA-02-12, 02-13).
-- [x] T042 Métricas con denominador: productos usados / elegibles (n/N) y cantidad consumida en `AgentEvaluationTest`; frontera media de máximos y máxima en `AlgorithmComparisonTest` (RNF-RIA-03).
-- [x] T043 `AgentSensitivityTest`: sensibilidad de los pesos y recocido con 10 semillas e igual presupuesto de cómputo (RNF-RIA-03).
-- [x] T044 `EvaluationCatalog` en `sharedTest` (`RealCatalog` lo usa en la JVM) y `AgentDevicePerformanceTest` en el teléfono: tiempo, nodos y memoria, normal y estrés (CA-RIA-02-10, RNF-RIA-02).
-- [x] T045 Correcciones de `docs/ia/` (frontera de A\*, memoria del backtracking, denominador del aprovechamiento), §8 de la evaluación y objetivos del póster.
+- [x] T047 Enmienda de la spec: CA-RIA-02-10 con 70 recetas, CA-RIA-02-13 y 02-14 (límite de 2 s), RNF-RIA-02 y la desviación del aviso.
+- [x] T048 Límite de tiempo en el dominio: `SearchDeadline`, `MealPlanner.searchOutcome`, `PlanResult.Found.complete`, `PlanResult.TimedOut`, `AiPlanOutcome` y `GeneratePlanUseCase` con `TimeSource` (2 s), con sus pruebas (CA-RIA-02-13, 02-14).
+- [x] T049 `AiPlanViewModel` (`planComplete`, `timedOut`, registro de nodos), el aviso y el mensaje en `AiFlowScreen` (CA-RIA-02-13, 02-14).
+- [x] T050 Métricas con denominador: productos usados / elegibles (n/N) y cantidad consumida en `AgentEvaluationTest`; frontera media de máximos y máxima en `AlgorithmComparisonTest` (RNF-RIA-03).
+- [x] T051 `AgentSensitivityTest`: sensibilidad de los pesos y recocido con 10 semillas e igual presupuesto de cómputo (RNF-RIA-03).
+- [x] T052 `EvaluationCatalog` en `sharedTest` (`RealCatalog` lo usa en la JVM) y `AgentDevicePerformanceTest` en el teléfono: tiempo, nodos y memoria, normal y estrés (CA-RIA-02-10, RNF-RIA-02).
+- [x] T053 Correcciones de `docs/ia/` (frontera de A\*, memoria del backtracking, denominador del aprovechamiento), §8 de la evaluación y objetivos del póster.
 
 ## Cierre (en el mismo PR)
 - [x] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
@@ -95,8 +95,8 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `MealPlannerCatalogTest`, U `GetAiContextUseCaseTest`, U `GeneratePlanUseCaseTest` |
 | CA-RIA-02-10 | U `MealPlannerPerformanceTest`, I `AgentDevicePerformanceTest` (V2436), M (release con logcat, `docs/ia/evaluacion-agente.md` §8) |
 | CA-RIA-02-11 | U `AiPlanViewModelTest` |
-| CA-RIA-02-12 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-13 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
+| CA-RIA-02-14 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |
 | CA-RIA-04-02 | U `RecipeDetailViewModelTest` |

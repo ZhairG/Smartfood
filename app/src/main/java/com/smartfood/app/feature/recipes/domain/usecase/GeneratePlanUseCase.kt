@@ -25,8 +25,8 @@ import kotlinx.coroutines.withContext
  * `Dispatchers.Default` para no trabar la pantalla; si se cancela la corrutina, el cálculo se descarta. Si hay plan,
  * agrega las razones de "¿Por qué te conviene?" con [PlanExplainer].
  *
- * La búsqueda tiene un límite de [PLAN_TIME_LIMIT] (enmienda del 2026-11-20, T040): al vencer devuelve el mejor plan
- * encontrado (CA-RIA-02-12) o [AiPlanOutcome.TimedOut] si no había ninguno (CA-RIA-02-13).
+ * La búsqueda tiene un límite de [PLAN_TIME_LIMIT] (enmienda del 2026-11-20, T048): al vencer devuelve el mejor plan
+ * encontrado (CA-RIA-02-13) o [AiPlanOutcome.TimedOut] si no había ninguno (CA-RIA-02-14).
  *
  * @param catalog Recetas e ingredientes.
  * @param timeSource Reloj del límite; las pruebas usan un `TestTimeSource`.
@@ -73,7 +73,7 @@ class GeneratePlanUseCase(
     }
 
     companion object {
-        /** Lo máximo que busca el agente: la meta de RNF-RIA-02 (CA-RIA-02-12, 02-13). */
+        /** Lo máximo que busca el agente: la meta de RNF-RIA-02 (CA-RIA-02-13, 02-14). */
         val PLAN_TIME_LIMIT: Duration = 2.seconds
     }
 }

@@ -134,7 +134,7 @@ class AlgorithmComparisonTest {
         return buildString {
             append("\n### ${profile.name} ($total inventarios)\n\n")
             // "Frontera": la media, entre inventarios, del máximo de estados que A* guardó a la vez, y el mayor de esos
-            // máximos. Son estados, no bytes (informe de IA, T042).
+            // máximos. Son estados, no bytes (informe de IA, T050).
             append(
                 "| Algoritmo | Planes | Utilidad media | Brecha con el óptimo | Aprovechamiento | Desperdicio | Costo | Nodos | " +
                     "Frontera (media de máximos) | Frontera máxima | ms |\n",

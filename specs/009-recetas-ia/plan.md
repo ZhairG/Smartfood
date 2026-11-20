@@ -116,7 +116,7 @@ return mejor?.let(::Found) ?: NoPlan(sugerencias)
   tiempo daría plan.
 - `PlanExplainer` arma las frases de CA-RIA-02-06 a partir de los `IngredientUse` del plan.
 
-### 3.3.1 Límite de tiempo (enmienda del 2026-11-20, CA-RIA-02-12 y 02-13)
+### 3.3.1 Límite de tiempo (enmienda del 2026-11-20, CA-RIA-02-13 y 02-14)
 - `MealPlanner.plan(recipes, pantry, context, deadline: SearchDeadline = SearchDeadline.NONE)`. `SearchDeadline` es
   una `fun interface { fun expired(): Boolean }` de Kotlin puro; `assign` la consulta al entrar y, si venció, corta la
   rama y marca la búsqueda como incompleta.

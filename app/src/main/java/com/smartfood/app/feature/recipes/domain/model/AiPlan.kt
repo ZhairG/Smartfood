@@ -39,7 +39,7 @@ sealed interface AiPlanOutcome {
 
     /**
      * El plan de 3 días y las razones de "¿Por qué te conviene?". Con [complete] en `false`, el límite de tiempo cortó
-     * la búsqueda y es el mejor plan encontrado hasta ese momento (CA-RIA-02-12).
+     * la búsqueda y es el mejor plan encontrado hasta ese momento (CA-RIA-02-13).
      *
      * @property nodes Nodos que visitó la búsqueda, para el registro de la medición (RNF-RIA-02).
      */
@@ -53,6 +53,6 @@ sealed interface AiPlanOutcome {
     /** Ningún plan cumple; [suggestions] dice qué cambiar. */
     data class NoPlan(val suggestions: List<PlanSuggestion>) : AiPlanOutcome
 
-    /** El límite de tiempo venció sin ningún plan (CA-RIA-02-13). */
+    /** El límite de tiempo venció sin ningún plan (CA-RIA-02-14). */
     data class TimedOut(val nodes: Long) : AiPlanOutcome
 }

@@ -24,7 +24,7 @@ import org.junit.Test
  * - **Aprovechamiento del plan:** % de los productos que vencen en ≤ 3 días y alguna receta usa (los *elegibles*), que
  *   el plan usa **al menos en parte** antes de que venzan; es la media de esa proporción por inventario. Meta: ≥ 80 % y
  *   más que las dos líneas base. La tabla muestra también el total de productos usados sobre el total de elegibles
- *   (n/N), porque el porcentaje solo no dice cuántos productos hay detrás (informe de IA, T042).
+ *   (n/N), porque el porcentaje solo no dice cuántos productos hay detrás (informe de IA, T050).
  * - **Cantidad consumida:** fracción de la cantidad de los productos elegibles que el plan consume, en promedio. Separa
  *   el conteo de productos (usar 10 g de 1 kg cuenta como usado) de lo que de verdad se cocina. No es peso: las
  *   cantidades sin unidad cuentan como una porción entera.

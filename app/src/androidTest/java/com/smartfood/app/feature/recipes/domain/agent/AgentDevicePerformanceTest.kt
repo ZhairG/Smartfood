@@ -20,8 +20,8 @@ import org.junit.runner.RunWith
  * Nombre: AgentDevicePerformanceTest.kt
  * Autor: SmartFood Team
  * Fecha: Noviembre 2026
- * Descripción: Medición del agente en el teléfono con el catálogo real de 70 recetas (spec 009, T044, CA-RIA-02-10,
- * CA-RIA-02-12, RNF-RIA-02), que pidió el informe de IA. Corre los 30 inventarios normales de `AgentEvaluationTest` y
+ * Descripción: Medición del agente en el teléfono con el catálogo real de 70 recetas (spec 009, T052, CA-RIA-02-10,
+ * CA-RIA-02-13, RNF-RIA-02), que pidió el informe de IA. Corre los 30 inventarios normales de `AgentEvaluationTest` y
  * los 6 de estrés ("Inventario enorme": todos los ingredientes y 8 por vencer), primero sin límite y luego con el límite
  * de 2 s de la app, y registra en logcat (`adb logcat -s SmartFoodIA`):
  * - el tiempo de cada búsqueda (promedio y peor caso), los nodos y si terminó;
@@ -59,7 +59,7 @@ class AgentDevicePerformanceTest {
     }
 
     @Test
-    fun caRia0212_conElLimiteNingunaBusquedaPasaDeDosSegundos() {
+    fun caRia0213_conElLimiteNingunaBusquedaPasaDeDosSegundos() {
         val cases = catalog.syntheticInventories() + catalog.largeInventories(count = 6, seed = 2026)
         measure(cases.first(), limited = false) // Calentamiento.
 

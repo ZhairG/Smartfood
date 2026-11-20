@@ -7,7 +7,7 @@ import java.io.File
  * Nombre: RealCatalog.kt
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
- * Descripción: Catálogo real de `src/main/assets` para las pruebas del agente en la JVM (spec 009, T013, T037 y T044).
+ * Descripción: Catálogo real de `src/main/assets` para las pruebas del agente en la JVM (spec 009, T013, T037 y T052).
  * Los inventarios sintéticos y los perfiles de evaluación están en [EvaluationCatalog] (`sharedTest`), que también usa
  * la medición en el teléfono.
  */

@@ -7,7 +7,7 @@ import kotlin.time.TimeSource
  * Nombre: SearchDeadline.kt
  * Autor: SmartFood Team
  * Fecha: Noviembre 2026
- * Descripción: Límite de la búsqueda de [MealPlanner] (spec 009, enmienda del 2026-11-20, T040, CA-RIA-02-12 y 02-13).
+ * Descripción: Límite de la búsqueda de [MealPlanner] (spec 009, enmienda del 2026-11-20, T048, CA-RIA-02-13 y 02-14).
  * [MealPlanner] lo consulta en cada nodo; cuando [expired] devuelve `true`, deja de buscar y se queda con el mejor plan
  * encontrado hasta ese momento. Es Kotlin puro: la app lo arma con un reloj y las pruebas con un contador o un
  * `TestTimeSource`.

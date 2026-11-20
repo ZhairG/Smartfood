@@ -234,7 +234,7 @@ class AiFlowScreenTest {
     }
 
     @Test
-    fun caRia0212_planIncompletoMuestraElAvisoDelLimite() {
+    fun caRia0213_planIncompletoMuestraElAvisoDelLimite() {
         mostrar(contexto.copy(step = AiStep.Plan, plan = plan, planComplete = false))
 
         composeTestRule.onNodeWithText("No alcancé a revisar todas las combinaciones", substring = true)
@@ -243,7 +243,7 @@ class AiFlowScreenTest {
     }
 
     @Test
-    fun caRia0212_planCompletoNoMuestraElAviso() {
+    fun caRia0213_planCompletoNoMuestraElAviso() {
         mostrar(contexto.copy(step = AiStep.Plan, plan = plan))
 
         composeTestRule.onNodeWithText("No alcancé a revisar todas las combinaciones", substring = true)
@@ -251,7 +251,7 @@ class AiFlowScreenTest {
     }
 
     @Test
-    fun caRia0213_sinPlanPorElLimiteMuestraElMensajeYAjustar() {
+    fun caRia0214_sinPlanPorElLimiteMuestraElMensajeYAjustar() {
         mostrar(contexto.copy(step = AiStep.NoPlan, timedOut = true))
 
         composeTestRule.onNodeWithText("Sin coincidencias").assertIsDisplayed()

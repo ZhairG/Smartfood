@@ -425,7 +425,7 @@ private fun PlanContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = BodyStyle()
         )
-        // CA-RIA-02-12: el límite de 2 s cortó la búsqueda (desviación de la spec §9, el Figma no lo define).
+        // CA-RIA-02-13: el límite de 2 s cortó la búsqueda (desviación de la spec §9, el Figma no lo define).
         if (!state.planComplete) {
             Text(
                 text = stringResource(id = R.string.recipes_ai_partial_plan),
@@ -499,7 +499,7 @@ private fun ColumnScope.NoPlanContent(state: AiUiState, onEvent: (AiEvent) -> Un
             .align(Alignment.CenterHorizontally)
             .padding(top = NoPlanIconTop)
     )
-    // CA-RIA-02-13: si el límite de 2 s venció sin plan, el mensaje lo dice (desviación de la spec §9).
+    // CA-RIA-02-14: si el límite de 2 s venció sin plan, el mensaje lo dice (desviación de la spec §9).
     Text(
         text = stringResource(
             id = if (state.timedOut) R.string.recipes_ai_timed_out_heading else R.string.recipes_ai_no_plan_heading

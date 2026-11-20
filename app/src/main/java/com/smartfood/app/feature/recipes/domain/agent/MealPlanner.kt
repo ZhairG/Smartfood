@@ -32,7 +32,7 @@ import com.smartfood.app.feature.recipes.domain.model.Recipe
  *
  * Es determinista (RNF-RIA-01): ante utilidades iguales gana el plan con los ids de receta menores en orden.
  *
- * **Límite de tiempo** (enmienda del 2026-11-20, CA-RIA-02-12 y 02-13): la búsqueda consulta un [SearchDeadline] en
+ * **Límite de tiempo** (enmienda del 2026-11-20, CA-RIA-02-13 y 02-14): la búsqueda consulta un [SearchDeadline] en
  * cada nodo. Si vence, corta las ramas que faltan y devuelve el mejor plan encontrado hasta ese momento, que cumple
  * todas las restricciones pero no garantiza el óptimo (`PlanResult.Found.complete = false`), o [PlanResult.TimedOut]
  * si todavía no había ninguno. Sin límite ([SearchDeadline.NONE]) el resultado es el de siempre.
@@ -48,7 +48,7 @@ class MealPlanner(
 
     /**
      * Busca el plan de mayor utilidad; si no hay ninguno válido, devuelve sugerencias (CA-RIA-02-03, 02-07). Con
-     * [deadline], al vencer devuelve el mejor plan encontrado o [PlanResult.TimedOut] (CA-RIA-02-12, 02-13).
+     * [deadline], al vencer devuelve el mejor plan encontrado o [PlanResult.TimedOut] (CA-RIA-02-13, 02-14).
      */
     fun plan(
         recipes: List<Recipe>,
@@ -91,7 +91,7 @@ class MealPlanner(
      */
     data class SearchOutcome(val plan: MealPlan?, val complete: Boolean, val nodes: Long)
 
-    /** Como [search], pero respeta [deadline] y dice si terminó y cuántos nodos visitó (CA-RIA-02-12, RNF-RIA-02). */
+    /** Como [search], pero respeta [deadline] y dice si terminó y cuántos nodos visitó (CA-RIA-02-13, RNF-RIA-02). */
     fun searchOutcome(
         recipes: List<Recipe>,
         pantry: List<PantryItem>,
@@ -139,7 +139,7 @@ class MealPlanner(
         context: PlanContext,
         best: Best,
     ) {
-        // Límite de tiempo (CA-RIA-02-12): una vez vencido, ninguna rama sigue.
+        // Límite de tiempo (CA-RIA-02-13): una vez vencido, ninguna rama sigue.
         if (best.truncated) return
         if (best.deadline.expired()) {
             best.truncated = true

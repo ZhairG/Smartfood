@@ -72,7 +72,7 @@ class GeneratePlanUseCaseTest {
     }
 
     @Test
-    fun `CA-RIA-02-12 si el reloj no llega al limite el plan esta completo`() = runTest {
+    fun `CA-RIA-02-13 si el reloj no llega al limite el plan esta completo`() = runTest {
         val fixtures = AiFixtures()
         val generate = GeneratePlanUseCase(fixtures.catalog, TestTimeSource())
 
@@ -84,7 +84,7 @@ class GeneratePlanUseCaseTest {
     }
 
     @Test
-    fun `CA-RIA-02-13 si el reloj ya paso el limite no hay plan`() = runTest {
+    fun `CA-RIA-02-14 si el reloj ya paso el limite no hay plan`() = runTest {
         val fixtures = AiFixtures()
         // Un reloj en el que siempre pasaron 3 s: el límite de 2 s vence en la primera consulta.
         val vencido = object : TimeSource {

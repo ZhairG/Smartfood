@@ -299,7 +299,7 @@ sigue siendo una cota más ajustada, revisada contra `MealPlannerTest`.
 - **Con cocinas elegidas** el dominio es tan pequeño que la búsqueda tarda menos de 1 ms. En "Italiana y mexicana", el recocido
   encontró plan en 3 de 6 inventarios y los exactos en 4 de 6.
 
-## 8. Correcciones del informe de IA y medición en el teléfono (2026-11-20, T039 a T045)
+## 8. Correcciones del informe de IA y medición en el teléfono (2026-11-20, T047 a T053)
 
 El informe de IA del 13/11/2026 pidió precisar el aprovechamiento y la memoria de A\*, un análisis de sensibilidad de
 los pesos, varias semillas del recocido, la medición con 70 recetas en un teléfono y una respuesta clara si la búsqueda
@@ -349,7 +349,7 @@ APK release y `adb logcat -s SmartFoodIA` (`AiPlanViewModel` registra milisegund
 | Normales y estrés con límite de 2 s (debug) | ronda final | ronda final | ronda final | ronda final | ronda final |
 | Flujo normal, APK release | ronda final | ronda final | — | — | — |
 
-### 8.6 Límite de 2 s (CA-RIA-02-12 y 02-13)
+### 8.6 Límite de 2 s (CA-RIA-02-13 y 02-14)
 
 La búsqueda ya no puede pasar de 2 s. Al llegar al límite, la ramificación y poda devuelve el mejor plan encontrado
 hasta ese momento: cumple todas las restricciones duras, pero no garantiza el óptimo, y la app lo dice («No alcancé a
