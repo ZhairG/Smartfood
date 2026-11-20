@@ -8,6 +8,8 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
@@ -39,8 +41,12 @@ private tailrec fun Context.findActivity(): ComponentActivity? = when (this) {
 fun SystemBarEffect(isLightBackground: Boolean) {
     val context = LocalContext.current
     val isDarkTheme = LocalIsDarkTheme.current
+    val currentIsDarkTheme by rememberUpdatedState(isDarkTheme)
 
-    DisposableEffect(isLightBackground, isDarkTheme) {
+    // La barra de estado depende solo del fondo. Si el tema también fuera clave, al leerse el tema oscuro de DataStore
+    // (un instante después del primer dibujo) se repetiría el efecto de la Splash, que sigue en la transición, y
+    // dejaría íconos oscuros sobre el Login (spec 013, medido en el V2436 el 2026-11-19).
+    DisposableEffect(isLightBackground) {
         val activity = context.findActivity()
         if (activity != null) {
             val statusBarStyle = SystemBarStyle.auto(
@@ -49,9 +55,10 @@ fun SystemBarEffect(isLightBackground: Boolean) {
                 detectDarkMode = { !isLightBackground }
             )
 
+            // La barra de navegación sigue el tema vigente al mostrarse la pantalla (CA-OSC-04-01).
             activity.enableEdgeToEdge(
                 statusBarStyle = statusBarStyle,
-                navigationBarStyle = if (isDarkTheme) {
+                navigationBarStyle = if (currentIsDarkTheme) {
                     SystemBarStyle.dark(AndroidColor.TRANSPARENT)
                 } else {
                     SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT)

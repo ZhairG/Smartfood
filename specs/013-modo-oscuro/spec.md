@@ -81,6 +81,7 @@ claras.
 |---|---|
 | CA-OSC-04-01 | **Dado** el tema oscuro, **entonces** la barra de navegación del sistema tiene íconos claros sobre la app. |
 | CA-OSC-04-02 | **Dado** una hoja inferior abierta en oscuro ("Tema de la app", categoría, unidad, foto, ingrediente), **entonces** la barra de navegación no queda clara. |
+| CA-OSC-04-03 | **Dado** que abro la app en frío con la sesión iniciada, en claro o en oscuro, **entonces** la barra de estado tiene íconos blancos sobre el encabezado verde de Inventario, Recetas, Guardadas y las pantallas internas. *Agregado el 2026-11-19 (aprobado por Zhair): antes de esta spec, esas pantallas heredaban los íconos oscuros de la Splash. En el V2436 (vivo) se cumple cuando la actividad se recrea, pero no tras un arranque en frío, por una limitación del teléfono que también tiene `master` (plan §2.3).* |
 
 ## 4. Requisitos funcionales
 

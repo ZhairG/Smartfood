@@ -49,6 +49,7 @@ import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
@@ -109,6 +110,8 @@ private fun InventoryTopBar(
     onSearchClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Encabezado verde: íconos blancos en la barra de estado, también al abrir la app en frío (spec 013, CA-OSC-04-03).
+    SystemBarEffect(isLightBackground = false)
     Box(
         modifier = modifier
             .fillMaxWidth()

@@ -31,7 +31,7 @@
 | CA-OSC-02-03 | I `ColorModeTest.ca_osc_02_03_*`, U `SmartFoodColorsContrastTest` |
 | CA-OSC-03-01 | I `ColorModeTest.ca_osc_03_01_*` |
 | CA-OSC-03-02 a 03-07 | U `SmartFoodColorsContrastTest` (roles), M |
-| CA-OSC-04-01, 04-02 | M |
+| CA-OSC-04-01, 04-02, 04-03 | M |
 
 U: unitaria. I: instrumentada. M: captura por adb en el V2436.
 
@@ -41,7 +41,13 @@ U: unitaria. I: instrumentada. M: captura por adb en el V2436.
   búsqueda, editor, Recetas, detalle, IA, sin coincidencias, Guardadas, editor de receta propia, "Antes de empezar" y
   un paso de cocina) se leen sin manchas claras.
 - [ ] En claro, las mismas pantallas son idénticas a las capturas de antes.
-- [ ] La hoja "Tema de la app" en oscuro no deja la barra de navegación clara.
+- [x] Las hojas en oscuro no dejan la barra de navegación clara: comprobado el 2026-11-19 con la hoja de categoría del
+  editor (misma `OptionSheet` que "Tema de la app"); "Cancelar" naranja con texto blanco y "Guardar" verde con texto
+  oscuro.
+- [x] Editor de producto en oscuro: la basura de la foto es roja con ícono blanco y la cámara verde con ícono oscuro.
+- [x] Búsqueda del inventario en oscuro: buscador, chips y etiquetas oscuros y legibles.
+- [ ] Barra de estado blanca al abrir en frío (CA-OSC-04-03): en el V2436 solo se cumple al navegar o al recrearse la
+  actividad (limitación del teléfono, plan §2.3); falta probarlo en otro dispositivo o emulador.
 - [x] Autenticación en oscuro contra los frames del Figma (`51:11` Inicio de sesión, `51:34` Crear cuenta y `51:84`
   ¿Olvidaste tu contraseña?), el 2026-11-19 con el APK anterior a esta spec: encabezado, panel, campos, título, botón y
   enlaces coinciden. Las diferencias son de texto (modo sin facturación, spec 012) o de ancho (spec 002).

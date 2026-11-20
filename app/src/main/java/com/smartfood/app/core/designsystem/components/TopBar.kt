@@ -30,6 +30,7 @@ import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.core.designsystem.util.SystemBarEffect
 
 /**
  * Nombre: TopBar.kt
@@ -57,6 +58,8 @@ fun SmartFoodTopBar(
     modifier: Modifier = Modifier,
     action: (@Composable () -> Unit)? = null,
 ) {
+    // Encabezado verde: íconos blancos en la barra de estado, también al abrir la app en frío (spec 013, CA-OSC-04-03).
+    SystemBarEffect(isLightBackground = false)
     Box(
         modifier = modifier
             .fillMaxWidth()

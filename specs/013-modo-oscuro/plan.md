@@ -71,8 +71,17 @@ val MaterialTheme.smartFoodColors: SmartFoodColors   // @Composable @ReadOnlyCom
 
 ### 2.3 Barras del sistema
 
-- `SystemBarEffect` pide la barra de navegación con `SystemBarStyle.auto(…) { LocalIsDarkTheme }` en lugar de
-  `SystemBarStyle.light`.
+- `SystemBarEffect` conserva un solo efecto con el fondo como única clave y pide la barra de navegación según el tema
+  vigente (`rememberUpdatedState`) en el mismo `enableEdgeToEdge`. Con el tema también en la clave, la lectura del tema
+  oscuro de DataStore repetía el efecto de la Splash durante la transición y dejaba íconos oscuros sobre el Login
+  (visto en el V2436 el 2026-11-19).
+- `SmartFoodTopBar`, `RecipesHeader` y la barra del Inventario llaman `SystemBarEffect(isLightBackground = false)`
+  (CA-OSC-04-03); antes, las pestañas heredaban los íconos oscuros de la Splash.
+- **Limitación del V2436 (vivo):** tras un arranque en frío, el teléfono mantiene los íconos oscuros de la pantalla
+  de arranque aunque la app pida blancos; el controlador de la ventana confirma la petición (`isAppearanceLightStatusBars
+  = false`) y aun así se pintan oscuros. Cuando la actividad se recrea, sí la respeta. También ocurre en `master`. Se
+  probaron, sin éxito, `windowLightStatusBar = false` en el tema XML y quitar la petición de la Splash; los dos se
+  revirtieron.
 - Las tres hojas (`OptionSheet`, `PhotoSourceSheet` e `IngredientSheet`) pasan `smartFoodSheetProperties()`
   (`core/designsystem/util/SheetProperties.kt`): `ModalBottomSheetProperties` con las dos barras en `!dark`. Sin
   ellas, Material 3 1.4.0 deduce las barras del color del contenido, y `TextMuted` (oscuro) cuenta como "oscuro":
