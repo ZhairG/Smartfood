@@ -8,9 +8,6 @@ import com.smartfood.app.feature.recipes.domain.model.PantryItem
 import com.smartfood.app.feature.recipes.domain.model.PlanContext
 import com.smartfood.app.feature.recipes.domain.model.Store
 import java.util.Locale
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicLong
-import kotlin.concurrent.thread
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertTrue
@@ -26,8 +23,8 @@ import org.junit.runner.RunWith
  * los 6 de estrés ("Inventario enorme": todos los ingredientes y 8 por vencer), primero sin límite y luego con el límite
  * de 2 s de la app, y registra en logcat (`adb logcat -s SmartFoodIA`):
  * - el tiempo de cada búsqueda (promedio y peor caso), los nodos y si terminó;
- * - la memoria: el máximo del heap de Java que se usó por encima del de antes de buscar, muestreado cada 2 ms (es una
- *   aproximación: incluye la basura que el recolector todavía no liberó);
+ * - la memoria: el heap de Java usado al terminar por encima del de antes de buscar (una aproximación: incluye la
+ *   basura que el recolector todavía no liberó y puede perder picos);
  * - con el límite, la brecha con el plan sin límite (solo en los inventarios normales).
  * El estrés sin límite se corta a los 60 s, porque en el APK debug puede tardar minutos.
  *
@@ -88,25 +85,14 @@ class AgentDevicePerformanceTest {
         val runtime = Runtime.getRuntime()
         System.gc()
         val baseline = runtime.totalMemory() - runtime.freeMemory()
-        val peak = AtomicLong(baseline)
-        val running = AtomicBoolean(true)
-        val sampler = thread(name = "muestreo-heap") {
-            while (running.get()) {
-                peak.accumulateAndGet(runtime.totalMemory() - runtime.freeMemory(), ::maxOf)
-                Thread.sleep(SAMPLE_MILLIS)
-            }
-        }
         val deadline = limit?.let { SearchDeadline.after(it) } ?: SearchDeadline.NONE
         val started = System.nanoTime()
-        // try/finally: si la búsqueda falla, el muestreo se detiene igual y la prueba muestra el error en vez de colgarse.
-        val outcome = try {
-            planner.searchOutcome(catalog.recipes, pantry, context, deadline)
-        } finally {
-            running.set(false)
-            sampler.join()
-        }
+        val outcome = planner.searchOutcome(catalog.recipes, pantry, context, deadline)
         val millis = (System.nanoTime() - started) / 1_000_000.0
-        return Measure(millis, outcome.nodes, outcome.complete, outcome.plan?.utility, (peak.get() - baseline) / 1024)
+        // Heap usado al terminar menos el de antes. Un hilo que muestreaba el máximo se bloqueaba en el V2436, así que
+        // esta cifra es una aproximación: incluye la basura que el recolector todavía no liberó y puede perder picos.
+        val used = (runtime.totalMemory() - runtime.freeMemory() - baseline).coerceAtLeast(0) / 1024
+        return Measure(millis, outcome.nodes, outcome.complete, outcome.plan?.utility, used)
     }
 
     private fun report(name: String, measures: List<Measure>) {
@@ -128,7 +114,6 @@ class AgentDevicePerformanceTest {
 
     private companion object {
         const val TAG = "SmartFoodIA"
-        const val SAMPLE_MILLIS = 2L
         const val LIMIT_MARGIN_MILLIS = 2_500.0
         val PLAN_LIMIT = 2.seconds
         val STRESS_CAP = 60.seconds
