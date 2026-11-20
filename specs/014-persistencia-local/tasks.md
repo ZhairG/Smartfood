@@ -16,7 +16,7 @@
   `RecentSearchesTest` y `RecipesDiscoverScreenTest`.
 - [x] T006 **Recientes en el Inventario** (CA-LOC-02-01 a 02-07): contrato, ViewModel (también la voz) y pantalla;
   `InventorySearchViewModelTest` e `InventorySearchScreenTest`.
-- [ ] T007 **Documentación**: `AGENTS.md` (arquitectura y lista de specs), `README.md`, matriz al día,
+- [x] T007 **Documentación**: `AGENTS.md` (arquitectura y lista de specs), `README.md`, matriz al día,
   `tools/ca_coverage.py` y su línea base, y `docs/pendientes.md`.
 - [ ] T008 **Cierre** (ronda final): unitarias, `assembleDebug`, `lintDebug`, instrumentadas de las clases tocadas,
   APK release en el V2436 y checklist manual (abajo), con capturas por adb en claro y oscuro.
