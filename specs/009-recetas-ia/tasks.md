@@ -67,7 +67,7 @@ Rama `feature/009-evaluacion-agente`. Origen: informe de IA del 13/11/2026 ([`do
 - [x] T042 Métricas con denominador: productos usados / elegibles (n/N) y cantidad consumida en `AgentEvaluationTest`; frontera media de máximos y máxima en `AlgorithmComparisonTest` (RNF-RIA-03).
 - [x] T043 `AgentSensitivityTest`: sensibilidad de los pesos y recocido con 10 semillas e igual presupuesto de cómputo (RNF-RIA-03).
 - [x] T044 `EvaluationCatalog` en `sharedTest` (`RealCatalog` lo usa en la JVM) y `AgentDevicePerformanceTest` en el teléfono: tiempo, nodos y memoria, normal y estrés (CA-RIA-02-10, RNF-RIA-02).
-- [ ] T045 Correcciones de `docs/ia/` (frontera de A\*, memoria del backtracking, denominador del aprovechamiento), §8 de la evaluación y objetivos del póster.
+- [x] T045 Correcciones de `docs/ia/` (frontera de A\*, memoria del backtracking, denominador del aprovechamiento), §8 de la evaluación y objetivos del póster.
 
 ## Cierre (en el mismo PR)
 - [x] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).

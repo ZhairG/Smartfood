@@ -7,8 +7,19 @@ Se reproducen con:
 ./gradlew :app:testDebugUnitTest --tests "*AgentEvaluationTest" --tests "*MealPlannerPerformanceTest"
 ```
 
-La comparación con otros algoritmos, la heurística y su admisibilidad están en la §6; los resultados con 70 recetas y Cocina Favorita, en la §7. La guía para estudiar la sustentación
-está en [`sustentacion-agente.md`](sustentacion-agente.md).
+La comparación con otros algoritmos, la heurística y su admisibilidad están en la §6; los resultados con 70 recetas y Cocina Favorita, en la §7; las
+correcciones que pidió el informe de IA, la sensibilidad de los pesos, el recocido con varias semillas, el límite de 2 s y la medición en el teléfono, en
+la §8. La guía para estudiar la sustentación está en [`sustentacion-agente.md`](sustentacion-agente.md).
+
+> **Cómo leer las cifras (corrección del 2026-11-20, informe de IA):**
+> - El *aprovechamiento* cuenta **productos**, no cantidad: es la media, por inventario, de la proporción de productos
+>   elegibles (vencen en ≤ 3 días y alguna receta los usa) que el plan usa **al menos en parte**. Usar 10 g de 1 kg
+>   cuenta como usado. Por eso desde la §8 se reporta siempre con su denominador (n/N) y junto a la *cantidad
+>   consumida*. No mide peso consumido ni desperdicio físico evitado.
+> - El *desperdicio medio* es una suma de fracciones sin usar (0,80 = ocho décimas de producto), no kilogramos.
+> - La *frontera* de A\* en las tablas es la **media, entre inventarios, del máximo de estados** que guardó a la vez,
+>   no un máximo global ni bytes de memoria. Con 70 recetas y sin restricciones, la media es 6.971,5 y el máximo
+>   individual, 15.172.
 
 ## 1. Formulación
 
@@ -172,7 +183,7 @@ de estas tablas cuenta todos los productos por vencer, también los que ninguna 
 
 **Agente contra los rivales:**
 
-| Perfil | Agente: nodos / ms | A\*: nodos / frontera / ms | Recocido: brecha / ms | Voraz: brecha / ms |
+| Perfil | Agente: nodos / ms | A\*: nodos / frontera (media de máximos) / ms | Recocido: brecha / ms | Voraz: brecha / ms |
 |---|---|---|---|---|
 | Sin restricciones | 498 / 60 | 123 / 3.066 / 46 | 0,050 / 40 | 0,199 / 1,5 |
 | Vegetariano | 422 / 13 | 91 / 1.369 / 16 | 0 / 34 | 0,154 / 0,5 |
@@ -190,11 +201,11 @@ empatan (3 de 6 inventarios con plan, en todos). Con COP 2.000 ninguno arma plan
   día por día no alcanza: confirma que el problema es de decisión conjunta, no un filtro.
 - **Recocido simulado:** llegó al óptimo en casi todos los perfiles y fue unas 14 veces más rápido con el inventario
   enorme, pero en "Sin restricciones" falló en al menos un inventario y no tiene garantía de óptimo.
-- **A\*:** halla el mismo óptimo expandiendo muchos menos nodos, pero guarda la frontera en memoria (hasta 110.997 estados)
-  y su tiempo fue parecido al del agente; en esta implementación, cada expansión reconstruye el inventario. La primera versión, con el inventario en cada
+- **A\*:** halla el mismo óptimo expandiendo muchos menos nodos, pero guarda la frontera en memoria (con el inventario
+  enorme, el máximo de su frontera fue en promedio de 110.997 estados; es la media de los 6 máximos, no el mayor, y son
+  estados, no bytes) y su tiempo fue parecido al del agente; en esta implementación, cada expansión reconstruye el inventario. La primera versión, con el inventario en cada
   nodo, agotó los 512 MB de la prueba.
-- **Agente:** se mantiene porque garantiza el óptimo, usa memoria mínima (solo la rama actual) y ya funciona bien en los
-  casos normales. Con todo, A\* es un rival serio: la decisión es por memoria, no por nodos.
+- **Agente:** se mantiene porque garantiza el óptimo, usa poca memoria: guarda solo la rama actual, que son como mucho 3 decisiones, y en cada nivel el inventario y el presupuesto que quedan y la lista de recetas candidatas ya evaluadas. Esa memoria crece con las recetas del dominio, no con el tamaño del árbol, y ya funciona bien en los casos normales. Con todo, A\* es un rival serio: la decisión es por memoria, no por nodos.
 
 ### 6.5 Limitaciones nuevas
 
@@ -208,7 +219,7 @@ empatan (3 de 6 inventarios con plan, en todos). Con COP 2.000 ninguno arma plan
 
 | Pregunta | Respuesta |
 |---|---|
-| ¿Por qué CSP y no otro? | Porque garantiza el óptimo con memoria mínima. El voraz se aleja del óptimo y el recocido no lo garantiza; A\* lo halla, pero guarda hasta 110.997 estados. |
+| ¿Por qué CSP y no otro? | Porque garantiza el óptimo con poca memoria (la rama actual y sus candidatas). El voraz se aleja del óptimo y el recocido no lo garantiza; A\* lo halla, pero su frontera llegó en promedio a 110.997 estados con el inventario enorme (media de los máximos, no bytes). |
 | ¿Solo existe el backtracking? | No: se compararon A\*, recocido simulado y voraz sobre los mismos datos (§6.4). |
 | ¿Cuál es el problema de búsqueda? | §6.1: estado, acción, meta y objetivo. |
 | ¿Qué heurística usan y cuándo actúa? | §6.2: la cota optimista, antes de bajar a cada receta, y es la que más reduce nodos. |
@@ -231,6 +242,10 @@ comparables con estas cifras, porque cambió el catálogo y los inventarios sint
 | **Agente CSP** | 30/30 | **88,9 %** | 56,2 % | 100 % | **0,80** | **COP 18.696** |
 | Línea base: coincidencias | 30/30 | 74,7 % | 64,8 % | 100 % | 1,21 | COP 47.813 |
 | Línea base: vencimiento | 30/30 | 85,0 % | 65,4 % | 100 % | 0,94 | COP 51.305 |
+
+El 88,9 % es la media, por inventario, de la proporción de productos elegibles que el plan usa al menos en parte; el
+denominador excluye los productos por vencer que ninguna receta puede usar. No mide cuánto peso se consumió ni cuánto
+desperdicio real se evitó (ver la nota al inicio y la §8.1, con n/N y la cantidad consumida).
 
 **Meta RNF-RIA-03 cumplida:** ≥ 80 % y por encima de las dos líneas base. El aprovechamiento bajó frente a §3 (97,2 %), pero las
 dos cifras salen de inventarios distintos, así que no se atribuye esa baja solo a las recetas nuevas.
@@ -266,7 +281,7 @@ sigue siendo una cota más ajustada, revisada contra `MealPlannerTest`.
 
 ### 7.4 Comparación de algoritmos
 
-| Perfil | Agente: nodos / ms | A\*: nodos / frontera / ms | Recocido: brecha / ms | Voraz: brecha / ms |
+| Perfil | Agente: nodos / ms | A\*: nodos / frontera (media de máximos) / ms | Recocido: brecha / ms | Voraz: brecha / ms |
 |---|---|---|---|---|
 | Sin restricciones | 992 / 165 | 230 / 6.972 / 137 | 0,012 / 61 | 0,147 / 5,2 |
 | Vegetariano | 811 / 48 | 160 / 2.839 / 52 | 0 / 40 | 0,147 / 0,7 |
@@ -276,14 +291,81 @@ sigue siendo una cota más ajustada, revisada contra `MealPlannerTest`.
 | Inventario enorme | 219.521 / 8.338 | 4.493 / 286.714 / 9.122 | 0 / 233 | 0,065 / 5,3 |
 | Nada por vencer | 28 / 13 | 20 / 581 / 10 | 0,021 / 42 | 0,034 / 1,4 |
 
-- **El agente sigue hallando el óptimo** y es la opción con memoria mínima; A\* lo iguala con menos nodos, pero guardó hasta
-  286.714 estados en la frontera.
+- **El agente sigue hallando el óptimo** con poca memoria (la rama actual y sus candidatas); A\* lo iguala con menos nodos,
+  pero el máximo de su frontera fue en promedio de 286.714 estados con el inventario enorme y de 6.971,5 sin restricciones
+  (el mayor máximo individual de ese perfil fue 15.172). Son estados, no bytes.
 - **El recocido perdió terreno:** con 70 recetas no llegó al óptimo en 5 de estos 7 perfiles, aunque sigue siendo unas 36 veces
   más rápido con el inventario enorme.
 - **Con cocinas elegidas** el dominio es tan pequeño que la búsqueda tarda menos de 1 ms. En "Italiana y mexicana", el recocido
   encontró plan en 3 de 6 inventarios y los exactos en 4 de 6.
 
+## 8. Correcciones del informe de IA y medición en el teléfono (2026-11-20, T039 a T045)
+
+El informe de IA del 13/11/2026 pidió precisar el aprovechamiento y la memoria de A\*, un análisis de sensibilidad de
+los pesos, varias semillas del recocido, la medición con 70 recetas en un teléfono y una respuesta clara si la búsqueda
+no termina. Las cifras marcadas «ronda final» se llenan al correr las pruebas al final de los puntos pendientes.
+
+### 8.1 Aprovechamiento con su denominador
+
+Se reproduce con `AgentEvaluationTest`, que ahora imprime los productos usados sobre los elegibles (n/N) y la cantidad
+consumida.
+
+| Método | Aprovechamiento (media por inventario) | Productos usados / elegibles | Cantidad consumida |
+|---|---|---|---|
+| Agente CSP | 88,9 % | ronda final | ronda final |
+| Línea base: coincidencias | 74,7 % | ronda final | ronda final |
+| Línea base: vencimiento | 85,0 % | ronda final | ronda final |
+
+### 8.2 Memoria de A\* y del backtracking
+
+- `AlgorithmComparisonTest` separa la frontera en dos columnas: la media de los máximos por inventario y el máximo
+  individual. Ninguna mide bytes.
+- El backtracking no guarda «tres recetas»: guarda la rama actual (como mucho 3 decisiones) y, en cada nivel, el
+  inventario y el presupuesto restantes y la lista de candidatas evaluadas. Su memoria crece con el dominio, no con el
+  árbol. La memoria real del agente se mide en el teléfono (§8.5).
+
+### 8.3 Sensibilidad de los pesos
+
+`SMARTFOOD_SENSITIVITY=1 ./gradlew :app:testDebugUnitTest --tests "*AgentSensitivityTest"` cambia un peso a la vez a la
+mitad y al doble, en los 30 inventarios, y mide todo con los pesos base. El resultado queda en
+`app/build/sensibilidad-agente.md`. Ronda final: tabla y conclusión.
+
+### 8.4 Recocido simulado con varias semillas
+
+El mismo archivo compara 10 semillas con 3.000 iteraciones y 10 con tantas iteraciones como nodos visitó el agente
+(igual presupuesto de cómputo): brecha media, desviación entre semillas, peor brecha y % de corridas que llegan al
+óptimo. Ronda final: tabla y conclusión.
+
+### 8.5 Medición en el teléfono (V2436, 70 recetas)
+
+`AgentDevicePerformanceTest` (APK debug) corre en el teléfono los 30 inventarios normales y los 6 de estrés, con y sin
+límite, y registra tiempo, nodos, si terminó y el heap de Java usado. El tiempo que vive el usuario se mide además con el
+APK release y `adb logcat -s SmartFoodIA` (`AiPlanViewModel` registra milisegundos, nodos y si llegó al límite).
+
+| Caso | Promedio | Peor caso | Nodos | Terminaron | Heap extra |
+|---|---|---|---|---|---|
+| Normales sin límite (debug) | ronda final | ronda final | ronda final | ronda final | ronda final |
+| Estrés sin límite (debug) | ronda final | ronda final | ronda final | ronda final | ronda final |
+| Normales y estrés con límite de 2 s (debug) | ronda final | ronda final | ronda final | ronda final | ronda final |
+| Flujo normal, APK release | ronda final | ronda final | — | — | — |
+
+### 8.6 Límite de 2 s (CA-RIA-02-12 y 02-13)
+
+La búsqueda ya no puede pasar de 2 s. Al llegar al límite, la ramificación y poda devuelve el mejor plan encontrado
+hasta ese momento: cumple todas las restricciones duras, pero no garantiza el óptimo, y la app lo dice («No alcancé a
+revisar todas las combinaciones»). Si no había ningún plan, muestra «La búsqueda tardó demasiado» con «Ajustar
+contexto». Sin límite, el resultado es idéntico al anterior: `MealPlannerTest` contra fuerza bruta no cambió. Con el
+límite, la brecha con el óptimo en el caso de estrés se registra en §8.5 (ronda final).
+
+### 8.7 Lo que sigue sin validarse
+
+- Usuarios y despensas reales: desperdicio físico evitado, costo real, satisfacción y factibilidad de las recetas.
+- Calibrar los pesos con prioridades observadas; la §8.3 solo muestra qué tan estable es el plan ante cambios.
+- Las cantidades que no se pueden convertir siguen tratándose como un producto completo (supuesto documentado).
+
 ## Anexo: tablas completas por perfil (2026-11-05)
+
+> La columna *Frontera* de este anexo es la media de los máximos por inventario (ver la nota al inicio).
 
 ### Sin restricciones (6 inventarios)
 

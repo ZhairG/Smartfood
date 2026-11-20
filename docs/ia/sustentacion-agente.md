@@ -51,7 +51,7 @@ Basada en la retroalimentación de la Clase 24 (transcripción de Word, 01:12 a 
 - **Qué hace la cota:** suma lo acumulado más todo el rescate que aún es posible, y descarta una rama si ni así alcanza al mejor plan.
 - **La aparente contradicción:** el profesor dijo que una heurística que da un valor más alto "no es admisible". La nuestra da un valor más alto a propósito, porque **maximizamos**. Pasada a costo (`C = M − U`), nunca sobreestima: es la misma idea de la línea recta.
 - **La poda es la que más ayuda:** de 9.177 a 498 nodos sin restricciones. Forward checking casi no reduce nodos, y hay que admitirlo.
-- **Por qué nos quedamos con el CSP:** garantiza el óptimo con memoria mínima. A\* también lo garantiza y expande menos nodos, pero guarda hasta 110.997 estados.
+- **Por qué nos quedamos con el CSP:** garantiza el óptimo con poca memoria (la rama actual y sus candidatas). A\* también lo garantiza y expande menos nodos, pero el máximo de su frontera fue en promedio de 110.997 estados con el inventario enorme (media de los máximos, no bytes).
 
 ### El fallo de los frijoles
 
@@ -65,7 +65,9 @@ Basada en la retroalimentación de la Clase 24 (transcripción de Word, 01:12 a 
 - Los perfiles son **sintéticos**, no usuarios reales.
 - Los tiempos son de un portátil de 7,3 GB, solo como orden de magnitud.
 - La admisibilidad se comprobó en esos 825 estados, junto con el argumento escrito: no es una demostración formal completa.
-- Con inventario enorme, el agente promedió 2,5 s, por encima de la meta de 2 s. No se ha medido en el teléfono con release.
+- Con inventario enorme, el agente promedió 2,5 s (50 recetas) y 8,3 s (70 recetas) en el portátil, por encima de la meta de 2 s. Desde la enmienda del 2026-11-20 la app corta a los 2 s con el mejor plan encontrado; la medición en el teléfono está en `evaluacion-agente.md` §8.5.
+- El 88,9 % cuenta productos usados al menos en parte, no cantidad ni desperdicio físico evitado. Dilo siempre con su denominador (§8.1 de la evaluación).
+- La «frontera» de A\* es la media de los máximos por inventario (6.971,5 sin restricciones; el mayor máximo fue 15.172), no un máximo global ni bytes.
 - El recocido se probó con un solo juego de parámetros.
 
 ### Cómo volver a generar las tablas
@@ -168,7 +170,7 @@ de estas tablas cuenta todos los productos por vencer, también los que ninguna 
 | Alérgico | 521 / 26 | 111 / 2.361 / 31 | 0 / 34 | 0,208 / 0,9 |
 | Poco presupuesto | 843 / 33 | 143 / 1.033 / 38 | 0 / 36 | 0,199 / 0,8 |
 | Poco tiempo | 185 / 5 | 43 / 334 / 5 | 0 / 27 | 0,271 / 0,3 |
-| Inventario enorme | 86.683 / 2.505 | 2.438 / 110.997 / 2.750 | 0 / 181 | 0,177 / 2,9 |
+| Inventario enorme | 86.683 / 2.505 | 2.438 / 110.997 (media de máximos) / 2.750 | 0 / 181 | 0,177 / 2,9 |
 | Nada por vencer | 30 / 6 | 23 / 503 / 6 | 0 / 29 | 0,045 / 0,8 |
 
 La *brecha* es la utilidad promedio que le falta para llegar al óptimo. Vegano sin lactosa no aparece porque los métodos
@@ -179,10 +181,10 @@ empatan (3 de 6 inventarios con plan, en todos). Con COP 2.000 ninguno arma plan
   día por día no alcanza: confirma que el problema es de decisión conjunta, no un filtro.
 - **Recocido simulado:** llegó al óptimo en casi todos los perfiles y fue unas 14 veces más rápido con el inventario
   enorme, pero en "Sin restricciones" falló en al menos un inventario y no tiene garantía de óptimo.
-- **A\*:** halla el mismo óptimo expandiendo muchos menos nodos, pero guarda la frontera en memoria (hasta 110.997 estados)
+- **A\*:** halla el mismo óptimo expandiendo muchos menos nodos, pero guarda la frontera en memoria (con el inventario enorme, en promedio un máximo de 110.997 estados)
   y su tiempo fue parecido al del agente; en esta implementación, cada expansión reconstruye el inventario. La primera versión, con el inventario en cada
   nodo, agotó los 512 MB de la prueba.
-- **Agente:** se mantiene porque garantiza el óptimo, usa memoria mínima (solo la rama actual) y ya funciona bien en los
+- **Agente:** se mantiene porque garantiza el óptimo, usa poca memoria (la rama actual, como mucho 3 decisiones, con el inventario, el presupuesto y las candidatas de cada nivel) y ya funciona bien en los
   casos normales. Con todo, A\* es un rival serio: la decisión es por memoria, no por nodos.
 
 ## 6. Limitaciones nuevas
@@ -197,7 +199,7 @@ empatan (3 de 6 inventarios con plan, en todos). Con COP 2.000 ninguno arma plan
 
 | Pregunta | Respuesta |
 |---|---|
-| ¿Por qué CSP y no otro? | Porque garantiza el óptimo con memoria mínima. El voraz se aleja del óptimo y el recocido no lo garantiza; A\* lo halla, pero guarda hasta 110.997 estados. |
+| ¿Por qué CSP y no otro? | Porque garantiza el óptimo con poca memoria. El voraz se aleja del óptimo y el recocido no lo garantiza; A\* lo halla, pero su frontera llegó en promedio a 110.997 estados con el inventario enorme (media de los máximos, no bytes). |
 | ¿Solo existe el backtracking? | No: se compararon A\*, recocido simulado y voraz sobre los mismos datos (punto 5). |
 | ¿Cuál es el problema de búsqueda? | punto 2: estado, acción, meta y objetivo. |
 | ¿Qué heurística usan y cuándo actúa? | punto 3: la cota optimista, antes de bajar a cada receta, y es la que más reduce nodos. |
@@ -215,7 +217,7 @@ empatan (3 de 6 inventarios con plan, en todos). Con COP 2.000 ninguno arma plan
 - **Reglas:** sin cocinas elegidas no filtra; con varias, sirve cualquiera; la dieta siempre manda.
 - **Si no hay plan:** el agente comprueba con la misma búsqueda si quitando la cocina lo habría, y solo entonces sugiere "Quita tu
   cocina favorita en el Perfil".
-- **Resultados:** 88,9 % de aprovechamiento, sobre la meta del 80 % y por encima de las dos líneas base (85,0 % y 74,7 %).
+- **Resultados:** 88,9 % de aprovechamiento (media por inventario de los productos elegibles usados al menos en parte; el n/N y la cantidad consumida están en `evaluacion-agente.md` §8.1), sobre la meta del 80 % y por encima de las dos líneas base (85,0 % y 74,7 %).
 
 **Lo que no debes prometer:**
 
