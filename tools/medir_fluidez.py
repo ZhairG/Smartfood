@@ -5,8 +5,10 @@ Fecha: Noviembre 2026
 Descripción: Mide la fluidez de una transición en el teléfono (spec 007, RNF-ANI-01) con `dumpsys gfxinfo framestats`.
 
 Reinicia las estadísticas de la app, ejecuta la acción de adb que se le pasa (por ejemplo, un toque), espera y lee los
-cuadros dibujados. Reporta:
-  - el primer cuadro: milisegundos entre la acción y el inicio del primer cuadro;
+cuadros dibujados. Todos los cuadros que quedan después del reinicio son posteriores a la acción. Reporta:
+  - el primer cuadro: milisegundos desde que la app empieza a procesar el toque (`HandleInputStart`) hasta que termina
+    el cuadro que lo procesó (`FrameCompleted`). No se usa el reloj del teléfono: `/proc/uptime` cuenta el tiempo
+    dormido y los vsync no, así que en un teléfono que durmió las dos medidas no se pueden comparar;
   - el hueco más largo entre dos cuadros seguidos;
   - el porcentaje de cuadros lentos (más de 16,7 ms entre el vsync previsto y el cuadro terminado).
 
@@ -36,15 +38,10 @@ def adb(*args: str) -> str:
     return resultado.stdout
 
 
-def reloj_del_telefono_ns() -> int:
-    """Reloj monotónico del teléfono en nanosegundos (el mismo de los vsync de gfxinfo)."""
-    segundos = float(adb("cat", "/proc/uptime").split()[0])
-    return int(segundos * 1_000_000_000)
-
-
-def leer_cuadros(salida: str) -> list[tuple[int, int]]:
-    """Devuelve (vsync previsto, cuadro terminado) de cada cuadro válido de la sección PROFILEDATA."""
-    cuadros: list[tuple[int, int]] = []
+def leer_cuadros(salida: str) -> list[tuple[int, int, int, int]]:
+    """(vsync previsto, cuadro terminado, id del evento de entrada, inicio del manejo de la entrada) de cada cuadro
+    válido de la sección PROFILEDATA."""
+    cuadros: list[tuple[int, int, int, int]] = []
     columnas: list[str] | None = None
     dentro = False
     for linea in salida.splitlines():
@@ -65,23 +62,31 @@ def leer_cuadros(salida: str) -> list[tuple[int, int]]:
         fila = dict(zip(columnas, partes))
         if fila.get("Flags", "1") != "0":  # cuadros marcados como inválidos o de prueba
             continue
-        cuadros.append((int(fila["IntendedVsync"]), int(fila["FrameCompleted"])))
+        cuadros.append((
+            int(fila["IntendedVsync"]),
+            int(fila["FrameCompleted"]),
+            int(fila.get("InputEventId", "0")),
+            int(fila.get("HandleInputStart", fila["IntendedVsync"])),
+        ))
     return sorted(cuadros)
 
 
 def medir(accion: str, espera: float) -> dict[str, float]:
     adb("dumpsys", "gfxinfo", PAQUETE, "reset")
-    inicio = reloj_del_telefono_ns()
     if accion:
         adb(*accion.split())
     time.sleep(espera)
     cuadros = leer_cuadros(adb("dumpsys", "gfxinfo", PAQUETE, "framestats"))
-    cuadros = [c for c in cuadros if c[0] >= inicio]
     if not cuadros:
         raise SystemExit("No se dibujó ningún cuadro después de la acción.")
-    primer_cuadro = (cuadros[0][0] - inicio) / 1e6
+    # El cuadro que procesó la acción es el primero con un evento de entrada; si no hay (por ejemplo, una acción que no
+    # es un toque), se toma el primer cuadro.
+    con_entrada = [c for c in cuadros if c[2] != 0]
+    inicial = con_entrada[0] if con_entrada else cuadros[0]
+    primer_cuadro = (inicial[1] - inicial[3]) / 1e6
+    cuadros = [c for c in cuadros if c[0] >= inicial[0]]
     huecos = [(b[0] - a[0]) / 1e6 for a, b in zip(cuadros, cuadros[1:])]
-    lentos = sum(1 for vsync, fin in cuadros if (fin - vsync) / 1e6 > CUADRO_LENTO_MS)
+    lentos = sum(1 for vsync, fin, _, _ in cuadros if (fin - vsync) / 1e6 > CUADRO_LENTO_MS)
     return {
         "cuadros": len(cuadros),
         "primer_cuadro_ms": primer_cuadro,
