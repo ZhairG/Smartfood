@@ -17,7 +17,7 @@
   cocinamos hoy?", buscador, chips, detalle, flujo de la IA, ayuda y temporizador.
 - [x] T007 **Guardadas y recetas propias** (CA-OSC-02-01, 03-04): "Ordenar", tarjetas, editor, detalle y "¡Receta
   guardada!".
-- [ ] T008 **Pruebas** (HU-OSC-01, CA-OSC-02-01, 02-03, 03-01): `SmartFoodColorsContrastTest` y casos nuevos en
+- [x] T008 **Pruebas** (HU-OSC-01, CA-OSC-02-01, 02-03, 03-01): `SmartFoodColorsContrastTest` y casos nuevos en
   `ColorModeTest`.
 
 ## Matriz de trazabilidad

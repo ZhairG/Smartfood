@@ -30,9 +30,9 @@ START = r"(?<![a-zA-Z0-9])"
 
 PATTERNS = [
     # CA-INV-01-02, CA_INV_01_02, ca_inv_01_02, ca-ui-02-08
-    (re.compile(START + r"(ca|rf|rnf)[-_](inv|ui|rec|leg|mail|per|ria|sav|coc)[-_](\d{2})(?:[-_](\d{2}))?()", re.I), "area"),
+    (re.compile(START + r"(ca|rf|rnf)[-_](inv|ui|rec|leg|mail|per|ria|sav|coc|osc)[-_](\d{2})(?:[-_](\d{2}))?()", re.I), "area"),
     # caInv0102, rnfInv04, rfInv01, caRec0301, caLeg0101, caInv0101_0102
-    (re.compile(r"(?<![a-z])(ca|rf|rnf)(Inv|Ui|Rec|Leg|Mail|Per|Ria|Sav|Coc)(\d{2})(\d{2})?" + MORE), "area"),
+    (re.compile(r"(?<![a-z])(ca|rf|rnf)(Inv|Ui|Rec|Leg|Mail|Per|Ria|Sav|Coc|Osc)(\d{2})(\d{2})?" + MORE), "area"),
     # CA-02-01, ca_05_03
     (re.compile(START + r"ca[-_](\d{2})[-_](\d{2})(?![0-9])()", re.I), "auth"),
     # ca0201, ca0103_0105
