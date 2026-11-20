@@ -11,7 +11,7 @@
   `SystemBarEffect` y las tres hojas.
 - [x] T004 **Inventario** (CA-OSC-02-03, 03-01, 03-02, 03-03, 03-06): barra, etiqueta de categoría, búsqueda, chips, aviso
   de voz y hoja de foto.
-- [ ] T005 **Perfil y autenticación** (CA-OSC-02-04, 02-05, 03-03, 03-05): encabezado, íconos de las filas, avatar,
+- [x] T005 **Perfil y autenticación** (CA-OSC-02-04, 02-05, 03-03, 03-05): encabezado, íconos de las filas, avatar,
   chips de Preferencias y checklist de contraseña.
 - [ ] T006 **Recetas, IA y cocina guiada** (CA-OSC-02-01 a 02-03, 03-01, 03-04, 03-07): encabezado, tarjeta "¿Qué
   cocinamos hoy?", buscador, chips, detalle, flujo de la IA, ayuda y temporizador.
