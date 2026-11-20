@@ -20,12 +20,14 @@ import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
  * @param T Tipo del mensaje (texto, error tipado…).
  * @param message Mensaje vigente; `null` lo oculta.
  * @param modifier Modificador del contenedor animado.
+ * @param notice Si es un aviso de resultado (300 ms, CA-ANI-04-04) en lugar de un error en línea (150 ms).
  * @param content Dibuja el mensaje.
  */
 @Composable
 fun <T : Any> AnimatedMessage(
     message: T?,
     modifier: Modifier = Modifier,
+    notice: Boolean = false,
     content: @Composable (T) -> Unit,
 ) {
     val last = remember { LastValue<T>() }
@@ -33,8 +35,16 @@ fun <T : Any> AnimatedMessage(
     AnimatedVisibility(
         visible = message != null,
         modifier = modifier,
-        enter = fadeIn(SmartFoodMotion.focus()) + expandVertically(SmartFoodMotion.focus()),
-        exit = fadeOut(SmartFoodMotion.focus()) + shrinkVertically(SmartFoodMotion.focus())
+        enter = if (notice) {
+            fadeIn(SmartFoodMotion.standard()) + expandVertically(SmartFoodMotion.standard())
+        } else {
+            fadeIn(SmartFoodMotion.focus()) + expandVertically(SmartFoodMotion.focus())
+        },
+        exit = if (notice) {
+            fadeOut(SmartFoodMotion.standard()) + shrinkVertically(SmartFoodMotion.standard())
+        } else {
+            fadeOut(SmartFoodMotion.focus()) + shrinkVertically(SmartFoodMotion.focus())
+        }
     ) {
         last.value?.let { content(it) }
     }

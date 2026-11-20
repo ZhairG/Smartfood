@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.components.AnimatedMessage
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.smartFoodColors
@@ -87,7 +88,8 @@ fun SavedRecipesScreen(
                 null
             }
         )
-        state.deleted?.let { deleted ->
+        // La barra de deshacer aparece y se va con disolvencia de 300 ms (spec 007, CA-ANI-04-04).
+        AnimatedMessage(message = state.deleted, notice = true) { deleted ->
             DeletedRecipeBanner(
                 name = deleted.recipe.name,
                 secondsLeft = state.undoSecondsLeft,
