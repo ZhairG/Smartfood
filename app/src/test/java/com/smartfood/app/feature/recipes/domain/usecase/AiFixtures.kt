@@ -19,6 +19,9 @@ import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.FakeProfileRepository
 import com.smartfood.app.testutil.fixedClock
 import java.time.LocalDate
+import kotlin.time.Duration
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 /**
  * Nombre: AiFixtures.kt
@@ -65,6 +68,9 @@ internal class AiFixtures(restrictions: Set<DietaryRestriction> = emptySet()) {
 
     val generatePlan = GeneratePlanUseCase(catalog)
 
+    /** [GeneratePlanUseCase] con un reloj de prueba para el límite de 2 s (CA-RIA-02-12, 02-13). */
+    fun generatePlanWith(timeSource: TimeSource) = GeneratePlanUseCase(catalog, timeSource)
+
     private fun item(id: String, name: String, days: Long, quantity: Quantity?) = InventoryItem(
         id = id,
         name = name,
@@ -72,4 +78,15 @@ internal class AiFixtures(restrictions: Set<DietaryRestriction> = emptySet()) {
         expiresOn = today.plusDays(days),
         quantity = quantity,
     )
+}
+
+/**
+ * Reloj de prueba del límite de la búsqueda: cada consulta avanza [paso]. Con un paso de 50 ms, el límite de 2 s vence
+ * en la consulta 40, es decir, a los 40 nodos (CA-RIA-02-12); con un paso de 3 s vence en la primera (CA-RIA-02-13).
+ */
+internal class RelojQueAvanza(private val paso: Duration) : TimeSource {
+    override fun markNow(): TimeMark = object : TimeMark {
+        private var consultas = 0
+        override fun elapsedNow(): Duration = paso * ++consultas
+    }
 }

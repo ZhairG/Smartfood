@@ -2,6 +2,7 @@ package com.smartfood.app.feature.recipes.ui.ai
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertDoesNotExist
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -231,6 +232,36 @@ class AiFlowScreenTest {
         composeTestRule.onNodeWithText("Ver recetas económicas").performScrollTo().performClick()
 
         assertEquals(listOf(AiEvent.AdjustClicked, AiEvent.EconomicRecipesClicked), eventos)
+    }
+
+    @Test
+    fun caRia0212_planIncompletoMuestraElAvisoDelLimite() {
+        mostrar(contexto.copy(step = AiStep.Plan, plan = plan, planComplete = false))
+
+        composeTestRule.onNodeWithText("No alcancé a revisar todas las combinaciones", substring = true)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun caRia0212_planCompletoNoMuestraElAviso() {
+        mostrar(contexto.copy(step = AiStep.Plan, plan = plan))
+
+        composeTestRule.onNodeWithText("No alcancé a revisar todas las combinaciones", substring = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun caRia0213_sinPlanPorElLimiteMuestraElMensajeYAjustar() {
+        mostrar(contexto.copy(step = AiStep.NoPlan, timedOut = true))
+
+        composeTestRule.onNodeWithText("Sin coincidencias").assertIsDisplayed()
+        composeTestRule.onNodeWithText("La búsqueda tardó demasiado").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Revisé tu inventario durante 2 segundos", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Prueba una de estas opciones").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Ajustar contexto").performScrollTo().performClick()
+
+        assertEquals(listOf<AiEvent>(AiEvent.AdjustClicked), eventos)
     }
 
     @Test
