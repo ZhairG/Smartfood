@@ -27,9 +27,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -47,12 +45,11 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.components.SmartFoodBottomSheet
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
-import com.smartfood.app.core.designsystem.util.smartFoodSheetProperties
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> OptionSheet(
     title: String,
@@ -66,12 +63,8 @@ fun <T> OptionSheet(
     val spacing = MaterialTheme.spacing
     val metrics = LocalFormMetrics.current
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        properties = smartFoodSheetProperties(),
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(topStart = spacing.panelRadius, topEnd = spacing.panelRadius)
-    ) {
+    SmartFoodBottomSheet(onDismissRequest = onDismiss) {
+        val sheet = this
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -114,14 +107,14 @@ fun <T> OptionSheet(
                     text = stringResource(id = R.string.editor_sheet_save),
                     containerColor = MaterialTheme.smartFoodColors.checkedFill,
                     contentColor = MaterialTheme.smartFoodColors.onCheckedFill,
-                    onClick = { onConfirm(marked) },
+                    onClick = { sheet.close { onConfirm(marked) } },
                     modifier = Modifier.weight(1f)
                 )
                 SheetButton(
                     text = stringResource(id = R.string.editor_sheet_cancel),
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary,
-                    onClick = onDismiss,
+                    onClick = { sheet.close(onDismiss) },
                     modifier = Modifier.weight(1f)
                 )
             }

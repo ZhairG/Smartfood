@@ -20,7 +20,7 @@
 
 ## Fase 4: Diálogos, hojas y avisos
 - [x] T008 `Dialogs.kt`: entrada y salida animadas con velo en Compose; `onDismiss` al terminar la salida (CA-ANI-04-02).
-- [ ] T009 `SmartFoodBottomSheet`; `OptionSheet`, `PhotoSourceSheet` e `IngredientSheet` lo usan (CA-ANI-04-01).
+- [x] T009 `SmartFoodBottomSheet`; `OptionSheet`, `PhotoSourceSheet` e `IngredientSheet` lo usan (CA-ANI-04-01).
 - [ ] T010 Errores en línea de formularios y editores con 150 ms (CA-ANI-04-03).
 - [ ] T011 Avisos de resultado: editor, "Guardado" del Perfil y deshacer de Guardadas con 300 ms (CA-ANI-04-04).
 - [ ] T012 `VoiceSearchOverlay`: cambios de estado con 300 ms (CA-ANI-04-05).
