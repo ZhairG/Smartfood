@@ -212,7 +212,12 @@ fun NavGraphBuilder.recipesDestinations(navController: NavHostController) {
 
 /** Pestaña Guardadas (spec 010, T006 y T007) y el destino de "Nueva receta", que el #130 llena en T013. */
 fun NavGraphBuilder.savedDestinations(navController: NavHostController) {
-    composable<Route.Saved> {
+    composable<Route.Saved>(
+        enterTransition = NavTransitions.tabEnter,
+        exitTransition = NavTransitions.tabExit,
+        popEnterTransition = NavTransitions.tabPopEnter,
+        popExitTransition = NavTransitions.tabPopExit
+    ) {
         MainTabScaffold(
             currentTab = MainTab.SAVED,
             onTabSelected = navController::navigateToTab,

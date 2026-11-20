@@ -11,7 +11,7 @@
 - [x] T003 `tools/medir_fluidez.py`: primer cuadro, hueco más largo y cuadros lentos de una transición con `gfxinfo framestats` (RNF-ANI-01).
 
 ## Fase 2: Navegación
-- [ ] T004 `NavTransitions`: empuje de 300 ms ease-in-out y disolvencia de 100 ms entre las cuatro pestañas (Guardadas incluida). Ajustar `AppNavigationTest` y `MainNavigationTest` (CA-ANI-02-01 a 02-05, CA-ANI-06-01).
+- [x] T004 `NavTransitions`: empuje de 300 ms ease-in-out y disolvencia de 100 ms entre las cuatro pestañas (Guardadas incluida). Ajustar `AppNavigationTest` y `MainNavigationTest` (CA-ANI-02-01 a 02-05, CA-ANI-06-01).
 
 ## Fase 3: Campos y teclado
 - [ ] T005 Color del foco animado en `Inputs.kt`, `LineFrame` del editor y el editor de receta propia; ojo y checklist de contraseña con 150 ms (CA-ANI-03-01, 03-04).

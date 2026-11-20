@@ -39,8 +39,8 @@ class AppNavigationTest {
         /** Tiempo de delay de la pantalla inicial [com.smartfood.app.feature.splash.SplashScreen]. */
         private const val SPLASH_DELAY_MS = 2000L
 
-        /** Duración fija de la animación de transición de empuje configurada en [AppNavHost]. */
-        private const val PUSH_ANIMATION_DURATION_MS = 600L
+        /** Duración del empuje configurado en [AppNavHost] (spec 007, CA-ANI-02-04: 300 ms). */
+        private const val PUSH_ANIMATION_DURATION_MS = NavTransitions.PUSH_DURATION_MS.toLong()
     }
 
     @Before
@@ -84,7 +84,7 @@ class AppNavigationTest {
     }
 
     @Test
-    fun ca0304_transicionSplashALogin_respetaTiempoDeSplashYAnimacionDeEmpuje600ms() {
+    fun ca0304_caAni0204_transicionSplashALogin_respetaTiempoDeSplashYAnimacionDeEmpuje300ms() {
         // En esta prueba desactivamos el autoAdvance para inspeccionar el reloj frame a frame
         composeTestRule.mainClock.autoAdvance = false
 
@@ -104,10 +104,10 @@ class AppNavigationTest {
         // 3. Finaliza delay de Splash (t = 2000 ms): Se inicia la navegación a Login
         composeTestRule.mainClock.advanceTimeBy(SPLASH_DELAY_MS / 2)
 
-        // 4. Mitad de la animación de empuje (t = 2300 ms - 300 ms transcurridos)
+        // 4. Mitad de la animación de empuje (t = 2150 ms - 150 ms transcurridos)
         composeTestRule.mainClock.advanceTimeBy(PUSH_ANIMATION_DURATION_MS / 2)
 
-        // 5. Final de la animación de empuje (t = 2600 ms - 600 ms totales)
+        // 5. Final de la animación de empuje (t = 2300 ms - 300 ms totales)
         composeTestRule.mainClock.advanceTimeBy(PUSH_ANIMATION_DURATION_MS / 2)
 
         // Verificación: LoginScreen está completamente visible e interactiva
