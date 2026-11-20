@@ -9,7 +9,7 @@
   `LocalSmartFoodColors`).
 - [x] T003 **Design system y barras** (CA-OSC-02-01, 02-04, 03-03, 03-07, HU-OSC-04): `TopBar`, `Buttons`, `Dialogs`,
   `SystemBarEffect` y las tres hojas.
-- [ ] T004 **Inventario** (CA-OSC-02-03, 03-01, 03-02, 03-03, 03-06): barra, etiqueta de categoría, búsqueda, chips, aviso
+- [x] T004 **Inventario** (CA-OSC-02-03, 03-01, 03-02, 03-03, 03-06): barra, etiqueta de categoría, búsqueda, chips, aviso
   de voz y hoja de foto.
 - [ ] T005 **Perfil y autenticación** (CA-OSC-02-04, 02-05, 03-03, 03-05): encabezado, íconos de las filas, avatar,
   chips de Preferencias y checklist de contraseña.

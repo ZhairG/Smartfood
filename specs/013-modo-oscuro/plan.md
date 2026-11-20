@@ -96,6 +96,7 @@ val MaterialTheme.smartFoodColors: SmartFoodColors   // @Composable @ReadOnlyCom
 | `AiFlowScreen.kt`, `AiHelpScreen.kt`, `CookingScreens.kt`, `SavedRecipeCard.kt` | `if (LocalIsDarkTheme) … else YellowSoft/GreenSoft` → `highlight`/`greenSoft`. |
 | `OwnRecipeDetailScreen.kt`, `OwnRecipeSavedScreen.kt`, `SavedRecipesScreen.kt`, `ProfileAvatar.kt` | `GreenSoft` → `greenSoft`. |
 | `PhotoSourceSheet.kt` | Ícono `GreenCheck` → `greenIcon`; propiedades de la hoja (§2.3). |
+| `PhotoSlot.kt` | `SlotButton` recibe su `contentColor`: la basura (roja) usa `onError` y la cámara `onPrimary`; antes las dos usaban `onPrimary`. |
 | `PasswordRequirementChecklist.kt` | `White` → `surfaceVariant` (blanco en claro, `InputDark` en oscuro). |
 | `VoiceSearchOverlay.kt` | Velo → `veil`. |
 | `SystemBarEffect.kt`, `IngredientSheet.kt` | §2.3. |
