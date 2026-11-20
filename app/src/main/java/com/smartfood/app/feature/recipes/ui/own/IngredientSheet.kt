@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.core.designsystem.util.smartFoodSheetProperties
 import com.smartfood.app.feature.inventory.domain.usecase.SearchInventoryUseCase
 import com.smartfood.app.feature.inventory.ui.editor.EditorLineTextField
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
@@ -61,6 +62,7 @@ internal fun IngredientSheet(
     val selected = catalog.firstOrNull { it.id == sheet.selectedId }
     ModalBottomSheet(
         onDismissRequest = { onEvent(OwnRecipeEditorEvent.IngredientSheetDismissed) },
+        properties = smartFoodSheetProperties(),
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(topStart = spacing.panelRadius, topEnd = spacing.panelRadius)
     ) {

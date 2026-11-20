@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 
 /**
@@ -59,7 +60,7 @@ fun SmartFoodTopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.smartFoodColors.header)
             .windowInsetsPadding(WindowInsets.statusBars)
             .height(TopBarHeight)
     ) {
@@ -68,13 +69,13 @@ fun SmartFoodTopBar(
                 // Ícono del Figma (`476:3670`, flecha "átras"), teñido con el tema.
                 painter = painterResource(id = R.drawable.ic_figma_back),
                 contentDescription = stringResource(id = R.string.cd_navigate_back),
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = MaterialTheme.smartFoodColors.onHeader,
                 modifier = Modifier.size(TopBarIconSize)
             )
         }
         Text(
             text = title,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.smartFoodColors.onHeader,
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center,
             maxLines = 1,

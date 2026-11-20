@@ -10,13 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
+import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
 
 /**
  * Nombre: SystemBarEffect.kt
  * Autor: SmartFood Team
  * Fecha: Septiembre 2026
  * Descripción: Composable utilitario para adaptar dinámicamente el estilo y la apariencia de los íconos del Status Bar
- * según el fondo (claro u oscuro) de la pantalla activa.
+ * según el fondo (claro u oscuro) de la pantalla activa. La barra de navegación sigue el tema de la app (spec 013,
+ * CA-OSC-04-01).
  */
 
 /**
@@ -36,8 +38,9 @@ private tailrec fun Context.findActivity(): ComponentActivity? = when (this) {
 @Composable
 fun SystemBarEffect(isLightBackground: Boolean) {
     val context = LocalContext.current
+    val isDarkTheme = LocalIsDarkTheme.current
 
-    DisposableEffect(isLightBackground) {
+    DisposableEffect(isLightBackground, isDarkTheme) {
         val activity = context.findActivity()
         if (activity != null) {
             val statusBarStyle = SystemBarStyle.auto(
@@ -48,7 +51,11 @@ fun SystemBarEffect(isLightBackground: Boolean) {
 
             activity.enableEdgeToEdge(
                 statusBarStyle = statusBarStyle,
-                navigationBarStyle = SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT)
+                navigationBarStyle = if (isDarkTheme) {
+                    SystemBarStyle.dark(AndroidColor.TRANSPARENT)
+                } else {
+                    SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT)
+                }
             )
 
             WindowCompat.getInsetsController(activity.window, activity.window.decorView)

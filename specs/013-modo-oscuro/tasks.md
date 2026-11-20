@@ -7,7 +7,7 @@
   `docs/pendientes.md` y `tools/ca_coverage.py`.
 - [x] T002 **Roles del tema** (RF-OSC-01, RF-OSC-03, RNF-OSC-01): `SmartFoodColors.kt`, `Theme.kt` (esquema oscuro y
   `LocalSmartFoodColors`).
-- [ ] T003 **Design system y barras** (CA-OSC-02-01, 02-04, 03-03, 03-07, HU-OSC-04): `TopBar`, `Buttons`, `Dialogs`,
+- [x] T003 **Design system y barras** (CA-OSC-02-01, 02-04, 03-03, 03-07, HU-OSC-04): `TopBar`, `Buttons`, `Dialogs`,
   `SystemBarEffect` y las tres hojas.
 - [ ] T004 **Inventario** (CA-OSC-02-03, 03-01, 03-02, 03-03, 03-06): barra, etiqueta de categoría, búsqueda, chips, aviso
   de voz y hoja de foto.

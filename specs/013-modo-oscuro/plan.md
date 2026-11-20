@@ -73,9 +73,10 @@ val MaterialTheme.smartFoodColors: SmartFoodColors   // @Composable @ReadOnlyCom
 
 - `SystemBarEffect` pide la barra de navegación con `SystemBarStyle.auto(…) { LocalIsDarkTheme }` en lugar de
   `SystemBarStyle.light`.
-- Las tres hojas (`OptionSheet`, `PhotoSourceSheet` e `IngredientSheet`) pasan
-  `ModalBottomSheetProperties(isAppearanceLightStatusBars = false, isAppearanceLightNavigationBars = !dark)`. Ese
-  constructor existe en Material 3 1.4.0.
+- Las tres hojas (`OptionSheet`, `PhotoSourceSheet` e `IngredientSheet`) pasan `smartFoodSheetProperties()`
+  (`core/designsystem/util/SheetProperties.kt`): `ModalBottomSheetProperties` con las dos barras en `!dark`. Sin
+  ellas, Material 3 1.4.0 deduce las barras del color del contenido, y `TextMuted` (oscuro) cuenta como "oscuro":
+  por eso la barra de navegación quedaba clara. En claro el valor es el mismo de antes.
 
 ## 3. Cambios por archivo
 
@@ -89,6 +90,7 @@ val MaterialTheme.smartFoodColors: SmartFoodColors   // @Composable @ReadOnlyCom
 | `feature/recipes/ui/detail/RecipeDetailScreen.kt` | Píldora de precios a `header`; `GreyDivider` → `divider`. |
 | Acciones de texto en la barra (`AiFlowScreen` "Ayuda", `CookingScreens` "Salir", `SavedRecipesScreen` "Ordenar", `BarTextAction`) | `onPrimary` → `onHeader`. |
 | `Buttons.kt` (variante verde), `Dialogs.kt` (Guardar), `OptionSheet.kt` (Guardar), `PreferenceChip.kt` | `GreenCheck`/`White` → `checkedFill`/`onCheckedFill`. |
+| `OptionSheet.kt` | `SheetButton` recibe su `contentColor`: antes usaba `onPrimary` también en "Cancelar" (naranja), que con el nuevo `onPrimary` oscuro quedaría oscuro. El radio pasa de `GreenCheck` a `greenIcon`. |
 | `RecipeSearchField.kt`, `InventorySearchScreen.kt`, `CategoryChips.kt` | `SurfaceLight` → `softFill`; `GreyDivider` → `divider`. |
 | `RecipeFilterPill.kt`, `AiFlowScreen.kt`, `Dialogs.kt` | `GreyDivider` → `divider`. |
 | `AiFlowScreen.kt`, `AiHelpScreen.kt`, `CookingScreens.kt`, `SavedRecipeCard.kt` | `if (LocalIsDarkTheme) … else YellowSoft/GreenSoft` → `highlight`/`greenSoft`. |

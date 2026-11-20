@@ -51,6 +51,7 @@ import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.core.designsystem.util.smartFoodSheetProperties
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,6 +65,7 @@ fun PhotoSourceSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        properties = smartFoodSheetProperties(),
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(topStart = spacing.panelRadius, topEnd = spacing.panelRadius)
     ) {

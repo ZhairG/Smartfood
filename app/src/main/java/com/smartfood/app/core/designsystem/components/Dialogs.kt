@@ -47,11 +47,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.ShadowColorModal
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
@@ -544,13 +544,18 @@ private fun SmartFoodWarningDialogContent(
             val isSave = style == WarningDialogStyle.SAVE
             WarningDialogButton(
                 text = confirmText,
-                containerColor = if (isSave) GreenCheck else accent,
-                contentColor = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onSecondary,
+                containerColor = if (isSave) MaterialTheme.smartFoodColors.checkedFill else accent,
+                contentColor = when {
+                    destructive -> MaterialTheme.colorScheme.onError
+                    isSave -> MaterialTheme.smartFoodColors.onCheckedFill
+                    else -> MaterialTheme.colorScheme.onSecondary
+                },
                 onClick = onConfirm,
                 modifier = Modifier.weight(1f)
             )
             WarningDialogButton(
                 text = dismissText,
+                // "Cancelar" gris con texto negro en los dos modos, como el Figma (spec 013 §7).
                 containerColor = if (isSave) MaterialTheme.colorScheme.secondary else GreyDivider,
                 contentColor = if (isSave) MaterialTheme.colorScheme.onSecondary else Color.Black,
                 onClick = onDismiss,
