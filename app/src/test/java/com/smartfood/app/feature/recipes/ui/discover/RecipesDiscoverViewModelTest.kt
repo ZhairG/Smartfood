@@ -48,7 +48,7 @@ class RecipesDiscoverViewModelTest {
     private val recents = FakeRecentSearchesRepository()
 
     private fun viewModel(
-        favorites: FakeFavoritesRepository = FakeFavoritesRepository().apply { favorites.value = emptyList() },
+        favorites: FakeFavoritesRepository = FakeFavoritesRepository().apply { this.favorites.value = emptyList() },
         handle: SavedStateHandle = SavedStateHandle(),
     ) = RecipesDiscoverViewModel(
         getRecipes = GetRecipesUseCase(fixtures.catalog),
