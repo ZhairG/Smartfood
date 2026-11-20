@@ -7,7 +7,7 @@
 - [x] T001 La spec, el plan y las tareas, extendidas a Perfil, Recetas + IA y Guardadas (HU-ANI-06). Enmiendas: RNF-06 de la spec 001 (300 ms), `AGENTS.md`, `docs/pendientes.md` y `tools/ca_coverage.py` (área `ANI`).
 
 ## Fase 1: Tokens y medición
-- [ ] T002 `core/designsystem/theme/Motion.kt` con duraciones, curvas y especificaciones. Prueba `SmartFoodMotionTest` (RF-ANI-01, CA-ANI-01-01).
+- [x] T002 `core/designsystem/theme/Motion.kt` con duraciones, curvas y especificaciones. Prueba `SmartFoodMotionTest` (RF-ANI-01, CA-ANI-01-01).
 - [ ] T003 `tools/medir_fluidez.py`: primer cuadro, hueco más largo y cuadros lentos de una transición con `gfxinfo framestats` (RNF-ANI-01).
 
 ## Fase 2: Navegación

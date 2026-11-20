@@ -21,23 +21,21 @@ feature/inventory/ui/…                   ← lista, búsqueda, editor, aviso d
 
 ```kotlin
 object SmartFoodMotion {
-    // Duraciones (ms)
-    const val Instant = 0
-    const val Short = 100     // pestañas (Figma: disolvencia 100 ms)
-    const val Fast = 150      // foco, ojo, checklist, errores en línea (Figma: Smart Animate 150 ms)
-    const val Medium = 300    // navegación, hojas, diálogos, listas, búsqueda, botones (Figma: 300 ms)
+    const val SHORT = 100     // pestañas (Figma: disolvencia de 100 ms)
+    const val FAST = 150      // foco, ojo, checklist, errores en línea (Figma: Smart Animate de 150 ms)
+    const val MEDIUM = 300    // navegación, hojas, diálogos, avisos, listas, chips y botones (Figma: 300 ms)
 
-    // Curvas del Figma (equivalentes CSS)
     val EaseInOut = CubicBezierEasing(0.42f, 0f, 0.58f, 1f)
     val EaseOut = CubicBezierEasing(0f, 0f, 0.58f, 1f)
     val EaseIn = CubicBezierEasing(0.42f, 0f, 1f, 1f)
-    val EaseInOutBack: Easing  // valor exacto en T002, comparado con el prototipo
+    val EaseInOutBack = CubicBezierEasing(0.68f, -0.6f, 0.32f, 1.6f)   // "ease-in-out-back" de CSS
 
-    fun <T> navigation() = tween<T>(Medium, easing = EaseInOut)
-    fun <T> tab() = tween<T>(Short, easing = EaseOut)
-    fun <T> focus() = tween<T>(Fast, easing = EaseOut)
-    fun <T> standard() = tween<T>(Medium, easing = EaseInOut)
-    fun <T> emphasizedEnter() = tween<T>(Medium, easing = EaseInOutBack)  // solo la escala de los diálogos
+    fun <T> navigation() = tween<T>(MEDIUM, easing = EaseInOut)
+    fun <T> tab() = tween<T>(SHORT, easing = EaseOut)
+    fun <T> focus() = tween<T>(FAST, easing = EaseOut)
+    fun <T> standard() = tween<T>(MEDIUM, easing = EaseInOut)
+    fun <T> loading() = tween<T>(MEDIUM, easing = EaseOut)               // "BotonCargando"
+    fun <T> emphasizedEnter() = tween<T>(MEDIUM, easing = EaseInOutBack)  // solo la escala de los diálogos
 }
 ```
 
@@ -47,7 +45,7 @@ object SmartFoodMotion {
 
 ## 3. Navegación (HU-ANI-02)
 
-- `NavTransitions.PUSH_DURATION_MS` pasa de 600 a `SmartFoodMotion.Medium` y la curva a `EaseInOut`. Sigue siendo un
+- `NavTransitions.PUSH_DURATION_MS` pasa de 600 a `SmartFoodMotion.MEDIUM` y la curva a `EaseInOut`. Sigue siendo un
   empuje completo (las dos pantallas se mueven), como el "Push" del Figma.
 - Pestañas: hoy `EnterTransition.None`; pasan a `fadeIn(tab())` / `fadeOut(tab())`. `isTab()` suma `Route.Saved`, que
   hoy falta y hace que Guardadas entre con empuje (CA-ANI-02-03).
@@ -112,7 +110,7 @@ object SmartFoodMotion {
   con claves estables (`item.id`).
 - Búsqueda: `animateItem` en los resultados y `animateColorAsState(standard())` en los chips de categoría.
 - Botones con carga (`SmartFoodPrimaryButton` y equivalentes): `AnimatedContent(targetState = isLoading)` con
-  `fadeIn/fadeOut(tween(Medium, easing = EaseOut))`.
+  `fadeIn/fadeOut(loading())`.
 - `StepIndicator`: reemplaza su `spring` y su `tween(300)` por `standard()`.
 
 ## 6.1 Módulos de Perfil, Recetas + IA y Guardadas (HU-ANI-06)
