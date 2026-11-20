@@ -39,9 +39,12 @@
 - [x] T021 `RecipePhoto` con Coil: la foto se decodifica fuera del hilo principal, al tamaño de la tarjeta, con
   disolvencia de 100 ms la primera vez (desviación §8; RNF-ANI-01). El trazado de Perfetto de T017 mostró tres
   decodificaciones de unos 13 ms en el primer cuadro de Recetas.
-- [ ] T022 Trazados de Perfetto de Inventario, «Volver» y Perfil (ronda final, 2026-11-20): el primer cuadro gasta
-  37-53 ms en componer la pantalla desde cero dentro de `measure`, y al volver de la búsqueda el diseño se recalcula en
-  cada cuadro mientras se cierra el teclado. Los cambios se deciden en un plan aparte.
+- [x] T022 Trazados de Perfetto de Inventario, «Volver» y Perfil (ronda final, 2026-11-20): el primer cuadro gasta
+  37-53 ms en componer la pantalla desde cero dentro de `measure`. Dentro de eso, los íconos PNG de 512×512 se
+  decodifican en el hilo principal (7 en Perfil, unos 23 ms en debug) y cada texto tarda 1-2 ms en medirse. Al volver de
+  la búsqueda, el diseño se recalcula en cada cuadro mientras se cierra el teclado.
+- [x] T023 `tools/reducir_iconos.py`: los 19 `ic_figma_*.png` pasan de 512×512 (uno de 256) a 200×200 (50 dp × 4), sin
+  cambiar el dibujo; dejan de pesar en el primer cuadro (RNF-ANI-01).
 
 ## Matriz de trazabilidad
 
