@@ -15,7 +15,7 @@
   chips de Preferencias y checklist de contraseña.
 - [x] T006 **Recetas, IA y cocina guiada** (CA-OSC-02-01 a 02-03, 03-01, 03-04, 03-07): encabezado, tarjeta "¿Qué
   cocinamos hoy?", buscador, chips, detalle, flujo de la IA, ayuda y temporizador.
-- [ ] T007 **Guardadas y recetas propias** (CA-OSC-02-01, 03-04): "Ordenar", tarjetas, editor, detalle y "¡Receta
+- [x] T007 **Guardadas y recetas propias** (CA-OSC-02-01, 03-04): "Ordenar", tarjetas, editor, detalle y "¡Receta
   guardada!".
 - [ ] T008 **Pruebas** (HU-OSC-01, CA-OSC-02-01, 02-03, 03-01): `SmartFoodColorsContrastTest` y casos nuevos en
   `ColorModeTest`.
