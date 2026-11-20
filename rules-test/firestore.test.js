@@ -308,10 +308,12 @@ describe('historial de cocción (spec 009, CA-RIA-04-05)', () => {
 
   /** El lote del cierre tal como lo escribe FirestoreCookingRepository (plan §6). */
   const loteDelCierre = (operacion = 'op1', cantidad = 3) => {
-    const lote = writeBatch(db('u1'));
-    lote.update(item('u1', 'item1'), { quantity: cantidad, unit: 'UNITS', updatedAt: serverTimestamp() });
-    lote.delete(item('u1', 'item2'));
-    lote.set(cooking('u1', operacion), validCooking());
+    // El lote y sus documentos deben salir de la misma instancia: cada db() crea una nueva.
+    const firestore = db('u1');
+    const lote = writeBatch(firestore);
+    lote.update(doc(firestore, 'users/u1/inventory/item1'), { quantity: cantidad, unit: 'UNITS', updatedAt: serverTimestamp() });
+    lote.delete(doc(firestore, 'users/u1/inventory/item2'));
+    lote.set(doc(firestore, `users/u1/cookings/${operacion}`), validCooking());
     return lote.commit();
   };
 
