@@ -42,5 +42,8 @@ U: unitaria. I: instrumentada. M: captura por adb en el V2436.
   un paso de cocina) se leen sin manchas claras.
 - [ ] En claro, las mismas pantallas son idénticas a las capturas de antes.
 - [ ] La hoja "Tema de la app" en oscuro no deja la barra de navegación clara.
-- [ ] Autenticación en oscuro (cerrar sesión y volver a entrar) contra los 6 frames oscuros del Figma, con el checklist
-  de contraseña abierto.
+- [x] Autenticación en oscuro contra los frames del Figma (`51:11` Inicio de sesión, `51:34` Crear cuenta y `51:84`
+  ¿Olvidaste tu contraseña?), el 2026-11-19 con el APK anterior a esta spec: encabezado, panel, campos, título, botón y
+  enlaces coinciden. Las diferencias son de texto (modo sin facturación, spec 012) o de ancho (spec 002).
+- [ ] Checklist de contraseña en oscuro contra `572:1194` (tarjeta oscura con texto blanco), **a simple vista**: el
+  V2436 bloquea las capturas y las grabaciones mientras el teclado está sobre un campo de contraseña.
