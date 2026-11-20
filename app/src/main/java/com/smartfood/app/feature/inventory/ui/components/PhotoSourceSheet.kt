@@ -28,11 +28,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -48,11 +46,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreenCheck
+import com.smartfood.app.core.designsystem.components.SmartFoodBottomSheet
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoSourceSheet(
     onGallery: () -> Unit,
@@ -62,11 +60,8 @@ fun PhotoSourceSheet(
     val spacing = MaterialTheme.spacing
     val metrics = LocalFormMetrics.current
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(topStart = spacing.panelRadius, topEnd = spacing.panelRadius)
-    ) {
+    SmartFoodBottomSheet(onDismissRequest = onDismiss) {
+        val sheet = this
         Column(
             verticalArrangement = Arrangement.spacedBy(spacing.small),
             modifier = Modifier
@@ -84,16 +79,16 @@ fun PhotoSourceSheet(
             SourceRow(
                 icon = rememberVectorPainter(Icons.Outlined.PhotoLibrary),
                 text = stringResource(id = R.string.editor_photo_source_gallery),
-                onClick = onGallery
+                onClick = { sheet.close(onGallery) }
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.outline)
             SourceRow(
                 icon = painterResource(id = R.drawable.ic_figma_camera),
                 text = stringResource(id = R.string.editor_photo_source_camera),
-                onClick = onCamera
+                onClick = { sheet.close(onCamera) }
             )
             Button(
-                onClick = onDismiss,
+                onClick = { sheet.close(onDismiss) },
                 shape = RoundedCornerShape(spacing.buttonRadius),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
@@ -126,7 +121,7 @@ private fun SourceRow(icon: Painter, text: String, onClick: () -> Unit) {
                 .size(IconBox)
                 .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(IconRadius))
         ) {
-            Icon(painter = icon, contentDescription = null, tint = GreenCheck, modifier = Modifier.size(IconSize))
+            Icon(painter = icon, contentDescription = null, tint = MaterialTheme.smartFoodColors.greenIcon, modifier = Modifier.size(IconSize))
         }
         Text(
             text = text,

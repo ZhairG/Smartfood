@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imeAnimationTarget
+import androidx.compose.foundation.layout.imeAnimationSource
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -177,10 +180,17 @@ fun AuthScreenScaffold(
  * Encabezado de marca que se encoge a medida que sube el teclado. El alto se calcula en la fase de layout a partir
  * del inset del teclado, que ya viene animado por el sistema: no hay animaciones propias ni recomposiciones por
  * frame (ADR-UI-01).
+ *
+ * El progreso es la fracción recorrida por el teclado (alto actual sobre el alto de llegada o de salida), así que el
+ * encabezado se colapsa y vuelve **al mismo ritmo** que el teclado durante toda su animación (spec 007, CA-ANI-03-02 y
+ * 03-03). Antes de Android 11 el teclado no se anima y el cambio es de un solo paso (RNF-ANI-02).
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CollapsibleBrandHeader(metrics: FormMetrics, hasTopHeader: Boolean) {
     val imeInsets = WindowInsets.ime
+    val imeTarget = WindowInsets.imeAnimationTarget
+    val imeSource = WindowInsets.imeAnimationSource
     // Como en Figma, el indicador de pasos ocupa el margen superior: el logo queda a la misma altura que en el Login.
     val paddingTop = if (hasTopHeader) 0.dp else metrics.headerPaddingTop
 
@@ -193,7 +203,13 @@ private fun CollapsibleBrandHeader(metrics: FormMetrics, hasTopHeader: Boolean) 
                 val placeable = measurable.measure(constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity))
                 val fullHeight = placeable.height
                 val imeBottom = imeInsets.getBottom(this)
-                val collapsed = if (fullHeight == 0) 1f else (imeBottom.toFloat() / fullHeight).coerceIn(0f, 1f)
+                // Alto del teclado al terminar de subir (o, al bajar, el que tenía al empezar).
+                val imeTravel = maxOf(imeTarget.getBottom(this), imeSource.getBottom(this), imeBottom)
+                val collapsed = when {
+                    fullHeight == 0 -> 1f
+                    imeTravel == 0 -> 0f
+                    else -> (imeBottom.toFloat() / imeTravel).coerceIn(0f, 1f)
+                }
                 val visibleHeight = (fullHeight * (1f - collapsed)).roundToInt()
                 layout(placeable.width, visibleHeight) {
                     placeable.placeWithLayer(0, visibleHeight - fullHeight) { alpha = 1f - collapsed }

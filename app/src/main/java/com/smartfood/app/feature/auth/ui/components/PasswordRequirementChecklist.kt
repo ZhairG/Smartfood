@@ -27,7 +27,6 @@ import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreyNeutral35
 import com.smartfood.app.core.designsystem.theme.OrangeMain
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.White
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
 /**
@@ -64,7 +63,8 @@ fun PasswordRequirementChecklist(
                 blurRadius = 4.dp,
                 offsetY = 4.dp
             )
-            .background(color = White, shape = cardShape)
+            // Blanca en claro (Figma) e InputDark en oscuro, para que el texto onSurface se lea (spec 013, CA-OSC-03-05).
+            .background(color = MaterialTheme.colorScheme.surfaceVariant, shape = cardShape)
             .border(width = 1.dp, color = GreyNeutral35, shape = cardShape)
             .padding(start = 10.dp, end = 10.dp, top = 22.dp, bottom = 22.dp),
         verticalArrangement = Arrangement.spacedBy(13.dp)

@@ -8,6 +8,9 @@
  */
 package com.smartfood.app.feature.inventory.ui.components
 
+import androidx.compose.animation.animateColorAsState
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,9 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.SurfaceLight
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 
@@ -79,6 +81,9 @@ private fun CategoryChip(
     onClick: () -> Unit,
 ) {
     // Figma 476:3190: píldoras redondas; la elegida en verde oscuro y las demás claras con borde gris.
+    val container by animateColorAsState(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.smartFoodColors.softFill, SmartFoodMotion.standard(), label = "container")
+    val label by animateColorAsState(if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface, SmartFoodMotion.standard(), label = "label")
+    val border by animateColorAsState(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.smartFoodColors.divider, SmartFoodMotion.standard(), label = "border")
     FilterChip(
         selected = selected,
         onClick = onClick,
@@ -91,17 +96,18 @@ private fun CategoryChip(
             )
         },
         shape = CircleShape,
+        // Los colores cambian en 300 ms (spec 007, CA-ANI-05-03): el mismo valor animado sirve para los dos estados.
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = SurfaceLight,
-            labelColor = MaterialTheme.colorScheme.onSurface,
-            selectedContainerColor = MaterialTheme.colorScheme.primary,
-            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = container,
+            labelColor = label,
+            selectedContainerColor = container,
+            selectedLabelColor = label
         ),
         border = FilterChipDefaults.filterChipBorder(
             enabled = true,
             selected = selected,
-            borderColor = GreyDivider,
-            selectedBorderColor = MaterialTheme.colorScheme.primary
+            borderColor = border,
+            selectedBorderColor = border
         )
     )
 }

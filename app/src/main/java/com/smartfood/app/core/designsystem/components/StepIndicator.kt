@@ -1,10 +1,9 @@
 package com.smartfood.app.core.designsystem.components
 
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,16 +50,13 @@ fun SmartFoodStepIndicator(
 
             val animatedWidth by animateDpAsState(
                 targetValue = if (isActive) 60.dp else 20.dp,  // Figma: activo 60×20, inactivo 20×20
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
+                animationSpec = SmartFoodMotion.standard(),  // spec 007, CA-ANI-05-05
                 label = "step_width_$stepIndex"
             )
 
             val animatedColor by animateColorAsState(
                 targetValue = OrangeMain,  // Figma: todos los pasos en naranja sólido
-                animationSpec = tween(durationMillis = 300),
+                animationSpec = SmartFoodMotion.standard(),
                 label = "step_color_$stepIndex"
             )
 

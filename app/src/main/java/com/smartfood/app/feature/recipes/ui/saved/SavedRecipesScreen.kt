@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.recipes.ui.saved
 
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,9 +42,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.components.AnimatedMessage
 import com.smartfood.app.core.designsystem.theme.GreenCheck
-import com.smartfood.app.core.designsystem.theme.GreenSoft
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.recipes.domain.model.SavedFilter
 import com.smartfood.app.feature.recipes.domain.model.SavedRecipeCard as SavedRecipeCardData
@@ -87,7 +89,8 @@ fun SavedRecipesScreen(
                 null
             }
         )
-        state.deleted?.let { deleted ->
+        // La barra de deshacer aparece y se va con disolvencia de 300 ms (spec 007, CA-ANI-04-04).
+        AnimatedMessage(message = state.deleted, notice = true) { deleted ->
             DeletedRecipeBanner(
                 name = deleted.recipe.name,
                 secondsLeft = state.undoSecondsLeft,
@@ -148,7 +151,7 @@ private fun SortAction(onClick: () -> Unit) {
     ) {
         Text(
             text = stringResource(id = R.string.saved_sort),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.smartFoodColors.onHeader,
             style = MaterialTheme.typography.labelLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         )
     }
@@ -195,11 +198,18 @@ private fun SavedList(
             }
         } else {
             items(items = state.cards, key = { it.id }) { card ->
-                SavedRecipeCard(
-                    card = card,
-                    onClick = { onEvent(SavedRecipesEvent.CardClicked(card.id)) },
-                    onFavoriteToggled = { onEvent(SavedRecipesEvent.FavoriteToggled(card.id)) }
-                )
+                // Las tarjetas se reacomodan con 300 ms al cambiar el chip, la búsqueda o el orden (CA-ANI-06-04).
+                Box(modifier = Modifier.animateItem(
+                        fadeInSpec = SmartFoodMotion.standard(),
+                        placementSpec = SmartFoodMotion.standard(),
+                        fadeOutSpec = SmartFoodMotion.standard()
+                    )) {
+                    SavedRecipeCard(
+                        card = card,
+                        onClick = { onEvent(SavedRecipesEvent.CardClicked(card.id)) },
+                        onFavoriteToggled = { onEvent(SavedRecipesEvent.FavoriteToggled(card.id)) }
+                    )
+                }
             }
         }
         if (state.hasPendingSync) {
@@ -289,7 +299,7 @@ private fun OfflineCard() {
         modifier = Modifier
             .fillMaxWidth()
             .recipeCardShadow(),
-        colors = CardDefaults.cardColors(containerColor = GreenSoft),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.smartFoodColors.greenSoft),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(OfflineRadius),
     ) {

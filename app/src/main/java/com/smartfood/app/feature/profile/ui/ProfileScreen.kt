@@ -58,6 +58,7 @@ import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.ThemeMode
 import com.smartfood.app.core.designsystem.theme.formMetricsFor
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import com.smartfood.app.feature.inventory.ui.components.OptionSheet
@@ -206,7 +207,7 @@ private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens, onEditCl
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.smartFoodColors.header)
             .windowInsetsPadding(WindowInsets.statusBars)
             .padding(top = dimens.headerPadding, bottom = dimens.headerPadding)
     ) {
@@ -216,7 +217,7 @@ private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens, onEditCl
                 modifier = Modifier
                     .size(dimens.avatar)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(MaterialTheme.smartFoodColors.onHeaderVariant)
                     .semantics { contentDescription = name }
             ) {
                 // La foto de perfil, si hay; si no, las iniciales (CA-PER-01-01).
@@ -230,7 +231,7 @@ private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens, onEditCl
                 } else {
                     Text(
                         text = state.initials.orEmpty(),
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.smartFoodColors.header,
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontSize = dimens.initialsText,
                             fontWeight = FontWeight.Bold
@@ -246,7 +247,7 @@ private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens, onEditCl
                     .align(Alignment.BottomEnd)
                     .size(dimens.cameraBadge)
                     .background(MaterialTheme.colorScheme.secondary, CircleShape)
-                    .border(CameraBadgeBorder, MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                    .border(CameraBadgeBorder, MaterialTheme.smartFoodColors.onHeaderVariant, CircleShape)
                     .clickable(role = Role.Button, onClick = onEditClick)
                     .semantics { contentDescription = changePhoto }
             ) {
@@ -261,7 +262,7 @@ private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens, onEditCl
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
         Text(
             text = name,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.smartFoodColors.onHeader,
             style = MaterialTheme.typography.headlineSmall.copy(fontSize = dimens.nameText, fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -271,7 +272,7 @@ private fun ProfileHeader(state: ProfileUiState, dimens: ProfileDimens, onEditCl
         state.email?.let { email ->
             Text(
                 text = email,
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = MaterialTheme.smartFoodColors.onHeaderVariant,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = dimens.emailText,
                     fontWeight = FontWeight.Medium
@@ -391,7 +392,7 @@ private fun OptionRow(
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = null,
-                tint = GreenCheck,
+                tint = MaterialTheme.smartFoodColors.greenIcon,
                 modifier = Modifier.size(dimens.optionIconBox * OptionIconFraction)
             )
         }
