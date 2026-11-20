@@ -1,5 +1,10 @@
 package com.smartfood.app.core.designsystem.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -136,13 +141,21 @@ fun SmartFoodPrimaryButton(
                 Icon(imageVector = leadingIcon, contentDescription = null)
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
             }
-            Text(
-                text = displayText,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.SemiBold
+            // El paso a "cargando" y de vuelta dura 300 ms, ease-out (Figma "BotonCargando", spec 007, CA-ANI-05-04). Los
+            // puntos son un indicador continuo, no una transición.
+            AnimatedContent(
+                targetState = isLoading,
+                transitionSpec = { fadeIn(SmartFoodMotion.loading()) togetherWith fadeOut(SmartFoodMotion.loading()) },
+                label = "textoDelBoton"
+            ) { loading ->
+                Text(
+                    text = if (loading) displayText else text,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 )
-            )
+            }
         }
     }
 }
