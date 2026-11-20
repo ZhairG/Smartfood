@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.recipes.ui.saved
 
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -197,11 +198,18 @@ private fun SavedList(
             }
         } else {
             items(items = state.cards, key = { it.id }) { card ->
-                SavedRecipeCard(
-                    card = card,
-                    onClick = { onEvent(SavedRecipesEvent.CardClicked(card.id)) },
-                    onFavoriteToggled = { onEvent(SavedRecipesEvent.FavoriteToggled(card.id)) }
-                )
+                // Las tarjetas se reacomodan con 300 ms al cambiar el chip, la búsqueda o el orden (CA-ANI-06-04).
+                Box(modifier = Modifier.animateItem(
+                        fadeInSpec = SmartFoodMotion.standard(),
+                        placementSpec = SmartFoodMotion.standard(),
+                        fadeOutSpec = SmartFoodMotion.standard()
+                    )) {
+                    SavedRecipeCard(
+                        card = card,
+                        onClick = { onEvent(SavedRecipesEvent.CardClicked(card.id)) },
+                        onFavoriteToggled = { onEvent(SavedRecipesEvent.FavoriteToggled(card.id)) }
+                    )
+                }
             }
         }
         if (state.hasPendingSync) {

@@ -1,5 +1,9 @@
 package com.smartfood.app.feature.recipes.ui.ai
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.animateColorAsState
 import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.runtime.getValue
@@ -113,11 +117,24 @@ fun AiFlowScreen(
                 else -> null
             }
         )
-        when (state.step) {
-            AiStep.Context -> ScrollContent { ContextContent(state, onEvent) }
-            AiStep.Loading -> LoadingContent(state, onEvent, Modifier.weight(1f))
-            AiStep.Plan -> ScrollContent { PlanContent(state, onEvent) }
-            AiStep.NoPlan -> ScrollContent { NoPlanContent(state, onEvent) }
+        // Contexto, "Analizando opciones", plan y "Sin coincidencias" cambian con disolvencia de 300 ms, sin empuje,
+        // porque son una sola ruta (spec 007, CA-ANI-06-02).
+        AnimatedContent(
+            targetState = state.step,
+            transitionSpec = { fadeIn(SmartFoodMotion.standard()) togetherWith fadeOut(SmartFoodMotion.standard()) },
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            label = "pasoDeLaIa"
+        ) { step ->
+            Column(modifier = Modifier.fillMaxSize()) {
+                when (step) {
+                    AiStep.Context -> ScrollContent { ContextContent(state, onEvent) }
+                    AiStep.Loading -> LoadingContent(state, onEvent, Modifier.weight(1f))
+                    AiStep.Plan -> ScrollContent { PlanContent(state, onEvent) }
+                    AiStep.NoPlan -> ScrollContent { NoPlanContent(state, onEvent) }
+                }
+            }
         }
     }
 }

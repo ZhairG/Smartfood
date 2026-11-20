@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.recipes.ui.discover
 
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -104,12 +105,19 @@ fun RecipesDiscoverScreen(
                 }
 
                 else -> items(items = state.recipes, key = { it.id }) { recipe ->
+                    // Las tarjetas se reacomodan con 300 ms al filtrar o buscar (spec 007, CA-ANI-06-04).
+                    Box(modifier = Modifier.animateItem(
+                        fadeInSpec = SmartFoodMotion.standard(),
+                        placementSpec = SmartFoodMotion.standard(),
+                        fadeOutSpec = SmartFoodMotion.standard()
+                    )) {
                     RecipeCard(
                         card = recipe,
                         isFavorite = state.favoriteIds.contains(recipe.id),
                         onClick = { onEvent(RecipesDiscoverEvent.RecipeClicked(recipe.id)) },
                         onFavoriteToggled = { onEvent(RecipesDiscoverEvent.FavoriteToggled(recipe.id)) }
                     )
+                    }
                 }
             }
         }
