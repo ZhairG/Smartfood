@@ -100,7 +100,9 @@
 - [x] T022 Suite instrumentada completa y `rules-test` en verde.
 - [x] T023 Despliegue del bloque `recipes` de `firestore.rules` (con confirmación de Zhair). El bloque `favorites` se
   despliega al cerrar el #117, para poder probar el ♡ contra Firebase.
-- [ ] T024 Checklist manual en el teléfono (abajo) y capturas Figma vs app en el PR.
+- [ ] T024 Checklist manual en el teléfono (abajo) y capturas Figma vs app en el PR. *Programada para la ronda final de los
+  pendientes (punto 9, 2026-11-20), sobre `master` con todos los PR fusionados: la tabla y el checklist están en
+  [`disenos-figma/Modulo 5 - Recetas guardadas/comparacion/README.md`](../../disenos-figma/Modulo%205%20-%20Recetas%20guardadas/comparacion/README.md).*
 - [x] T025 Matriz al día, `tools/ca_coverage_baseline.txt`, `README.md` y `AGENTS.md` (arquitectura de Guardadas).
 
 ## Matriz de trazabilidad
