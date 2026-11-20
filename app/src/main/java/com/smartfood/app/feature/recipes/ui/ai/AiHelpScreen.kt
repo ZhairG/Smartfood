@@ -20,9 +20,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
-import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.YellowSoft
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.feature.recipes.ui.components.OutlineActionButton
 
 /**
@@ -79,14 +78,14 @@ fun AiHelpScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = BodyStyle()
             )
-            // Tarjeta amarilla del aviso, como la del temporizador (YellowSoft).
+            // Tarjeta amarilla del aviso, como la del temporizador (rol highlight).
             Column(
                 verticalArrangement = Arrangement.spacedBy(CardInnerGap),
                 modifier = Modifier
                     .fillMaxWidth()
                     .cardShadow()
                     .clip(RoundedCornerShape(CardRadius))
-                    .background(if (LocalIsDarkTheme.current) MaterialTheme.colorScheme.surfaceVariant else YellowSoft)
+                    .background(MaterialTheme.smartFoodColors.highlight)
                     .padding(CardPadding)
             ) {
                 Text(

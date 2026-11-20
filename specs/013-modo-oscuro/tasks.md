@@ -13,7 +13,7 @@
   de voz y hoja de foto.
 - [x] T005 **Perfil y autenticación** (CA-OSC-02-04, 02-05, 03-03, 03-05): encabezado, íconos de las filas, avatar,
   chips de Preferencias y checklist de contraseña.
-- [ ] T006 **Recetas, IA y cocina guiada** (CA-OSC-02-01 a 02-03, 03-01, 03-04, 03-07): encabezado, tarjeta "¿Qué
+- [x] T006 **Recetas, IA y cocina guiada** (CA-OSC-02-01 a 02-03, 03-01, 03-04, 03-07): encabezado, tarjeta "¿Qué
   cocinamos hoy?", buscador, chips, detalle, flujo de la IA, ayuda y temporizador.
 - [ ] T007 **Guardadas y recetas propias** (CA-OSC-02-01, 03-04): "Ordenar", tarjetas, editor, detalle y "¡Receta
   guardada!".

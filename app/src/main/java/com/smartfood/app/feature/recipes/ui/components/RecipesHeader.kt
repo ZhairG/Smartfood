@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 
 /**
  * Nombre: RecipesHeader.kt
@@ -49,7 +50,7 @@ fun RecipesHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.smartFoodColors.header)
             .windowInsetsPadding(WindowInsets.statusBars)
             .height(RecipesHeaderHeight)
     ) {
@@ -57,7 +58,7 @@ fun RecipesHeader(
             // Ícono del Figma (`557:3030`), teñido con el tema.
             painter = painterResource(id = R.drawable.ic_figma_fork_knife),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimary,
+            tint = MaterialTheme.smartFoodColors.onHeader,
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(start = RecipesHeaderSidePadding)
@@ -65,7 +66,7 @@ fun RecipesHeader(
         )
         Text(
             text = title,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.smartFoodColors.onHeader,
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center,
             maxLines = 1,

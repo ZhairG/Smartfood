@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenSoft
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
 import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipeCard
@@ -129,17 +130,17 @@ private fun SuggestCard(onSuggestRecipes: (() -> Unit)?) {
             .fillMaxWidth()
             .shadow(elevation = HeroElevation, shape = shape)
             .clip(shape)
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.smartFoodColors.header)
             .padding(HeroPadding)
     ) {
         Text(
             text = stringResource(id = R.string.recipes_hero_title),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.smartFoodColors.onHeader,
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)
         )
         Text(
             text = stringResource(id = R.string.recipes_hero_body),
-            // Figma: #DCFCE7, el token GreenSoft.
+            // Figma: #DCFCE7, el token GreenSoft. Va sobre el encabezado, que es GreenDark en los dos modos (ADR-OSC-03).
             color = GreenSoft,
             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp)
         )

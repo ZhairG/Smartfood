@@ -49,9 +49,8 @@ import com.smartfood.app.core.designsystem.components.SmartFoodWarningDialog
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreenDark
 import com.smartfood.app.core.designsystem.theme.GreyLight
-import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.YellowSoft
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.core.designsystem.util.figmaShadow
 import com.smartfood.app.feature.inventory.ui.messageRes
@@ -178,7 +177,7 @@ fun CookingScreen(
             action = {
                 Text(
                     text = stringResource(id = R.string.recipes_exit),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.smartFoodColors.onHeader,
                     style = CardTitleStyle(),
                     modifier = Modifier.clickable(role = Role.Button) { onEvent(CookingEvent.ExitClicked) }
                 )
@@ -282,8 +281,7 @@ private fun TimerCard(
     onToggle: () -> Unit,
     onReset: () -> Unit,
 ) {
-    val dark = LocalIsDarkTheme.current
-    val container = if (dark) MaterialTheme.colorScheme.surfaceVariant else YellowSoft
+    val container = MaterialTheme.smartFoodColors.highlight
     val toggleLabel = stringResource(
         id = when {
             ringing -> R.string.recipes_timer_stop_alarm

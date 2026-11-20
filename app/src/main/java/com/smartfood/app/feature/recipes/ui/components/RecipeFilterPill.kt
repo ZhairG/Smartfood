@@ -15,7 +15,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smartfood.app.core.designsystem.theme.GreyDivider
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 
 /**
  * Nombre: RecipeFilterPill.kt
@@ -42,7 +42,7 @@ fun RecipeFilterPill(
             )
             .border(
                 width = 1.dp,
-                color = if (selected) MaterialTheme.colorScheme.primary else GreyDivider,
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.smartFoodColors.divider,
                 shape = CircleShape
             )
             .selectable(selected = selected, role = Role.Tab, onClick = onClick)
