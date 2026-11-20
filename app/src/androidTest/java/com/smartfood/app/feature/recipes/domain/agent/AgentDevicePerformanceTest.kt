@@ -1,6 +1,8 @@
 package com.smartfood.app.feature.recipes.domain.agent
 
 import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.smartfood.app.feature.recipes.data.catalog.RecipeAssetSource
@@ -11,6 +13,7 @@ import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -34,6 +37,13 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class AgentDevicePerformanceTest {
+
+    /**
+     * Una pantalla vacía al frente mientras se mide: sin ella, Android deja el proceso "en caché" y el V2436 lo detiene
+     * a los pocos segundos.
+     */
+    @get:Rule
+    val pantalla = ActivityScenarioRule(ComponentActivity::class.java)
 
     private val assets = InstrumentationRegistry.getInstrumentation().targetContext.assets
     private val catalog = EvaluationCatalog(
@@ -83,7 +93,6 @@ class AgentDevicePerformanceTest {
     /** Mide una búsqueda con un límite de tiempo, o sin límite si [limit] es `null`. */
     private fun measure(pantry: List<PantryItem>, limit: Duration?): Measure {
         val runtime = Runtime.getRuntime()
-        System.gc()
         val baseline = runtime.totalMemory() - runtime.freeMemory()
         val deadline = limit?.let { SearchDeadline.after(it) } ?: SearchDeadline.NONE
         val started = System.nanoTime()
