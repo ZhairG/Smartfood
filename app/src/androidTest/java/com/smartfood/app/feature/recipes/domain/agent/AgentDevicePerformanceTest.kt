@@ -98,10 +98,14 @@ class AgentDevicePerformanceTest {
         }
         val deadline = limit?.let { SearchDeadline.after(it) } ?: SearchDeadline.NONE
         val started = System.nanoTime()
-        val outcome = planner.searchOutcome(catalog.recipes, pantry, context, deadline)
+        // try/finally: si la búsqueda falla, el muestreo se detiene igual y la prueba muestra el error en vez de colgarse.
+        val outcome = try {
+            planner.searchOutcome(catalog.recipes, pantry, context, deadline)
+        } finally {
+            running.set(false)
+            sampler.join()
+        }
         val millis = (System.nanoTime() - started) / 1_000_000.0
-        running.set(false)
-        sampler.join()
         return Measure(millis, outcome.nodes, outcome.complete, outcome.plan?.utility, (peak.get() - baseline) / 1024)
     }
 
