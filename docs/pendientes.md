@@ -18,7 +18,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | 7 | Animaciones y transiciones | 007 | Pendiente | — |
 | 8 | Correcciones de documentación y medición del agente | 009 | Pendiente | — |
 | 9 | Pendientes menores | 009, 010 | Pendiente | — |
-| 10 | Persistencia local con Room (opcional) | por definir | Pendiente | — |
+| 10 | Persistencia local con Room (opcional) | 014 (nueva) | En implementación | — |
 
 ## 1. Modo sin facturación (urgente)
 
