@@ -3,6 +3,10 @@ package com.smartfood.app.feature.recipes.ui.discover
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.smartfood.app.core.search.domain.ClearRecentSearchesUseCase
+import com.smartfood.app.core.search.domain.ObserveRecentSearchesUseCase
+import com.smartfood.app.core.search.domain.RecordRecentSearchUseCase
+import com.smartfood.app.core.search.domain.SearchScope
 import com.smartfood.app.feature.inventory.domain.model.InventorySection
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
 import com.smartfood.app.feature.recipes.domain.model.FavoriteSource
@@ -47,6 +51,9 @@ import kotlinx.coroutines.launch
  * @param observeFavoriteIds Ids de las recetas del catálogo marcadas como favorita.
  * @param toggleFavorite Marca o quita una receta como favorita.
  * @param savedStateHandle Recibe el filtro que pide "Ver recetas económicas" ([FILTER_KEY]).
+ * @param observeRecentSearches Búsquedas recientes de Recetas (spec 014, CA-LOC-02-01).
+ * @param recordRecentSearch Guarda la búsqueda al tocar un resultado o pulsar «Buscar» (CA-LOC-02-02).
+ * @param clearRecentSearches «Borrar» de «Recientes» (CA-LOC-02-06).
  */
 @HiltViewModel
 class RecipesDiscoverViewModel @Inject constructor(
@@ -58,6 +65,9 @@ class RecipesDiscoverViewModel @Inject constructor(
     private val observeFavoriteIds: ObserveFavoriteIdsUseCase,
     private val toggleFavorite: ToggleFavoriteUseCase,
     savedStateHandle: SavedStateHandle,
+    observeRecentSearches: ObserveRecentSearchesUseCase,
+    private val recordRecentSearch: RecordRecentSearchUseCase,
+    private val clearRecentSearches: ClearRecentSearchesUseCase,
 ) : ViewModel() {
 
     private val catalog = MutableStateFlow<CatalogState>(CatalogState.Loading)
@@ -132,8 +142,10 @@ class RecipesDiscoverViewModel @Inject constructor(
         baseUiState,
         // Si las favoritas no se pueden leer, las tarjetas se ven sin ♡ en lugar de cerrar la app.
         observeFavoriteIds().catch { emit(emptySet()) },
-    ) { state, favoriteIds ->
-        state.copy(favoriteIds = favoriteIds)
+        // Igual con las búsquedas recientes: sin ellas, la barra funciona como antes (spec 014).
+        observeRecentSearches(SearchScope.RECIPES).catch { emit(emptyList()) },
+    ) { state, favoriteIds, recents ->
+        state.copy(favoriteIds = favoriteIds, recentSearches = recents)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(StopTimeoutMs),
@@ -145,8 +157,19 @@ class RecipesDiscoverViewModel @Inject constructor(
             is RecipesDiscoverEvent.QueryChanged -> query.value = event.query
             RecipesDiscoverEvent.ClearQuery -> query.value = ""
             is RecipesDiscoverEvent.FilterSelected -> filter.value = event.filter
-            is RecipesDiscoverEvent.RecipeClicked ->
-                viewModelScope.launch { _effects.send(RecipesDiscoverEffect.OpenRecipe(event.recipeId)) }
+            is RecipesDiscoverEvent.RecipeClicked -> viewModelScope.launch {
+                // Tocar un resultado es usar la búsqueda (spec 014, CA-LOC-02-02); el caso de uso ignora la barra vacía.
+                recordRecentSearch(SearchScope.RECIPES, query.value)
+                _effects.send(RecipesDiscoverEffect.OpenRecipe(event.recipeId))
+            }
+            RecipesDiscoverEvent.SearchSubmitted ->
+                viewModelScope.launch { recordRecentSearch(SearchScope.RECIPES, query.value) }
+            is RecipesDiscoverEvent.RecentClicked -> {
+                query.value = event.text
+                viewModelScope.launch { recordRecentSearch(SearchScope.RECIPES, event.text) }
+            }
+            RecipesDiscoverEvent.ClearRecents ->
+                viewModelScope.launch { clearRecentSearches(SearchScope.RECIPES) }
             is RecipesDiscoverEvent.FavoriteToggled -> viewModelScope.launch {
                 val isNowFavorite = !uiState.value.favoriteIds.contains(event.recipeId)
                 toggleFavorite(event.recipeId, FavoriteSource.CATALOG, isNowFavorite)

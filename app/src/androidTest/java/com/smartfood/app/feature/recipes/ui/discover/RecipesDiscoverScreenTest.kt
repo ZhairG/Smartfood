@@ -3,6 +3,7 @@ package com.smartfood.app.feature.recipes.ui.discover
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.test.assertDoesNotExist
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
@@ -158,6 +159,42 @@ class RecipesDiscoverScreenTest {
             .performTextInput("pollo")
 
         assertEquals(listOf<RecipesDiscoverEvent>(RecipesDiscoverEvent.QueryChanged("pollo")), eventos)
+    }
+
+    @Test
+    fun caLoc0201_conLaBarraEnfocadaYVaciaMuestraRecientes() {
+        mostrar(RecipesDiscoverUiState(isLoading = false, recentSearches = listOf("pollo", "arroz")))
+        composeTestRule.onNodeWithText("Recientes").assertDoesNotExist()
+
+        composeTestRule.onNodeWithContentDescription("Buscar receta o ingrediente...").performClick()
+
+        composeTestRule.onNodeWithText("Recientes").assertIsDisplayed()
+        composeTestRule.onNodeWithText("pollo").assertIsDisplayed()
+    }
+
+    @Test
+    fun caLoc0207_alEscribirRecientesSeOculta() {
+        mostrar(RecipesDiscoverUiState(isLoading = false, recentSearches = listOf("pollo")))
+        composeTestRule.onNodeWithContentDescription("Buscar receta o ingrediente...").performClick()
+        composeTestRule.onNodeWithText("Recientes").assertIsDisplayed()
+
+        estado.value = estado.value.copy(query = "arr")
+
+        composeTestRule.onNodeWithText("Recientes").assertDoesNotExist()
+    }
+
+    @Test
+    fun caLoc0205_tocarUnChipYBorrarEmitenSusEventos() {
+        mostrar(RecipesDiscoverUiState(isLoading = false, recentSearches = listOf("pollo")))
+        composeTestRule.onNodeWithContentDescription("Buscar receta o ingrediente...").performClick()
+
+        composeTestRule.onNodeWithText("pollo").performClick()
+        composeTestRule.onNodeWithText("Borrar").performClick()
+
+        assertEquals(
+            listOf(RecipesDiscoverEvent.RecentClicked("pollo"), RecipesDiscoverEvent.ClearRecents),
+            eventos
+        )
     }
 
     @Test

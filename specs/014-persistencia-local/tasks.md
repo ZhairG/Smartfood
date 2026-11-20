@@ -11,7 +11,7 @@
   `LocalUserData` y `LogoutUseCase`; `CachedCookingHistoryRepositoryTest` y `SessionUseCasesTest` (`LogoutUseCase`).
 - [x] T004 **Dominio de las búsquedas recientes** (RF-LOC-03): `SearchScope`,
   `RecentSearchesRepository`, los tres casos de uso y `RoomRecentSearchesRepository`; `RecentSearchUseCasesTest`.
-- [ ] T005 **Recientes en Descubrir** (CA-LOC-02-01, 02-02, 02-04 a 02-07): `SmartFoodRecentSearches`,
+- [x] T005 **Recientes en Descubrir** (CA-LOC-02-01, 02-02, 02-04 a 02-07): `SmartFoodRecentSearches`,
   `strings_search.xml`, `RecipeSearchField`, contrato, ViewModel y pantalla; `RecipesDiscoverViewModelTest`,
   `RecentSearchesTest` y `RecipesDiscoverScreenTest`.
 - [ ] T006 **Recientes en el Inventario** (CA-LOC-02-01 a 02-07): contrato, ViewModel (también la voz) y pantalla;
