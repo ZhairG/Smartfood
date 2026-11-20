@@ -99,7 +99,7 @@ class AlgorithmComparisonTest {
 
     private data class Measured(val result: PlanSearchProblem.Outcome, val millis: Double, val optimum: Double?)
 
-    private fun table(profile: RealCatalog.EvaluationProfile): String {
+    private fun table(profile: EvaluationProfile): String {
         val methods: List<Pair<String, (PlanSearchProblem, Int) -> PlanSearchProblem.Outcome>> = listOf(
             "Agente CSP (orden + FC + poda)" to { p, _ -> p.backtracking(true, ValueOrder.UTILITY, true) },
             "Backtracking puro" to { p, _ -> p.backtracking(false, ValueOrder.ID, false) },
