@@ -15,7 +15,7 @@
 
 ## Fase 3: Campos y teclado
 - [x] T005 Color del foco animado en `Inputs.kt`, `LineFrame` del editor y el editor de receta propia; ojo y checklist de contraseña con 150 ms (CA-ANI-03-01, 03-04).
-- [ ] T006 `AuthScreenScaffold`: encabezado de marca que sigue al teclado (CA-ANI-03-02, 03-03, RNF-ANI-02, RNF-ANI-04).
+- [x] T006 `AuthScreenScaffold`: encabezado de marca que sigue al teclado (CA-ANI-03-02, 03-03, RNF-ANI-02, RNF-ANI-04).
 - [ ] T007 Editor de producto, búsqueda y editor de receta propia: el campo enfocado no salta al abrir el teclado (CA-ANI-03-05).
 
 ## Fase 4: Diálogos, hojas y avisos
