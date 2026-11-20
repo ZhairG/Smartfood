@@ -7,8 +7,8 @@
 - [x] T002 **Base local** (RF-LOC-01, RNF-LOC-01): dependencias de Room en `libs.versions.toml` y `app/build.gradle.kts`,
   `SmartFoodDatabase`, `CookingEntity`, `RecentSearchEntity`, `CookingDao`, `RecentSearchDao`, `DatabaseModule`,
   `@ApplicationScope` y el esquema en `app/schemas/`; `CookingDaoTest` y `RecentSearchDaoTest`.
-- [ ] T003 **Historial sin conexión** (HU-LOC-01): `CachedCookingHistoryRepository`, `RecipesDataModule`,
-  `LocalUserData` y `LogoutUseCase`; `CachedCookingHistoryRepositoryTest` y `LogoutUseCaseTest`.
+- [x] T003 **Historial sin conexión** (HU-LOC-01): `CachedCookingHistoryRepository`, `RecipesDataModule`,
+  `LocalUserData` y `LogoutUseCase`; `CachedCookingHistoryRepositoryTest` y `SessionUseCasesTest` (`LogoutUseCase`).
 - [ ] T004 **Dominio de las búsquedas recientes** (RF-LOC-03): `SearchScope`, `RecentSearch`,
   `RecentSearchesRepository`, los tres casos de uso y `RoomRecentSearchesRepository`; `RecentSearchUseCasesTest`.
 - [ ] T005 **Recientes en Descubrir** (CA-LOC-02-01, 02-02, 02-04 a 02-07): `SmartFoodRecentSearches`,
@@ -31,7 +31,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **M** = manual.
 | CA-LOC-01-02 | U `CachedCookingHistoryRepositoryTest`, I `CookingDaoTest` |
 | CA-LOC-01-03 | U `CachedCookingHistoryRepositoryTest` |
 | CA-LOC-01-04 | U `CachedCookingHistoryRepositoryTest` |
-| CA-LOC-01-05 | U `CachedCookingHistoryRepositoryTest`, U `LogoutUseCaseTest`, I `CookingDaoTest`, M |
+| CA-LOC-01-05 | U `CachedCookingHistoryRepositoryTest`, U `SessionUseCasesTest`, I `CookingDaoTest`, M |
 | CA-LOC-02-01 | U `RecentSearchUseCasesTest`, I `RecentSearchesTest`, I `RecipesDiscoverScreenTest`, I `InventorySearchScreenTest` |
 | CA-LOC-02-02 | U `RecentSearchUseCasesTest`, U `RecipesDiscoverViewModelTest`, U `InventorySearchViewModelTest` |
 | CA-LOC-02-03 | U `InventorySearchViewModelTest` |
@@ -39,7 +39,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **M** = manual.
 | CA-LOC-02-05 | U `RecipesDiscoverViewModelTest`, U `InventorySearchViewModelTest`, I `RecentSearchesTest` |
 | CA-LOC-02-06 | U `RecentSearchUseCasesTest`, I `RecentSearchDaoTest`, I `RecentSearchesTest` |
 | CA-LOC-02-07 | I `RecipesDiscoverScreenTest`, I `InventorySearchScreenTest`, I `RecentSearchDaoTest` |
-| CA-LOC-02-08 | U `LogoutUseCaseTest`, I `RecentSearchDaoTest`, M |
+| CA-LOC-02-08 | U `SessionUseCasesTest`, I `RecentSearchDaoTest`, M |
 
 ### Checklist de verificación manual
 1. Cocinar una receta; activar el modo avión, cerrar la app por completo y abrir el Perfil: «Ahorrados este mes» muestra el valor.

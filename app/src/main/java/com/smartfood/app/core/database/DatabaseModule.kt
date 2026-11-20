@@ -49,4 +49,7 @@ abstract class DatabaseBindingsModule {
     @Binds
     @Singleton
     abstract fun bindLocalUserData(impl: RoomLocalUserData): LocalUserData
+
+    @Binds
+    abstract fun bindCurrentUid(impl: FirebaseCurrentUid): CurrentUid
 }
