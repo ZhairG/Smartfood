@@ -113,7 +113,7 @@ val MaterialTheme.smartFoodColors: SmartFoodColors   // @Composable @ReadOnlyCom
   WCAG 2.1 de cada par (relleno, contenido) en claro y en oscuro.
   - En oscuro, los textos llegan a 4,5:1 y los íconos y bordes a 3:1 (CA-OSC-01-01 y 01-02).
   - En claro, cada rol es igual al token anterior (CA-OSC-01-03).
-  - Los esquemas de Material se leen con funciones `internal` de `Theme.kt` (`lightScheme()` y `darkScheme()`).
+  - Los esquemas de Material se leen de `LightColorScheme` y `DarkColorScheme`, que pasan a `internal` en `Theme.kt`.
 - **Instrumentada `ColorModeTest`:** se agregan casos que dibujan `SmartFoodTopBar`, `RecipeSearchField` y
   `RecipeFilterPill` con `ThemeMode.DARK` y comprueban el color de píxel (CA-OSC-02-01, 02-03 y 03-01).
 - **Manual:** las mismas 16 pantallas por adb en el V2436, antes y después, en el PR.

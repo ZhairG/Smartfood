@@ -5,7 +5,7 @@
 
 - [x] T001 La spec, el plan, las tareas y sus referencias: enmienda de CA-UI-05-04 (spec 002), `AGENTS.md`,
   `docs/pendientes.md` y `tools/ca_coverage.py`.
-- [ ] T002 **Roles del tema** (RF-OSC-01, RF-OSC-03, RNF-OSC-01): `SmartFoodColors.kt`, `Theme.kt` (esquema oscuro y
+- [x] T002 **Roles del tema** (RF-OSC-01, RF-OSC-03, RNF-OSC-01): `SmartFoodColors.kt`, `Theme.kt` (esquema oscuro y
   `LocalSmartFoodColors`).
 - [ ] T003 **Design system y barras** (CA-OSC-02-01, 02-04, 03-03, 03-07, HU-OSC-04): `TopBar`, `Buttons`, `Dialogs`,
   `SystemBarEffect` y las tres hojas.
