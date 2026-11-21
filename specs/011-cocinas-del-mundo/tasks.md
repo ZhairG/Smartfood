@@ -21,6 +21,8 @@
 - [x] T009 Enmienda de CA-COC-02-02, 02-03 y 03-02; CA-COC-02-06, 02-07 y 03-05 con su desviación; §8 de `docs/ia/evaluacion-agente.md`.
 - [x] T010 **Agente:** `PlanContext.minCuisineRecipes`, búsqueda escalonada 3 → 2 → 1 en `MealPlanner.plan` y `PlanResult.Found.cuisineRecipes`; `MealPlannerTest` contra fuerza bruta y `MealPlannerPerformanceTest` (CA-COC-02-06, 02-07).
 - [x] T011 **Aviso en el plan:** `AiPlanOutcome.Found.cuisineShortfall`, `AiUiState.cuisineNotice`, `AiReasonText` y `AiFlowScreen` (CA-COC-03-05).
+- [x] T012 **Cifras de la cocina relajada** (CA-COC-02-06): tabla con interruptor en `AlgorithmComparisonTest` y §8.1 de
+  `docs/ia/evaluacion-agente.md` (2026-11-21).
 
 ## Matriz de trazabilidad
 
@@ -33,7 +35,7 @@
 | CA-COC-02-01 a 02-05 | `MealPlannerTest` |
 | CA-COC-03-01 | `AiPlanViewModelTest`, `AiFlowScreenTest` |
 | CA-COC-03-02, 03-03 | `MealPlannerTest`, `AiFlowScreenTest` |
-| CA-COC-02-06 | `MealPlannerTest` (contra fuerza bruta), `MealPlannerPerformanceTest`, `GeneratePlanUseCaseTest` |
+| CA-COC-02-06 | `MealPlannerTest` (contra fuerza bruta), `MealPlannerPerformanceTest`, `GeneratePlanUseCaseTest`, `AlgorithmComparisonTest` (tabla, con interruptor) |
 | CA-COC-02-07 | `MealPlannerTest` (contra fuerza bruta) |
 | CA-COC-03-04 | `GetAiContextUseCaseTest` |
 | CA-COC-03-05 | `AiPlanViewModelTest`, `AiFlowScreenTest` |
