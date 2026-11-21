@@ -64,12 +64,28 @@ class AiPlanViewModel @Inject constructor(
         viewModelScope.launch {
             getAiContext.observe()
                 .catch { _uiState.update { it.copy(isLoadingContext = false) } }
-                .collect(::showContext)
+                .collect { showContext(it) }
         }
     }
 
-    /** Guarda [loaded] para generar el plan y lo muestra, sin tocar el plan ni el paso actual. */
-    private fun showContext(loaded: AiContext) {
+    /**
+     * Guarda [fetched] para generar el plan y lo muestra, sin tocar el plan ni el paso actual. Si esta vez las
+     * preferencias no se leyeron pero antes sí, se conservan las últimas leídas: nunca se cambian por "sin
+     * restricciones" (CA-RIA-02-12). Devuelve el contexto guardado.
+     */
+    private fun showContext(fetched: AiContext): AiContext {
+        val previous = context
+        val loaded = if (!fetched.preferencesKnown && previous != null && previous.preferencesKnown) {
+            fetched.copy(
+                restrictions = previous.restrictions,
+                diet = previous.diet,
+                cuisines = previous.cuisines,
+                store = previous.store,
+                preferencesKnown = true,
+            )
+        } else {
+            fetched
+        }
         context = loaded
         val today = LocalDate.now(clock)
         val daysById = loaded.items.associate { it.id to ChronoUnit.DAYS.between(today, it.expiresOn).toInt() }
@@ -83,9 +99,18 @@ class AiPlanViewModel @Inject constructor(
                 firstExpiringDays = expiring.firstOrNull()?.let { item -> daysById.getValue(item.id) } ?: 0,
                 restrictions = loaded.restrictions,
                 cuisines = loaded.cuisines,
+                preferencesUnavailable = !loaded.preferencesKnown,
                 store = loaded.store,
                 ingredients = loaded.ingredients,
             )
+        }
+        return loaded
+    }
+
+    /** "Reintentar": vuelve a leer el Perfil; si sigue sin poder leerse, el aviso se queda (CA-RIA-02-12). */
+    private fun retryPreferences() {
+        viewModelScope.launch {
+            safeRunCatching { getAiContext() }.onSuccess { showContext(it) }
         }
     }
 
@@ -104,6 +129,7 @@ class AiPlanViewModel @Inject constructor(
                 generation = null
                 _uiState.update { it.copy(step = AiStep.Context) }
             }
+            AiEvent.RetryPreferencesClicked -> retryPreferences()
             AiEvent.AdjustClicked -> _uiState.update { it.copy(step = AiStep.Context) }
             is AiEvent.RecipeClicked -> send(AiEffect.OpenRecipe(event.recipeId))
             AiEvent.EconomicRecipesClicked -> send(AiEffect.OpenEconomicRecipes)
@@ -113,13 +139,15 @@ class AiPlanViewModel @Inject constructor(
 
     private fun generate() {
         val current = context ?: return
+        // Sin las preferencias no se sabe la dieta: no se arma un plan "sin restricciones" (CA-RIA-02-12).
+        if (!current.preferencesKnown) return
         if (_uiState.value.step == AiStep.Loading) return
         _uiState.update { it.copy(step = AiStep.Loading, plan = null, reasons = emptyList(), suggestions = emptyList()) }
         val state = _uiState.value
         generation = viewModelScope.launch {
             // Las restricciones del Perfil no avisan cuando cambian: se leen otra vez justo antes de buscar (CA-RIA-02-11).
-            val loaded = safeRunCatching { getAiContext() }.getOrDefault(current)
-            showContext(loaded)
+            // Si la nueva lectura del Perfil falla, showContext conserva las preferencias de `current` (CA-RIA-02-12).
+            val loaded = showContext(safeRunCatching { getAiContext() }.getOrDefault(current))
             val outcome = coroutineScope {
                 val result = async {
                     val started = System.nanoTime()

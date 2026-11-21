@@ -127,6 +127,9 @@ class RequestEmailChangeUseCase @Inject constructor(
     private val auth: AuthRepository,
     private val emailChange: EmailChangeRepository,
 ) {
+    /** `true` si después hay que confirmar un código; `false` si se envió un enlace (spec 012, CA-SPK-03-01). */
+    val usesCode: Boolean get() = emailChange.usesCode
+
     suspend operator fun invoke(newEmail: String, currentPassword: String): Result<Duration> {
         val email = newEmail.trim()
         if (currentPassword.isEmpty()) return authFailure(AuthError.EmptyFields(setOf(AuthField.PASSWORD)))

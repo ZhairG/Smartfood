@@ -58,6 +58,18 @@
     <string name="recovery_step1_back_prompt">Volver a</string>
     <string name="recovery_step1_back_action">Iniciar sesión</string>
 
+    <!-- Recuperación con enlace del modo gratuito (spec 012, HU-SPK-02) -->
+    <string name="recovery_step1_subtitle_link">Escribe tu correo y te enviaremos un enlace para crear una contraseña nueva.</string>
+    <string name="recovery_step1_button_link">Enviar enlace</string>
+    <string name="recovery_step1_button_link_countdown">Enviar enlace en %1$s</string>
+    <string name="recovery_link_title">Revisa tu correo</string>
+    <string name="recovery_link_subtitle">Si el correo tiene una cuenta, te enviamos un enlace para crear una contraseña nueva a:</string>
+    <string name="recovery_link_spam_hint">Abre el enlace, crea tu contraseña y vuelve a iniciar sesión. Si no lo ves, revisa también la carpeta de spam.</string>
+    <string name="recovery_link_button">Volver a Iniciar sesión</string>
+    <string name="recovery_link_resend_prompt">¿No recibiste el enlace?</string>
+    <string name="recovery_link_resend_action">Reenviar enlace</string>
+    <string name="recovery_link_resend_countdown_prompt">Reenviar enlace en</string>
+
     <string name="recovery_step2_title">Verifica tu correo</string>
     <string name="recovery_step2_subtitle">Si el correo tiene una cuenta, te enviamos un código de 4 dígitos a:</string>
     <string name="recovery_step2_wrong_email_link">¿Correo incorrecto? Haz click aqui para cambiarlo</string>

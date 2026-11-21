@@ -56,7 +56,7 @@ ingredientes y más usuarios, así que el pedido queda registrado como decisión
 | CA-COC-03-01 | **Dado** cocinas elegidas en el Perfil, **cuando** abro "Sugerencia con IA", **entonces** veo la línea "Cocina favorita: …" con sus nombres. Sin cocinas, la línea no aparece. |
 | CA-COC-03-02 | **Dado** que no hay plan con mis cocinas y sin ellas sí lo habría, **entonces** "Prueba una de estas opciones" incluye "Quita tu cocina favorita en el Perfil". |
 | CA-COC-03-03 | **Dado** que no hay plan y quitar las cocinas no lo arregla, o que no elegí cocinas, **entonces** esa sugerencia no aparece. |
-| CA-COC-03-04 | **Dado** que las preferencias no se pueden leer, **entonces** el flujo sigue sin filtrar por cocina, como con las restricciones. |
+| CA-COC-03-04 | **Dado** que las preferencias no se pueden leer, **entonces** no se genera el plan ni se quitan las cocinas en silencio: se aplica CA-RIA-02-12 de la [spec 009](../009-recetas-ia/spec.md) (aviso con "Reintentar"; enmienda del 2026-11-19). |
 
 ## 4. Requisitos funcionales
 

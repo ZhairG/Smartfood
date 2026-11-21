@@ -107,8 +107,11 @@ class FakeProfilePhotoRepository : ProfilePhotoRepository {
     }
 }
 
-/** Fake de [EmailChangeRepository]: registra los correos pedidos y los códigos confirmados. */
-class FakeEmailChangeRepository : EmailChangeRepository {
+/**
+ * Fake de [EmailChangeRepository]: registra los correos pedidos y los códigos confirmados.
+ * @param usesCode `false` simula el modo gratuito con enlace (spec 012).
+ */
+class FakeEmailChangeRepository(override val usesCode: Boolean = true) : EmailChangeRepository {
     var requestResult: Result<Duration> = Result.success(60.seconds)
     /** Si no es `null`, [confirm] devuelve este fallo. */
     var confirmError: Result<String>? = null

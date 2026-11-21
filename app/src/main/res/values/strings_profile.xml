@@ -46,6 +46,8 @@
     <string name="edit_profile_saved">Guardado</string>
     <string name="edit_profile_saved_body">Perfil se actualizó</string>
     <string name="edit_profile_email_changed">Tu correo ahora es %1$s</string>
+    <!-- Modo gratuito (spec 012, CA-SPK-03-02) -->
+    <string name="edit_profile_email_link_sent">Te enviamos un enlace a %1$s. Tu correo cambia cuando lo abras.</string>
     <!-- Cambio de correo con código (spec 008, T009b; desviación: el Figma no tiene este aviso). -->
     <string name="edit_profile_code_title">Revisa tu correo</string>
     <string name="edit_profile_code_body">Escribe el código de 4 dígitos que enviamos a %1$s.</string>

@@ -162,6 +162,18 @@ class EditProfileViewModel @Inject constructor(
                         val onPhone = saved.outcome == WriteOutcome.PENDING
                         _uiState.update { it.loaded(saved.profile).copy(dialog = EditProfileDialog.Saved(onPhone = onPhone)) }
                         closeSavedLater()
+                    } else if (!requestEmailChange.usesCode) {
+                        // Modo gratuito: Firebase envió un enlace al correo nuevo y el correo cambia cuando se abre;
+                        // mientras tanto se sigue mostrando el anterior (spec 012, CA-SPK-03-01 y CA-SPK-03-02).
+                        _uiState.update {
+                            it.loaded(saved.profile).copy(
+                                dialog = EditProfileDialog.Saved(
+                                    emailLinkSentTo = newEmail,
+                                    onPhone = saved.outcome == WriteOutcome.PENDING,
+                                )
+                            )
+                        }
+                        closeSavedLater()
                     } else {
                         // Los demás datos ya quedaron; el correo cambia al confirmar el código (CA-PER-02-10).
                         _uiState.update {

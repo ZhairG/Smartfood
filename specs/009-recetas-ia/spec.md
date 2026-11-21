@@ -60,6 +60,7 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 | CA-RIA-02-09 | **Dado** que tengo restricciones en Preferencias alimentarias (CA-PER-03-01), **entonces** ninguna receta del plan contiene un ingrediente que esas restricciones excluyen. |
 | CA-RIA-02-10 | **Dado** 50 recetas en el catálogo, **entonces** el plan se calcula en 2 segundos o menos en el teléfono (meta del Avance 2). |
 | CA-RIA-02-11 | **Dado** que cambié mi inventario o mis restricciones después de abrir "Sugerencia con IA", **entonces** la pantalla muestra el inventario actual y, **cuando** genero el plan, se usan el inventario y las restricciones actuales; un plan que ya estoy viendo no se borra solo. |
+| CA-RIA-02-12 | **Dado** que mis preferencias alimentarias no se pueden leer (sin red ni copia en el teléfono), **entonces** "Sugerencia con IA" sigue mostrando mi inventario, en lugar de "Según tus preferencias" dice "No pudimos leer tus preferencias" con "Reintentar" y "Generar plan" está deshabilitado: nunca se arma un plan como si no tuviera restricciones. **Cuando** toco "Reintentar" y la lectura funciona, el aviso desaparece y el plan usa mis restricciones y cocinas. Si ya las había leído y solo falla la nueva lectura al generar, se usan las últimas leídas. |
 
 ### HU-RIA-03: Entender cómo decide la IA
 | Código | Criterio |
@@ -155,6 +156,7 @@ solo al resultado (`AFTER_TIMEOUT`); en la app pasa cuando el agente termina.
 | "Analizando opciones" se muestra al menos 1,5 s, o lo que tarde el cálculo si es más (aprobada por Zhair el 2026-10-21). | El agente tarda unos 50 ms; el prototipo usa 2 s (`AFTER_TIMEOUT`). |
 | "Tu plan de 3 días" muestra las tres tarjetas a lo ancho, una debajo de otra, con la etiqueta "Día N" donde el Figma dice "Mejor opción" (aprobada por Zhair el 2026-10-21). | Son tres recetas, no dos; lado a lado no caben. |
 | "Sin coincidencias" lista las sugerencias que calcula el agente (subir el presupuesto a COP $X, permitir picante, subir el tiempo, agregar productos al inventario) en lugar del texto fijo del Figma; no hay "sustituciones económicas". | Las sugerencias deben salir de datos reales (CA-RIA-02-07); el agente no hace sustituciones. |
+| Si las preferencias no se pueden leer, el contexto de la IA muestra "No pudimos leer tus preferencias" con "Reintentar" (botón blanco con borde) en el lugar de "Según tus preferencias" y deshabilita "Generar plan" (aprobada por Zhair el 2026-11-19, CA-RIA-02-12). | El Figma no tiene este estado; sin él, un fallo de lectura armaba un plan sin la dieta (retroalimentación de la entrega). |
 | "Contactar soporte" abre el correo a smartfood.equipo@gmail.com con el asunto "SmartFood: ayuda con la IA" (aprobada por Zhair el 2026-10-21). En la Ayuda, la barra inferior resalta Recetas (el Figma `557:2476` resalta Guardadas por error). | El Figma no define el correo; la Ayuda es parte de Recetas. |
 
 ## 10. Plan de entrega

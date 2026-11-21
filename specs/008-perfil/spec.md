@@ -113,6 +113,10 @@ mi cuenta tenga mis datos reales.
 | RF-PER-01 | Perfil del usuario con nombre, correo, teléfono, fecha de nacimiento y foto, guardado en `users/{uid}`. | HU-PER-01, HU-PER-02 |
 | RF-PER-02 | Foto de perfil en Storage (`users/{uid}/profile/`), tomada con la cámara del sistema o de la galería. | HU-PER-02 |
 | RF-PER-03 | Cambio de correo con un código enviado por el SMTP de SmartFood al correo nuevo; las Cloud Functions `requestEmailChangeCode` y `confirmEmailChange` cambian la cuenta y el perfil (mismo patrón y límites que la spec 003). | HU-PER-02 |
+
+> **Enmienda (spec 012):** RF-PER-02 y RF-PER-03 describen el modo Blaze. Con `blaze_activo = false`, la foto va a
+> `users/{uid}/media/` en Firestore y el correo cambia con un enlace de Firebase
+> ([spec 012](../012-modo-sin-facturacion/spec.md), HU-SPK-03 y HU-SPK-05).
 | RF-PER-04 | Preferencias alimentarias en `users/{uid}`. | HU-PER-03 |
 | RF-PER-05 | Preferencias de notificaciones en el teléfono, que encienden o apagan el aviso diario y el aviso de inventario vacío. | HU-PER-04 |
 | RF-PER-06 | Cambio de contraseña confirmando la actual. | HU-PER-05 |
