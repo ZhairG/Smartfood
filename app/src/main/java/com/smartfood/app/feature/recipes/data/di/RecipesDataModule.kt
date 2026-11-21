@@ -5,10 +5,12 @@ import com.smartfood.app.feature.recipes.data.catalog.AssetsRecipeCatalog
 import com.smartfood.app.feature.recipes.data.catalog.RecipeAssetSource
 import com.smartfood.app.feature.recipes.data.repository.CachedCookingHistoryRepository
 import com.smartfood.app.feature.recipes.data.repository.FirestoreCookingHistoryRepository
+import com.smartfood.app.feature.recipes.data.repository.FirestoreCookingRepository
 import com.smartfood.app.feature.recipes.data.repository.RemoteHistory
 import com.smartfood.app.feature.recipes.data.repository.FirestoreFavoritesRepository
 import com.smartfood.app.feature.recipes.data.repository.FirestoreOwnRecipesRepository
 import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
+import com.smartfood.app.feature.recipes.domain.repository.CookingRepository
 import com.smartfood.app.feature.recipes.domain.repository.FavoritesRepository
 import com.smartfood.app.feature.recipes.domain.repository.OwnRecipesRepository
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
@@ -56,6 +58,11 @@ abstract class RecipesDataModule {
     abstract fun bindCookingHistoryRepository(
         impl: CachedCookingHistoryRepository
     ): CookingHistoryRepository
+
+    /** Cierre de la cocina: descuento del inventario y registro en un solo lote (plan §6, CA-RIA-04-09). */
+    @Binds
+    @Singleton
+    abstract fun bindCookingRepository(impl: FirestoreCookingRepository): CookingRepository
 
     /** Favoritas en Firestore (`users/{uid}/favorites`, spec 010, T002). */
     @Binds

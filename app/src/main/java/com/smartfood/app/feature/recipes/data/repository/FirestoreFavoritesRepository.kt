@@ -18,10 +18,13 @@ import com.smartfood.app.feature.recipes.domain.model.Favorite
 import com.smartfood.app.feature.recipes.domain.model.FavoriteSource
 import com.smartfood.app.feature.recipes.domain.repository.FavoritesRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
@@ -65,12 +68,22 @@ class FirestoreFavoritesRepository @Inject constructor(
         }
         .catch { throw InventoryErrorMapper.toException(it) }
 
+    /**
+     * Borrados que esperan al servidor. Vive en memoria (el repositorio es `@Singleton`): si la app se cierra antes
+     * de sincronizar, Firestore igual sube el borrado, pero la tarjeta no lo cuenta al reabrir (spec 010 §9).
+     */
+    private val pendingRemovals = MutableStateFlow<Set<String>>(emptySet())
+
+    override fun observePendingRemovals(): Flow<Set<String>> = pendingRemovals.asStateFlow()
+
     override suspend fun setFavorite(
         recipeId: String,
         source: FavoriteSource,
         favorite: Boolean,
     ): Result<WriteOutcome> = safeRunCatching {
         val document = favorites().document(recipeId)
+        // Volver a marcar la receta anula el borrado pendiente que pudiera tener.
+        pendingRemovals.update { it - recipeId }
         val task: Task<Void> = if (favorite) {
             // `set` también sirve cuando el documento ya existe: volver a tocar el ♡ sin conexión no falla y las
             // reglas permiten `create` y `update` (plan §6).
@@ -81,7 +94,9 @@ class FirestoreFavoritesRepository @Inject constructor(
                 )
             )
         } else {
-            document.delete()
+            // El borrado queda pendiente hasta que Firestore lo confirma; si falla, también deja de contar.
+            pendingRemovals.update { it + recipeId }
+            document.delete().addOnCompleteListener { pendingRemovals.update { it - recipeId } }
         }
         // `await()` de un Task<Void> da null aunque termine bien: por eso el bloque devuelve Unit.
         val confirmed = withTimeoutOrNull(WRITE_WAIT_MILLIS) { task.await(); Unit } != null

@@ -1,5 +1,9 @@
 package com.smartfood.app.core.designsystem.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
@@ -21,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 
 /**
  * Nombre: AnchoredPopup.kt
@@ -87,14 +92,24 @@ fun AnchoredPopup(
     Box(modifier = modifier.onSizeChanged { anchorWidthPx = it.width }) {
         content()
 
-        if (visible && anchorWidthPx > 0) {
+        // El popup aparece y se va con disolvencia de 150 ms (CA-ANI-03-04); sigue en la composición hasta que termina
+        // de irse.
+        val visibleState = remember { MutableTransitionState(false) }
+        visibleState.targetState = visible
+        if ((visibleState.currentState || visibleState.targetState) && anchorWidthPx > 0) {
             Popup(
                 popupPositionProvider = positionProvider,
                 properties = PopupProperties(focusable = false)
             ) {
                 val popupWidth = with(density) { anchorWidthPx.toDp() }.coerceAtMost(maxPopupWidth)
-                Box(modifier = Modifier.width(popupWidth)) {
-                    popupContent()
+                AnimatedVisibility(
+                    visibleState = visibleState,
+                    enter = fadeIn(SmartFoodMotion.focus()),
+                    exit = fadeOut(SmartFoodMotion.focus())
+                ) {
+                    Box(modifier = Modifier.width(popupWidth)) {
+                        popupContent()
+                    }
                 }
             }
         }

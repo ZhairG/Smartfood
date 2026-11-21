@@ -14,6 +14,9 @@ interface OwnRecipesRepository {
     /** Recetas propias del usuario, incluyendo metadatos de escrituras pendientes. */
     fun observeRecipes(): Flow<List<OwnRecipe>>
 
+    /** Ids de las recetas propias borradas cuyo borrado todavía espera al servidor (CA-SAV-02-09). */
+    fun observePendingRemovals(): Flow<Set<String>>
+
     /** Obtiene una receta propia por identificador. */
     suspend fun getRecipe(id: String): Result<OwnRecipe>
 

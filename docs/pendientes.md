@@ -16,14 +16,14 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 |---|---|---|---|---|
 | 1 | Modo sin facturación (sin plan Blaze) | [012](../specs/012-modo-sin-facturacion/spec.md) | Implementado, pruebas en la ronda final | — |
 | 2 | La dieta se pierde si falla la lectura del perfil | 009 (CA-RIA-02-12) | Hecho | [#140](https://github.com/ZhairG/Smartfood/pull/140) |
-| 3 | Cierre de cocina: precio y reintentos | 009 | Pendiente | — |
-| 4 | Guardado pendiente o confirmado en el Perfil | 008 | Pendiente | — |
-| 5 | Cocina Favorita sin plan posible | 011 | Pendiente | — |
-| 6 | Revisión del modo oscuro | 002 (enmienda) o 013 | Pendiente | — |
-| 7 | Animaciones y transiciones | 007 | Pendiente | — |
-| 8 | Correcciones de documentación y medición del agente | 009 | Pendiente | — |
-| 9 | Pendientes menores | 009, 010 | Pendiente | — |
-| 10 | Persistencia local con Room (opcional) | 014 (nueva) | Implementado, pruebas en la ronda final | — |
+| 3 | Cierre de cocina: precio y reintentos | 009 (CA-RIA-04-08, 04-09) | Hecho | [#141](https://github.com/ZhairG/Smartfood/pull/141) |
+| 4 | Guardado pendiente o confirmado en el Perfil | 008 (CA-PER-02-14, 03-06) | Hecho | [#142](https://github.com/ZhairG/Smartfood/pull/142) |
+| 5 | Cocina Favorita sin plan posible | 011 (CA-COC-02-06, 02-07, 03-05) | Hecho | [#143](https://github.com/ZhairG/Smartfood/pull/143) |
+| 6 | Revisión del modo oscuro | 013 (enmienda CA-UI-05-04) | Hecho | [#144](https://github.com/ZhairG/Smartfood/pull/144) |
+| 7 | Animaciones y transiciones | 007 | Hecho | [#145](https://github.com/ZhairG/Smartfood/pull/145) |
+| 8 | Correcciones de documentación y medición del agente | 009 (T047 a T053) | Hecho | [#146](https://github.com/ZhairG/Smartfood/pull/146) |
+| 9 | Pendientes menores | 009, 010 | Hecho | [#147](https://github.com/ZhairG/Smartfood/pull/147) |
+| 10 | Persistencia local con Room (opcional) | 014 (nueva) | Hecho | [#148](https://github.com/ZhairG/Smartfood/pull/148) |
 
 ## 1. Modo sin facturación (urgente)
 
@@ -125,10 +125,29 @@ fusionó. Hoy está en el *stash* local «On docs/007-animaciones: borrador spec
   meta de 2 s). Definir un tiempo límite y una respuesta clara si la búsqueda no termina.
 - Corregir los objetivos específicos del póster.
 
+**Hecho (rama `feature/009-evaluacion-agente`, 2026-11-20):** límite de 2 s con el mejor plan encontrado (CA-RIA-02-13 y
+02-14), n/N y cantidad consumida, frontera media y máxima, `AgentSensitivityTest`, `AgentDevicePerformanceTest`,
+correcciones de [`ia/evaluacion-agente.md`](ia/evaluacion-agente.md) §9 y [`ia/poster-objetivos.md`](ia/poster-objetivos.md).
+Las cifras de §9 se midieron en la ronda final del 2026-11-20.
+
 ## 9. Pendientes menores
 
 - T024 de la spec 010.
 - Prueba intermitente `AiFlowScreenTest.caRia0207`.
+
+**Avance (rama `fix/009-010-pendientes-menores`, 2026-11-20):**
+- **Prueba intermitente:** la causa es externa. La ventana emergente de Truecaller se abrió encima de la prueba en el
+  V2436 y la dejó en pausa («No compose hierarchies found»). No hay que corregir código: la precaución quedó en
+  [`instalacion.md`](instalacion.md) y en la T046 de la spec 009.
+- **T024 (hecha el 2026-11-20):** comparación Figma vs app de las 11 pantallas, en claro y oscuro, y checklist manual,
+  con el APK de `integracion/ronda-final`. Todo está en `disenos-figma/Modulo 5 - Recetas guardadas/comparacion/README.md`.
+  Quedan sin corregir:
+  - un hallazgo de contraste del rojo en modo oscuro;
+  - 4 hallazgos menores de fidelidad;
+  - la favorita en otro teléfono, que no se verificó.
+- **T026 (encontrado en la ronda final):** quitar un ♡ o borrar una receta propia sin conexión no mostraba la tarjeta
+  «Sin conexión» de Guardadas, porque el borrado saca la tarjeta de la lista. Los repositorios ahora exponen los
+  borrados pendientes (CA-SAV-02-09).
 
 ## 10. Persistencia local con Room (opcional)
 

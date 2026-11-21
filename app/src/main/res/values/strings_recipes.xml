@@ -104,6 +104,9 @@
     <string name="recipes_ai_adjust">Ajustar</string>
     <string name="recipes_ai_ready">✓ Recomendaciones listas</string>
     <string name="recipes_ai_ready_body">Ordenadas por utilidad: urgencia, uso del inventario y costo.</string>
+    <!-- Plan completado con otras cocinas (spec 011, CA-COC-03-05): %1$d días, %2$s cocinas en minúscula -->
+    <string name="recipes_ai_cuisine_relaxed">No alcanzó para %1$d recetas de cocina %2$s: completamos tu plan con otras cocinas.</string>
+    <string name="recipes_ai_cuisine_or">" o "</string>
     <string name="recipes_ai_day">Día %1$d</string>
     <string name="recipes_ai_card_meta">%1$d %% del inventario · COP $%2$s · %3$d min</string>
     <string name="recipes_ai_why">¿Por qué te conviene?</string>
@@ -121,6 +124,10 @@
     <string name="recipes_ai_no_plan_heading">No encontramos una opción segura</string>
     <string name="recipes_ai_no_plan_body">Con COP $%1$s y los ingredientes actuales, ninguna receta cumple tus preferencias sin compras costosas.</string>
     <string name="recipes_ai_try">Prueba una de estas opciones</string>
+    <!-- Límite de 2 s de la búsqueda (spec 009, CA-RIA-02-13 y 02-14). -->
+    <string name="recipes_ai_partial_plan">No alcancé a revisar todas las combinaciones: este es el mejor plan que encontré en 2 segundos.</string>
+    <string name="recipes_ai_timed_out_heading">La búsqueda tardó demasiado</string>
+    <string name="recipes_ai_timed_out_body">Revisé tu inventario durante 2 segundos y no alcancé a armar un plan con COP $%1$s. Ajusta el contexto e inténtalo otra vez.</string>
     <string name="recipes_ai_suggest_budget">Sube el presupuesto a COP $%1$s</string>
     <string name="recipes_ai_suggest_spicy">Permite recetas picantes</string>
     <string name="recipes_ai_suggest_cuisine">Quita tu cocina favorita en el Perfil</string>

@@ -103,6 +103,7 @@ fun PhotoSlot(
             contentDescription = stringResource(id = R.string.cd_editor_remove_photo),
             // Figma: gris sin foto (deshabilitada) y roja cuando hay una foto que borrar.
             containerColor = MaterialTheme.colorScheme.error,
+            contentColor = MaterialTheme.colorScheme.onError,
             disabledContainerColor = GreyDark,
             iconSize = TrashIconSize,
             onClick = onRemoveClick,
@@ -115,6 +116,7 @@ fun PhotoSlot(
             icon = R.drawable.ic_figma_camera,
             contentDescription = stringResource(id = R.string.cd_editor_take_photo),
             containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             iconSize = CameraIconSize,
             onClick = onAddPhotoClick,
             modifier = Modifier
@@ -130,6 +132,7 @@ private fun SlotButton(
     @DrawableRes icon: Int,
     contentDescription: String,
     containerColor: Color,
+    contentColor: Color,
     iconSize: Dp,
     disabledContainerColor: Color = containerColor,
     onClick: () -> Unit,
@@ -141,9 +144,9 @@ private fun SlotButton(
         enabled = enabled,
         colors = IconButtonDefaults.iconButtonColors(
             containerColor = containerColor,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
+            contentColor = contentColor,
             disabledContainerColor = disabledContainerColor,
-            disabledContentColor = MaterialTheme.colorScheme.onPrimary
+            disabledContentColor = contentColor
         ),
         modifier = modifier
             .size(SlotButtonSize)

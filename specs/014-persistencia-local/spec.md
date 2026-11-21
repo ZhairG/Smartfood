@@ -35,7 +35,7 @@ entidad, DAO y pruebas. Zhair eligió dos (2026-11-20):
 |---|---|
 | CA-LOC-01-01 | **Dado** que cociné recetas este mes, **cuando** abro el Perfil sin conexión (también con la app abierta en frío), **entonces** «Ahorrados este mes» muestra el valor guardado en el teléfono. |
 | CA-LOC-01-02 | **Dado** que el historial cambió en Firestore (por ejemplo, desde otro teléfono), **cuando** hay red, **entonces** el teléfono reemplaza su copia y el valor se actualiza. |
-| CA-LOC-01-03 | **Dado** que termino de cocinar, con o sin conexión, **entonces** el registro queda en el teléfono enseguida y «Ahorrados este mes» lo suma. La escritura en Firestore no cambia (`WriteOutcome`, spec 006 §13). |
+| CA-LOC-01-03 | **Dado** que termino de cocinar, con o sin conexión, **entonces** el registro queda en el teléfono enseguida y «Ahorrados este mes» lo suma. La escritura no cambia: el registro va en el lote del cierre de la cocina (spec 009, CA-RIA-04-09) y llega a la copia con el snapshot local de Firestore. |
 | CA-LOC-01-04 | **Dado** que la lectura de Firestore falla, **entonces** la app sigue mostrando lo guardado en el teléfono y no se cierra. |
 | CA-LOC-01-05 | **Dado** que cierro sesión, **entonces** el historial guardado en el teléfono se borra, y otra cuenta en el mismo teléfono nunca ve el historial ajeno. |
 

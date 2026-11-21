@@ -48,9 +48,8 @@ class CachedCookingHistoryRepository @Inject constructor(
   - sin sesión, emite una lista vacía;
   - con sesión, hace un `channelFlow`: en un hijo, `remote.observeHistory()` → `dao.replaceAll(uid, …)`, y si falla
     lo atrapa (CA-LOC-01-04); en el principal, `dao.observe(uid)` → modelos.
-- `saveRecord(record)`: `remote.saveRecord(record)`; si no falla, `dao.upsert(...)` (CA-LOC-01-03). El `WriteOutcome`
-  no cambia.
-- `newRecordId()` delega en Firestore.
+- La escritura no pasa por este repositorio: el registro va en el lote de `CookingRepository` (spec 009, CA-RIA-04-09)
+  y el snapshot local de Firestore lo trae a Room, también sin conexión (CA-LOC-01-03).
 - `RecipesDataModule` enlaza `CookingHistoryRepository` con esta clase.
 
 ## 4. Búsquedas recientes (HU-LOC-02)

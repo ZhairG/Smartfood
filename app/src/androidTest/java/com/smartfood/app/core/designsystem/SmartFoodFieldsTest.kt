@@ -25,6 +25,7 @@ import com.smartfood.app.core.designsystem.components.SmartFoodSelectorField
 import com.smartfood.app.core.designsystem.components.SmartFoodTextField
 import com.smartfood.app.core.designsystem.theme.FormMetrics
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -120,5 +121,19 @@ class SmartFoodFieldsTest {
         // CA-UI-02-01: tocar la etiqueta abre el selector.
         composeTestRule.onNodeWithText("Categoría", useUnmergedTree = true).performClick()
         assertEquals("tocar la etiqueta", 1, toquesConValor)
+    }
+
+    @Test
+    fun ca_ani_03_04_elOjoCambiaConDisolvenciaDe150ms() {
+        mostrar { SmartFoodPasswordField(label = "Contraseña", value = "clave", onValueChange = {}) }
+        composeTestRule.mainClock.autoAdvance = false
+
+        composeTestRule.onNodeWithContentDescription("Mostrar contraseña").performClick()
+        // A la mitad de la disolvencia se dibujan los dos íconos; al terminar, solo el nuevo.
+        composeTestRule.mainClock.advanceTimeBy(SmartFoodMotion.FAST / 2L)
+        composeTestRule.onNodeWithContentDescription("Ocultar contraseña").assertExists()
+        composeTestRule.mainClock.advanceTimeBy(SmartFoodMotion.FAST.toLong())
+        composeTestRule.onNodeWithContentDescription("Ocultar contraseña").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Mostrar contraseña").assertDoesNotExist()
     }
 }

@@ -61,6 +61,26 @@
 - [x] T039 La dieta no se pierde si falla la lectura del perfil (2026-11-19, punto 2 de `docs/pendientes.md`): CA-RIA-02-12 y su desviación en la spec, y CA-COC-03-04 de la spec 011 remite a él.
 - [x] T040 `AiContext.preferencesKnown`: `GetAiContextUseCase` distingue "sin restricciones" de "perfil desconocido"; prueba con perfil `VEGAN` y la lectura fallida (CA-RIA-02-12).
 - [x] T041 `AiPlanViewModel` no genera con el perfil desconocido y "Reintentar" lo vuelve a leer; `AiFlowScreen` muestra el aviso y deshabilita "Generar plan" (CA-RIA-02-12).
+- [x] T042 Cierre de cocina sin perder el precio ni descontar dos veces (2026-11-19, punto 3 de `docs/pendientes.md`): CA-RIA-04-08 y 04-09 en la spec y el contrato de `CookingRepository` en el plan §6.
+- [x] T043 `CookingRepository` con `WriteBatch` (cantidades, borrados y `cookings` en un lote) y `FinishCookingUseCase` con `operationId`; pruebas en `FinishCookingUseCaseTest` (CA-RIA-04-08, 04-09).
+- [x] T044 `CookingViewModel` crea el `operationId` una vez en `SavedStateHandle` y lo usa en cada intento (CA-RIA-04-09).
+- [x] T045 `rules-test`: un lote válido del cierre se acepta y uno que repite `cookings/{id}` se rechaza entero (CA-RIA-04-09).
+
+- [x] T046 Prueba intermitente de `AiFlowScreenTest` (punto 9 de los pendientes, 2026-11-20). La causa no estaba en la
+  app: en el V2436, la ventana emergente de Truecaller (`NeoPACSActivity`) se abrió 0,6 s después de que empezara una
+  prueba, la dejó en pausa y Compose falló con «No compose hierarchies found». Se reprodujo 1 vez en 5 corridas de la
+  clase; `caRia0207` sola pasó 20 de 20. No cambia el código; la precaución quedó en `docs/instalacion.md` («Pruebas»).
+  Sin esa ventana, la clase completa pasó 20 veces seguidas (240 pruebas, 0 fallas).
+
+## Punto 8 de los pendientes: evaluación y medición del agente (2026-11-20)
+Rama `feature/009-evaluacion-agente`. Origen: informe de IA del 13/11/2026 ([`docs/pendientes.md`](../../docs/pendientes.md) §8).
+- [x] T047 Enmienda de la spec: CA-RIA-02-10 con 70 recetas, CA-RIA-02-13 y 02-14 (límite de 2 s), RNF-RIA-02 y la desviación del aviso.
+- [x] T048 Límite de tiempo en el dominio: `SearchDeadline`, `MealPlanner.searchOutcome`, `PlanResult.Found.complete`, `PlanResult.TimedOut`, `AiPlanOutcome` y `GeneratePlanUseCase` con `TimeSource` (2 s), con sus pruebas (CA-RIA-02-13, 02-14).
+- [x] T049 `AiPlanViewModel` (`planComplete`, `timedOut`, registro de nodos), el aviso y el mensaje en `AiFlowScreen` (CA-RIA-02-13, 02-14).
+- [x] T050 Métricas con denominador: productos usados / elegibles (n/N) y cantidad consumida en `AgentEvaluationTest`; frontera media de máximos y máxima en `AlgorithmComparisonTest` (RNF-RIA-03).
+- [x] T051 `AgentSensitivityTest`: sensibilidad de los pesos y recocido con 10 semillas e igual presupuesto de cómputo (RNF-RIA-03).
+- [x] T052 `EvaluationCatalog` en `sharedTest` (`RealCatalog` lo usa en la JVM) y `AgentDevicePerformanceTest` en el teléfono: tiempo, nodos y memoria, normal y estrés (CA-RIA-02-10, RNF-RIA-02).
+- [x] T053 Correcciones de `docs/ia/` (frontera de A\*, memoria del backtracking, denominador del aprovechamiento), §9 de la evaluación y objetivos del póster.
 
 ## Cierre (en el mismo PR)
 - [x] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
@@ -86,9 +106,11 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-07 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, U `RecipesDiscoverViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-08 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `MealPlannerCatalogTest`, U `GetAiContextUseCaseTest`, U `GeneratePlanUseCaseTest` |
-| CA-RIA-02-10 | U `MealPlannerPerformanceTest`, M (release: 62 ms el peor caso, `docs/ia/evaluacion-agente.md`) |
+| CA-RIA-02-10 | U `MealPlannerPerformanceTest`, I `AgentDevicePerformanceTest` (V2436), M (release con logcat, `docs/ia/evaluacion-agente.md` §9) |
 | CA-RIA-02-11 | U `AiPlanViewModelTest` |
 | CA-RIA-02-12 | U `GetAiContextUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
+| CA-RIA-02-13 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
+| CA-RIA-02-14 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |
 | CA-RIA-04-02 | U `RecipeDetailViewModelTest` |
@@ -97,9 +119,11 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-04-05 | U `FinishCookingUseCaseTest`, U `CookingViewModelTest`, I `CookingScreenTest`, R |
 | CA-RIA-04-06 | U `GetMonthlySavingsUseCaseTest`, U `FinishCookingUseCaseTest`, I `ProfileScreenTest` |
 | CA-RIA-04-07 | U `RecipeDetailViewModelTest`, I `RecipeDetailScreenTest` |
+| CA-RIA-04-08 | U `FinishCookingUseCaseTest` |
+| CA-RIA-04-09 | U `FinishCookingUseCaseTest`, U `CookingViewModelTest`, R |
 | RNF-RIA-01 | U `MealPlannerTest` (mismo resultado dos veces) |
-| RNF-RIA-02 | U `MealPlannerPerformanceTest`, M |
-| RNF-RIA-03 | U `AgentEvaluationTest`, U `AlgorithmComparisonTest` |
+| RNF-RIA-02 | U `MealPlannerPerformanceTest`, U `MealPlannerTest` (límite), I `AgentDevicePerformanceTest`, M |
+| RNF-RIA-03 | U `AgentEvaluationTest`, U `AlgorithmComparisonTest`, U `AgentSensitivityTest` |
 | RNF-RIA-04 | R |
 | RNF-RIA-05 | U `RecipeCatalogTest` (cada foto tiene fuente), revisión del PR |
 

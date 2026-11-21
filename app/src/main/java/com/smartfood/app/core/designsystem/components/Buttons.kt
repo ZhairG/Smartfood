@@ -1,5 +1,10 @@
 package com.smartfood.app.core.designsystem.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -29,11 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreyDark
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.White
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
 /**
@@ -79,12 +83,12 @@ fun SmartFoodPrimaryButton(
     // Colores cerrados: nadie pasa colores sueltos al botón (plan §8, #80).
     val containerColor = when {
         destructive -> MaterialTheme.colorScheme.error
-        green -> GreenCheck
+        green -> MaterialTheme.smartFoodColors.checkedFill
         else -> MaterialTheme.colorScheme.secondary
     }
     val contentColor = when {
         destructive -> MaterialTheme.colorScheme.onError
-        green -> White
+        green -> MaterialTheme.smartFoodColors.onCheckedFill
         else -> MaterialTheme.colorScheme.onSecondary
     }
     
@@ -137,13 +141,21 @@ fun SmartFoodPrimaryButton(
                 Icon(imageVector = leadingIcon, contentDescription = null)
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
             }
-            Text(
-                text = displayText,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.SemiBold
+            // El paso a "cargando" y de vuelta dura 300 ms, ease-out (Figma "BotonCargando", spec 007, CA-ANI-05-04). Los
+            // puntos son un indicador continuo, no una transición.
+            AnimatedContent(
+                targetState = isLoading,
+                transitionSpec = { fadeIn(SmartFoodMotion.loading()) togetherWith fadeOut(SmartFoodMotion.loading()) },
+                label = "textoDelBoton"
+            ) { loading ->
+                Text(
+                    text = if (loading) displayText else text,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 )
-            )
+            }
         }
     }
 }

@@ -3,7 +3,6 @@ package com.smartfood.app.feature.recipes.data.repository
 import com.smartfood.app.core.database.CookingDao
 import com.smartfood.app.core.database.CookingEntity
 import com.smartfood.app.core.database.CurrentUid
-import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.recipes.domain.model.CookingRecord
 import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
 import javax.inject.Inject
@@ -27,8 +26,9 @@ annotation class RemoteHistory
  * Descripción: Historial de cocina con una copia en Room (spec 014, HU-LOC-01). Firestore sigue siendo la fuente de
  * verdad: cada snapshot reemplaza la copia del teléfono (CA-LOC-01-02), y lo que se emite sale de Room, así que
  * «Ahorrados este mes» se ve sin red y al abrir la app en frío (CA-LOC-01-01). Si Firestore falla, se queda con la
- * copia (CA-LOC-01-04). La escritura no cambia: va a Firestore con su `WriteOutcome` y, si no falla, también a Room
- * (CA-LOC-01-03).
+ * copia (CA-LOC-01-04). La escritura no pasa por aquí: el registro va en el lote de `CookingRepository` (spec 009,
+ * CA-RIA-04-09), y Firestore lo entrega enseguida en el snapshot local, también sin conexión, así que llega a la copia
+ * por el mismo camino (CA-LOC-01-03).
  *
  * @param remote Historial en Firestore (`users/{uid}/cookings`).
  * @param dao Copia local.
@@ -50,15 +50,6 @@ class CachedCookingHistoryRepository @Inject constructor(
             }
             dao.observe(uid).map { rows -> rows.map { it.toRecord() } }.collect { send(it) }
         }
-    }
-
-    override fun newRecordId(): String = remote.newRecordId()
-
-    override suspend fun saveRecord(record: CookingRecord): Result<WriteOutcome> {
-        val outcome = remote.saveRecord(record)
-        val uid = currentUid.get()
-        if (outcome.isSuccess && uid != null) dao.upsert(record.toEntity(uid))
-        return outcome
     }
 
     private fun CookingRecord.toEntity(uid: String) =

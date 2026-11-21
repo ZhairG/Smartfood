@@ -29,8 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreenSoft
-import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.feature.recipes.domain.model.SavedRecipeCard
 
 /**
@@ -38,7 +37,7 @@ import com.smartfood.app.feature.recipes.domain.model.SavedRecipeCard
  * Autor: SmartFood Team
  * Fecha: Noviembre 2026
  * Descripción: Tarjeta de Guardadas (spec 010, CA-SAV-02-02, T007, Figma `633:2723`): tarjeta blanca con foto o ícono
- * de libro sobre [GreenSoft] si no tiene foto, ♡, nombre y "N porciones · M min".
+ * de libro sobre el rol `greenSoft` si no tiene foto, ♡, nombre y "N porciones · M min".
  *
  * @param card Datos de la tarjeta.
  * @param onClick Abre el detalle o el editor.
@@ -72,7 +71,7 @@ fun SavedRecipeCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(PhotoAspectRatio)
-                            .background(if (LocalIsDarkTheme.current) MaterialTheme.colorScheme.surfaceVariant else GreenSoft),
+                            .background(MaterialTheme.smartFoodColors.greenSoft),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(

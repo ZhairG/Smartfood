@@ -1,7 +1,6 @@
 package com.smartfood.app.feature.recipes.data.repository
 
 import com.smartfood.app.core.database.CookingEntity
-import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.recipes.domain.model.CookingRecord
 import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
 import com.smartfood.app.testutil.FakeCookingDao
@@ -23,7 +22,8 @@ import org.junit.Test
  * Fecha: Noviembre 2026
  * Descripción: Pruebas de [CachedCookingHistoryRepository] (spec 014, T003, HU-LOC-01): el historial sale del teléfono
  * aunque Firestore no responda (CA-LOC-01-01) o falle (CA-LOC-01-04), un snapshot reemplaza la copia (CA-LOC-01-02),
- * guardar escribe en los dos lados (CA-LOC-01-03) y otra cuenta no ve filas ajenas (CA-LOC-01-05).
+ * un registro recién cocinado llega a la copia con el snapshot local (CA-LOC-01-03) y otra cuenta no ve filas ajenas
+ * (CA-LOC-01-05).
  */
 class CachedCookingHistoryRepositoryTest {
 
@@ -31,15 +31,8 @@ class CachedCookingHistoryRepositoryTest {
     private class FakeRemote : CookingHistoryRepository {
         val snapshots = MutableSharedFlow<List<CookingRecord>>()
         var history: Flow<List<CookingRecord>> = snapshots
-        var result: Result<WriteOutcome> = Result.success(WriteOutcome.SYNCED)
-        val saved = mutableListOf<CookingRecord>()
 
         override fun observeHistory(): Flow<List<CookingRecord>> = history
-        override fun newRecordId(): String = "nuevo"
-        override suspend fun saveRecord(record: CookingRecord): Result<WriteOutcome> {
-            saved += record
-            return result
-        }
     }
 
     private val dao = FakeCookingDao()
@@ -76,24 +69,17 @@ class CachedCookingHistoryRepositoryTest {
     }
 
     @Test
-    fun `CA-LOC-01-03 guardar escribe en Firestore y en el telefono con el mismo resultado`() = runTest {
-        remote.result = Result.success(WriteOutcome.PENDING)
+    fun `CA-LOC-01-03 lo cocinado sin conexion llega a la copia con el snapshot local`() = runTest(UnconfinedTestDispatcher()) {
+        dao.upsert(entity("antes"))
+        val seen = mutableListOf<List<CookingRecord>>()
+        val job = launch { repository.observeHistory().collect { seen += it } }
 
-        val outcome = repository.saveRecord(record("r1", value = 3_000))
+        // Firestore entrega la escritura pendiente del lote del cierre en el snapshot local, sin esperar al servidor.
+        remote.snapshots.emit(listOf(record("antes"), record("r1", cookedAt = 2_000, value = 3_000)))
 
-        assertEquals(WriteOutcome.PENDING, outcome.getOrNull())
-        assertEquals(listOf(record("r1", value = 3_000)), remote.saved)
-        assertEquals(listOf(entity("r1", value = 3_000)), dao.rows.value)
-    }
-
-    @Test
-    fun `CA-LOC-01-03 si Firestore rechaza la escritura no queda en el telefono`() = runTest {
-        remote.result = Result.failure(IllegalStateException("sin permiso"))
-
-        val outcome = repository.saveRecord(record("r1"))
-
-        assertTrue(outcome.isFailure)
-        assertTrue(dao.rows.value.isEmpty())
+        assertEquals(listOf("r1", "antes"), seen.last().map { it.id })
+        assertTrue(dao.rows.value.any { it.id == "r1" && it.rescuedValueCop == 3_000 })
+        job.cancel()
     }
 
     @Test
@@ -116,10 +102,5 @@ class CachedCookingHistoryRepositoryTest {
         assertTrue(repository.observeHistory().first().isEmpty())
         uid.uid = null
         assertTrue(repository.observeHistory().first().isEmpty())
-    }
-
-    @Test
-    fun `CA-LOC-01-02 el identificador nuevo sale de Firestore`() {
-        assertEquals("nuevo", repository.newRecordId())
     }
 }

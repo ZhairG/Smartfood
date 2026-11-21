@@ -2,6 +2,7 @@ package com.smartfood.app.testutil
 
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthException
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.UserProfile
 import com.smartfood.app.feature.profile.domain.repository.EmailChangeRepository
@@ -27,7 +28,10 @@ class FakeProfileRepository(initial: UserProfile? = defaultProfile()) : ProfileR
     val profile = MutableStateFlow(initial)
 
     /** Si no es `null`, [updateProfile] devuelve este fallo sin cambiar nada. */
-    var updateResult: Result<Unit>? = null
+    var updateResult: Result<WriteOutcome>? = null
+
+    /** Cómo terminan [updateProfile] y [savePreferences]: confirmados o en el teléfono (CA-PER-02-14, 03-06). */
+    var outcome: WriteOutcome = WriteOutcome.SYNCED
     val updates = mutableListOf<UserProfile>()
     val syncedEmails = mutableListOf<String>()
 
@@ -41,17 +45,17 @@ class FakeProfileRepository(initial: UserProfile? = defaultProfile()) : ProfileR
     var getPreferencesResult: Result<FoodPreferences>? = null
 
     /** Si no es `null`, [savePreferences] devuelve este resultado sin cambiar nada. */
-    var savePreferencesResult: Result<Unit>? = null
+    var savePreferencesResult: Result<WriteOutcome>? = null
     val savedPreferences = mutableListOf<FoodPreferences>()
 
     override fun observeProfile(): Flow<UserProfile> =
         observeError?.let { error -> flow { throw AuthException(error) } } ?: profile.filterNotNull()
 
-    override suspend fun updateProfile(profile: UserProfile): Result<Unit> {
+    override suspend fun updateProfile(profile: UserProfile): Result<WriteOutcome> {
         updateResult?.let { return it }
         updates += profile
         this.profile.value = profile.copy(email = this.profile.value?.email ?: profile.email)
-        return Result.success(Unit)
+        return Result.success(outcome)
     }
 
     override suspend fun syncEmail(email: String): Result<Unit> {
@@ -65,11 +69,11 @@ class FakeProfileRepository(initial: UserProfile? = defaultProfile()) : ProfileR
         return Result.success(preferences)
     }
 
-    override suspend fun savePreferences(preferences: FoodPreferences): Result<Unit> {
+    override suspend fun savePreferences(preferences: FoodPreferences): Result<WriteOutcome> {
         savePreferencesResult?.let { return it }
         this.preferences = preferences
         savedPreferences += preferences
-        return Result.success(Unit)
+        return Result.success(outcome)
     }
 
     companion object {

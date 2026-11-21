@@ -10,6 +10,7 @@
  */
 package com.smartfood.app.feature.inventory.ui.search
 
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -57,9 +58,8 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodRecentSearches
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
-import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.SurfaceLight
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
@@ -151,10 +151,19 @@ fun InventorySearchScreen(
 
                         else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
                             items(items = state.results, key = { it.item.id }) { result ->
-                                SearchResultRow(
-                                    result = result,
-                                    onClick = { id -> onEvent(InventorySearchEvent.ResultClicked(id)) }
-                                )
+                                // Los resultados se reacomodan con 300 ms al filtrar o escribir (CA-ANI-05-02, 05-03).
+                                Box(
+                                    modifier = Modifier.animateItem(
+                                        fadeInSpec = SmartFoodMotion.standard(),
+                                        placementSpec = SmartFoodMotion.standard(),
+                                        fadeOutSpec = SmartFoodMotion.standard()
+                                    )
+                                ) {
+                                    SearchResultRow(
+                                        result = result,
+                                        onClick = { id -> onEvent(InventorySearchEvent.ResultClicked(id)) }
+                                    )
+                                }
                             }
                         }
                     }
@@ -220,8 +229,8 @@ private fun SearchField(
                     .fillMaxWidth()
                     .heightIn(min = SearchBarHeight)
                     // Figma 476:3200: relleno #F3F4F6 con borde #E5E7EB de 1 px y radio 24.
-                    .background(color = SurfaceLight, shape = CircleShape)
-                    .border(width = SearchBarBorder, color = GreyDivider, shape = CircleShape)
+                    .background(color = MaterialTheme.smartFoodColors.softFill, shape = CircleShape)
+                    .border(width = SearchBarBorder, color = MaterialTheme.smartFoodColors.divider, shape = CircleShape)
                     .padding(horizontal = MaterialTheme.spacing.medium)
             ) {
                 Icon(

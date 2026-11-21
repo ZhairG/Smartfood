@@ -145,7 +145,7 @@ correo y la contraseña, y guardar la cuenta nueva sin copiarla a mano. Lo hace 
 | RNF-03 | Todos los textos visibles están en `strings.xml`, en español. |
 | RNF-04 | Accesibilidad: los íconos informativos tienen `contentDescription` y los errores se anuncian con `liveRegion`. |
 | RNF-05 | Android 7.0 (API 24) o superior y orientación vertical. Los formularios se desplazan para no quedar tapados por el teclado. **Ampliado por la [spec 002](../002-adaptabilidad-ui/spec.md):** los formularios caben sin scroll desde 360×720 dp y el foco y el teclado responden sin retrasos. |
-| RNF-06 | Las pantallas respetan el diseño de Figma del equipo (colores, tipografía y transiciones de empuje de 600 ms). |
+| RNF-06 | Las pantallas respetan el diseño de Figma del equipo (colores, tipografía y transiciones de empuje). **Enmendado por la [spec 007](../007-animaciones/spec.md):** el empuje dura 300 ms, como en el prototipo, y todo el movimiento sale de los tokens de `Motion.kt`. |
 
 ## 6. Fuera de alcance (v1)
 

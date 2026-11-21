@@ -21,13 +21,18 @@ import org.junit.Test
  * - **Por vencimiento:** la receta que usa el producto que vence antes.
  *
  * Métricas, impresas como tabla para el informe de IA:
- * - **Aprovechamiento del plan:** % de los productos que vencen en ≤ 3 días y alguna receta usa, que el plan usa antes
- *   de que venzan. Meta: ≥ 80 % y más que las dos líneas base.
+ * - **Aprovechamiento del plan:** % de los productos que vencen en ≤ 3 días y alguna receta usa (los *elegibles*), que
+ *   el plan usa **al menos en parte** antes de que venzan; es la media de esa proporción por inventario. Meta: ≥ 80 % y
+ *   más que las dos líneas base. La tabla muestra también el total de productos usados sobre el total de elegibles
+ *   (n/N), porque el porcentaje solo no dice cuántos productos hay detrás (informe de IA, T050).
+ * - **Cantidad consumida:** fracción de la cantidad de los productos elegibles que el plan consume, en promedio. Separa
+ *   el conteo de productos (usar 10 g de 1 kg cuenta como usado) de lo que de verdad se cocina. No es peso: las
+ *   cantidades sin unidad cuentan como una porción entera.
  * - **Aprovechamiento del Día 1** (métrica del Avance 2, que recomendaba una sola receta): % de los productos por vencer
  *   que usa la receta del Día 1, en los escenarios donde una sola receta los usa todos. Se reporta sin meta: con el plan
  *   de 3 días, lo que vence en 2 o 3 días puede cocinarse después sin perderse (decisión de Zhair del 2026-10-20).
  * - **Presupuesto:** % de planes cuyas compras caben en el presupuesto (restricción dura: 100 %).
- * - Desperdicio y costo medios.
+ * - Desperdicio y costo medios. El desperdicio es una suma de fracciones sin usar, no kilogramos.
  */
 class AgentEvaluationTest {
 
@@ -37,13 +42,24 @@ class AgentEvaluationTest {
     private val context = PlanContext(budgetCop = BUDGET, servings = 4, store = Store.D1)
     private val scenarios = RealCatalog.syntheticInventories()
 
-    /** Plan de un método en un escenario: cada receta con los productos del inventario que usó, el costo y el desperdicio. */
-    private data class Outcome(val days: List<Pair<Recipe, Set<String>>>, val costCop: Long, val waste: Double)
+    /**
+     * Plan de un método en un escenario: cada receta con los productos del inventario que usó, el costo, el desperdicio
+     * y el inventario que queda al final.
+     */
+    private data class Outcome(
+        val days: List<Pair<Recipe, Set<String>>>,
+        val costCop: Long,
+        val waste: Double,
+        val finalStock: PantryStock,
+    )
 
     private data class Metrics(
         val name: String,
         val complete: Int,
         val planShare: Double,
+        val usedCount: Int,
+        val eligibleCount: Int,
+        val consumedShare: Double,
         val dayOneShare: Double,
         val withinBudget: Double,
         val waste: Double,
@@ -67,13 +83,23 @@ class AgentEvaluationTest {
 
     private fun metrics(name: String, plan: (List<PantryItem>) -> Outcome?): Metrics {
         val planShares = mutableListOf<Double>()
+        val consumedShares = mutableListOf<Double>()
+        var usedCount = 0
+        var eligibleCount = 0
         val dayOneShares = mutableListOf<Double>()
         val outcomes = scenarios.map { pantry ->
             val outcome = plan(pantry)
             val expiring = pantry.filter { it.isExpiringSoon() }
             val usable = expiring.filter { item -> recipes.any { r -> r.ingredients.any { it.ingredientId == item.ingredientId } } }
             val used = outcome?.days?.flatMapTo(HashSet()) { it.second }.orEmpty()
-            if (usable.isNotEmpty()) planShares += usable.count { it.itemId in used }.toDouble() / usable.size
+            if (usable.isNotEmpty()) {
+                val usedHere = usable.count { it.itemId in used }
+                planShares += usedHere.toDouble() / usable.size
+                usedCount += usedHere
+                eligibleCount += usable.size
+                // Sin plan no se consume nada.
+                consumedShares += usable.map { 1.0 - (outcome?.finalStock?.unusedFraction(it.itemId) ?: 1.0) }.average()
+            }
             // Avance 2: solo cuentan los escenarios donde una receta usa todos los productos por vencer.
             val expiringIngredients = expiring.map { it.ingredientId }.toSet()
             if (recipes.any { r -> r.ingredients.map { it.ingredientId }.containsAll(expiringIngredients) }) {
@@ -87,6 +113,9 @@ class AgentEvaluationTest {
             name = name,
             complete = complete.size,
             planShare = planShares.average(),
+            usedCount = usedCount,
+            eligibleCount = eligibleCount,
+            consumedShare = consumedShares.average(),
             dayOneShare = dayOneShares.average(),
             withinBudget = complete.count { it.costCop <= context.budgetCop }.toDouble() / complete.size.coerceAtLeast(1),
             waste = complete.map { it.waste }.average(),
@@ -100,7 +129,7 @@ class AgentEvaluationTest {
         // El desperdicio se calcula igual que en las líneas base: lo que queda sin usar al final del plan.
         var stock = PantryStock.of(pantry)
         plan.days.forEach { stock = evaluator.evaluate(it.recipe, context.servings, it.day, stock, context.store).remaining }
-        return Outcome(days, plan.totalCostCop, evaluator.waste(stock))
+        return Outcome(days, plan.totalCostCop, evaluator.waste(stock), stock)
     }
 
     /**
@@ -128,7 +157,7 @@ class AgentEvaluationTest {
             budgetLeft -= evaluation.costCop
             cost += evaluation.costCop
         }
-        return Outcome(days, cost, evaluator.waste(stock))
+        return Outcome(days, cost, evaluator.waste(stock), stock)
     }
 
     /** Ingredientes de la receta que todavía están en el inventario y sirven ese día. */
@@ -148,13 +177,17 @@ class AgentEvaluationTest {
 
     private fun printTable(rows: List<Metrics>) {
         println("\nEvaluación del agente (RNF-RIA-03): ${scenarios.size} inventarios sintéticos, COP $BUDGET, 4 porciones, D1")
-        println("| Método | Planes completos | Aprovechamiento del plan | Aprovechamiento del Día 1 | En presupuesto | Desperdicio medio | Costo medio |")
-        println("|---|---|---|---|---|---|---|")
+        println(
+            "| Método | Planes completos | Aprovechamiento del plan | Productos usados / elegibles | Cantidad consumida | " +
+                "Aprovechamiento del Día 1 | En presupuesto | Desperdicio medio | Costo medio |",
+        )
+        println("|---|---|---|---|---|---|---|---|---|")
         rows.forEach { m ->
             val waste = "%.2f".format(Locale.ROOT, m.waste)
             val cost = "%,.0f".format(Locale.ROOT, m.cost)
             println(
-                "| ${m.name} | ${m.complete}/${scenarios.size} | ${percent(m.planShare)} | ${percent(m.dayOneShare)} | " +
+                "| ${m.name} | ${m.complete}/${scenarios.size} | ${percent(m.planShare)} | ${m.usedCount}/${m.eligibleCount} | " +
+                    "${percent(m.consumedShare)} | ${percent(m.dayOneShare)} | " +
                     "${percent(m.withinBudget)} | $waste | COP $cost |",
             )
         }

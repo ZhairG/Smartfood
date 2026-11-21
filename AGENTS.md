@@ -14,7 +14,7 @@ Trabajo pendiente después de la entrega, en orden: [`docs/pendientes.md`](docs/
 
 Antes de escribir código, leer **`specs/constitution.md`** (principios no negociables) y la spec de la feature.
 
-- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario`, `008-perfil`, `009-recetas-ia` y `010-recetas-guardadas` y `011-cocinas-del-mundo` (implementadas), y `012-modo-sin-facturacion` y `014-persistencia-local` (en implementación). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`, `CA-RIA-01-01`, `CA-SAV-01-01`, `CA-COC-01-01`, `CA-SPK-01-01`, `CA-LOC-01-01`).
+- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario`, `007-animaciones`, `008-perfil`, `009-recetas-ia`, `010-recetas-guardadas`, `011-cocinas-del-mundo` y `013-modo-oscuro` (implementadas), y `012-modo-sin-facturacion` y `014-persistencia-local` (en implementación). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`, `CA-RIA-01-01`, `CA-SAV-01-01`, `CA-COC-01-01`, `CA-SPK-01-01`, `CA-OSC-01-01`, `CA-ANI-01-01`, `CA-LOC-01-01`).
 - Las capturas de referencia de cada módulo están en `disenos-figma/` (índice en su `README.md`); la fuente de verdad sigue siendo el Figma.
 - Cada feature vive en `specs/NNN-nombre/` con `spec.md` (QUÉ: historias, criterios Dado/Cuando/Entonces), `plan.md` (CÓMO: contratos, decisiones) y `tasks.md` (tareas + matriz CA → test).
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
@@ -173,6 +173,7 @@ Zhair (planeador) da recomendaciones durante el trabajo. **Toda recomendación n
 | 2026-10-18 | Que nadie borre trabajo ajeno en las ramas compartidas del módulo. | Ver §1 "Ramas compartidas": `git pull` ante un rechazo y nunca `--force`. |
 | 2026-10-18 | Medir la fluidez de las animaciones en el build release. | En debug, Compose pierde ~300 ms al iniciar cada pantalla; las animaciones se juzgan con el APK release en el teléfono (medición del 18/10/2026). |
 | 2026-11-18 | Los pendientes posteriores a la entrega los hace Zhair solo, y las pruebas van al final. | Ver «Reglas» de [`docs/pendientes.md`](docs/pendientes.md): rama y PR en *draft* por punto, sin Issues, y una sola ronda de pruebas al terminar todos los puntos. |
+| 2026-11-19 | Hacer las revisiones visuales con comparaciones reales por adb. | Capturas con `adb exec-out screencap -p` en el teléfono (V2436), antes y después y en claro y oscuro, en lugar de deducir el resultado del código (spec 013). |
 
 ## Comandos
 
@@ -255,7 +256,7 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
     texto normalizado, 10 por barra). Se guardan al tocar un resultado, al pulsar «Buscar» y, en el Inventario, al dictar.
     `SmartFoodRecentSearches` las muestra con la barra enfocada y vacía (desviación aprobada, sin ícono).
   - `LogoutUseCase` llama a `LocalUserData.clearAll()`, que borra las tablas en el `@ApplicationScope`.
-- **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 600 ms se declaran una sola vez (`NavTransitions`). `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
+- **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 300 ms y la disolvencia de 100 ms entre pestañas se declaran una sola vez (`NavTransitions`). Todas las duraciones y curvas salen de `theme/Motion.kt` (`SmartFoodMotion`, spec 007); ninguna pantalla declara una duración suelta. `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
 - **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore`, `FirebaseFunctions` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
 - **Design system (`core/designsystem`):** `theme/` (tokens), `components/` (prefijo `SmartFood`) y `util/` (modificadores, `SystemBarEffect`, `ClearFocusOnKeyboardDismiss`).
 - **Adaptabilidad (spec 002):** las medidas de los formularios salen de `theme/FormMetrics.kt`.
@@ -264,13 +265,21 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
   - El alto sobrante se reparte con `FlexibleGap(minHeight, weight)`. Dentro de un `AnimatedContent`, el contenido usa `Modifier.fillFormViewport(LocalFormViewport.current)`.
 - **Modo de color (spec 002, HU-UI-05):**
   - El modo se decide **solo** con `ThemeMode` (`theme/ThemeMode.kt`, por defecto `LIGHT`): `SmartfoodTheme(themeMode)` provee `LocalIsDarkTheme`.
-  - Los componentes leen `LocalIsDarkTheme.current`; **prohibido `isSystemInDarkTheme()` fuera de `ThemeMode.kt`**.
-  - La paleta y los esquemas claro y oscuro no se tocan.
+  - Los componentes leen `LocalIsDarkTheme.current` (solo para lo que no es un color, como las barras del sistema); **prohibido `isSystemInDarkTheme()` fuera de `ThemeMode.kt`**.
+  - Los tokens de `Color.kt` y el esquema claro no se tocan. El esquema oscuro se ajustó en la spec 013 (2026-11-19)
+    para que sea legible.
+  - **Colores por rol (spec 013):** las pantallas leen roles de Material o `MaterialTheme.smartFoodColors`
+    (`theme/SmartFoodColors.kt`: encabezado, relleno marcado, superficie suave, divisor, verde suave, resaltado,
+    etiqueta, ícono verde y velo). No se usan tokens de un solo modo (`White`, `SurfaceLight`, `GreenSoft`,
+    `YellowSoft`, `GreyDivider`) ni `if (LocalIsDarkTheme.current)` para elegir colores. La única excepción es
+    `ActionSuccessScreen`, que copia los frames de éxito claro y oscuro del Figma.
   - El tema XML es claro (`Base.Theme.Smartfood`, ventana `GreenLight`). `values-v31` hace que la pantalla de arranque de Android 12+ sea igual a la Splash (`splash_icon`).
 - **Fidelidad con Figma (spec 002, HU-UI-07):** referencia en los frames "_Claro" del archivo Figma `z1AoQvluQcmx98gjP4vHF6`.
   - Tipografía Poppins empaquetada en `res/font` (licencia en `docs/licenses/OFL-Poppins.txt`).
   - Para ajustar un color a Figma se cambia el **rol** en `LightColorScheme` (`Theme.kt`), nunca el valor de un token. Los únicos tokens agregados son `GreenCheck`, `GreenSoft` (`#DCFCE7`, círculo de las iniciales del Perfil, spec 008; aprobado por Zhair el 2026-10-18) y `YellowSoft` (`#FFF7D6`, tarjeta del temporizador de la cocina guiada, spec 009; aprobado por Zhair el 2026-10-21).
-- **Ícono (spec 002, HU-UI-06):** los `mipmap-*/ic_launcher*` y `ic_launcher-playstore.png` los genera `tools/generate_launcher_icon.py` desde `drawable-nodpi/logo_smartfood_circle.png`. Nunca se editan a mano; si cambia el logo, se vuelve a ejecutar el script.
+- **Ícono (spec 002, HU-UI-06):** los `mipmap-*/ic_launcher*` y `ic_launcher-playstore.png` los genera `tools/generate_launcher_icon.py` desde `drawable-nodpi/logo_smartfood_circle.png`. Nunca se editan a mano; si cambia el logo, se vuelve a ejecutar el script. Los íconos del Figma exportados como PNG
+  (`drawable-nodpi/ic_figma_*.png`) se pasan por `tools/reducir_iconos.py` (200×200): a 512 px se decodificaban en el
+  hilo principal y saltaban cuadros (spec 007, T023).
 - **Foco y teclado (spec 002):**
   - **Prohibido el scroll programático** (`scrollTo`, `animateScrollTo`) en las pantallas. El panel aplica el inset del teclado fuera del `verticalScroll` y Compose mantiene visible el campo enfocado.
   - El encabezado de marca se colapsa leyendo `WindowInsets.ime` en la fase de layout.

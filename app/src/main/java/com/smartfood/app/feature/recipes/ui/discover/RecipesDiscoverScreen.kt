@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.recipes.ui.discover
 
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +40,7 @@ import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodRecentSearches
 import com.smartfood.app.core.designsystem.theme.GreenSoft
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
 import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipeCard
@@ -122,12 +124,19 @@ fun RecipesDiscoverScreen(
                 }
 
                 else -> items(items = state.recipes, key = { it.id }) { recipe ->
+                    // Las tarjetas se reacomodan con 300 ms al filtrar o buscar (spec 007, CA-ANI-06-04).
+                    Box(modifier = Modifier.animateItem(
+                        fadeInSpec = SmartFoodMotion.standard(),
+                        placementSpec = SmartFoodMotion.standard(),
+                        fadeOutSpec = SmartFoodMotion.standard()
+                    )) {
                     RecipeCard(
                         card = recipe,
                         isFavorite = state.favoriteIds.contains(recipe.id),
                         onClick = { onEvent(RecipesDiscoverEvent.RecipeClicked(recipe.id)) },
                         onFavoriteToggled = { onEvent(RecipesDiscoverEvent.FavoriteToggled(recipe.id)) }
                     )
+                    }
                 }
             }
         }
@@ -148,17 +157,17 @@ private fun SuggestCard(onSuggestRecipes: (() -> Unit)?) {
             .fillMaxWidth()
             .shadow(elevation = HeroElevation, shape = shape)
             .clip(shape)
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.smartFoodColors.header)
             .padding(HeroPadding)
     ) {
         Text(
             text = stringResource(id = R.string.recipes_hero_title),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.smartFoodColors.onHeader,
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)
         )
         Text(
             text = stringResource(id = R.string.recipes_hero_body),
-            // Figma: #DCFCE7, el token GreenSoft.
+            // Figma: #DCFCE7, el token GreenSoft. Va sobre el encabezado, que es GreenDark en los dos modos (ADR-OSC-03).
             color = GreenSoft,
             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp)
         )

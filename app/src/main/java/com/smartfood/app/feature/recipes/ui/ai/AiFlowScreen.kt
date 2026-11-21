@@ -1,5 +1,12 @@
 package com.smartfood.app.feature.recipes.ui.ai
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.animateColorAsState
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
+import androidx.compose.runtime.getValue
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,12 +56,9 @@ import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreenDark
-import com.smartfood.app.core.designsystem.theme.GreenSoft
-import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.GreyLight
-import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.YellowSoft
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.util.figmaShadow
 import com.smartfood.app.feature.inventory.ui.components.OptionSheet
 import com.smartfood.app.feature.profile.ui.preferences.titleRes
@@ -115,11 +119,24 @@ fun AiFlowScreen(
                 else -> null
             }
         )
-        when (state.step) {
-            AiStep.Context -> ScrollContent { ContextContent(state, onEvent) }
-            AiStep.Loading -> LoadingContent(state, onEvent, Modifier.weight(1f))
-            AiStep.Plan -> ScrollContent { PlanContent(state, onEvent) }
-            AiStep.NoPlan -> ScrollContent { NoPlanContent(state, onEvent) }
+        // Contexto, "Analizando opciones", plan y "Sin coincidencias" cambian con disolvencia de 300 ms, sin empuje,
+        // porque son una sola ruta (spec 007, CA-ANI-06-02).
+        AnimatedContent(
+            targetState = state.step,
+            transitionSpec = { fadeIn(SmartFoodMotion.standard()) togetherWith fadeOut(SmartFoodMotion.standard()) },
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            label = "pasoDeLaIa"
+        ) { step ->
+            Column(modifier = Modifier.fillMaxSize()) {
+                when (step) {
+                    AiStep.Context -> ScrollContent { ContextContent(state, onEvent) }
+                    AiStep.Loading -> LoadingContent(state, onEvent, Modifier.weight(1f))
+                    AiStep.Plan -> ScrollContent { PlanContent(state, onEvent) }
+                    AiStep.NoPlan -> ScrollContent { NoPlanContent(state, onEvent) }
+                }
+            }
         }
     }
 }
@@ -129,7 +146,7 @@ fun AiFlowScreen(
 private fun BarAction(text: String, onClick: () -> Unit) {
     Text(
         text = text,
-        color = MaterialTheme.colorScheme.onPrimary,
+        color = MaterialTheme.smartFoodColors.onHeader,
         style = CardTitleStyle(),
         modifier = Modifier.clickable(role = Role.Button, onClick = onClick)
     )
@@ -236,7 +253,7 @@ private fun ContextContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
         )
         Text(
             text = stringResource(id = R.string.recipes_ai_budget_value, formatCop(state.budgetCop)),
-            color = if (LocalIsDarkTheme.current) MaterialTheme.colorScheme.primary else GreenDark,
+            color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp, lineHeight = 22.5.sp, fontWeight = FontWeight.Bold)
         )
         Column {
@@ -332,20 +349,34 @@ private fun Pill(
     toggle: Boolean = false,
     onClick: (() -> Unit)? = null,
 ) {
-    val container = when {
-        selected -> MaterialTheme.colorScheme.primary
-        highlighted && !LocalIsDarkTheme.current -> YellowSoft
-        else -> MaterialTheme.colorScheme.surfaceVariant
-    }
-    val content = when {
-        selected -> MaterialTheme.colorScheme.onPrimary
-        highlighted && !LocalIsDarkTheme.current -> GreenDark
-        else -> MaterialTheme.colorScheme.onSurface
-    }
+    // Los colores cambian en 300 ms (spec 007, CA-ANI-05-03).
+    val container by animateColorAsState(
+        when {
+            selected -> MaterialTheme.colorScheme.primary
+            highlighted -> MaterialTheme.smartFoodColors.highlight
+            else -> MaterialTheme.colorScheme.surfaceVariant
+        },
+        SmartFoodMotion.standard(),
+        label = "fondoDePildora"
+    )
+    val content by animateColorAsState(
+        when {
+            selected -> MaterialTheme.colorScheme.onPrimary
+            highlighted -> MaterialTheme.smartFoodColors.onHighlight
+            else -> MaterialTheme.colorScheme.onSurface
+        },
+        SmartFoodMotion.standard(),
+        label = "textoDePildora"
+    )
+    val border by animateColorAsState(
+        if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.smartFoodColors.divider,
+        SmartFoodMotion.standard(),
+        label = "bordeDePildora"
+    )
     val base = Modifier
         .clip(CircleShape)
         .background(container)
-        .border(1.dp, if (selected) MaterialTheme.colorScheme.primary else GreyDivider, CircleShape)
+        .border(1.dp, border, CircleShape)
     val interactive = when {
         onClick == null -> base
         toggle -> base.toggleable(value = selected, role = Role.Switch, onValueChange = { onClick() })
@@ -410,7 +441,7 @@ private fun PlanContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
             .fillMaxWidth()
             .cardShadow()
             .clip(RoundedCornerShape(CardRadius))
-            .background(if (LocalIsDarkTheme.current) MaterialTheme.colorScheme.surfaceVariant else GreenSoft)
+            .background(MaterialTheme.smartFoodColors.greenSoft)
             .padding(CardPadding)
     ) {
         Text(
@@ -423,6 +454,15 @@ private fun PlanContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = BodyStyle()
         )
+        // Plan completado con otras cocinas (spec 011, CA-COC-03-05): se avisa por qué hay recetas de otras cocinas.
+        if (state.cuisineRecipes != null && state.cuisines.isNotEmpty()) {
+            Text(
+                text = cuisineRelaxedText(state.cuisines, plan.days.size),
+                color = MaterialTheme.colorScheme.secondary,
+                style = BodyStyle(),
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+            )
+        }
     }
     plan.days.forEach { day ->
         DayCard(day = day, onClick = { onEvent(AiEvent.RecipeClicked(day.recipe.id)) })
@@ -440,6 +480,14 @@ private fun PlanContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = BodyStyle()
         )
+        // CA-RIA-02-13: el límite de 2 s cortó la búsqueda (desviación de la spec §9, el Figma no lo define).
+        if (!state.planComplete) {
+            Text(
+                text = stringResource(id = R.string.recipes_ai_partial_plan),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = BodyStyle().copy(fontWeight = FontWeight.SemiBold)
+            )
+        }
     }
 }
 
@@ -506,14 +554,20 @@ private fun ColumnScope.NoPlanContent(state: AiUiState, onEvent: (AiEvent) -> Un
             .align(Alignment.CenterHorizontally)
             .padding(top = NoPlanIconTop)
     )
+    // CA-RIA-02-14: si el límite de 2 s venció sin plan, el mensaje lo dice (desviación de la spec §9).
     Text(
-        text = stringResource(id = R.string.recipes_ai_no_plan_heading),
+        text = stringResource(
+            id = if (state.timedOut) R.string.recipes_ai_timed_out_heading else R.string.recipes_ai_no_plan_heading
+        ),
         color = MaterialTheme.colorScheme.onSurface,
         style = TitleStyle(),
         modifier = Modifier.semantics { heading() }
     )
     Text(
-        text = stringResource(id = R.string.recipes_ai_no_plan_body, formatCop(state.budgetCop)),
+        text = stringResource(
+            id = if (state.timedOut) R.string.recipes_ai_timed_out_body else R.string.recipes_ai_no_plan_body,
+            formatCop(state.budgetCop)
+        ),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         style = BodyStyle()
     )

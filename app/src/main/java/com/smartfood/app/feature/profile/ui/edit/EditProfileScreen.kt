@@ -248,13 +248,17 @@ private fun EditProfileDialogs(state: EditProfileUiState, onEvent: (EditProfileE
                     modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * GlyphFraction)
                 )
             },
-            title = stringResource(id = R.string.edit_profile_saved),
+            title = stringResource(
+                id = if (dialog.onPhone) R.string.profile_saved_on_phone else R.string.edit_profile_saved
+            ),
             body = when {
                 dialog.emailChangedTo != null ->
                     stringResource(id = R.string.edit_profile_email_changed, dialog.emailChangedTo)
                 // Modo gratuito: el correo cambia al abrir el enlace (spec 012, CA-SPK-03-02).
                 dialog.emailLinkSentTo != null ->
                     stringResource(id = R.string.edit_profile_email_link_sent, dialog.emailLinkSentTo)
+                // Sin conexión: "Guardado en tu teléfono" (CA-PER-02-14).
+                dialog.onPhone -> stringResource(id = R.string.profile_saved_on_phone_body)
                 else -> stringResource(id = R.string.edit_profile_saved_body)
             }
         )
