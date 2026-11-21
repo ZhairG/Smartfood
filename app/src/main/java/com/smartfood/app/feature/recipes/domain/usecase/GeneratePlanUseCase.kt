@@ -47,7 +47,11 @@ class GeneratePlanUseCase @Inject constructor(
                 cuisines = context.cuisines.mapTo(LinkedHashSet()) { RecipeCuisine.valueOf(it.name) },
             )
             when (val result = MealPlanner(ingredients).plan(recipes, context.pantry, planContext)) {
-                is PlanResult.Found -> AiPlanOutcome.Found(result.plan, PlanExplainer().explain(result.plan, context.pantry))
+                is PlanResult.Found -> AiPlanOutcome.Found(
+                    plan = result.plan,
+                    reasons = PlanExplainer().explain(result.plan, context.pantry),
+                    cuisineRecipes = result.cuisineRecipes,
+                )
                 is PlanResult.NoPlan -> AiPlanOutcome.NoPlan(result.suggestions)
             }
         }

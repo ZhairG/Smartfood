@@ -35,8 +35,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -408,6 +410,15 @@ private fun PlanContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = BodyStyle()
         )
+        // Plan completado con otras cocinas (spec 011, CA-COC-03-05): se avisa por qué hay recetas de otras cocinas.
+        if (state.cuisineRecipes != null && state.cuisines.isNotEmpty()) {
+            Text(
+                text = cuisineRelaxedText(state.cuisines, plan.days.size),
+                color = MaterialTheme.colorScheme.secondary,
+                style = BodyStyle(),
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+            )
+        }
     }
     plan.days.forEach { day ->
         DayCard(day = day, onClick = { onEvent(AiEvent.RecipeClicked(day.recipe.id)) })

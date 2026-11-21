@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.smartfood.app.R
 import com.smartfood.app.feature.inventory.domain.model.InventoryItem
+import com.smartfood.app.feature.profile.domain.model.Cuisine
+import com.smartfood.app.feature.profile.ui.preferences.titleRes
 import com.smartfood.app.feature.recipes.domain.agent.PlanExplainer
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
@@ -17,7 +19,8 @@ import com.smartfood.app.feature.recipes.ui.components.formatQuantity
  * Fecha: Octubre 2026
  * Descripción: Único lugar que convierte las razones del agente ([PlanExplainer.Reason], CA-RIA-02-06) y las
  * sugerencias de "Sin coincidencias" ([PlanSuggestion], CA-RIA-02-07) en texto de `strings_recipes.xml`, como
- * `InventoryErrorText` hace con los errores (spec 009, T017). El dominio no lleva textos.
+ * `InventoryErrorText` hace con los errores (spec 009, T017), y el aviso del plan completado con otras cocinas
+ * (spec 011, CA-COC-03-05). El dominio no lleva textos.
  */
 
 /**
@@ -47,6 +50,21 @@ fun PlanExplainer.Reason.text(ingredients: Map<String, Ingredient>, items: List<
         val byId = items.associateBy { it.id }
         stringResource(id = R.string.recipes_ai_reason_not_used, itemIds.mapNotNull { byId[it]?.name }.joinToString(", "))
     }
+}
+
+/**
+ * "No alcanzó para 3 recetas de cocina italiana: completamos tu plan con otras cocinas." (spec 011, CA-COC-03-05). Con
+ * varias cocinas las nombra con "o": "cocina italiana o mexicana".
+ *
+ * @param cuisines Cocinas favoritas del Perfil.
+ * @param days Días del plan.
+ */
+@Composable
+fun cuisineRelaxedText(cuisines: Set<Cuisine>, days: Int): String {
+    val names = cuisines.map { stringResource(id = it.titleRes).lowercase() }
+    val joined = if (names.size <= 1) names.joinToString() else
+        names.dropLast(1).joinToString(", ") + stringResource(id = R.string.recipes_ai_cuisine_or) + names.last()
+    return stringResource(id = R.string.recipes_ai_cuisine_relaxed, days, joined)
 }
 
 /** Sugerencia de "Prueba una de estas opciones". Nunca propone quitar las restricciones alimentarias. */

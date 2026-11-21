@@ -101,6 +101,9 @@
     <string name="recipes_ai_adjust">Ajustar</string>
     <string name="recipes_ai_ready">✓ Recomendaciones listas</string>
     <string name="recipes_ai_ready_body">Ordenadas por utilidad: urgencia, uso del inventario y costo.</string>
+    <!-- Plan completado con otras cocinas (spec 011, CA-COC-03-05): %1$d días, %2$s cocinas en minúscula -->
+    <string name="recipes_ai_cuisine_relaxed">No alcanzó para %1$d recetas de cocina %2$s: completamos tu plan con otras cocinas.</string>
+    <string name="recipes_ai_cuisine_or">" o "</string>
     <string name="recipes_ai_day">Día %1$d</string>
     <string name="recipes_ai_card_meta">%1$d %% del inventario · COP $%2$s · %3$d min</string>
     <string name="recipes_ai_why">¿Por qué te conviene?</string>

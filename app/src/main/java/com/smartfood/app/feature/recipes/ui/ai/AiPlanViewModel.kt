@@ -114,7 +114,9 @@ class AiPlanViewModel @Inject constructor(
     private fun generate() {
         val current = context ?: return
         if (_uiState.value.step == AiStep.Loading) return
-        _uiState.update { it.copy(step = AiStep.Loading, plan = null, reasons = emptyList(), suggestions = emptyList()) }
+        _uiState.update {
+            it.copy(step = AiStep.Loading, plan = null, cuisineRecipes = null, reasons = emptyList(), suggestions = emptyList())
+        }
         val state = _uiState.value
         generation = viewModelScope.launch {
             // Las restricciones del Perfil no avisan cuando cambian: se leen otra vez justo antes de buscar (CA-RIA-02-11).
@@ -134,7 +136,12 @@ class AiPlanViewModel @Inject constructor(
             }
             _uiState.update {
                 when (outcome) {
-                    is AiPlanOutcome.Found -> it.copy(step = AiStep.Plan, plan = outcome.plan, reasons = outcome.reasons)
+                    is AiPlanOutcome.Found -> it.copy(
+                        step = AiStep.Plan,
+                        plan = outcome.plan,
+                        reasons = outcome.reasons,
+                        cuisineRecipes = outcome.cuisineRecipes,
+                    )
                     is AiPlanOutcome.NoPlan -> it.copy(step = AiStep.NoPlan, suggestions = outcome.suggestions)
                 }
             }
