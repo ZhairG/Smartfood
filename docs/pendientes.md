@@ -17,7 +17,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | 6 | Revisión del modo oscuro | 002 (enmienda) o 013 | Pendiente | — |
 | 7 | Animaciones y transiciones | 007 | Pendiente | — |
 | 8 | Correcciones de documentación y medición del agente | 009 | Pendiente | — |
-| 9 | Pendientes menores | 009, 010 | Pendiente | — |
+| 9 | Pendientes menores | 009, 010 | Hecho (T046, T024 y T026; ronda final del 2026-11-20) | — |
 | 10 | Persistencia local con Room (opcional) | por definir | Pendiente | — |
 
 ## 1. Modo sin facturación (urgente)
@@ -129,8 +129,12 @@ fusionó. Hoy está en el *stash* local «On docs/007-animaciones: borrador spec
 - **Prueba intermitente:** la causa es externa. La ventana emergente de Truecaller se abrió encima de la prueba en el
   V2436 y la dejó en pausa («No compose hierarchies found»). No hay que corregir código: la precaución quedó en
   [`instalacion.md`](instalacion.md) y en la T046 de la spec 009.
-- **T024:** se hace en la ronda final, sobre `master` con todo fusionado. La tabla Figma vs app y el checklist están
-  en `disenos-figma/Modulo 5 - Recetas guardadas/comparacion/README.md`.
+- **T024 (hecha el 2026-11-20):** comparación Figma vs app de las 11 pantallas, en claro y oscuro, y checklist manual,
+  con el APK de `integracion/ronda-final`. Todo está en `disenos-figma/Modulo 5 - Recetas guardadas/comparacion/README.md`.
+  Quedan sin corregir:
+  - un hallazgo de contraste del rojo en modo oscuro;
+  - 4 hallazgos menores de fidelidad;
+  - la favorita en otro teléfono, que no se verificó.
 - **T026 (encontrado en la ronda final):** quitar un ♡ o borrar una receta propia sin conexión no mostraba la tarjeta
   «Sin conexión» de Guardadas, porque el borrado saca la tarjeta de la lista. Los repositorios ahora exponen los
   borrados pendientes (CA-SAV-02-09).
