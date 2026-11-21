@@ -58,6 +58,9 @@
     (`randomScenarioExigente`), todos contra la fuerza bruta.
   - Revisión aparte: 0 diferencias en 23.000 escenarios. Las métricas de `AgentEvaluationTest` no cambiaron y el
     peor caso de `MealPlannerPerformanceTest` sigue por debajo de 2 s.
+- [x] T039 La dieta no se pierde si falla la lectura del perfil (2026-11-19, punto 2 de `docs/pendientes.md`): CA-RIA-02-12 y su desviación en la spec, y CA-COC-03-04 de la spec 011 remite a él.
+- [x] T040 `AiContext.preferencesKnown`: `GetAiContextUseCase` distingue "sin restricciones" de "perfil desconocido"; prueba con perfil `VEGAN` y la lectura fallida (CA-RIA-02-12).
+- [x] T041 `AiPlanViewModel` no genera con el perfil desconocido y "Reintentar" lo vuelve a leer; `AiFlowScreen` muestra el aviso y deshabilita "Generar plan" (CA-RIA-02-12).
 
 ## Punto 8 de los pendientes: evaluación y medición del agente (2026-11-20)
 Rama `feature/009-evaluacion-agente`. Origen: informe de IA del 13/11/2026 ([`docs/pendientes.md`](../../docs/pendientes.md) §8).
@@ -67,7 +70,7 @@ Rama `feature/009-evaluacion-agente`. Origen: informe de IA del 13/11/2026 ([`do
 - [x] T050 Métricas con denominador: productos usados / elegibles (n/N) y cantidad consumida en `AgentEvaluationTest`; frontera media de máximos y máxima en `AlgorithmComparisonTest` (RNF-RIA-03).
 - [x] T051 `AgentSensitivityTest`: sensibilidad de los pesos y recocido con 10 semillas e igual presupuesto de cómputo (RNF-RIA-03).
 - [x] T052 `EvaluationCatalog` en `sharedTest` (`RealCatalog` lo usa en la JVM) y `AgentDevicePerformanceTest` en el teléfono: tiempo, nodos y memoria, normal y estrés (CA-RIA-02-10, RNF-RIA-02).
-- [x] T053 Correcciones de `docs/ia/` (frontera de A\*, memoria del backtracking, denominador del aprovechamiento), §8 de la evaluación y objetivos del póster.
+- [x] T053 Correcciones de `docs/ia/` (frontera de A\*, memoria del backtracking, denominador del aprovechamiento), §9 de la evaluación y objetivos del póster.
 
 ## Cierre (en el mismo PR)
 - [x] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).
@@ -93,8 +96,9 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-07 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, U `RecipesDiscoverViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-08 | U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `MealPlannerCatalogTest`, U `GetAiContextUseCaseTest`, U `GeneratePlanUseCaseTest` |
-| CA-RIA-02-10 | U `MealPlannerPerformanceTest`, I `AgentDevicePerformanceTest` (V2436), M (release con logcat, `docs/ia/evaluacion-agente.md` §8) |
+| CA-RIA-02-10 | U `MealPlannerPerformanceTest`, I `AgentDevicePerformanceTest` (V2436), M (release con logcat, `docs/ia/evaluacion-agente.md` §9) |
 | CA-RIA-02-11 | U `AiPlanViewModelTest` |
+| CA-RIA-02-12 | U `GetAiContextUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-13 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-02-14 | U `MealPlannerTest`, U `GeneratePlanUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |

@@ -2,7 +2,7 @@ package com.smartfood.app.feature.inventory.data
 
 import com.smartfood.app.feature.inventory.data.local.DataStoreInventoryPreferences
 import com.smartfood.app.feature.inventory.data.reminder.WorkManagerExpiryReminderScheduler
-import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
+import com.smartfood.app.feature.inventory.data.repository.ModeAwarePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
 import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
 import com.smartfood.app.feature.inventory.data.sync.WorkManagerPhotoSync
@@ -80,7 +80,8 @@ class InventoryDataModuleTest {
     fun t019_t020_t021_t031_t038_t048_elGrafoProveeLasImplementacionesRealesYLasUnicas() {
         // T021: inventario y fotos con Firebase, y un solo repositorio en la app.
         assertTrue("inventario", inventoryRepository is FirestoreInventoryRepository)
-        assertTrue("fotos", photoRepository is FirebaseStoragePhotoRepository)
+        // Spec 012: las fotos van a Storage o a Firestore según el interruptor del backend.
+        assertTrue("fotos", photoRepository is ModeAwarePhotoRepository)
         assertSame("inventario único", inventoryRepository, otroInventoryRepository)
         // T048: las fotos se sincronizan con WorkManager.
         assertTrue("sincronización de fotos", photoSync is WorkManagerPhotoSync)

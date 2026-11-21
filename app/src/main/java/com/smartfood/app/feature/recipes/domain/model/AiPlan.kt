@@ -23,6 +23,8 @@ import com.smartfood.app.feature.recipes.domain.agent.PlanExplainer
  * @property diet Las mismas restricciones como reglas del agente.
  * @property store Supermercado de los precios ("Mi supermercado").
  * @property cuisines Cocinas favoritas del Perfil; vacío si no eligió ninguna (spec 011).
+ * @property preferencesKnown `false` si las preferencias no se pudieron leer: entonces [restrictions], [diet] y
+ * [cuisines] están vacíos porque se desconocen, no porque no haya, y no se genera el plan (CA-RIA-02-12).
  */
 data class AiContext(
     val pantry: List<PantryItem>,
@@ -32,6 +34,7 @@ data class AiContext(
     val diet: Set<DietRule>,
     val store: Store,
     val cuisines: Set<Cuisine> = emptySet(),
+    val preferencesKnown: Boolean = true,
 )
 
 /** Resultado del agente con su explicación (CA-RIA-02-03, 02-06, 02-07). */
