@@ -2,6 +2,7 @@ package com.smartfood.app.feature.recipes.ui.ai
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -33,7 +34,8 @@ import org.junit.Test
  * Descripción: Pruebas instrumentadas del flujo de la IA sin estado (spec 009, T015 a T018; Figma `633:2948`,
  * `666:3546`, `557:2903`, `557:2515` y `557:2476`): el contexto con el aviso y las preferencias (CA-RIA-02-01), los
  * chips que abren las hojas, "Analizando opciones" con "Cancelar" (CA-RIA-02-02), "Tu plan de 3 días" con
- * "¿Por qué te conviene?" (CA-RIA-02-03, 02-06, 02-08), "Sin coincidencias" (CA-RIA-02-07) y la Ayuda (CA-RIA-03-01).
+ * "¿Por qué te conviene?" (CA-RIA-02-03, 02-06, 02-08), "Sin coincidencias" (CA-RIA-02-07), la Ayuda (CA-RIA-03-01)
+ * y el aviso de preferencias que no se pudieron leer (CA-RIA-02-12).
  */
 class AiFlowScreenTest {
 
@@ -115,6 +117,18 @@ class AiFlowScreenTest {
         mostrar(contexto.copy(restrictions = setOf(DietaryRestriction.VEGAN)))
 
         composeTestRule.onNodeWithText("Según tus preferencias: Vegano").assertIsDisplayed()
+    }
+
+    @Test
+    fun caRia0212_sinPreferenciasAvisaConReintentarYNoDejaGenerar() {
+        mostrar(contexto.copy(preferencesUnavailable = true))
+
+        composeTestRule.onNodeWithText("No pudimos leer tus preferencias", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Según tus preferencias", substring = true).assertDoesNotExist()
+        composeTestRule.onNodeWithText("Generar recomendaciones").performScrollTo().assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Reintentar").performScrollTo().performClick()
+
+        assertEquals(listOf<AiEvent>(AiEvent.RetryPreferencesClicked), eventos)
     }
 
     @Test
