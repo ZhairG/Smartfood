@@ -35,6 +35,8 @@ enum class AiSheet { Servings, Time }
  * @property firstExpiringDays Días que le faltan a [firstExpiring] (0 = hoy).
  * @property restrictions Restricciones del Perfil para "Según tus preferencias" (no se cambian aquí).
  * @property cuisines Cocinas favoritas para "Cocina favorita: …" (spec 011, CA-COC-03-01).
+ * @property preferencesUnavailable Las preferencias no se pudieron leer: se avisa con "Reintentar" y no se genera
+ * el plan (CA-RIA-02-12).
  * @property store Supermercado de los precios, para "COP $50.000 · D1".
  * @property budgetCop Presupuesto máximo (CA-RIA-02-01: de $2.000 a $100.000).
  * @property servings Porciones de cada receta.
@@ -58,6 +60,7 @@ data class AiUiState(
     val firstExpiringDays: Int = 0,
     val restrictions: Set<DietaryRestriction> = emptySet(),
     val cuisines: Set<Cuisine> = emptySet(),
+    val preferencesUnavailable: Boolean = false,
     val store: Store = Store.D1,
     val budgetCop: Long = DEFAULT_BUDGET_COP,
     val servings: Int = DEFAULT_SERVINGS,
@@ -95,6 +98,9 @@ sealed interface AiEvent {
     data object DismissSheet : AiEvent
     data object GenerateClicked : AiEvent
     data object CancelClicked : AiEvent
+
+    /** "Reintentar" del aviso de preferencias que no se pudieron leer (CA-RIA-02-12). */
+    data object RetryPreferencesClicked : AiEvent
 
     /** "Ajustar" del plan y "Ajustar contexto": vuelve al contexto con los mismos datos (CA-RIA-02-08). */
     data object AdjustClicked : AiEvent

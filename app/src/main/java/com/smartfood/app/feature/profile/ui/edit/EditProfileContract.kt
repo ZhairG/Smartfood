@@ -39,8 +39,9 @@ sealed interface EditProfileDialog {
      * "Guardado" (Figma `369:905`, CA-PER-02-04), que se cierra solo.
      *
      * @property emailChangedTo Correo nuevo de la cuenta si el correo cambió, o `null` (CA-PER-02-12).
+     * @property emailLinkSentTo Correo al que se envió el enlace del modo gratuito, o `null` (spec 012, CA-SPK-03-02).
      */
-    data class Saved(val emailChangedTo: String? = null) : EditProfileDialog
+    data class Saved(val emailChangedTo: String? = null, val emailLinkSentTo: String? = null) : EditProfileDialog
 }
 
 /**

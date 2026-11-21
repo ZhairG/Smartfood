@@ -73,10 +73,11 @@ fun PasswordRecoveryScreen(
 ) {
     AuthScreenScaffold(
         topHeaderContent = {
-            SmartFoodStepIndicator(currentStep = state.step.stepIndex)
+            // El modo con enlace no tiene 3 pasos, así que no muestra el indicador (spec 012, CA-SPK-02-02).
+            if (!state.isLinkMode) SmartFoodStepIndicator(currentStep = state.step.stepIndex)
         },
         headerContent = {
-            RecoveryHeader(step = state.step, email = state.email, onEvent = onEvent)
+            RecoveryHeader(step = state.step, email = state.email, isLinkMode = state.isLinkMode, onEvent = onEvent)
             Spacer(modifier = Modifier.height(LocalFormMetrics.current.sectionSpacing))
         },
         modifier = modifier
@@ -98,6 +99,12 @@ fun PasswordRecoveryScreen(
                 RecoveryStep.OTP_VERIFICATION -> VerifyCodeStep(state = state, onEvent = onEvent)
 
                 RecoveryStep.NEW_PASSWORD -> CreateNewPasswordStep(state = state, onEvent = onEvent)
+
+                RecoveryStep.LINK_SENT -> LinkSentStep(
+                    state = state,
+                    onEvent = onEvent,
+                    onNavigateToLogin = onNavigateToLogin
+                )
             }
         }
     }
@@ -110,6 +117,7 @@ fun PasswordRecoveryScreen(
 private fun RecoveryHeader(
     step: RecoveryStep,
     email: String,
+    isLinkMode: Boolean,
     onEvent: (PasswordRecoveryEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -118,12 +126,16 @@ private fun RecoveryHeader(
             RecoveryStep.EMAIL_REQUEST -> stringResource(id = R.string.recovery_step1_title)
             RecoveryStep.OTP_VERIFICATION -> stringResource(id = R.string.recovery_step2_title)
             RecoveryStep.NEW_PASSWORD -> stringResource(id = R.string.recovery_step3_title)
+            RecoveryStep.LINK_SENT -> stringResource(id = R.string.recovery_link_title)
         }
 
         val subtitle = when (step) {
-            RecoveryStep.EMAIL_REQUEST -> stringResource(id = R.string.recovery_step1_subtitle)
+            RecoveryStep.EMAIL_REQUEST -> stringResource(
+                id = if (isLinkMode) R.string.recovery_step1_subtitle_link else R.string.recovery_step1_subtitle
+            )
             RecoveryStep.OTP_VERIFICATION -> stringResource(id = R.string.recovery_step2_subtitle)
             RecoveryStep.NEW_PASSWORD -> stringResource(id = R.string.recovery_step3_subtitle)
+            RecoveryStep.LINK_SENT -> stringResource(id = R.string.recovery_link_subtitle)
         }
 
         Text(
@@ -140,7 +152,7 @@ private fun RecoveryHeader(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        if (step == RecoveryStep.OTP_VERIFICATION) {
+        if (step == RecoveryStep.OTP_VERIFICATION || step == RecoveryStep.LINK_SENT) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = email.ifBlank { stringResource(id = R.string.login_email_placeholder) },
@@ -210,13 +222,18 @@ private fun ForgotPasswordStep(
 
         // Con la espera activa para este correo, el botón muestra la cuenta regresiva y se deshabilita (CA-REC-04-03).
         SmartFoodPrimaryButton(
-            text = if (state.isEmailInCooldown) {
-                stringResource(
-                    id = R.string.recovery_step1_button_countdown,
+            text = when {
+                state.isEmailInCooldown -> stringResource(
+                    id = if (state.isLinkMode) {
+                        R.string.recovery_step1_button_link_countdown
+                    } else {
+                        R.string.recovery_step1_button_countdown
+                    },
                     formatCountdown(state.resendCooldownSeconds)
                 )
-            } else {
-                stringResource(id = R.string.recovery_step1_button)
+                // Modo gratuito: Firebase envía un enlace, no un código (spec 012, CA-SPK-02-01).
+                state.isLinkMode -> stringResource(id = R.string.recovery_step1_button_link)
+                else -> stringResource(id = R.string.recovery_step1_button)
             },
             loadingText = stringResource(id = R.string.login_button_loading),
             onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.SendCodeClicked) } },
@@ -293,6 +310,68 @@ private fun VerifyCodeStep(
                 action = stringResource(id = R.string.recovery_step2_resend_action),
                 onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ResendCodeClicked) } },
                 fontSize = 16.sp  // Figma: nodo 585:4474
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+/**
+ * «Revisa tu correo» del modo gratuito (spec 012, CA-SPK-02-02 y CA-SPK-02-03): Firebase envió el enlace para crear la
+ * contraseña nueva. El botón vuelve al Login y "Reenviar enlace" sigue la misma espera que el código (HU-REC-04). No
+ * está en el Figma: reutiliza los componentes del paso 2 (Desviación aprobada, spec 012 §8).
+ */
+@Composable
+private fun LinkSentStep(
+    state: PasswordRecoveryUiState,
+    onEvent: (PasswordRecoveryEvent) -> Unit,
+    onNavigateToLogin: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val metrics = LocalFormMetrics.current
+
+    Column(
+        modifier = modifier.fillFormViewport(LocalFormViewport.current),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(id = R.string.recovery_link_spam_hint),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        AuthErrorMessage(message = state.errorText(), modifier = Modifier.fillMaxWidth())
+
+        FlexibleGap(minHeight = metrics.sectionSpacing, weight = 3f)
+
+        SmartFoodPrimaryButton(
+            text = stringResource(id = R.string.recovery_link_button),
+            loadingText = stringResource(id = R.string.login_button_loading),
+            onClick = onNavigateToLogin,
+            isLoading = state.isLoading
+        )
+
+        FlexibleGap(minHeight = metrics.sectionSpacing)
+
+        if (state.isEmailInCooldown) {
+            SmartFoodPromptCountdown(
+                prompt = stringResource(id = R.string.recovery_link_resend_countdown_prompt),
+                countdown = formatCountdown(state.resendCooldownSeconds),
+                fontSize = 16.sp,
+                contentDescription = pluralStringResource(
+                    id = R.plurals.recovery_resend_countdown_a11y,
+                    count = state.resendCooldownSeconds,
+                    state.resendCooldownSeconds
+                )
+            )
+        } else {
+            SmartFoodPromptLink(
+                prompt = stringResource(id = R.string.recovery_link_resend_prompt),
+                action = stringResource(id = R.string.recovery_link_resend_action),
+                onClick = remember(onEvent) { { onEvent(PasswordRecoveryEvent.ResendCodeClicked) } },
+                fontSize = 16.sp
             )
         }
 

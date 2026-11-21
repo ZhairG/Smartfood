@@ -33,3 +33,6 @@ ui-debug.log
 
 # Configuración local de Claude Code (permisos personales)
 .claude/settings.local.json
+
+# Informes de evaluación de los profesores: privados, solo locales (docs/pendientes.md)
+/retroalimentacion/

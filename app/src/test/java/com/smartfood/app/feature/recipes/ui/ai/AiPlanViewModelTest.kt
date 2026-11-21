@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -28,7 +29,7 @@ import org.junit.Test
  * Descripción: Pruebas de [AiPlanViewModel] (spec 009, T014) con el catálogo real: el contexto cargado (CA-RIA-02-01),
  * "Analizando opciones" al menos 1,5 s y "Cancelar" (CA-RIA-02-02), el plan con sus razones (CA-RIA-02-03, 02-06),
  * "Sin coincidencias" (CA-RIA-02-07), "Ajustar" con los mismos datos (CA-RIA-02-08) y el contexto siempre al día
- * (CA-RIA-02-11).
+ * (CA-RIA-02-11), y que un Perfil que no se pudo leer nunca pasa por "sin restricciones" (CA-RIA-02-12).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AiPlanViewModelTest {
@@ -185,6 +186,64 @@ class AiPlanViewModelTest {
         val vegetarian = PlanContext(budgetCop = 100_000, servings = 2, diet = setOf(DietRule.VEGETARIAN))
         val planner = MealPlanner(state.ingredients)
         assertTrue(state.plan?.days.orEmpty().all { planner.fitsDiet(it.recipe, vegetarian) })
+    }
+
+    @Test(timeout = 20_000)
+    fun `CA-RIA-02-12 con un perfil VEGAN que no se pudo leer no genera el plan`() = runTest {
+        val fixtures = AiFixtures(setOf(DietaryRestriction.VEGAN))
+        fixtures.profile.getPreferencesResult = Result.failure(IllegalStateException("sin red"))
+        val viewModel = viewModel(fixtures)
+        val state = viewModel.uiState.first { !it.isLoadingContext }
+        assertTrue("Falta el aviso de preferencias", state.preferencesUnavailable)
+        assertTrue("El inventario se sigue mostrando", state.detected.isNotEmpty())
+
+        viewModel.onEvent(AiEvent.BudgetChanged(100_000))
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        runCurrent()
+        advanceTimeBy(AiPlanViewModel.MIN_LOADING_MILLIS * 2)
+        runCurrent()
+
+        assertEquals(AiStep.Context, viewModel.uiState.value.step)
+        assertNull("No se arma un plan sin la dieta", viewModel.uiState.value.plan)
+    }
+
+    @Test(timeout = 20_000)
+    fun `CA-RIA-02-12 reintentar lee el Perfil y el plan respeta la dieta`() = runTest {
+        val fixtures = AiFixtures(setOf(DietaryRestriction.VEGAN))
+        fixtures.profile.getPreferencesResult = Result.failure(IllegalStateException("sin red"))
+        val viewModel = viewModel(fixtures)
+        viewModel.uiState.first { !it.isLoadingContext }
+
+        fixtures.profile.getPreferencesResult = null
+        viewModel.onEvent(AiEvent.RetryPreferencesClicked)
+        val recovered = viewModel.uiState.first { !it.preferencesUnavailable }
+        assertEquals(setOf(DietaryRestriction.VEGAN), recovered.restrictions)
+
+        viewModel.onEvent(AiEvent.BudgetChanged(100_000))
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        val state = viewModel.uiState.first { it.step == AiStep.Plan || it.step == AiStep.NoPlan }
+
+        val vegan = PlanContext(budgetCop = 100_000, servings = 2, diet = setOf(DietRule.VEGAN))
+        val planner = MealPlanner(state.ingredients)
+        assertTrue(state.plan?.days.orEmpty().all { planner.fitsDiet(it.recipe, vegan) })
+    }
+
+    @Test(timeout = 20_000)
+    fun `CA-RIA-02-12 si al generar falla la nueva lectura se usan las ultimas preferencias leidas`() = runTest {
+        val fixtures = AiFixtures(setOf(DietaryRestriction.VEGAN))
+        val viewModel = viewModel(fixtures)
+        viewModel.uiState.first { !it.isLoadingContext }
+
+        fixtures.profile.getPreferencesResult = Result.failure(IllegalStateException("sin red"))
+        viewModel.onEvent(AiEvent.BudgetChanged(100_000))
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        val state = viewModel.uiState.first { it.step == AiStep.Plan || it.step == AiStep.NoPlan }
+
+        assertFalse(state.preferencesUnavailable)
+        assertEquals(setOf(DietaryRestriction.VEGAN), state.restrictions)
+        val vegan = PlanContext(budgetCop = 100_000, servings = 2, diet = setOf(DietRule.VEGAN))
+        val planner = MealPlanner(state.ingredients)
+        assertTrue(state.plan?.days.orEmpty().all { planner.fitsDiet(it.recipe, vegan) })
     }
 
     @Test(timeout = 20_000)

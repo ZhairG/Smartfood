@@ -13,6 +13,12 @@ import kotlin.time.Duration
 interface PasswordRecoveryRepository {
 
     /**
+     * `true` si el flujo usa el código de 4 dígitos (pasos 2 y 3); `false` si [requestCode] envía un enlace y el flujo
+     * termina en «Revisa tu correo» (spec 012, modo gratuito, CA-SPK-02-01).
+     */
+    val usesCode: Boolean get() = true
+
+    /**
      * Paso 1: solicita el envío de un código de verificación al [email].
      *
      * @return El tiempo que falta para poder pedir otro código (spec 003, RF-REC-07).

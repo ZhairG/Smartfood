@@ -37,7 +37,7 @@
 | CA-COC-03-02, 03-03 | `MealPlannerTest`, `AiFlowScreenTest` |
 | CA-COC-02-06 | `MealPlannerTest` (contra fuerza bruta), `MealPlannerPerformanceTest`, `GeneratePlanUseCaseTest`, `AlgorithmComparisonTest` (tabla, con interruptor) |
 | CA-COC-02-07 | `MealPlannerTest` (contra fuerza bruta) |
-| CA-COC-03-04 | `GetAiContextUseCaseTest` |
+| CA-COC-03-04 | `GetAiContextUseCaseTest`, `AiPlanViewModelTest` (ver CA-RIA-02-12) |
 | CA-COC-03-05 | `AiPlanViewModelTest`, `AiFlowScreenTest` |
 
 ### Checklist de verificación manual

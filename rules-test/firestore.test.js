@@ -3,7 +3,8 @@
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas de firestore.rules para el inventario (spec 006, RNF-INV-01, plan §3), las favoritas
- * (spec 010, RNF-SAV-01) y regresión del perfil (spec 005, CA-LEG-02-02). Se ejecutan contra el emulador de Firestore:
+ * (spec 010, RNF-SAV-01), las fotos del modo gratuito (spec 012, RNF-SPK-03) y regresión del perfil (spec 005,
+ * CA-LEG-02-02). Se ejecutan contra el emulador de Firestore:
  * firebase emulators:exec --only firestore,storage "npm --prefix rules-test test"
  */
 import { after, before, beforeEach, describe, test } from 'node:test';
@@ -13,7 +14,7 @@ import {
   assertSucceeds,
   initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { deleteField, doc, getDoc, serverTimestamp, setDoc, deleteDoc, Timestamp } from 'firebase/firestore';
+import { Bytes, deleteField, doc, getDoc, serverTimestamp, setDoc, deleteDoc, Timestamp, updateDoc } from 'firebase/firestore';
 
 let env;
 
@@ -184,6 +185,16 @@ describe('perfil: edición (spec 008, RNF-PER-01)', () => {
     await assertSucceeds(editar({
       fullName: 'Ana María', phone: '3001234567', birthDate: '2000-05-17',
       photoPath: 'users/u1/profile/a.jpg', photoUrl: 'https://foto',
+    }));
+  });
+
+  test('CA-SPK-05-02 la foto del perfil también puede estar en media (modo gratuito)', async () => {
+    await sembrarPerfil();
+    await assertSucceeds(editar({
+      photoPath: 'users/u1/media/profile-1', photoUrl: 'smartfood-media://users/u1/media/profile-1',
+    }));
+    await assertFails(editar({
+      photoPath: 'users/u2/media/profile-1', photoUrl: 'smartfood-media://users/u2/media/profile-1',
     }));
   });
 
@@ -394,5 +405,42 @@ describe('recetas propias (spec 010, RF-SAV-02, RNF-SAV-01)', () => {
     const muchos = Array.from({ length: 21 }, (_, i) => ({ ingredientId: `i${i}`, quantity: 1 }));
     await assertFails(setDoc(recipe('u1', 'h'), validRecipe({ ingredients: muchos })));
     await assertFails(setDoc(recipe('u1', 'i'), validRecipe({ createdAt: 1000 })));
+  });
+});
+
+describe('fotos del modo gratuito (spec 012, RNF-SPK-03)', () => {
+  const foto = (uid, id = 'inv-item1-a') => doc(db(uid), `users/u1/media/${id}`);
+  const jpeg = (tamano = 1024) => Bytes.fromUint8Array(new Uint8Array(tamano).fill(7));
+  const media = (cambios = {}) => ({ data: jpeg(), contentType: 'image/jpeg', createdAt: serverTimestamp(), ...cambios });
+
+  test('CA-SPK-05-01 el dueño guarda, lee y borra una foto', async () => {
+    await assertSucceeds(setDoc(foto('u1'), media()));
+    await assertSucceeds(getDoc(foto('u1')));
+    await assertSucceeds(deleteDoc(foto('u1')));
+  });
+
+  test('RNF-SPK-03 otro usuario o sin sesión no lee ni escribe', async () => {
+    await assertFails(setDoc(foto('u2'), media()));
+    await assertFails(setDoc(foto(null), media()));
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'users/u1/media/inv-item1-a'), media({ createdAt: Timestamp.now() }));
+    });
+    await assertFails(getDoc(foto('u2')));
+    await assertFails(deleteDoc(foto('u2')));
+  });
+
+  test('RNF-SPK-03 más de 900 KB, vacía, otro tipo o campos extra se rechazan', async () => {
+    await assertFails(setDoc(foto('u1'), media({ data: jpeg(900 * 1024 + 1) })));
+    await assertSucceeds(setDoc(foto('u1', 'limite'), media({ data: jpeg(900 * 1024) })));
+    await assertFails(setDoc(foto('u1', 'vacia'), media({ data: jpeg(0) })));
+    await assertFails(setDoc(foto('u1', 'png'), media({ contentType: 'image/png' })));
+    await assertFails(setDoc(foto('u1', 'texto'), media({ data: 'no son bytes' })));
+    await assertFails(setDoc(foto('u1', 'extra'), media({ dueno: 'u1' })));
+    await assertFails(setDoc(foto('u1', 'hora'), media({ createdAt: Timestamp.fromMillis(0) })));
+  });
+
+  test('RNF-SPK-03 una foto no se edita: se crea otra y se borra la anterior', async () => {
+    await assertSucceeds(setDoc(foto('u1'), media()));
+    await assertFails(updateDoc(foto('u1'), { contentType: 'image/jpeg' }));
   });
 });

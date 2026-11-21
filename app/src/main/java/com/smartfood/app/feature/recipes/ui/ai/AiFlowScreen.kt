@@ -198,7 +198,20 @@ private fun ContextContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
                 style = BodyStyle()
             )
         }
-        if (state.restrictions.isNotEmpty()) {
+        if (state.preferencesUnavailable) {
+            // Sin leer el Perfil no se sabe la dieta: se avisa en lugar de "Según tus preferencias" (CA-RIA-02-12).
+            Text(
+                text = stringResource(id = R.string.recipes_ai_preferences_unavailable),
+                color = MaterialTheme.colorScheme.error,
+                style = BodyStyle(),
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+            )
+            OutlineActionButton(
+                text = stringResource(id = R.string.recipes_ai_preferences_retry),
+                onClick = { onEvent(AiEvent.RetryPreferencesClicked) },
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else if (state.restrictions.isNotEmpty()) {
             val names = state.restrictions.map { stringResource(id = it.titleRes) }.joinToString(", ")
             Text(
                 text = stringResource(id = R.string.recipes_ai_preferences, names),
@@ -274,7 +287,7 @@ private fun ContextContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
     RecipeActionButton(
         text = stringResource(id = R.string.recipes_ai_generate),
         onClick = { onEvent(AiEvent.GenerateClicked) },
-        enabled = !state.isLoadingContext,
+        enabled = !state.isLoadingContext && !state.preferencesUnavailable,
         modifier = Modifier.fillMaxWidth()
     )
 }
