@@ -127,8 +127,8 @@ fusionó. Hoy está en el *stash* local «On docs/007-animaciones: borrador spec
 
 **Hecho (rama `feature/009-evaluacion-agente`, 2026-11-20):** límite de 2 s con el mejor plan encontrado (CA-RIA-02-13 y
 02-14), n/N y cantidad consumida, frontera media y máxima, `AgentSensitivityTest`, `AgentDevicePerformanceTest`,
-correcciones de [`ia/evaluacion-agente.md`](ia/evaluacion-agente.md) §8 y [`ia/poster-objetivos.md`](ia/poster-objetivos.md).
-Las cifras de §8 se midieron en la ronda final del 2026-11-20.
+correcciones de [`ia/evaluacion-agente.md`](ia/evaluacion-agente.md) §9 y [`ia/poster-objetivos.md`](ia/poster-objetivos.md).
+Las cifras de §9 se midieron en la ronda final del 2026-11-20.
 
 ## 9. Pendientes menores
 
