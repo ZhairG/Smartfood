@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -44,8 +45,9 @@ fun AuthErrorMessage(
 ) {
     AnimatedVisibility(
         visible = !message.isNullOrBlank(),
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically(),
+        // 150 ms, ease-out (spec 007, CA-ANI-04-03).
+        enter = fadeIn(SmartFoodMotion.focus()) + expandVertically(SmartFoodMotion.focus()),
+        exit = fadeOut(SmartFoodMotion.focus()) + shrinkVertically(SmartFoodMotion.focus()),
         modifier = modifier
     ) {
         if (!message.isNullOrBlank()) {

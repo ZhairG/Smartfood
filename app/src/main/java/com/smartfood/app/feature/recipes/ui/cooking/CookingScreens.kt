@@ -1,5 +1,12 @@
 package com.smartfood.app.feature.recipes.ui.cooking
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -187,15 +194,31 @@ fun CookingScreen(
         when {
             state.isLoading -> Loading(Modifier.weight(1f))
             state.hasError || step == null -> Error(Modifier.weight(1f))
-            else -> Column(
-                verticalArrangement = Arrangement.spacedBy(ContentGap),
+            else -> {
+            // La barra queda fuera del paso para avanzar con 300 ms de uno al otro (spec 007, CA-ANI-06-03).
+            StepProgress(
+                fraction = state.progressFraction,
+                modifier = Modifier.padding(start = ContentPadding, end = ContentPadding, top = ContentPadding)
+            )
+            // Cada paso entra con disolvencia de 300 ms; la clave es el índice, así el temporizador se actualiza sin
+            // reiniciar la animación.
+            AnimatedContent(
+                targetState = state,
+                contentKey = { it.currentStepIndex },
+                transitionSpec = { fadeIn(SmartFoodMotion.standard()) togetherWith fadeOut(SmartFoodMotion.standard()) },
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                label = "pasoDeCocina"
+            ) { state ->
+            val step = state.currentStep ?: return@AnimatedContent
+            Column(
+                verticalArrangement = Arrangement.spacedBy(ContentGap),
+                modifier = Modifier
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(ContentPadding)
+                    .padding(start = ContentPadding, end = ContentPadding, bottom = ContentPadding, top = ContentGap)
             ) {
-                StepProgress(fraction = state.progressFraction)
                 Text(
                     text = stringResource(id = R.string.recipes_step_label, state.currentStepIndex + 1),
                     color = GreenCheck,
@@ -246,22 +269,25 @@ fun CookingScreen(
                     }
                 }
             }
+            }
+            }
         }
     }
 }
 
 /** Barra de avance del Figma (`633:2856`): gris de fondo y naranja hasta el paso actual. */
 @Composable
-private fun StepProgress(fraction: Float) {
+private fun StepProgress(fraction: Float, modifier: Modifier = Modifier) {
+    val animated by animateFloatAsState(fraction.coerceIn(0f, 1f), SmartFoodMotion.standard(), label = "avanceDeCocina")
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(ProgressHeight)
             .background(GreyLight)
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(fraction.coerceIn(0f, 1f))
+                .fillMaxWidth(animated)
                 .height(ProgressHeight)
                 .background(MaterialTheme.colorScheme.secondary)
         )

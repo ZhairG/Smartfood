@@ -14,7 +14,7 @@ Trabajo pendiente después de la entrega, en orden: [`docs/pendientes.md`](docs/
 
 Antes de escribir código, leer **`specs/constitution.md`** (principios no negociables) y la spec de la feature.
 
-- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario`, `008-perfil`, `009-recetas-ia`, `010-recetas-guardadas`, `011-cocinas-del-mundo` y `013-modo-oscuro` (implementadas), y `012-modo-sin-facturacion` (en implementación). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`, `CA-RIA-01-01`, `CA-SAV-01-01`, `CA-COC-01-01`, `CA-SPK-01-01`, `CA-OSC-01-01`).
+- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario`, `007-animaciones`, `008-perfil`, `009-recetas-ia`, `010-recetas-guardadas`, `011-cocinas-del-mundo` y `013-modo-oscuro` (implementadas), y `012-modo-sin-facturacion` (en implementación). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`, `CA-RIA-01-01`, `CA-SAV-01-01`, `CA-COC-01-01`, `CA-SPK-01-01`, `CA-OSC-01-01`, `CA-ANI-01-01`).
 - Las capturas de referencia de cada módulo están en `disenos-figma/` (índice en su `README.md`); la fuente de verdad sigue siendo el Figma.
 - Cada feature vive en `specs/NNN-nombre/` con `spec.md` (QUÉ: historias, criterios Dado/Cuando/Entonces), `plan.md` (CÓMO: contratos, decisiones) y `tasks.md` (tareas + matriz CA → test).
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
@@ -247,7 +247,7 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
   - **Recetas propias (`ui/own`):** editor, "¡Receta guardada!", detalle y "Eliminar receta". Sus pantallas conservan la barra inferior con Guardadas resaltada. `OwnRecipeText.kt` es el único mapeo de categorías y errores a texto.
   - **Deshacer:** `DeleteOwnRecipeUseCase` borra de verdad y deja la copia en `DeletedRecipeStore`; `SavedRecipesViewModel` cuenta de 8 a 1 y `RestoreOwnRecipeUseCase` la vuelve a escribir.
   - Textos en `res/values/strings_saved.xml`; la sombra de las tarjetas es `recipeCardShadow()`.
-- **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 600 ms se declaran una sola vez (`NavTransitions`). `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
+- **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 300 ms y la disolvencia de 100 ms entre pestañas se declaran una sola vez (`NavTransitions`). Todas las duraciones y curvas salen de `theme/Motion.kt` (`SmartFoodMotion`, spec 007); ninguna pantalla declara una duración suelta. `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
 - **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore`, `FirebaseFunctions` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
 - **Design system (`core/designsystem`):** `theme/` (tokens), `components/` (prefijo `SmartFood`) y `util/` (modificadores, `SystemBarEffect`, `ClearFocusOnKeyboardDismiss`).
 - **Adaptabilidad (spec 002):** las medidas de los formularios salen de `theme/FormMetrics.kt`.
@@ -268,7 +268,9 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
 - **Fidelidad con Figma (spec 002, HU-UI-07):** referencia en los frames "_Claro" del archivo Figma `z1AoQvluQcmx98gjP4vHF6`.
   - Tipografía Poppins empaquetada en `res/font` (licencia en `docs/licenses/OFL-Poppins.txt`).
   - Para ajustar un color a Figma se cambia el **rol** en `LightColorScheme` (`Theme.kt`), nunca el valor de un token. Los únicos tokens agregados son `GreenCheck`, `GreenSoft` (`#DCFCE7`, círculo de las iniciales del Perfil, spec 008; aprobado por Zhair el 2026-10-18) y `YellowSoft` (`#FFF7D6`, tarjeta del temporizador de la cocina guiada, spec 009; aprobado por Zhair el 2026-10-21).
-- **Ícono (spec 002, HU-UI-06):** los `mipmap-*/ic_launcher*` y `ic_launcher-playstore.png` los genera `tools/generate_launcher_icon.py` desde `drawable-nodpi/logo_smartfood_circle.png`. Nunca se editan a mano; si cambia el logo, se vuelve a ejecutar el script.
+- **Ícono (spec 002, HU-UI-06):** los `mipmap-*/ic_launcher*` y `ic_launcher-playstore.png` los genera `tools/generate_launcher_icon.py` desde `drawable-nodpi/logo_smartfood_circle.png`. Nunca se editan a mano; si cambia el logo, se vuelve a ejecutar el script. Los íconos del Figma exportados como PNG
+  (`drawable-nodpi/ic_figma_*.png`) se pasan por `tools/reducir_iconos.py` (200×200): a 512 px se decodificaban en el
+  hilo principal y saltaban cuadros (spec 007, T023).
 - **Foco y teclado (spec 002):**
   - **Prohibido el scroll programático** (`scrollTo`, `animateScrollTo`) en las pantallas. El panel aplica el inset del teclado fuera del `verticalScroll` y Compose mantiene visible el campo enfocado.
   - El encabezado de marca se colapsa leyendo `WindowInsets.ime` en la fase de layout.

@@ -82,7 +82,8 @@ val MaterialTheme.smartFoodColors: SmartFoodColors   // @Composable @ReadOnlyCom
   = false`) y aun así se pintan oscuros. Cuando la actividad se recrea, sí la respeta. También ocurre en `master`. Se
   probaron, sin éxito, `windowLightStatusBar = false` en el tema XML y quitar la petición de la Splash; los dos se
   revirtieron.
-- Las tres hojas (`OptionSheet`, `PhotoSourceSheet` e `IngredientSheet`) pasan `smartFoodSheetProperties()`
+- *Reemplazado por la spec 007 (T009): las hojas usan `SmartFoodBottomSheet`, cuya ventana pide las barras según el
+  tema, y `SheetProperties.kt` se borró.* Antes: las tres hojas (`OptionSheet`, `PhotoSourceSheet` e `IngredientSheet`) pasaban `smartFoodSheetProperties()`
   (`core/designsystem/util/SheetProperties.kt`): `ModalBottomSheetProperties` con las dos barras en `!dark`. Sin
   ellas, Material 3 1.4.0 deduce las barras del color del contenido, y `TextMuted` (oscuro) cuenta como "oscuro":
   por eso la barra de navegación quedaba clara. En claro el valor es el mismo de antes.

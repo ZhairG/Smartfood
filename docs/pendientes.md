@@ -20,7 +20,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | 4 | Guardado pendiente o confirmado en el Perfil | 008 (CA-PER-02-14, 03-06) | Hecho | [#142](https://github.com/ZhairG/Smartfood/pull/142) |
 | 5 | Cocina Favorita sin plan posible | 011 (CA-COC-02-06, 02-07, 03-05) | Hecho | [#143](https://github.com/ZhairG/Smartfood/pull/143) |
 | 6 | Revisión del modo oscuro | 013 (enmienda CA-UI-05-04) | Hecho | [#144](https://github.com/ZhairG/Smartfood/pull/144) |
-| 7 | Animaciones y transiciones | 007 | Pendiente | — |
+| 7 | Animaciones y transiciones | 007 | Hecho | [#145](https://github.com/ZhairG/Smartfood/pull/145) |
 | 8 | Correcciones de documentación y medición del agente | 009 | Pendiente | — |
 | 9 | Pendientes menores | 009, 010 | Pendiente | — |
 | 10 | Persistencia local con Room (opcional) | por definir | Pendiente | — |

@@ -1,5 +1,8 @@
 package com.smartfood.app.feature.recipes.ui.components
 
+import androidx.compose.animation.animateColorAsState
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -34,23 +37,20 @@ fun RecipeFilterPill(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
+    val container by animateColorAsState(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, SmartFoodMotion.standard(), label = "container")
+    val border by animateColorAsState(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.smartFoodColors.divider, SmartFoodMotion.standard(), label = "border")
+    val label by animateColorAsState(if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface, SmartFoodMotion.standard(), label = "label")
     Box(
         modifier = Modifier
             .clip(CircleShape)
-            .background(
-                if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-            )
-            .border(
-                width = 1.dp,
-                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.smartFoodColors.divider,
-                shape = CircleShape
-            )
+            .background(container)
+            .border(width = 1.dp, color = border, shape = CircleShape)
             .selectable(selected = selected, role = Role.Tab, onClick = onClick)
             .padding(horizontal = FilterSidePadding, vertical = FilterVerticalPadding)
     ) {
         Text(
             text = text,
-            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+            color = label,
             style = MaterialTheme.typography.labelLarge.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
             maxLines = 1
         )

@@ -11,11 +11,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,9 +25,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.components.SmartFoodBottomSheet
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.spacing
-import com.smartfood.app.core.designsystem.util.smartFoodSheetProperties
 import com.smartfood.app.feature.inventory.domain.usecase.SearchInventoryUseCase
 import com.smartfood.app.feature.inventory.ui.editor.EditorLineTextField
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
@@ -50,7 +47,6 @@ import com.smartfood.app.feature.recipes.ui.components.RecipeSearchField
  * @param catalog Ingredientes del catálogo.
  * @param onEvent Acciones de la persona.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun IngredientSheet(
     sheet: IngredientSheetState,
@@ -60,12 +56,7 @@ internal fun IngredientSheet(
     val spacing = MaterialTheme.spacing
     val metrics = LocalFormMetrics.current
     val selected = catalog.firstOrNull { it.id == sheet.selectedId }
-    ModalBottomSheet(
-        onDismissRequest = { onEvent(OwnRecipeEditorEvent.IngredientSheetDismissed) },
-        properties = smartFoodSheetProperties(),
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(topStart = spacing.panelRadius, topEnd = spacing.panelRadius)
-    ) {
+    SmartFoodBottomSheet(onDismissRequest = { onEvent(OwnRecipeEditorEvent.IngredientSheetDismissed) }) {
         Column(
             verticalArrangement = Arrangement.spacedBy(spacing.small),
             modifier = Modifier

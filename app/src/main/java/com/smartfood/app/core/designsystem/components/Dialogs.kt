@@ -1,5 +1,18 @@
 package com.smartfood.app.core.designsystem.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import android.os.Build
 import android.view.WindowManager
 import androidx.compose.foundation.background
@@ -85,10 +98,12 @@ fun SmartFoodOfflineDialog(
             usePlatformDefaultWidth = false
         )
     ) {
-        SmartFoodOfflineDialogContent(
-            isReconnecting = isReconnecting,
-            onReconnect = onReconnect
-        )
+        AnimatedDialogContent(rememberDialogMotion()) {
+            SmartFoodOfflineDialogContent(
+                isReconnecting = isReconnecting,
+                onReconnect = onReconnect
+            )
+        }
     }
 }
 
@@ -190,17 +205,20 @@ fun SmartFoodConfirmDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Dialog(onDismissRequest = onDismiss) {
+    val motion = rememberDialogMotion()
+    Dialog(onDismissRequest = { motion.close(onDismiss) }) {
         BlurBehindDialog()
-        SmartFoodConfirmDialogContent(
-            icon = icon,
-            question = question,
-            confirmText = confirmText,
-            dismissText = dismissText,
-            onConfirm = onConfirm,
-            onDismiss = onDismiss,
-            modifier = modifier
-        )
+        AnimatedDialogContent(motion) {
+            SmartFoodConfirmDialogContent(
+                icon = icon,
+                question = question,
+                confirmText = confirmText,
+                dismissText = dismissText,
+                onConfirm = { motion.close(onConfirm) },
+                onDismiss = { motion.close(onDismiss) },
+                modifier = modifier
+            )
+        }
     }
 }
 
@@ -295,13 +313,15 @@ fun SmartFoodResultDialog(
     // Sin cierre propio: atrás y el toque fuera no lo cierran (ver el KDoc); lo quita quien lo muestra.
     Dialog(onDismissRequest = {}) {
         BlurBehindDialog()
-        SmartFoodResultDialogContent(
-            icon = icon,
-            title = title,
-            body = body,
-            destructive = destructive,
-            modifier = modifier
-        )
+        AnimatedDialogContent(rememberDialogMotion()) {
+            SmartFoodResultDialogContent(
+                icon = icon,
+                title = title,
+                body = body,
+                destructive = destructive,
+                modifier = modifier
+            )
+        }
     }
 }
 
@@ -322,7 +342,9 @@ fun SmartFoodLoadingDialog(
 ) {
     Dialog(onDismissRequest = {}) {
         BlurBehindDialog()
-        SmartFoodResultDialogContent(icon = { LoadingIndicator() }, title = text, body = null, modifier = modifier)
+        AnimatedDialogContent(rememberDialogMotion()) {
+            SmartFoodResultDialogContent(icon = { LoadingIndicator() }, title = text, body = null, modifier = modifier)
+        }
     }
 }
 
@@ -363,9 +385,21 @@ fun SmartFoodWarningDialog(
     modifier: Modifier = Modifier,
     destructive: Boolean = false
 ) {
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(dismissOnClickOutside = false)) {
+    val motion = rememberDialogMotion()
+    Dialog(onDismissRequest = { motion.close(onDismiss) }, properties = DialogProperties(dismissOnClickOutside = false)) {
         BlurBehindDialog()
-        SmartFoodWarningDialogContent(title, body, confirmText, dismissText, onConfirm, onDismiss, modifier, destructive)
+        AnimatedDialogContent(motion) {
+            SmartFoodWarningDialogContent(
+                title,
+                body,
+                confirmText,
+                dismissText,
+                { motion.close(onConfirm) },
+                { motion.close(onDismiss) },
+                modifier,
+                destructive
+            )
+        }
     }
 }
 
@@ -392,18 +426,21 @@ fun SmartFoodSaveChangesDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(dismissOnClickOutside = false)) {
+    val motion = rememberDialogMotion()
+    Dialog(onDismissRequest = { motion.close(onDismiss) }, properties = DialogProperties(dismissOnClickOutside = false)) {
         BlurBehindDialog()
-        SmartFoodWarningDialogContent(
-            title = question,
-            body = null,
-            confirmText = confirmText,
-            dismissText = dismissText,
-            onConfirm = onConfirm,
-            onDismiss = onDismiss,
-            modifier = modifier,
-            style = WarningDialogStyle.SAVE
-        )
+        AnimatedDialogContent(motion) {
+            SmartFoodWarningDialogContent(
+                title = question,
+                body = null,
+                confirmText = confirmText,
+                dismissText = dismissText,
+                onConfirm = { motion.close(onConfirm) },
+                onDismiss = { motion.close(onDismiss) },
+                modifier = modifier,
+                style = WarningDialogStyle.SAVE
+            )
+        }
     }
 }
 
@@ -772,3 +809,47 @@ private const val LoadingIndicatorFraction = 0.5f
 
 /** Radio del desenfoque detrás de los diálogos, en píxeles. */
 private const val DialogBlurRadiusPx = 40
+
+/**
+ * Estado de entrada y salida de un diálogo (spec 007, CA-ANI-04-02). La entrada empieza al mostrarse; [close] inicia
+ * la salida y ejecuta la acción cuando termina, así el diálogo no desaparece de golpe al tocar un botón o "atrás".
+ * Los diálogos que quita quien los muestra (resultado, carga, sin conexión) solo animan la entrada.
+ */
+@Stable
+private class DialogMotion {
+    val visibleState = MutableTransitionState(false).apply { targetState = true }
+    var pendingAction: (() -> Unit)? by mutableStateOf(null)
+
+    /** Inicia la salida y deja [action] para cuando termine; un segundo toque durante la salida no hace nada. */
+    fun close(action: () -> Unit) {
+        if (pendingAction != null) return
+        pendingAction = action
+        visibleState.targetState = false
+    }
+}
+
+@Composable
+private fun rememberDialogMotion(): DialogMotion = remember { DialogMotion() }
+
+/**
+ * Contenido de un diálogo que aparece con disolvencia y una escala leve con "back" en 300 ms, y se va con disolvencia
+ * y escala en 300 ms (Figma: disolvencia de 300 ms, algunos con "Ease in and out back"; spec 007 §8). El velo es el de
+ * la ventana, con su desenfoque, y se disuelve con ella.
+ */
+@Composable
+private fun AnimatedDialogContent(motion: DialogMotion, content: @Composable () -> Unit) {
+    AnimatedVisibility(
+        visibleState = motion.visibleState,
+        enter = fadeIn(SmartFoodMotion.standard()) + scaleIn(SmartFoodMotion.emphasizedEnter(), initialScale = DialogInitialScale),
+        exit = fadeOut(SmartFoodMotion.standard()) + scaleOut(SmartFoodMotion.standard(), targetScale = DialogInitialScale)
+    ) {
+        content()
+    }
+    val action = motion.pendingAction
+    if (action != null && motion.visibleState.isIdle && !motion.visibleState.currentState) {
+        LaunchedEffect(action) { action() }
+    }
+}
+
+/** Escala con la que entra y sale un diálogo. */
+private const val DialogInitialScale = 0.92f

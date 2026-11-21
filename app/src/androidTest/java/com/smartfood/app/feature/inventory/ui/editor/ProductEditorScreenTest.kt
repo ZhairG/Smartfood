@@ -87,10 +87,14 @@ class ProductEditorScreenTest {
         composeTestRule.onNodeWithText("Seleccione una categoría").assertIsDisplayed()
         composeTestRule.onNodeWithText("Lácteos").performClick()
         composeTestRule.onNodeWithText("Guardar").performClick()
+        composeTestRule.waitForIdle()
         assertEquals("elegir Lácteos", listOf<ProductEditorEvent>(ProductEditorEvent.CategoryPicked(FoodCategory.DAIRY)), flujo.eventos)
 
-        flujo.eventos.clear()
+        // La hoja anima la salida y se cierra al guardar (spec 007, CA-ANI-04-02): se vuelve a abrir para cancelar.
+        flujo.paso(ProductEditorUiState())
+        flujo.paso(ProductEditorUiState(dialog = EditorDialog.CategorySheet))
         composeTestRule.onNodeWithText("Cancelar").performClick()
+        composeTestRule.waitForIdle()
         assertEquals("cancelar la hoja", listOf<ProductEditorEvent>(ProductEditorEvent.DialogDismissed), flujo.eventos)
     }
 
@@ -105,6 +109,7 @@ class ProductEditorScreenTest {
         flujo.paso(formularioCompleto.copy(mode = EditorMode.EDIT, dialog = EditorDialog.ConfirmDelete))
         composeTestRule.onNodeWithText("¿Desea eliminar el producto?").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cancelar").performClick()
+        composeTestRule.waitForIdle()
         assertEquals("cancelar la confirmación", listOf<ProductEditorEvent>(ProductEditorEvent.DialogDismissed), flujo.eventos)
     }
 
@@ -120,6 +125,7 @@ class ProductEditorScreenTest {
         flujo.paso(ProductEditorUiState(dialog = EditorDialog.PhotoSourceSheet))
         composeTestRule.onNodeWithText("Agregar foto").assertIsDisplayed()
         composeTestRule.onNodeWithText("Galería").performClick()
+        composeTestRule.waitForIdle()
         assertEquals("elegir la galería", listOf<ProductEditorEvent>(ProductEditorEvent.GalleryChosen), flujo.eventos)
 
         // CA-INV-05-04: con foto, la papelera pide confirmar.

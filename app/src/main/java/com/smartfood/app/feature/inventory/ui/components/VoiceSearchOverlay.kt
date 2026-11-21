@@ -9,6 +9,13 @@
  */
 package com.smartfood.app.feature.inventory.ui.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.runtime.remember
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -73,10 +80,29 @@ fun VoiceSearchOverlay(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (state == VoiceUiState.Hidden) return
+    // El aviso aparece y se va con disolvencia de 300 ms y, mientras se va, sigue mostrando el último estado
+    // (spec 007, CA-ANI-04-05).
+    val lastShown = remember { arrayOfNulls<VoiceUiState>(1) }
+    if (state != VoiceUiState.Hidden) lastShown[0] = state
+    AnimatedVisibility(
+        visible = state != VoiceUiState.Hidden,
+        enter = fadeIn(SmartFoodMotion.standard()),
+        exit = fadeOut(SmartFoodMotion.standard())
+    ) {
+        val shown = lastShown[0] ?: return@AnimatedVisibility
+        VoiceOverlayContent(state = shown, onRetry = onRetry, onDismiss = onDismiss, modifier = modifier)
+    }
+    if (state != VoiceUiState.Hidden) BackHandler(onBack = onDismiss)
+}
 
-    BackHandler(onBack = onDismiss)
-
+/** Velo y tarjeta del aviso de voz para un estado visible. */
+@Composable
+private fun VoiceOverlayContent(
+    state: VoiceUiState,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier,
+) {
     val dismissLabel = stringResource(id = R.string.cd_voice_dismiss)
     Box(
         modifier = modifier
@@ -96,6 +122,14 @@ fun VoiceSearchOverlay(
             shape = RoundedCornerShape(MaterialTheme.spacing.panelRadius),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
+            // Cada cambio de estado (escuchando, reconocido, procesando, error) dura 300 ms, ease-in-out (Figma
+            // "Grabadora"). La clave es el tipo de estado: el texto reconocido se actualiza sin reiniciar la animación.
+            AnimatedContent(
+                targetState = state,
+                contentKey = { it::class },
+                transitionSpec = { fadeIn(SmartFoodMotion.standard()) togetherWith fadeOut(SmartFoodMotion.standard()) },
+                label = "estadoDeVoz"
+            ) { state ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -162,6 +196,7 @@ fun VoiceSearchOverlay(
 
                     VoiceUiState.Hidden -> Unit
                 }
+            }
             }
         }
     }

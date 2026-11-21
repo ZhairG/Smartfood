@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.components.AnimatedMessage
 import com.smartfood.app.core.designsystem.components.SmartFoodLoadingDialog
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.components.SmartFoodResultDialog
@@ -150,7 +151,7 @@ private fun FoodPreferencesContent(
             }
         }
 
-        state.error?.let { error ->
+        AnimatedMessage(message = state.error) { error ->
             Text(
                 text = stringResource(id = error.messageRes()),
                 color = MaterialTheme.colorScheme.error,
