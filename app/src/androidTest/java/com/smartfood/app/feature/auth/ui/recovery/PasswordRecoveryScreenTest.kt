@@ -92,6 +92,28 @@ class PasswordRecoveryScreenTest {
     }
 
     @Test
+    fun caSpk0201_0202_0203_modoEnlaceEnviaEnlaceYMuestraRevisaTuCorreo() {
+        // CA-SPK-02-01: en el modo gratuito el paso 1 ofrece un enlace.
+        flujo.mostrar(PasswordRecoveryUiState(isLinkMode = true))
+        composeTestRule.mostrado("Escribe tu correo y te enviaremos un enlace para crear una contraseña nueva.")
+        composeTestRule.onNode(hasText("Enviar enlace") and hasClickAction()).assertIsEnabled()
+
+        // CA-SPK-02-02: «Revisa tu correo» con el texto neutro y el correo.
+        val enviado = PasswordRecoveryUiState(isLinkMode = true, step = RecoveryStep.LINK_SENT, email = "demo@smartfood.com")
+        flujo.paso(enviado)
+        composeTestRule.mostrado("Revisa tu correo")
+        composeTestRule.mostrado("Si el correo tiene una cuenta, te enviamos un enlace para crear una contraseña nueva a:")
+        composeTestRule.mostrado("demo@smartfood.com")
+        composeTestRule.mostrado("Volver a Iniciar sesión")
+        composeTestRule.mostrado("Reenviar enlace")
+
+        // CA-SPK-02-03: con la espera, la cuenta regresiva reemplaza al enlace de reenvío.
+        flujo.paso(enviado.copy(resendCooldownSeconds = 42, cooldownEmail = "demo@smartfood.com"))
+        composeTestRule.mostrado("Reenviar enlace en")
+        composeTestRule.onNodeWithText("Reenviar enlace").assertDoesNotExist()
+    }
+
+    @Test
     fun ca0410_0703_paso3HabilitaElBotonSoloConLaContrasenaValidaYConfirmada() {
         flujo.mostrar(PasswordRecoveryUiState(step = RecoveryStep.NEW_PASSWORD))
         composeTestRule.onNode(hasText("Reestablecer Contraseña") and hasClickAction()).assertIsNotEnabled()

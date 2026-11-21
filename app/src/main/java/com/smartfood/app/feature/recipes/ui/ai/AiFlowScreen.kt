@@ -42,8 +42,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -213,7 +215,20 @@ private fun ContextContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
                 style = BodyStyle()
             )
         }
-        if (state.restrictions.isNotEmpty()) {
+        if (state.preferencesUnavailable) {
+            // Sin leer el Perfil no se sabe la dieta: se avisa en lugar de "Según tus preferencias" (CA-RIA-02-12).
+            Text(
+                text = stringResource(id = R.string.recipes_ai_preferences_unavailable),
+                color = MaterialTheme.colorScheme.error,
+                style = BodyStyle(),
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+            )
+            OutlineActionButton(
+                text = stringResource(id = R.string.recipes_ai_preferences_retry),
+                onClick = { onEvent(AiEvent.RetryPreferencesClicked) },
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else if (state.restrictions.isNotEmpty()) {
             val names = state.restrictions.map { stringResource(id = it.titleRes) }.joinToString(", ")
             Text(
                 text = stringResource(id = R.string.recipes_ai_preferences, names),
@@ -289,7 +304,7 @@ private fun ContextContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
     RecipeActionButton(
         text = stringResource(id = R.string.recipes_ai_generate),
         onClick = { onEvent(AiEvent.GenerateClicked) },
-        enabled = !state.isLoadingContext,
+        enabled = !state.isLoadingContext && !state.preferencesUnavailable,
         modifier = Modifier.fillMaxWidth()
     )
 }

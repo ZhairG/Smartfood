@@ -1,5 +1,8 @@
 package com.smartfood.app.feature.auth.domain.usecase
 
+import com.smartfood.app.core.backend.BackendMode
+import com.smartfood.app.core.backend.GetBackendModeUseCase
+import com.smartfood.app.testutil.FakeBackendModeProvider
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthField
 import com.smartfood.app.feature.auth.domain.model.User
@@ -27,6 +30,7 @@ class RegisterUseCaseTest {
     private lateinit var authRepository: FakeAuthRepository
     private lateinit var userRepository: FakeUserRepository
     private lateinit var register: RegisterUseCase
+    private val backendMode = FakeBackendModeProvider(BackendMode.BLAZE)
 
     @Before
     fun prepararEntornoTest() {
@@ -36,8 +40,31 @@ class RegisterUseCaseTest {
             authRepository = authRepository,
             userRepository = userRepository,
             validateEmailUseCase = ValidateEmailUseCase(),
-            validatePasswordUseCase = ValidatePasswordUseCase()
+            validatePasswordUseCase = ValidatePasswordUseCase(),
+            getBackendMode = GetBackendModeUseCase(backendMode)
         )
+    }
+
+    @Test
+    fun `CA-SPK-04-01 en el modo gratuito pide el correo de verificacion antes de cerrar la sesion`() = runTest {
+        backendMode.mode = BackendMode.FREE
+        assertTrue(registrarValido().isSuccess)
+        assertEquals(1, authRepository.sendVerificationCalls)
+        assertEquals(1, authRepository.logoutCalls)
+    }
+
+    @Test
+    fun `CA-SPK-04-02 si la verificacion falla la cuenta queda creada`() = runTest {
+        backendMode.mode = BackendMode.FREE
+        authRepository.sendVerificationResult = Result.failure(IllegalStateException("sin red"))
+        assertTrue(registrarValido().isSuccess)
+        assertEquals(0, authRepository.deleteAccountCalls)
+    }
+
+    @Test
+    fun `CA-SPK-04-03 en el modo Blaze no envia nada porque el correo lo envia el servidor`() = runTest {
+        assertTrue(registrarValido().isSuccess)
+        assertEquals(0, authRepository.sendVerificationCalls)
     }
 
     private suspend fun registrarValido() = register(
