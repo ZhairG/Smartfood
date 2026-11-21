@@ -41,7 +41,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
@@ -54,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.SpeechError
 import com.smartfood.app.feature.inventory.ui.messageRes
@@ -81,7 +81,7 @@ fun VoiceSearchOverlay(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(ScrimColor)
+            .background(MaterialTheme.smartFoodColors.veil)
             .clickable(onClick = onDismiss)
             .semantics { contentDescription = dismissLabel },
         contentAlignment = Alignment.Center
@@ -204,10 +204,6 @@ private fun VoiceWaves(modifier: Modifier = Modifier) {
         }
     }
 }
-
-/** Velo oscuro que separa el aviso del contenido de la búsqueda. */
-// Velo claro: el contenido de la búsqueda va desenfocado detrás, como el Figma (476:4507).
-private val ScrimColor = Color.White.copy(alpha = 0.35f)
 
 // Medidas del componente "Grabadora" (`476:4507`): ondas de 132 px y círculo de error de 100 px. No son medidas de
 // formulario, así que no van en FormMetrics.

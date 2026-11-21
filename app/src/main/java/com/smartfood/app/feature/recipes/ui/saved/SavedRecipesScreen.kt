@@ -42,8 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenCheck
-import com.smartfood.app.core.designsystem.theme.GreenSoft
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.recipes.domain.model.SavedFilter
 import com.smartfood.app.feature.recipes.domain.model.SavedRecipeCard as SavedRecipeCardData
@@ -148,7 +148,7 @@ private fun SortAction(onClick: () -> Unit) {
     ) {
         Text(
             text = stringResource(id = R.string.saved_sort),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.smartFoodColors.onHeader,
             style = MaterialTheme.typography.labelLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         )
     }
@@ -289,7 +289,7 @@ private fun OfflineCard() {
         modifier = Modifier
             .fillMaxWidth()
             .recipeCardShadow(),
-        colors = CardDefaults.cardColors(containerColor = GreenSoft),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.smartFoodColors.greenSoft),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(OfflineRadius),
     ) {

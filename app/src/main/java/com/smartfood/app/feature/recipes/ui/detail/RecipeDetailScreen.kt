@@ -49,8 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
-import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientGroup
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredientLine
@@ -228,7 +228,7 @@ private fun TimeCard(
     progress: Float?,
     modifier: Modifier = Modifier,
 ) {
-    val trackColor = GreyDivider
+    val trackColor = MaterialTheme.smartFoodColors.divider
     val progressColor = MaterialTheme.colorScheme.secondary
     Card(
         shape = RoundedCornerShape(MetricRadius),
@@ -361,7 +361,7 @@ private fun PortionButton(
             )
             .border(
                 width = 1.dp,
-                color = if (filled) MaterialTheme.colorScheme.secondary else GreyDivider,
+                color = if (filled) MaterialTheme.colorScheme.secondary else MaterialTheme.smartFoodColors.divider,
                 shape = CircleShape
             )
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
@@ -385,12 +385,12 @@ private fun ReferencePrices(store: Store) {
         modifier = Modifier
             .padding(horizontal = ContentPadding, vertical = ReferenceVerticalPadding)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.smartFoodColors.header)
             .padding(horizontal = ReferenceSidePadding, vertical = ReferenceBarPadding)
     ) {
         Text(
             text = stringResource(id = R.string.recipes_store_prices, stringResource(id = store.titleRes)),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.smartFoodColors.onHeader,
             style = MaterialTheme.typography.labelLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold),
             maxLines = 1
         )

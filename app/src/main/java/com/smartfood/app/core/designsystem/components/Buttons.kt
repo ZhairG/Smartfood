@@ -29,11 +29,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreyDark
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.White
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.util.figmaShadow
 
 /**
@@ -79,12 +78,12 @@ fun SmartFoodPrimaryButton(
     // Colores cerrados: nadie pasa colores sueltos al botón (plan §8, #80).
     val containerColor = when {
         destructive -> MaterialTheme.colorScheme.error
-        green -> GreenCheck
+        green -> MaterialTheme.smartFoodColors.checkedFill
         else -> MaterialTheme.colorScheme.secondary
     }
     val contentColor = when {
         destructive -> MaterialTheme.colorScheme.onError
-        green -> White
+        green -> MaterialTheme.smartFoodColors.onCheckedFill
         else -> MaterialTheme.colorScheme.onSecondary
     }
     

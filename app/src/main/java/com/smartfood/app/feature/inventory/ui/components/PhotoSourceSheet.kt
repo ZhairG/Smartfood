@@ -48,9 +48,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.core.designsystem.util.smartFoodSheetProperties
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,6 +65,7 @@ fun PhotoSourceSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        properties = smartFoodSheetProperties(),
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(topStart = spacing.panelRadius, topEnd = spacing.panelRadius)
     ) {
@@ -126,7 +128,7 @@ private fun SourceRow(icon: Painter, text: String, onClick: () -> Unit) {
                 .size(IconBox)
                 .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(IconRadius))
         ) {
-            Icon(painter = icon, contentDescription = null, tint = GreenCheck, modifier = Modifier.size(IconSize))
+            Icon(painter = icon, contentDescription = null, tint = MaterialTheme.smartFoodColors.greenIcon, modifier = Modifier.size(IconSize))
         }
         Text(
             text = text,
