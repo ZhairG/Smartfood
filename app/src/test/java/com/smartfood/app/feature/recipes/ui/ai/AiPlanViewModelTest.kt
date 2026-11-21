@@ -4,6 +4,7 @@ import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.recipes.domain.agent.MealPlanner
+import com.smartfood.app.feature.recipes.domain.model.AiPlanOutcome
 import com.smartfood.app.feature.recipes.domain.model.DietRule
 import com.smartfood.app.feature.recipes.domain.model.PlanContext
 import com.smartfood.app.feature.recipes.domain.model.PlanSuggestion
@@ -145,6 +146,29 @@ class AiPlanViewModelTest {
         assertTrue("Pollo sigue en lo detectado", state.detected.none { it.name == "Pollo" })
         assertEquals("Tomate", state.firstExpiring?.name)
         assertEquals(setOf("tomate"), state.expiringIds)
+    }
+
+    @Test(timeout = 20_000)
+    fun `CA-COC-03-05 el plan dice si se completo con otras cocinas y generar de nuevo lo reinicia`() = runTest {
+        val fixtures = AiFixtures(setOf(DietaryRestriction.VEGETARIAN))
+        fixtures.profile.preferences = FoodPreferences(
+            restrictions = setOf(DietaryRestriction.VEGETARIAN),
+            cuisines = setOf(Cuisine.ASIAN),
+        )
+        val viewModel = viewModel(fixtures)
+        viewModel.uiState.first { !it.isLoadingContext }
+        val expected = fixtures.generatePlan(fixtures.getAiContext(), 100_000, AiUiState.DEFAULT_SERVINGS, null, false)
+
+        viewModel.onEvent(AiEvent.BudgetChanged(100_000))
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        val state = viewModel.uiState.first { it.step == AiStep.Plan || it.step == AiStep.NoPlan }
+
+        assertEquals((expected as? AiPlanOutcome.Found)?.cuisineRecipes, state.cuisineRecipes)
+
+        viewModel.onEvent(AiEvent.AdjustClicked)
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        runCurrent()
+        assertNull("Mientras se analiza no queda el aviso anterior", viewModel.uiState.value.cuisineRecipes)
     }
 
     @Test(timeout = 20_000)
