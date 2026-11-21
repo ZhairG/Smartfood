@@ -21,7 +21,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | 5 | Cocina Favorita sin plan posible | 011 (CA-COC-02-06, 02-07, 03-05) | Hecho | [#143](https://github.com/ZhairG/Smartfood/pull/143) |
 | 6 | Revisión del modo oscuro | 013 (enmienda CA-UI-05-04) | Hecho | [#144](https://github.com/ZhairG/Smartfood/pull/144) |
 | 7 | Animaciones y transiciones | 007 | Hecho | [#145](https://github.com/ZhairG/Smartfood/pull/145) |
-| 8 | Correcciones de documentación y medición del agente | 009 | Pendiente | — |
+| 8 | Correcciones de documentación y medición del agente | 009 (T047 a T053) | Hecho | [#146](https://github.com/ZhairG/Smartfood/pull/146) |
 | 9 | Pendientes menores | 009, 010 | Pendiente | — |
 | 10 | Persistencia local con Room (opcional) | por definir | Pendiente | — |
 
@@ -124,6 +124,11 @@ fusionó. Hoy está en el *stash* local «On docs/007-animaciones: borrador spec
 - Medir en un teléfono con el catálogo de 70 recetas, incluido el caso de estrés (8,3 s en un portátil, frente a la
   meta de 2 s). Definir un tiempo límite y una respuesta clara si la búsqueda no termina.
 - Corregir los objetivos específicos del póster.
+
+**Hecho (rama `feature/009-evaluacion-agente`, 2026-11-20):** límite de 2 s con el mejor plan encontrado (CA-RIA-02-13 y
+02-14), n/N y cantidad consumida, frontera media y máxima, `AgentSensitivityTest`, `AgentDevicePerformanceTest`,
+correcciones de [`ia/evaluacion-agente.md`](ia/evaluacion-agente.md) §9 y [`ia/poster-objetivos.md`](ia/poster-objetivos.md).
+Las cifras de §9 se midieron en la ronda final del 2026-11-20.
 
 ## 9. Pendientes menores
 

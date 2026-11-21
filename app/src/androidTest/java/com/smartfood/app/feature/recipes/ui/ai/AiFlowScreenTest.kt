@@ -280,6 +280,36 @@ class AiFlowScreenTest {
     }
 
     @Test
+    fun caRia0213_planIncompletoMuestraElAvisoDelLimite() {
+        mostrar(contexto.copy(step = AiStep.Plan, plan = plan, planComplete = false))
+
+        composeTestRule.onNodeWithText("No alcancé a revisar todas las combinaciones", substring = true)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun caRia0213_planCompletoNoMuestraElAviso() {
+        mostrar(contexto.copy(step = AiStep.Plan, plan = plan))
+
+        composeTestRule.onNodeWithText("No alcancé a revisar todas las combinaciones", substring = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun caRia0214_sinPlanPorElLimiteMuestraElMensajeYAjustar() {
+        mostrar(contexto.copy(step = AiStep.NoPlan, timedOut = true))
+
+        composeTestRule.onNodeWithText("Sin coincidencias").assertIsDisplayed()
+        composeTestRule.onNodeWithText("La búsqueda tardó demasiado").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Revisé tu inventario durante 2 segundos", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Prueba una de estas opciones").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Ajustar contexto").performScrollTo().performClick()
+
+        assertEquals(listOf<AiEvent>(AiEvent.AdjustClicked), eventos)
+    }
+
+    @Test
     fun caRia0301_laAyudaMuestraLosCriteriosYContactarSoporte() {
         var contacto = false
         composeTestRule.setContent {

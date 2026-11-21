@@ -72,6 +72,8 @@ data class AiUiState(
     val reasons: List<PlanExplainer.Reason> = emptyList(),
     val suggestions: List<PlanSuggestion> = emptyList(),
     val ingredients: Map<String, Ingredient> = emptyMap(),
+    val planComplete: Boolean = true,
+    val timedOut: Boolean = false,
 ) {
     companion object {
         const val DEFAULT_BUDGET_COP = 50_000L

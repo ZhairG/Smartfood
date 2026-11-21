@@ -9,12 +9,16 @@ import com.smartfood.app.feature.recipes.domain.model.DietRule
 import com.smartfood.app.feature.recipes.domain.model.PlanContext
 import com.smartfood.app.feature.recipes.domain.model.PlanSuggestion
 import com.smartfood.app.feature.recipes.domain.usecase.AiFixtures
+import com.smartfood.app.feature.recipes.domain.usecase.GeneratePlanUseCase
+import com.smartfood.app.feature.recipes.domain.usecase.RelojQueAvanza
 import com.smartfood.app.testutil.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -29,7 +33,8 @@ import org.junit.Test
  * Descripción: Pruebas de [AiPlanViewModel] (spec 009, T014) con el catálogo real: el contexto cargado (CA-RIA-02-01),
  * "Analizando opciones" al menos 1,5 s y "Cancelar" (CA-RIA-02-02), el plan con sus razones (CA-RIA-02-03, 02-06),
  * "Sin coincidencias" (CA-RIA-02-07), "Ajustar" con los mismos datos (CA-RIA-02-08) y el contexto siempre al día
- * (CA-RIA-02-11), y que un Perfil que no se pudo leer nunca pasa por "sin restricciones" (CA-RIA-02-12).
+ * (CA-RIA-02-11), que un Perfil que no se pudo leer nunca pasa por "sin restricciones" (CA-RIA-02-12) y el límite de
+ * 2 s de la búsqueda (CA-RIA-02-13, 02-14).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AiPlanViewModelTest {
@@ -37,8 +42,10 @@ class AiPlanViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private fun viewModel(fixtures: AiFixtures = AiFixtures()) =
-        AiPlanViewModel(fixtures.getAiContext, fixtures.generatePlan, fixtures.clock)
+    private fun viewModel(
+        fixtures: AiFixtures = AiFixtures(),
+        generatePlan: GeneratePlanUseCase = fixtures.generatePlan,
+    ) = AiPlanViewModel(fixtures.getAiContext, generatePlan, fixtures.clock)
 
     @Test
     fun `CA-RIA-02-01 carga el inventario detectado, el que vence primero, las preferencias y la tienda`() = runTest {
@@ -270,5 +277,46 @@ class AiPlanViewModelTest {
 
         assertEquals(AiStep.Plan, viewModel.uiState.value.step)
         assertEquals(plan, viewModel.uiState.value.plan)
+    }
+
+    @Test
+    fun `CA-RIA-02-13 si la busqueda llega al limite muestra el mejor plan y avisa que no termino`() = runTest {
+        val fixtures = AiFixtures()
+        val viewModel = viewModel(fixtures, fixtures.generatePlanWith(RelojQueAvanza(50.milliseconds)))
+        viewModel.uiState.first { !it.isLoadingContext }
+
+        viewModel.onEvent(AiEvent.BudgetChanged(100_000))
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        val state = viewModel.uiState.first { it.step == AiStep.Plan || it.step == AiStep.NoPlan }
+
+        assertEquals(AiStep.Plan, state.step)
+        assertEquals(3, state.plan?.days?.size)
+        assertFalse("el plan está marcado como incompleto", state.planComplete)
+    }
+
+    @Test
+    fun `CA-RIA-02-13 un plan completo no muestra el aviso`() = runTest {
+        val viewModel = viewModel()
+        viewModel.uiState.first { !it.isLoadingContext }
+
+        viewModel.onEvent(AiEvent.BudgetChanged(100_000))
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        val state = viewModel.uiState.first { it.step == AiStep.Plan }
+
+        assertTrue(state.planComplete)
+    }
+
+    @Test
+    fun `CA-RIA-02-14 si el limite vence sin plan muestra sin coincidencias con el mensaje y sin sugerencias`() = runTest {
+        val fixtures = AiFixtures()
+        val viewModel = viewModel(fixtures, fixtures.generatePlanWith(RelojQueAvanza(3.seconds)))
+        viewModel.uiState.first { !it.isLoadingContext }
+
+        viewModel.onEvent(AiEvent.GenerateClicked)
+        val state = viewModel.uiState.first { it.step == AiStep.Plan || it.step == AiStep.NoPlan }
+
+        assertEquals(AiStep.NoPlan, state.step)
+        assertTrue(state.timedOut)
+        assertTrue(state.suggestions.isEmpty())
     }
 }
