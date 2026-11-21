@@ -24,7 +24,7 @@ Proyecto de **Construcción de Aplicaciones Móviles** e **Inteligencia Artifici
 ## Versión funcional
 
 La última versión funcional está en la rama **`master`** de este repositorio. La APK lista para instalar está en el
-Release [`v1.0-entrega`](https://github.com/ZhairG/Smartfood/releases/tag/v1.0-entrega).
+Release [`v1.2`](https://github.com/ZhairG/Smartfood/releases/tag/v1.2).
 
 ## Capturas
 
@@ -48,7 +48,7 @@ flowchart LR
     D --> E[Regístrate y crea tu cuenta]
 ```
 
-1. Desde el teléfono, abre el Release [`v1.0-entrega`](https://github.com/ZhairG/Smartfood/releases/tag/v1.0-entrega) y
+1. Desde el teléfono, abre el Release [`v1.2`](https://github.com/ZhairG/Smartfood/releases/tag/v1.2) y
    descarga **`SmartFood-release.apk`**.
 2. Ábrela. Android avisará que no permite instalar apps de esa fuente: toca **Configuración** y activa **Permitir desde
    esta fuente**.
