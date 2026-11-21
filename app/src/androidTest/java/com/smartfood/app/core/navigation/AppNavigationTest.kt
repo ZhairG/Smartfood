@@ -138,8 +138,12 @@ class AppNavigationTest {
         // Disparamos la navegación a Recuperación de Contraseña
         composeTestRule.onNodeWithText("¿Olvidaste tu contraseña?").performScrollTo().performClick()
 
+        // El subtítulo cambia con el modo del backend (spec 012): con código o con el enlace de Firebase.
         composeTestRule.waitUntil(timeoutMillis = 5000) {
-            composeTestRule.onAllNodesWithText("Recupera tu acceso y vuelve a disfrutar de tus recetas favoritas.").fetchSemanticsNodes().isNotEmpty()
+            listOf(
+                "Recupera tu acceso y vuelve a disfrutar de tus recetas favoritas.",
+                "Escribe tu correo y te enviaremos un enlace para crear una contraseña nueva.",
+            ).any { composeTestRule.onAllNodesWithText(it).fetchSemanticsNodes().isNotEmpty() }
         }
 
         // Disparamos el retorno a Login mediante el enlace "Iniciar sesión"

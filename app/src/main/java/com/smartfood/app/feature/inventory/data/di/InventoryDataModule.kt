@@ -2,7 +2,7 @@ package com.smartfood.app.feature.inventory.data.di
 
 import com.smartfood.app.feature.inventory.data.local.DataStoreInventoryPreferences
 import com.smartfood.app.feature.inventory.data.reminder.WorkManagerExpiryReminderScheduler
-import com.smartfood.app.feature.inventory.data.repository.FirebaseStoragePhotoRepository
+import com.smartfood.app.feature.inventory.data.repository.ModeAwarePhotoRepository
 import com.smartfood.app.feature.inventory.data.repository.FirestoreInventoryRepository
 import com.smartfood.app.feature.inventory.data.speech.AndroidSpeechToText
 import com.smartfood.app.feature.inventory.data.sync.WorkManagerPhotoSync
@@ -41,7 +41,7 @@ abstract class InventoryDataModule {
     /** Fotos de productos en Cloud Storage (RNF-INV-02, T018). */
     @Binds
     @Singleton
-    abstract fun bindPhotoRepository(impl: FirebaseStoragePhotoRepository): PhotoRepository
+    abstract fun bindPhotoRepository(impl: ModeAwarePhotoRepository): PhotoRepository
 
     /** Subida y borrado de fotos en segundo plano con WorkManager, también sin conexión (§13, T048). */
     @Binds

@@ -58,6 +58,9 @@
     (`randomScenarioExigente`), todos contra la fuerza bruta.
   - Revisión aparte: 0 diferencias en 23.000 escenarios. Las métricas de `AgentEvaluationTest` no cambiaron y el
     peor caso de `MealPlannerPerformanceTest` sigue por debajo de 2 s.
+- [x] T039 La dieta no se pierde si falla la lectura del perfil (2026-11-19, punto 2 de `docs/pendientes.md`): CA-RIA-02-12 y su desviación en la spec, y CA-COC-03-04 de la spec 011 remite a él.
+- [x] T040 `AiContext.preferencesKnown`: `GetAiContextUseCase` distingue "sin restricciones" de "perfil desconocido"; prueba con perfil `VEGAN` y la lectura fallida (CA-RIA-02-12).
+- [x] T041 `AiPlanViewModel` no genera con el perfil desconocido y "Reintentar" lo vuelve a leer; `AiFlowScreen` muestra el aviso y deshabilita "Generar plan" (CA-RIA-02-12).
 - [x] T042 Cierre de cocina sin perder el precio ni descontar dos veces (2026-11-19, punto 3 de `docs/pendientes.md`): CA-RIA-04-08 y 04-09 en la spec y el contrato de `CookingRepository` en el plan §6.
 - [x] T043 `CookingRepository` con `WriteBatch` (cantidades, borrados y `cookings` en un lote) y `FinishCookingUseCase` con `operationId`; pruebas en `FinishCookingUseCaseTest` (CA-RIA-04-08, 04-09).
 - [x] T044 `CookingViewModel` crea el `operationId` una vez en `SavedStateHandle` y lo usa en cada intento (CA-RIA-04-09).
@@ -89,6 +92,7 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-02-09 | U `MealPlannerTest` (contra fuerza bruta), U `MealPlannerCatalogTest`, U `GetAiContextUseCaseTest`, U `GeneratePlanUseCaseTest` |
 | CA-RIA-02-10 | U `MealPlannerPerformanceTest`, M (release: 62 ms el peor caso, `docs/ia/evaluacion-agente.md`) |
 | CA-RIA-02-11 | U `AiPlanViewModelTest` |
+| CA-RIA-02-12 | U `GetAiContextUseCaseTest`, U `AiPlanViewModelTest`, I `AiFlowScreenTest` |
 | CA-RIA-03-01 | I `AiFlowScreenTest` |
 | CA-RIA-04-01 | I `RecipeDetailScreenTest` |
 | CA-RIA-04-02 | U `RecipeDetailViewModelTest` |

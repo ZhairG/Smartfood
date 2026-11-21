@@ -77,5 +77,7 @@ que mi cuenta quedó creada y confirmar que el correo es mío.
 ## 7. Supuestos
 
 - Las funciones de la spec 003 están desplegadas y los secretos del correo configurados.
+  **Enmienda (spec 012):** vale para el modo Blaze. Con `blaze_activo = false` no hay correo de bienvenida: la app pide
+  a Firebase el correo de verificación estándar ([spec 012](../012-modo-sin-facturacion/spec.md), HU-SPK-04).
 - La página de acción de la plataforma está configurada en español (consola de Firebase → Authentication →
   Plantillas → idioma).
