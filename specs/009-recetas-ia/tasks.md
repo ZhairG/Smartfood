@@ -58,6 +58,11 @@
     (`randomScenarioExigente`), todos contra la fuerza bruta.
   - Revisión aparte: 0 diferencias en 23.000 escenarios. Las métricas de `AgentEvaluationTest` no cambiaron y el
     peor caso de `MealPlannerPerformanceTest` sigue por debajo de 2 s.
+- [x] T046 Prueba intermitente de `AiFlowScreenTest` (punto 9 de los pendientes, 2026-11-20). La causa no estaba en la
+  app: en el V2436, la ventana emergente de Truecaller (`NeoPACSActivity`) se abrió 0,6 s después de que empezara una
+  prueba, la dejó en pausa y Compose falló con «No compose hierarchies found». Se reprodujo 1 vez en 5 corridas de la
+  clase; `caRia0207` sola pasó 20 de 20. No cambia el código; la precaución quedó en `docs/instalacion.md` («Pruebas»).
+  Sin esa ventana, la clase completa pasó 20 veces seguidas (240 pruebas, 0 fallas).
 
 ## Cierre (en el mismo PR)
 - [x] T027 Suite instrumentada completa, `rules-test` y despliegue de reglas (con confirmación de Zhair).

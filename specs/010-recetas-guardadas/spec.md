@@ -53,7 +53,7 @@ favoritas.
 | CA-SAV-02-06 | **Dado** una tarjeta del catálogo, **cuando** la toco, **entonces** se abre su detalle (spec 009); **dado** una tarjeta creada por mí, **cuando** la toco, **entonces** se abre "Editar receta" (Figma `666:3647`). |
 | CA-SAV-02-07 | **Dado** que no tengo favoritas ni recetas creadas, **entonces** no se ven el buscador ni los chips, y veo el ícono de libro, "Aún no creas recetas", "Guarda una recomendación de IA o crea tu primera receta desde cero." y el botón "Crear receta" (Figma `557:2585`). |
 | CA-SAV-02-08 | **Dado** un chip sin recetas (por ejemplo, "Creadas por mí" sin recetas creadas), **entonces** veo un texto corto que lo explica en lugar de la cuadrícula. |
-| CA-SAV-02-09 | **Dado** que tengo cambios que esperan sincronizarse, **entonces** debajo de las tarjetas veo la tarjeta "Sin conexión · Tus recetas guardadas siguen disponibles. Los cambios se sincronizarán después." (Figma `633:2723`), que desaparece al sincronizar. |
+| CA-SAV-02-09 | **Dado** que tengo cambios que esperan sincronizarse (incluido quitar una favorita o borrar una receta propia), **entonces** debajo de las tarjetas veo la tarjeta "Sin conexión · Tus recetas guardadas siguen disponibles. Los cambios se sincronizarán después." (Figma `633:2723`), que desaparece al sincronizar. |
 | CA-SAV-02-10 | **Dado** que toco el "+" o "Crear receta", **entonces** se abre "Nueva receta" (Figma `557:2693`). |
 | CA-SAV-02-11 | **Dado** que mis recetas guardadas no se pueden leer, **entonces** veo "No pudimos cargar tus recetas guardadas." en lugar de la lista, la app no se cierra y en Recetas y en el detalle las tarjetas se ven sin ♡ marcado. *(Zhair, 2026-11-05.)* |
 
@@ -191,6 +191,7 @@ Flujo:
 | En el detalle, el ♡ reemplaza al `⋮` de la barra (Figma `557:2856`), que no tiene acción. Lleva la píldora blanca de las tarjetas, porque el verde no se distingue sobre la barra. | Aprobado por Zhair en el #117 (2026-11-02). |
 | El detalle de la receta propia usa el lenguaje del detalle del catálogo: cabecera con el libro sobre `GreenSoft`, tarjetas de ingredientes y preparación, y "Editar". | El Figma no define esta pantalla (Zhair, 2026-11-06). |
 | El aviso rojo y el texto de error usan el rol `error` (`#D92E2E`); el Figma usa `#DC2626` y `#FEE2E2`. | Un solo rojo en la app, sin tokens nuevos; la diferencia es mínima (Zhair, 2026-11-06). |
+| Un borrado pendiente (♡ quitado o receta propia borrada sin conexión) se cuenta en memoria. Si la app se cierra antes de sincronizar, al reabrirla la tarjeta "Sin conexión" no aparece por ese borrado, aunque Firestore igual lo sube al volver la red. | Firestore no marca como pendiente un documento borrado; guardarlo en disco no compensa para un aviso (Zhair, 2026-11-20). |
 
 ## 10. Plan de entrega
 

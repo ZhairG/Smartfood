@@ -242,6 +242,12 @@ npm --prefix functions test                  # Cloud Functions (Node.js)
 En Windows usa `gradlew.bat` en lugar de `./gradlew`. Cada prueba lleva en su nombre el criterio de aceptación que cubre
 (por ejemplo `CA-COC-02-02`): ver [`metodologia.md`](metodologia.md).
 
+**Antes de las instrumentadas en un teléfono real:** desbloquéalo, deja la pantalla encendida y activa *No molestar*.
+Cierra las apps que abren ventanas encima de las demás, como la pantalla de Truecaller después de una llamada o un aviso
+de identificación de llamadas. Si una de esas ventanas aparece durante una prueba, la pantalla de la prueba queda en
+pausa y Compose falla con «No compose hierarchies found», aunque la app no tenga ningún error. Así fallaba de vez en
+cuando `AiFlowScreenTest` en el V2436 (punto 9 de [`pendientes.md`](pendientes.md), 2026-11-20).
+
 ### Problemas comunes al compilar
 
 | Qué aparece | Causa | Solución |
