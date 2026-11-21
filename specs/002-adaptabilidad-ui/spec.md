@@ -89,7 +89,7 @@ consistente con el diseño, aunque mi teléfono esté en modo oscuro.
 | CA-UI-05-01 | **Dado** un teléfono en modo oscuro, **entonces** toda la app se ve en modo claro, incluidas las pantallas de éxito ("¡Cuenta creada con éxito!" y "¡Contraseña actualizada!"). |
 | CA-UI-05-02 | **Dado** un arranque en frío, **entonces** antes de la Splash no aparece ningún fondo oscuro. En Android 12+, la pantalla del sistema usa el mismo fondo (`GreenLight`) y el mismo logo que la Splash; en versiones anteriores, la ventana se pinta con ese fondo. |
 | CA-UI-05-03 | El modo de color se decide en **un solo lugar** (`ThemeMode`, por defecto CLARO). Las pantallas y componentes no consultan el modo del sistema directamente, de modo que un selector futuro (claro, oscuro o sistema) no exige tocarlos. |
-| CA-UI-05-04 | Los colores de cada modo y su asignación por pantalla no cambian: la paleta y los esquemas claro y oscuro quedan iguales. |
+| CA-UI-05-04 | Los colores de cada modo y su asignación por pantalla no cambian: la paleta y los esquemas claro y oscuro quedan iguales. *Enmendado por la spec 013 (2026-11-19): los tokens de `Color.kt` y el esquema claro siguen iguales; el esquema oscuro y los roles propios (`SmartFoodColors`) se ajustan para que el modo oscuro sea legible.* |
 
 ### HU-UI-06: Ícono oficial
 **Como** usuario **quiero** reconocer la app por su logo en el launcher **para** encontrarla rápido.

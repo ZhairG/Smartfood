@@ -140,17 +140,25 @@ class FoodPreferencesScreenTest {
     }
 
     @Test
-    fun caPer0303_laPreguntaConfirmaOCancelaElGuardado() {
+    fun caPer0303_laPreguntaCancelaElGuardado() {
         mostrar(estado(dialog = FoodPreferencesDialog.ConfirmSave))
 
         composeTestRule.onNodeWithText("¿Desea guardar los cambios?").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cancelar").performClick()
-        composeTestRule.onNodeWithText("Guardar").performClick()
+        composeTestRule.waitForIdle()
 
-        assertEquals(
-            listOf(FoodPreferencesEvent.DialogDismissed, FoodPreferencesEvent.SaveConfirmed),
-            eventos
-        )
+        assertEquals(listOf<FoodPreferencesEvent>(FoodPreferencesEvent.DialogDismissed), eventos)
+    }
+
+    // El diálogo anima la salida y la acción llega al terminarla (spec 007, CA-ANI-04-02): cada botón en su prueba.
+    @Test
+    fun caPer0303_laPreguntaConfirmaElGuardado() {
+        mostrar(estado(dialog = FoodPreferencesDialog.ConfirmSave))
+
+        composeTestRule.onNodeWithText("Guardar").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(listOf<FoodPreferencesEvent>(FoodPreferencesEvent.SaveConfirmed), eventos)
     }
 
     @Test
@@ -159,5 +167,13 @@ class FoodPreferencesScreenTest {
 
         composeTestRule.onNodeWithText("Guardado").assertIsDisplayed()
         composeTestRule.onNodeWithText("Preferencias se actualizó").assertIsDisplayed()
+    }
+
+    @Test
+    fun caPer0306_sinConexionMuestraGuardadoEnTuTelefono() {
+        mostrar(estado(dialog = FoodPreferencesDialog.SavedOnPhone))
+
+        composeTestRule.onNodeWithText("Guardado en tu teléfono").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Se subirá cuando vuelva la conexión.").assertIsDisplayed()
     }
 }

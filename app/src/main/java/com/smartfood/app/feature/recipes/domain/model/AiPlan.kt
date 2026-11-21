@@ -44,11 +44,14 @@ sealed interface AiPlanOutcome {
      * El plan de 3 días y las razones de "¿Por qué te conviene?". Con [complete] en `false`, el límite de tiempo cortó
      * la búsqueda y es el mejor plan encontrado hasta ese momento (CA-RIA-02-13).
      *
+     * @property cuisineRecipes Si el plan se completó con otras cocinas, cuántas de sus recetas son de las favoritas;
+     *   `null` si no hizo falta (spec 011, CA-COC-02-06 y 03-05).
      * @property nodes Nodos que visitó la búsqueda, para el registro de la medición (RNF-RIA-02).
      */
     data class Found(
         val plan: MealPlan,
         val reasons: List<PlanExplainer.Reason>,
+        val cuisineRecipes: Int? = null,
         val complete: Boolean = true,
         val nodes: Long = 0,
     ) : AiPlanOutcome

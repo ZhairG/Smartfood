@@ -79,6 +79,8 @@ de Preferencias alimentarias (spec 008) como restricciones duras.
 | CA-RIA-04-04 | **Dado** la cocina guiada (Figma `557:2781`), **entonces** veo "Cocinando · paso N de T", el paso con su texto, "Anterior", "Siguiente" y "Salir"; si el paso tiene tiempo, un temporizador que puedo iniciar, pausar y reiniciar, y que avisa con sonido y vibración al llegar a 0. |
 | CA-RIA-04-05 | **Dado** el último paso, **cuando** toco "Terminar", **entonces** la app pregunta "¿Cocinaste esta receta?"; si confirmo, se descuentan del inventario las cantidades usadas (se borra el producto que queda en 0 o que no tenía cantidad) y se registra lo que se rescató. |
 | CA-RIA-04-06 | **Dado** que cociné una receta, **entonces** "Ahorrados este mes" del Perfil suma el valor de los ingredientes por vencer que usé este mes (CA-PER-01-02). |
+| CA-RIA-04-08 | **Dado** que cociné una receta que usa parte de un producto, **entonces** el producto conserva su precio, su foto, su vencimiento y su categoría: solo cambia la cantidad. |
+| CA-RIA-04-09 | **Dado** que confirmé "¿Cocinaste esta receta?", **cuando** el guardado falla, **entonces** el inventario no queda descontado a medias; **y cuando** lo vuelvo a intentar (o el cierre se repite), cada ingrediente se descuenta una sola vez y queda un solo registro de lo rescatado. |
 
 ## 4. Requisitos funcionales
 

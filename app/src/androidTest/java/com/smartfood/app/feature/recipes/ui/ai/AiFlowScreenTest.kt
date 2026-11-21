@@ -193,6 +193,38 @@ class AiFlowScreenTest {
     }
 
     @Test
+    fun caCoc0305_planCompletadoConOtrasCocinasMuestraElAviso() {
+        mostrar(contexto.copy(step = AiStep.Plan, plan = plan, cuisines = setOf(Cuisine.ITALIAN), cuisineRecipes = 1))
+
+        composeTestRule
+            .onNodeWithText("No alcanzó para 3 recetas de cocina italiana: completamos tu plan con otras cocinas.")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun caCoc0305_conVariasCocinasLasNombraConO() {
+        mostrar(
+            contexto.copy(
+                step = AiStep.Plan,
+                plan = plan,
+                cuisines = linkedSetOf(Cuisine.ITALIAN, Cuisine.MEXICAN),
+                cuisineRecipes = 2,
+            )
+        )
+
+        composeTestRule
+            .onNodeWithText("No alcanzó para 3 recetas de cocina italiana o mexicana: completamos tu plan con otras cocinas.")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun caCoc0305_sinRelajarNoMuestraElAviso() {
+        mostrar(contexto.copy(step = AiStep.Plan, plan = plan, cuisines = setOf(Cuisine.ITALIAN)))
+
+        composeTestRule.onNodeWithText("No alcanzó para", substring = true).assertDoesNotExist()
+    }
+
+    @Test
     fun caRia0206_porQueTeConvieneExplicaConDatosDelPlan() {
         mostrar(
             contexto.copy(

@@ -24,6 +24,9 @@ sealed interface FoodPreferencesDialog {
 
     /** "Guardado · Preferencias se actualizó" (Figma `593:1898`, CA-PER-03-03), que se cierra solo. */
     data object Saved : FoodPreferencesDialog
+
+    /** "Guardado en tu teléfono": sin conexión, las preferencias suben cuando vuelva (CA-PER-03-06). */
+    data object SavedOnPhone : FoodPreferencesDialog
 }
 
 /**

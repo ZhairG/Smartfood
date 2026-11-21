@@ -95,6 +95,45 @@ class AlgorithmComparisonTest {
         println(out)
     }
 
+    /**
+     * Cifras de la Cocina Favorita relajada para `docs/ia/evaluacion-agente.md` §8 (spec 011, T012, CA-COC-02-06): en los
+     * perfiles con cocina, cuántos inventarios tenían plan con la restricción dura (mínimo 3 = todas, como en §7.2) y
+     * cuántos lo tienen ahora, con cuántas recetas de la cocina, el costo medio y el tiempo en la JVM. Deja el resultado en
+     * `app/build/cocina-relajada.md`.
+     */
+    @Test
+    fun `CA-COC-02-06 tabla de la cocina relajada`() {
+        assumeTrue(System.getenv("SMARTFOOD_COMPARISON") == "1")
+        val planner = MealPlanner(RealCatalog.ingredients)
+        val out = StringBuilder()
+        out.append("| Cocina elegida | Con plan antes (dura) | Con plan ahora | 3 / 2 / 1 recetas de la cocina | Costo medio | ms medio | ms máximo |\n")
+        out.append("|---|---|---|---|---|---|---|\n")
+        RealCatalog.evaluationProfiles().filter { it.context.cuisines.isNotEmpty() }.forEach { profile ->
+            val total = profile.inventories.size
+            var before = 0
+            val levels = IntArray(4)
+            val costs = mutableListOf<Double>()
+            val millis = mutableListOf<Double>()
+            profile.inventories.forEach { pantry ->
+                val strict = planner.plan(RealCatalog.recipes, pantry, profile.context.copy(minCuisineRecipes = profile.context.days))
+                if (strict is PlanResult.Found) before++
+                val started = System.nanoTime()
+                val result = planner.plan(RealCatalog.recipes, pantry, profile.context)
+                millis += (System.nanoTime() - started) / 1_000_000.0
+                if (result is PlanResult.Found) {
+                    levels[result.cuisineRecipes ?: profile.context.days]++
+                    costs += result.plan.totalCostCop.toDouble()
+                }
+            }
+            val found = levels.sum()
+            out.append("| ${profile.name} | $before de $total | $found de $total | ${levels[3]} / ${levels[2]} / ${levels[1]} | ")
+            out.append("${if (costs.isEmpty()) "—" else "COP " + "%,.0f".format(Locale.ROOT, costs.average()).replace(',', '.')} | ")
+            out.append("${n(millis, 1)} | ${"%.1f".format(Locale.ROOT, millis.max())} |\n")
+        }
+        File("build/cocina-relajada.md").writeText(out.toString())
+        println(out)
+    }
+
     private data class Row(val name: String, val results: MutableList<Measured> = mutableListOf())
 
     private data class Measured(val result: PlanSearchProblem.Outcome, val millis: Double, val optimum: Double?)

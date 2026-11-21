@@ -28,9 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
-import com.smartfood.app.core.designsystem.theme.GreenCheck
-import com.smartfood.app.core.designsystem.theme.GreenSoft
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.feature.recipes.domain.model.OwnRecipe
 import com.smartfood.app.feature.recipes.ui.components.FavoriteButton
 import com.smartfood.app.feature.recipes.ui.components.OutlineActionButton
@@ -95,12 +94,12 @@ private fun DetailContent(recipe: OwnRecipe, state: OwnRecipeDetailUiState, onEd
                 .fillMaxWidth()
                 .aspectRatio(HeaderAspectRatio)
                 .clip(RoundedCornerShape(CardRadius))
-                .background(GreenSoft)
+                .background(MaterialTheme.smartFoodColors.greenSoft)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_figma_book),
                 contentDescription = null,
-                tint = GreenCheck,
+                tint = MaterialTheme.smartFoodColors.greenIcon,
                 modifier = Modifier.size(HeaderIconSize)
             )
         }

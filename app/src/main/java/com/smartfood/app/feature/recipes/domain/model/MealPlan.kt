@@ -50,7 +50,9 @@ enum class DietRule(val forbidden: Set<FoodTag>) {
  * @property days Días del plan (spec §2: 3).
  * @property diet Restricciones alimentarias del Perfil; son duras y nunca se sugiere quitarlas (CA-RIA-02-09).
  * @property store Supermercado de los precios ("Mi supermercado" del Perfil, CA-RIA-04-07); D1 por defecto.
- * @property cuisines Cocinas favoritas del Perfil; vacío si acepta todas (spec 011, RF-COC-02). Es una restricción dura.
+ * @property cuisines Cocinas favoritas del Perfil; vacío si acepta todas (spec 011, RF-COC-02).
+ * @property minCuisineRecipes Mínimo de recetas del plan que deben ser de [cuisines], o `null` para todas (restricción
+ *   dura, CA-COC-02-02). `MealPlanner.plan` lo baja de 3 a 1 cuando no hay plan con todas (CA-COC-02-06).
  */
 data class PlanContext(
     val budgetCop: Long,
@@ -62,6 +64,7 @@ data class PlanContext(
     val diet: Set<DietRule> = emptySet(),
     val store: Store = Store.D1,
     val cuisines: Set<RecipeCuisine> = emptySet(),
+    val minCuisineRecipes: Int? = null,
 )
 
 /**
@@ -165,9 +168,16 @@ sealed interface PlanResult {
      * El plan de mayor utilidad entre todos los válidos (CA-RIA-02-04). Con [complete] en `false`, el límite de tiempo
      * cortó la búsqueda: es el mejor encontrado hasta ese momento y cumple todas las restricciones (CA-RIA-02-13).
      *
+     * @property cuisineRecipes Si el plan se completó con otras cocinas, cuántas de sus recetas son de las favoritas;
+     *   `null` si todas lo son o no hay cocinas elegidas (CA-COC-02-06, 03-05).
      * @property nodes Nodos que visitó la búsqueda (para la medición, RNF-RIA-02).
      */
-    data class Found(val plan: MealPlan, val complete: Boolean = true, val nodes: Long = 0) : PlanResult
+    data class Found(
+        val plan: MealPlan,
+        val cuisineRecipes: Int? = null,
+        val complete: Boolean = true,
+        val nodes: Long = 0,
+    ) : PlanResult
 
     /** Ningún plan cumple las restricciones; [suggestions] dice qué cambiar (CA-RIA-02-07). */
     data class NoPlan(val suggestions: List<PlanSuggestion>) : PlanResult

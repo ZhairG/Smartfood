@@ -10,6 +10,7 @@ import com.smartfood.app.feature.auth.data.mapper.FirebaseErrorMapper
 import com.smartfood.app.feature.auth.data.mapper.mapFirebaseError
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthException
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.model.UserProfile
 import com.smartfood.app.feature.profile.domain.repository.ProfileRepository
@@ -48,7 +49,7 @@ class FirestoreProfileRepository @Inject constructor(
         )
     }.catch { throw AuthException(FirebaseErrorMapper.map(it)) }
 
-    override suspend fun updateProfile(profile: UserProfile): Result<Unit> = write {
+    override suspend fun updateProfile(profile: UserProfile): Result<WriteOutcome> = write {
         userDocument(profile.uid).update(profile.toUpdateFields(FieldValue.delete(), FieldValue.serverTimestamp()))
     }
 
@@ -57,14 +58,14 @@ class FirestoreProfileRepository @Inject constructor(
         userDocument(uid).update(
             mapOf(ProfileDocument.EMAIL to email, ProfileDocument.UPDATED_AT to FieldValue.serverTimestamp())
         )
-    }
+    }.map { }
 
     override suspend fun getPreferences(): Result<FoodPreferences> = safeRunCatching {
         val uid = auth.currentUser?.uid ?: throw AuthException(AuthError.AccountNotFound)
         preferencesFromDocument(userDocument(uid).get().await().data.orEmpty())
     }.mapFirebaseError()
 
-    override suspend fun savePreferences(preferences: FoodPreferences): Result<Unit> = write {
+    override suspend fun savePreferences(preferences: FoodPreferences): Result<WriteOutcome> = write {
         val uid = auth.currentUser?.uid ?: throw AuthException(AuthError.AccountNotFound)
         // Al escribir el mapa completo se borran las claves que el usuario quitó (CA-PER-03-04). Firestore no acepta
         // `null`: `spice` y `budget` solo viajan cuando hay elección.
@@ -80,14 +81,16 @@ class FirestoreProfileRepository @Inject constructor(
 
     /**
      * Encola la escritura y espera al servidor como mucho [SERVER_WAIT_MS]. Si no llega a tiempo, el cambio ya quedó
-     * en la caché del teléfono (el Perfil lo muestra) y se sube cuando vuelva la conexión.
+     * en la caché del teléfono (el Perfil lo muestra), se sube cuando vuelva la conexión y el resultado es
+     * [WriteOutcome.PENDING], como en el inventario (spec 006 §13, CA-PER-02-14 y 03-06).
      */
-    private suspend fun write(block: () -> com.google.android.gms.tasks.Task<Void>): Result<Unit> = safeRunCatching {
-        val task = block()
-        // `await` de un Task<Void> devuelve null: se devuelve Unit para distinguirlo del tiempo agotado.
-        withTimeoutOrNull(SERVER_WAIT_MS) { task.await(); Unit }
-        Unit
-    }.mapFirebaseError()
+    private suspend fun write(block: () -> com.google.android.gms.tasks.Task<Void>): Result<WriteOutcome> =
+        safeRunCatching {
+            val task = block()
+            // `await` de un Task<Void> devuelve null: se devuelve Unit para distinguirlo del tiempo agotado.
+            val confirmed = withTimeoutOrNull(SERVER_WAIT_MS) { task.await(); Unit } != null
+            if (confirmed) WriteOutcome.SYNCED else WriteOutcome.PENDING
+        }.mapFirebaseError()
 
     private companion object {
         const val USERS_COLLECTION = "users"

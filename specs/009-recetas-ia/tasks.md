@@ -61,6 +61,10 @@
 - [x] T039 La dieta no se pierde si falla la lectura del perfil (2026-11-19, punto 2 de `docs/pendientes.md`): CA-RIA-02-12 y su desviación en la spec, y CA-COC-03-04 de la spec 011 remite a él.
 - [x] T040 `AiContext.preferencesKnown`: `GetAiContextUseCase` distingue "sin restricciones" de "perfil desconocido"; prueba con perfil `VEGAN` y la lectura fallida (CA-RIA-02-12).
 - [x] T041 `AiPlanViewModel` no genera con el perfil desconocido y "Reintentar" lo vuelve a leer; `AiFlowScreen` muestra el aviso y deshabilita "Generar plan" (CA-RIA-02-12).
+- [x] T042 Cierre de cocina sin perder el precio ni descontar dos veces (2026-11-19, punto 3 de `docs/pendientes.md`): CA-RIA-04-08 y 04-09 en la spec y el contrato de `CookingRepository` en el plan §6.
+- [x] T043 `CookingRepository` con `WriteBatch` (cantidades, borrados y `cookings` en un lote) y `FinishCookingUseCase` con `operationId`; pruebas en `FinishCookingUseCaseTest` (CA-RIA-04-08, 04-09).
+- [x] T044 `CookingViewModel` crea el `operationId` una vez en `SavedStateHandle` y lo usa en cada intento (CA-RIA-04-09).
+- [x] T045 `rules-test`: un lote válido del cierre se acepta y uno que repite `cookings/{id}` se rechaza entero (CA-RIA-04-09).
 
 ## Punto 8 de los pendientes: evaluación y medición del agente (2026-11-20)
 Rama `feature/009-evaluacion-agente`. Origen: informe de IA del 13/11/2026 ([`docs/pendientes.md`](../../docs/pendientes.md) §8).
@@ -109,6 +113,8 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **M** = 
 | CA-RIA-04-05 | U `FinishCookingUseCaseTest`, U `CookingViewModelTest`, I `CookingScreenTest`, R |
 | CA-RIA-04-06 | U `GetMonthlySavingsUseCaseTest`, U `FinishCookingUseCaseTest`, I `ProfileScreenTest` |
 | CA-RIA-04-07 | U `RecipeDetailViewModelTest`, I `RecipeDetailScreenTest` |
+| CA-RIA-04-08 | U `FinishCookingUseCaseTest` |
+| CA-RIA-04-09 | U `FinishCookingUseCaseTest`, U `CookingViewModelTest`, R |
 | RNF-RIA-01 | U `MealPlannerTest` (mismo resultado dos veces) |
 | RNF-RIA-02 | U `MealPlannerPerformanceTest`, U `MealPlannerTest` (límite), I `AgentDevicePerformanceTest`, M |
 | RNF-RIA-03 | U `AgentEvaluationTest`, U `AlgorithmComparisonTest`, U `AgentSensitivityTest` |

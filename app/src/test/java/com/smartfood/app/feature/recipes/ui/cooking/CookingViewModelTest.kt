@@ -9,24 +9,20 @@ import com.smartfood.app.feature.inventory.domain.model.QuantityUnit
 import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.inventory.domain.repository.PhotoSync
 import com.smartfood.app.feature.inventory.domain.usecase.ClassifyExpiryUseCase
-import com.smartfood.app.feature.inventory.domain.usecase.DeleteItemUseCase
 import com.smartfood.app.feature.inventory.domain.usecase.ObserveInventoryUseCase
-import com.smartfood.app.feature.inventory.domain.usecase.UpdateItemUseCase
-import com.smartfood.app.feature.inventory.domain.usecase.ValidateItemUseCase
 import com.smartfood.app.feature.profile.domain.usecase.GetFoodPreferencesUseCase
 import com.smartfood.app.feature.recipes.domain.agent.IngredientMatcher
-import com.smartfood.app.feature.recipes.domain.model.CookingRecord
 import com.smartfood.app.feature.recipes.domain.model.Ingredient
 import com.smartfood.app.feature.recipes.domain.model.IngredientUnit
 import com.smartfood.app.feature.recipes.domain.model.Recipe
 import com.smartfood.app.feature.recipes.domain.model.RecipeIngredient
 import com.smartfood.app.feature.recipes.domain.model.RecipeStep
 import com.smartfood.app.feature.recipes.domain.model.Store
-import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
 import com.smartfood.app.feature.recipes.domain.repository.RecipeCatalog
 import com.smartfood.app.feature.recipes.domain.usecase.FinishCookingUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetPreferredStoreUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetRecipeDetailUseCase
+import com.smartfood.app.testutil.FakeCookingRepository
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakeProfileRepository
 import com.smartfood.app.testutil.MainDispatcherRule
@@ -90,17 +86,6 @@ class CookingViewModelTest {
         override suspend fun ingredients(): Map<String, Ingredient> = mapOf("arepa" to ingredient)
     }
 
-    private inner class FakeCookingHistoryRepository : CookingHistoryRepository {
-        val saved = mutableListOf<CookingRecord>()
-        override fun observeHistory(): Flow<List<CookingRecord>> = flowOf(saved)
-        override fun newRecordId(): String = "record1"
-        var result: Result<WriteOutcome> = Result.success(WriteOutcome.SYNCED)
-        override suspend fun saveRecord(record: CookingRecord): Result<WriteOutcome> {
-            saved.add(record)
-            return result
-        }
-    }
-
     private inner class NoOpPhotoSync : PhotoSync {
         override fun cancelUpload(itemId: String) {}
         override fun enqueueUpload(itemId: String, photo: LocalPhoto, replacedPath: String?) {}
@@ -113,7 +98,7 @@ class CookingViewModelTest {
     private lateinit var getRecipeDetailUseCase: GetRecipeDetailUseCase
     private lateinit var finishCookingUseCase: FinishCookingUseCase
     private lateinit var inventoryRepository: FakeInventoryRepository
-    private lateinit var historyRepository: FakeCookingHistoryRepository
+    private lateinit var cookingRepository: FakeCookingRepository
     private val today = LocalDate.of(2026, 10, 20)
 
     private fun viewModel() = CookingViewModel(
@@ -126,25 +111,21 @@ class CookingViewModelTest {
     fun setUp() {
         val clock = fixedClock(today)
         inventoryRepository = FakeInventoryRepository()
-        historyRepository = FakeCookingHistoryRepository()
+        cookingRepository = FakeCookingRepository(inventoryRepository)
         val photoSync = NoOpPhotoSync()
         val classifyExpiry = ClassifyExpiryUseCase(clock)
 
         getRecipeDetailUseCase = GetRecipeDetailUseCase(FakeRecipeCatalog())
         val observeInventory = ObserveInventoryUseCase(inventoryRepository, photoSync, classifyExpiry)
         val getPreferredStore = GetPreferredStoreUseCase(GetFoodPreferencesUseCase(FakeProfileRepository()))
-        val validateItem = ValidateItemUseCase(clock)
-        val updateItem = UpdateItemUseCase(inventoryRepository, photoSync, validateItem)
-        val deleteItem = DeleteItemUseCase(inventoryRepository, photoSync)
         val matcher = IngredientMatcher(clock)
 
         finishCookingUseCase = FinishCookingUseCase(
             getRecipeDetail = getRecipeDetailUseCase,
             observeInventory = observeInventory,
             getPreferredStore = getPreferredStore,
-            updateItemUseCase = updateItem,
-            deleteItemUseCase = deleteItem,
-            cookingHistoryRepository = historyRepository,
+            cookingRepository = cookingRepository,
+            photoSync = photoSync,
             ingredientMatcher = matcher,
             clock = clock
         )
@@ -278,7 +259,7 @@ class CookingViewModelTest {
         viewModel.onEvent(CookingEvent.ExitClicked)
 
         assertEquals(CookingEffect.ExitToDetail, viewModel.effects.first())
-        assertTrue(historyRepository.saved.isEmpty())
+        assertTrue(cookingRepository.records.isEmpty())
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -300,13 +281,13 @@ class CookingViewModelTest {
         advanceUntilIdle()
         assertEquals(null, viewModel.uiState.value.dialog)
         assertEquals(CookingEffect.ExitToDetail, viewModel.effects.first())
-        assertEquals(1, historyRepository.saved.size)
+        assertEquals(1, cookingRepository.records.size)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `CA-RIA-04-05 sin conexion muestra Guardado en tu telefono`() = runTest {
-        historyRepository.result = Result.success(WriteOutcome.PENDING)
+        cookingRepository.outcome = WriteOutcome.PENDING
         val viewModel = viewModel()
         runCurrent()
 
@@ -319,7 +300,7 @@ class CookingViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `CA-RIA-04-05 si falla muestra el error y se queda en la guia`() = runTest {
-        historyRepository.result = Result.failure(IllegalStateException("sin permiso"))
+        cookingRepository.failure = IllegalStateException("sin permiso")
         val viewModel = viewModel()
         runCurrent()
 
@@ -329,5 +310,45 @@ class CookingViewModelTest {
 
         advanceUntilIdle()
         assertEquals(null, viewModel.uiState.value.dialog)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `CA-RIA-04-09 reintentar despues de un fallo usa la misma operacion y descuenta una sola vez`() = runTest {
+        inventoryRepository.createItem(
+            InventoryItem("item1", "Arepa de maíz", FoodCategory.GRAINS, today.plusDays(1), Quantity(5.0, QuantityUnit.UNITS))
+        )
+        val handle = SavedStateHandle(mapOf("recipeId" to "arepas_hogao", "servings" to 2))
+        val viewModel = CookingViewModel(handle, getRecipeDetailUseCase, finishCookingUseCase)
+        runCurrent()
+        cookingRepository.failure = IllegalStateException("sin red")
+        viewModel.onEvent(CookingEvent.ConfirmFinishClicked)
+        advanceUntilIdle()
+        val firstId = handle.get<String>(CookingViewModel.OPERATION_ID_KEY)
+
+        cookingRepository.failure = null
+        viewModel.onEvent(CookingEvent.ConfirmFinishClicked)
+        advanceUntilIdle()
+
+        assertEquals(listOf(firstId), cookingRepository.records.map { it.id })
+        assertEquals(listOf(firstId), cookingRepository.operationIds)
+        val arepa = inventoryRepository.items.value.single { it.id == "item1" }
+        assertEquals(3.0, arepa.quantity!!.amount, 0.001)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `CA-RIA-04-09 si Android recrea la pantalla el cierre sigue con la misma operacion`() = runTest {
+        val handle = SavedStateHandle(
+            mapOf("recipeId" to "arepas_hogao", "servings" to 2, CookingViewModel.OPERATION_ID_KEY to "op-guardada")
+        )
+        val viewModel = CookingViewModel(handle, getRecipeDetailUseCase, finishCookingUseCase)
+        runCurrent()
+
+        viewModel.onEvent(CookingEvent.ConfirmFinishClicked)
+        advanceUntilIdle()
+
+        assertEquals(listOf("op-guardada"), cookingRepository.records.map { it.id })
+        assertTrue("No se crea otra operación", cookingRepository.operationIds.isEmpty())
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -293,5 +294,24 @@ class MainNavigationTest {
         assertTrue(navController.currentDestination?.hasRoute<Route.Inventory>() == true)
         // Sin pantalla anterior, "atrás" del sistema termina la actividad en lugar de volver a la Splash o al login.
         assertNull(navController.previousBackStackEntry?.takeIf { it.destination.navigatorName == "composable" })
+    }
+
+    @Test
+    fun caAni0203_entrePestanasLaDisolvenciaTerminaEn100msSinEmpuje() {
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.autoAdvance = false
+
+        // Con el empuje de 300 ms, el inventario seguiría en pantalla a los 100 ms; con la disolvencia ya se fue.
+        listOf("Recetas", "Guardadas", "Perfil").forEach { pestana ->
+            composeTestRule.onNode(hasText(pestana) and hasClickAction()).performClick()
+            composeTestRule.mainClock.advanceTimeBy(NavTransitions.TAB_DURATION_MS + 50L)
+            composeTestRule.onNode(hasText(pestana) and isSelected()).assertIsDisplayed()
+            assertEquals(
+                "Solo debe quedar una pestaña en pantalla después de $pestana",
+                0,
+                composeTestRule.onAllNodesWithText("Mi Inventario").fetchSemanticsNodes().size
+            )
+        }
+        composeTestRule.mainClock.autoAdvance = true
     }
 }

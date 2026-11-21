@@ -30,6 +30,10 @@ import com.smartfood.app.feature.recipes.domain.model.Recipe
  *   no alcanza la del mejor plan encontrado; la cota usa todo el rescate que sigue disponible en el inventario, así que
  *   nunca subestima).
  *
+ * - **Cocina Favorita (spec 011):** con el mínimo en todos los días es una restricción de una sola receta. Si así no hay
+ *   plan, [plan] baja el mínimo a 2 y luego a 1 (CA-COC-02-06): pasa a ser una restricción global que se poda cuando
+ *   las recetas de la cocina elegidas más los días que faltan no alcanzan el mínimo. La dieta nunca se relaja.
+ *
  * Es determinista (RNF-RIA-01): ante utilidades iguales gana el plan con los ids de receta menores en orden.
  *
  * **Límite de tiempo** (enmienda del 2026-11-20, CA-RIA-02-13 y 02-14): la búsqueda consulta un [SearchDeadline] en
@@ -47,8 +51,9 @@ class MealPlanner(
     private val evaluator = RecipeEvaluator(ingredients, weights)
 
     /**
-     * Busca el plan de mayor utilidad; si no hay ninguno válido, devuelve sugerencias (CA-RIA-02-03, 02-07). Con
-     * [deadline], al vencer devuelve el mejor plan encontrado o [PlanResult.TimedOut] (CA-RIA-02-13, 02-14).
+     * Busca el plan de mayor utilidad; si no hay ninguno válido, devuelve sugerencias (CA-RIA-02-03, 02-07). Con cocinas
+     * favoritas y sin plan con todas sus recetas, lo completa con otras cocinas (CA-COC-02-06). Con [deadline], al vencer
+     * devuelve el mejor plan encontrado o [PlanResult.TimedOut] (CA-RIA-02-13, 02-14).
      */
     fun plan(
         recipes: List<Recipe>,
@@ -56,12 +61,49 @@ class MealPlanner(
         context: PlanContext,
         deadline: SearchDeadline = SearchDeadline.NONE,
     ): PlanResult {
-        val outcome = searchOutcome(recipes, pantry, context, deadline)
+        val outcome = relaxedSearch(recipes, pantry, context, deadline)
         return when {
-            outcome.plan != null -> PlanResult.Found(outcome.plan, outcome.complete, outcome.nodes)
+            outcome.plan != null ->
+                PlanResult.Found(outcome.plan, outcome.cuisineRecipes, complete = outcome.complete, nodes = outcome.nodes)
             !outcome.complete -> PlanResult.TimedOut(outcome.nodes)
             else -> PlanResult.NoPlan(suggestions(recipes, pantry, context, deadline))
         }
+    }
+
+    /**
+     * Resultado de [relaxedSearch].
+     *
+     * @property cuisineRecipes Cuántas recetas del plan son de las cocinas favoritas cuando hubo que relajar, o `null`.
+     * @property complete `false` si el [SearchDeadline] venció en algún nivel.
+     * @property nodes Nodos de todos los niveles que se buscaron.
+     */
+    private data class RelaxedOutcome(val plan: MealPlan?, val cuisineRecipes: Int?, val complete: Boolean, val nodes: Long)
+
+    /**
+     * [searchOutcome] con todas las recetas de las cocinas favoritas y, si no hay plan, con 2 y luego con 1
+     * (CA-COC-02-06): gana el primer nivel que tenga plan, así se respeta la preferencia lo más posible. Todos los niveles
+     * comparten el mismo [deadline]; si vence en un nivel sin plan, no se baja al siguiente (CA-RIA-02-14).
+     */
+    private fun relaxedSearch(
+        recipes: List<Recipe>,
+        pantry: List<PantryItem>,
+        context: PlanContext,
+        deadline: SearchDeadline = SearchDeadline.NONE,
+    ): RelaxedOutcome {
+        val first = searchOutcome(recipes, pantry, context, deadline)
+        var nodes = first.nodes
+        if (first.plan != null || !first.complete) return RelaxedOutcome(first.plan, null, first.complete, nodes)
+        if (context.cuisines.isEmpty() || context.minCuisineRecipes != null) return RelaxedOutcome(null, null, true, nodes)
+        for (min in context.days - 1 downTo 1) {
+            val level = searchOutcome(recipes, pantry, context.copy(minCuisineRecipes = min), deadline)
+            nodes += level.nodes
+            val plan = level.plan
+            if (plan != null) {
+                return RelaxedOutcome(plan, plan.days.count { fitsCuisine(it.recipe, context) }, level.complete, nodes)
+            }
+            if (!level.complete) return RelaxedOutcome(null, null, false, nodes)
+        }
+        return RelaxedOutcome(null, null, true, nodes)
     }
 
     /**
@@ -78,7 +120,11 @@ class MealPlanner(
     fun fitsCuisine(recipe: Recipe, context: PlanContext): Boolean =
         context.cuisines.isEmpty() || recipe.cuisine in context.cuisines
 
-    /** El plan de mayor utilidad que cumple todas las restricciones, o `null` si no existe. */
+    /**
+     * El plan de mayor utilidad que cumple todas las restricciones, o `null` si no existe. Con
+     * `PlanContext.minCuisineRecipes` menor que los días, la cocina deja de filtrar el dominio y se exige ese mínimo de
+     * recetas de las cocinas favoritas en el plan (CA-COC-02-06).
+     */
     fun search(recipes: List<Recipe>, pantry: List<PantryItem>, context: PlanContext): MealPlan? =
         searchOutcome(recipes, pantry, context).plan
 
@@ -99,21 +145,30 @@ class MealPlanner(
         deadline: SearchDeadline = SearchDeadline.NONE,
     ): SearchOutcome {
         val full = PantryStock.of(pantry)
+        val minCuisine = context.minCuisineRecipes
+        // Relajada: la cocina es un mínimo del plan, no una restricción de cada receta.
+        val relaxed = context.cuisines.isNotEmpty() && minCuisine != null && minCuisine < context.days
+        val needed = if (relaxed) minCuisine ?: 0 else 0
         // Consistencia de nodo: las restricciones de una sola receta. Lo que cuesta sola con el inventario completo es lo
         // mínimo que el plan tiene que pagar por ella (los empaques se compran igual, en ese día o antes).
         val domain = recipes
             .filter { context.maxMinutes == null || it.totalMinutes <= context.maxMinutes }
             .filter { !(context.noSpicy && it.spicy) }
             .filter { fitsDiet(it, context) }
-            .filter { fitsCuisine(it, context) }
+            .filter { relaxed || fitsCuisine(it, context) }
             .filter {
                 evaluator.evaluate(it, context.servings, day = 1, stock = full, store = context.store).costCop <= context.budgetCop
             }
             .sortedBy { it.id }
-        if (domain.size < context.days) return SearchOutcome(plan = null, complete = true, nodes = 0)
+        val noPlan = SearchOutcome(plan = null, complete = true, nodes = 0)
+        if (domain.size < context.days) return noPlan
+        if (domain.count { fitsCuisine(it, context) } < needed) return noPlan
 
         val best = Best(deadline)
-        assign(day = 1, chosen = emptyList(), stock = full, budgetLeft = context.budgetCop, partial = 0.0, domain, context, best)
+        assign(
+            day = 1, chosen = emptyList(), stock = full, budgetLeft = context.budgetCop, partial = 0.0, domain, context, best,
+            needed = needed,
+        )
         return SearchOutcome(best.plan, complete = !best.truncated, nodes = best.nodes)
     }
 
@@ -138,6 +193,7 @@ class MealPlanner(
         domain: List<Recipe>,
         context: PlanContext,
         best: Best,
+        needed: Int = 0,
     ) {
         // Límite de tiempo (CA-RIA-02-13): una vez vencido, ninguna rama sigue.
         if (best.truncated) return
@@ -146,6 +202,10 @@ class MealPlanner(
             return
         }
         best.nodes++
+        // Cocina Favorita relajada (CA-COC-02-06): si las recetas de la cocina ya elegidas más los días que faltan no llegan
+        // al mínimo, la rama no tiene salida. En la hoja (ningún día por delante) exige el mínimo.
+        val favorites = if (needed > 0) chosen.count { fitsCuisine(it.recipe, context) } else 0
+        if (favorites + (context.days - day + 1) < needed) return
         if (day > context.days) {
             val utility = partial - weights.waste * evaluator.waste(stock)
             val ids = chosen.map { it.recipe.id }
@@ -169,6 +229,8 @@ class MealPlanner(
             .toList()
         val daysLeft = context.days - day + 1
         if (affordable.size < daysLeft) return
+        // Una receta de la cocina que hoy no cabe en el presupuesto tampoco cabrá otro día (mismo argumento de arriba).
+        if (needed > 0 && favorites + affordable.count { fitsCuisine(it.recipe, context) } < needed) return
         val candidates = affordable
             .filter { it.evaluation.missingCount <= context.maxMissing }
             .sortedWith(compareByDescending<Assigned> { it.evaluation.utility }.thenBy { it.recipe.id })
@@ -189,6 +251,7 @@ class MealPlanner(
                 domain,
                 context,
                 best,
+                needed,
             )
         }
     }
@@ -217,7 +280,8 @@ class MealPlanner(
     /**
      * Qué cambiar para que exista un plan (CA-RIA-02-07): el presupuesto mínimo (el plan más barato, buscado con la
      * misma búsqueda y pesos que solo miran el costo), quitar "Sin picante", subir el tiempo máximo o quitar las cocinas
-     * favoritas (spec 011, CA-COC-03-02). Nunca propone quitar la dieta.
+     * favoritas (spec 011, CA-COC-03-02). Nunca propone quitar la dieta. Cada cambio se prueba con la Cocina Favorita
+     * relajada, como [plan] (CA-COC-02-06), así que quitar las cocinas solo se sugiere si ni con una receta hay plan.
      *
      * Las búsquedas respetan el mismo [deadline]: si vence, un plan encontrado sigue siendo válido (la sugerencia es
      * cierta, aunque el presupuesto sugerido quizá no sea el mínimo) y las que no alcanzaron a buscarse se omiten.
@@ -230,7 +294,7 @@ class MealPlanner(
     ): List<PlanSuggestion> {
         val cheapest = MealPlanner(ingredients, CHEAPEST)
         val unlimited = context.copy(budgetCop = UNLIMITED_BUDGET)
-        fun find(planner: MealPlanner, ctx: PlanContext) = planner.searchOutcome(recipes, pantry, ctx, deadline).plan
+        fun find(planner: MealPlanner, ctx: PlanContext) = planner.relaxedSearch(recipes, pantry, ctx, deadline).plan
         val out = mutableListOf<PlanSuggestion>()
         find(cheapest, unlimited)?.let { out += PlanSuggestion.RaiseBudget(roundUpToThousand(it.totalCostCop)) }
         if (context.noSpicy && find(this, context.copy(noSpicy = false)) != null) out += PlanSuggestion.AllowSpicy

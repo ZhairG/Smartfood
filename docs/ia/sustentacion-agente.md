@@ -65,8 +65,8 @@ Basada en la retroalimentación de la Clase 24 (transcripción de Word, 01:12 a 
 - Los perfiles son **sintéticos**, no usuarios reales.
 - Los tiempos son de un portátil de 7,3 GB, solo como orden de magnitud.
 - La admisibilidad se comprobó en esos 825 estados, junto con el argumento escrito: no es una demostración formal completa.
-- Con inventario enorme, el agente promedió 2,5 s (50 recetas) y 8,3 s (70 recetas) en el portátil, por encima de la meta de 2 s. Desde la enmienda del 2026-11-20 la app corta a los 2 s con el mejor plan encontrado; la medición en el teléfono está en `evaluacion-agente.md` §8.5.
-- El 88,9 % cuenta productos usados al menos en parte, no cantidad ni desperdicio físico evitado. Dilo siempre con su denominador (§8.1 de la evaluación).
+- Con inventario enorme, el agente promedió 2,5 s (50 recetas) y 8,3 s (70 recetas) en el portátil, por encima de la meta de 2 s. Desde la enmienda del 2026-11-20 la app corta a los 2 s con el mejor plan encontrado; la medición en el teléfono está en `evaluacion-agente.md` §9.5.
+- El 88,9 % cuenta productos usados al menos en parte, no cantidad ni desperdicio físico evitado. Dilo siempre con su denominador (§9.1 de la evaluación).
 - La «frontera» de A\* es la media de los máximos por inventario (6.971,5 sin restricciones; el mayor máximo fue 15.172), no un máximo global ni bytes.
 - El recocido se probó con un solo juego de parámetros.
 
@@ -217,7 +217,7 @@ empatan (3 de 6 inventarios con plan, en todos). Con COP 2.000 ninguno arma plan
 - **Reglas:** sin cocinas elegidas no filtra; con varias, sirve cualquiera; la dieta siempre manda.
 - **Si no hay plan:** el agente comprueba con la misma búsqueda si quitando la cocina lo habría, y solo entonces sugiere "Quita tu
   cocina favorita en el Perfil".
-- **Resultados:** 88,9 % de aprovechamiento (media por inventario de los productos elegibles usados al menos en parte; el n/N y la cantidad consumida están en `evaluacion-agente.md` §8.1), sobre la meta del 80 % y por encima de las dos líneas base (85,0 % y 74,7 %).
+- **Resultados:** 88,9 % de aprovechamiento (media por inventario de los productos elegibles usados al menos en parte; el n/N y la cantidad consumida están en `evaluacion-agente.md` §9.1), sobre la meta del 80 % y por encima de las dos líneas base (85,0 % y 74,7 %).
 
 **Lo que no debes prometer:**
 

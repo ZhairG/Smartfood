@@ -63,6 +63,7 @@ class GeneratePlanUseCase(
                 is PlanResult.Found -> AiPlanOutcome.Found(
                     plan = result.plan,
                     reasons = PlanExplainer().explain(result.plan, context.pantry),
+                    cuisineRecipes = result.cuisineRecipes,
                     complete = result.complete,
                     nodes = result.nodes,
                 )

@@ -143,7 +143,9 @@ class AiPlanViewModel @Inject constructor(
         // Sin las preferencias no se sabe la dieta: no se arma un plan "sin restricciones" (CA-RIA-02-12).
         if (!current.preferencesKnown) return
         if (_uiState.value.step == AiStep.Loading) return
-        _uiState.update { it.copy(step = AiStep.Loading, plan = null, reasons = emptyList(), suggestions = emptyList()) }
+        _uiState.update {
+            it.copy(step = AiStep.Loading, plan = null, cuisineRecipes = null, reasons = emptyList(), suggestions = emptyList())
+        }
         val state = _uiState.value
         generation = viewModelScope.launch {
             // Las restricciones del Perfil no avisan cuando cambian: se leen otra vez justo antes de buscar (CA-RIA-02-11).
@@ -169,6 +171,7 @@ class AiPlanViewModel @Inject constructor(
                         step = AiStep.Plan,
                         plan = outcome.plan,
                         reasons = outcome.reasons,
+                        cuisineRecipes = outcome.cuisineRecipes,
                         planComplete = outcome.complete,
                         timedOut = false,
                     )

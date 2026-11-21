@@ -8,6 +8,7 @@ import com.smartfood.app.feature.recipes.domain.agent.PlanExplainer
 import com.smartfood.app.feature.recipes.domain.agent.RealCatalog
 import com.smartfood.app.feature.recipes.domain.model.AiPlanOutcome
 import com.smartfood.app.feature.recipes.domain.model.PlanContext
+import com.smartfood.app.feature.recipes.domain.model.PlanResult
 import com.smartfood.app.feature.recipes.domain.model.RecipeCuisine
 import com.smartfood.app.feature.recipes.domain.model.PlanSuggestion
 import kotlin.time.Duration
@@ -17,6 +18,7 @@ import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -56,8 +58,41 @@ class GeneratePlanUseCaseTest {
         val outcome = fixtures.generatePlan(context, budgetCop = 100_000, servings = 4, maxMinutes = null, noSpicy = false)
 
         assertTrue("Esperaba un plan: $outcome", outcome is AiPlanOutcome.Found)
-        (outcome as AiPlanOutcome.Found).plan.days.forEach {
+        assertNull("No hace falta completar con otras cocinas", (outcome as AiPlanOutcome.Found).cuisineRecipes)
+        outcome.plan.days.forEach {
             assertTrue(it.recipe.id, it.recipe.cuisine in setOf(RecipeCuisine.ITALIAN, RecipeCuisine.COLOMBIAN))
+        }
+    }
+
+    @Test
+    fun `CA-COC-02-06 CA-COC-02-07 con asiatica y vegetariano entrega lo que decide el agente con la cocina relajada`() = runTest {
+        val fixtures = AiFixtures(setOf(DietaryRestriction.VEGETARIAN))
+        fixtures.profile.preferences = FoodPreferences(
+            restrictions = setOf(DietaryRestriction.VEGETARIAN),
+            cuisines = setOf(Cuisine.ASIAN),
+        )
+        val context = fixtures.getAiContext()
+
+        val outcome = fixtures.generatePlan(context, budgetCop = 100_000, servings = 4, maxMinutes = null, noSpicy = false)
+
+        val planner = MealPlanner(RealCatalog.ingredients)
+        val planContext = PlanContext(
+            budgetCop = 100_000,
+            servings = 4,
+            diet = context.diet,
+            store = context.store,
+            cuisines = setOf(RecipeCuisine.ASIAN),
+        )
+        when (val expected = planner.plan(RealCatalog.recipes, context.pantry, planContext)) {
+            is PlanResult.Found -> {
+                val found = outcome as AiPlanOutcome.Found
+                assertEquals(expected.cuisineRecipes, found.cuisineRecipes)
+                assertEquals(expected.plan.days.map { it.recipe.id }, found.plan.days.map { it.recipe.id })
+                found.plan.days.forEach { assertTrue("${it.recipe.id} no es vegetariana", planner.fitsDiet(it.recipe, planContext)) }
+            }
+            is PlanResult.NoPlan -> assertTrue("Esperaba sin coincidencias: $outcome", outcome is AiPlanOutcome.NoPlan)
+            // Sin límite de tiempo la búsqueda siempre termina (CA-RIA-02-13).
+            is PlanResult.TimedOut -> org.junit.Assert.fail("Sin límite no puede vencer: $expected")
         }
     }
 

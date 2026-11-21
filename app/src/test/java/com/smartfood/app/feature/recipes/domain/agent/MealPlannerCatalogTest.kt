@@ -7,6 +7,7 @@ import com.smartfood.app.feature.recipes.domain.model.PlanResult
 import com.smartfood.app.feature.recipes.domain.model.RecipeCuisine
 import com.smartfood.app.feature.recipes.domain.model.Store
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -56,7 +57,8 @@ class MealPlannerCatalogTest {
             val contexto = context(emptySet()).copy(cuisines = setOf(cocina))
             val result = planner.plan(RealCatalog.recipes, despensa, contexto)
             assertTrue("Sin plan con la cocina $cocina: $result", result is PlanResult.Found)
-            (result as PlanResult.Found).plan.days.forEach {
+            assertNull("$cocina: no debería hacer falta completar con otras cocinas", (result as PlanResult.Found).cuisineRecipes)
+            result.plan.days.forEach {
                 assertEquals("$cocina: ${it.recipe.id}", cocina, it.recipe.cuisine)
             }
         }

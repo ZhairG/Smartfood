@@ -27,6 +27,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -45,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 
 /**
@@ -171,14 +173,17 @@ private fun LineFrame(
                 }
             }
         }
-        HorizontalDivider(
-            color = when {
+        // La línea cambia de color en 150 ms, ease-out (CA-ANI-03-01).
+        val lineColor by animateColorAsState(
+            targetValue = when {
                 isError -> MaterialTheme.colorScheme.error
                 isFocused -> MaterialTheme.colorScheme.primary
                 else -> MaterialTheme.colorScheme.outline
             },
-            thickness = if (isError || isFocused) ErrorLine else Line
+            animationSpec = SmartFoodMotion.focus(),
+            label = "lineaDelCampo"
         )
+        HorizontalDivider(color = lineColor, thickness = if (isError || isFocused) ErrorLine else Line)
     }
 }
 

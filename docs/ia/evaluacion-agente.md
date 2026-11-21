@@ -9,12 +9,12 @@ Se reproducen con:
 
 La comparación con otros algoritmos, la heurística y su admisibilidad están en la §6; los resultados con 70 recetas y Cocina Favorita, en la §7; las
 correcciones que pidió el informe de IA, la sensibilidad de los pesos, el recocido con varias semillas, el límite de 2 s y la medición en el teléfono, en
-la §8. La guía para estudiar la sustentación está en [`sustentacion-agente.md`](sustentacion-agente.md).
+la §9. La guía para estudiar la sustentación está en [`sustentacion-agente.md`](sustentacion-agente.md).
 
 > **Cómo leer las cifras (corrección del 2026-11-20, informe de IA):**
 > - El *aprovechamiento* cuenta **productos**, no cantidad: es la media, por inventario, de la proporción de productos
 >   elegibles (vencen en ≤ 3 días y alguna receta los usa) que el plan usa **al menos en parte**. Usar 10 g de 1 kg
->   cuenta como usado. Por eso desde la §8 se reporta siempre con su denominador (n/N) y junto a la *cantidad
+>   cuenta como usado. Por eso desde la §9 se reporta siempre con su denominador (n/N) y junto a la *cantidad
 >   consumida*. No mide peso consumido ni desperdicio físico evitado.
 > - El *desperdicio medio* es una suma de fracciones sin usar (0,80 = ocho décimas de producto), no kilogramos.
 > - La *frontera* de A\* en las tablas es la **media, entre inventarios, del máximo de estados** que guardó a la vez,
@@ -245,7 +245,7 @@ comparables con estas cifras, porque cambió el catálogo y los inventarios sint
 
 El 88,9 % es la media, por inventario, de la proporción de productos elegibles que el plan usa al menos en parte; el
 denominador excluye los productos por vencer que ninguna receta puede usar. No mide cuánto peso se consumió ni cuánto
-desperdicio real se evitó (ver la nota al inicio y la §8.1, con n/N y la cantidad consumida).
+desperdicio real se evitó (ver la nota al inicio y la §9.1, con n/N y la cantidad consumida).
 
 **Meta RNF-RIA-03 cumplida:** ≥ 80 % y por encima de las dos líneas base. El aprovechamiento bajó frente a §3 (97,2 %), pero las
 dos cifras salen de inventarios distintos, así que no se atribuye esa baja solo a las recetas nuevas.
@@ -299,13 +299,56 @@ sigue siendo una cota más ajustada, revisada contra `MealPlannerTest`.
 - **Con cocinas elegidas** el dominio es tan pequeño que la búsqueda tarda menos de 1 ms. En "Italiana y mexicana", el recocido
   encontró plan en 3 de 6 inventarios y los exactos en 4 de 6.
 
-## 8. Correcciones del informe de IA y medición en el teléfono (2026-11-20, T047 a T053)
+## 8. Cocina Favorita relajada (2026-11-19, punto 5 de `docs/pendientes.md`)
+
+§7.2 mostró que la restricción dura dejaba sin plan a la mayoría de los inventarios con una sola cocina (asiática y
+vegetariano: 0 de 6). La Cocina Favorita deja de ser una restricción de una sola receta y pasa a ser una **restricción global
+con un mínimo**: el plan debe tener al menos `minCuisineRecipes` recetas de las cocinas elegidas (spec 011, CA-COC-02-06).
+
+- **Búsqueda escalonada:** `MealPlanner.plan` busca con el mínimo en 3 (todas, como antes), luego en 2 y luego en 1, y entrega
+  el plan del primer nivel que lo tenga. Así se respeta la preferencia lo más posible y, dentro de cada nivel, el objetivo
+  sigue siendo la utilidad.
+- **Poda:** una rama se descarta si las recetas de la cocina ya elegidas más los días que faltan no alcanzan el mínimo. Es una
+  forma de *forward checking* para la restricción global; no cambia la cota de ramificación y poda.
+- **Lo que no se relaja:** la dieta, el tiempo, el picante y el presupuesto siguen en la consistencia de nodo (CA-COC-02-07).
+- **Sin plan ni con una receta:** se mantiene la sugerencia "Quita tu cocina favorita en el Perfil" (CA-COC-03-02).
+- **Costo:** en el peor caso son 3 búsquedas en lugar de una; con el mínimo bajo, el dominio vuelve a ser todo el catálogo que
+  cumple la dieta. `MealPlannerPerformanceTest` incluye este caso.
+- **Verificación:** `MealPlannerTest` compara 100 escenarios aleatorios con cocinas y mínimos de 1 a 3 contra la fuerza bruta,
+  que aprende la misma restricción.
+
+### 8.1 Planes por cocina (2026-11-21)
+
+Mismos 6 inventarios sintéticos, COP 100.000 y 4 porciones que §7.2, en la JVM del portátil
+(`AlgorithmComparisonTest`, "CA-COC-02-06 tabla de la cocina relajada", con `SMARTFOOD_COMPARISON=1`). "Antes" es la
+búsqueda con el mínimo en 3, que equivale a la restricción dura, y reproduce §7.2. La columna "3 / 2 / 1" dice cuántos
+planes tienen esas recetas de la cocina elegida.
+
+| Cocina elegida | Con plan antes (dura) | Con plan ahora | 3 / 2 / 1 recetas de la cocina | Costo medio | ms medio | ms máximo |
+|---|---|---|---|---|---|---|
+| Italiana | 3 de 6 | **6 de 6** | 3 / 3 / 0 | COP 47.333 | 13,5 | 52,2 |
+| Asiática | 1 de 6 | **6 de 6** | 1 / 4 / 1 | COP 34.560 | 22,7 | 61,6 |
+| Mexicana | 1 de 6 | **6 de 6** | 1 / 5 / 0 | COP 40.135 | 10,9 | 18,4 |
+| Mediterránea | 2 de 6 | **6 de 6** | 2 / 4 / 0 | COP 32.302 | 13,9 | 33,8 |
+| Italiana y mexicana | 4 de 6 | **6 de 6** | 4 / 2 / 0 | COP 47.328 | 4,9 | 16,7 |
+| Asiática y vegetariano | 0 de 6 | **6 de 6** | 0 / 3 / 3 | COP 26.605 | 23,9 | 74,1 |
+
+- **Todos los inventarios tienen plan** (36 de 36, frente a 11 de 36 con la restricción dura), y la preferencia se respeta
+  lo más posible: 11 planes con las 3 recetas de la cocina, 21 con 2 y solo 4 con 1.
+- **"Asiática y vegetariano"** pasa de 0 a 6 de 6, pero la mitad de esos planes tiene una sola receta asiática: con la dieta
+  vegetariana quedan muy pocas recetas asiáticas.
+- **El costo medio no es comparable con §7.2:** allí se promedian solo los inventarios con plan, y aquí los 6,
+  que incluyen planes completados con otras cocinas.
+- **Tiempo:** el peor caso fue de 74,1 ms, lejos de los 2 s de RNF-RIA-02, aunque en el peor caso se hacen 3 búsquedas. Es la
+  JVM del portátil, no el teléfono.
+
+## 9. Correcciones del informe de IA y medición en el teléfono (2026-11-20, T047 a T053)
 
 El informe de IA del 13/11/2026 pidió precisar el aprovechamiento y la memoria de A\*, un análisis de sensibilidad de
 los pesos, varias semillas del recocido, la medición con 70 recetas en un teléfono y una respuesta clara si la búsqueda
 no termina. Cifras del 2026-11-20 (JVM en un portátil de 7,3 GB y teléfono V2436 con Android 16).
 
-### 8.1 Aprovechamiento con su denominador
+### 9.1 Aprovechamiento con su denominador
 
 `AgentEvaluationTest`, 30 inventarios sintéticos, COP 100.000, 4 porciones, D1:
 
@@ -321,7 +364,7 @@ no termina. Cifras del 2026-11-20 (JVM en un portátil de 7,3 GB y teléfono V24
   muestra lo que el informe advirtió: usar un producto no es consumirlo entero.
 - El desperdicio es una suma de fracciones sin usar, no kilogramos.
 
-### 8.2 Memoria de A\* y del backtracking
+### 9.2 Memoria de A\* y del backtracking
 
 `AlgorithmComparisonTest` separa la frontera en la media de los máximos por inventario y el máximo individual:
 
@@ -333,9 +376,9 @@ no termina. Cifras del 2026-11-20 (JVM en un portátil de 7,3 GB y teléfono V24
 - Son estados guardados a la vez, no bytes.
 - El backtracking no guarda «tres recetas»: guarda la rama actual (como mucho 3 decisiones) y, en cada nivel, el
   inventario y el presupuesto restantes y la lista de candidatas evaluadas. Su memoria crece con el dominio, no con el
-  árbol. En el teléfono, el heap extra de una búsqueda fue de 1 a 2 MB en promedio y 8 MB como máximo (§8.5).
+  árbol. En el teléfono, el heap extra de una búsqueda fue de 1 a 2 MB en promedio y 8 MB como máximo (§9.5).
 
-### 8.3 Sensibilidad de los pesos
+### 9.3 Sensibilidad de los pesos
 
 `AgentSensitivityTest` cambia un peso a la vez a la mitad y al doble, en los 30 inventarios, y mide todo con los pesos
 base:
@@ -357,7 +400,7 @@ base:
   COP 3.000 más.
 - No hay calibración con usuarios reales: la tabla muestra la estabilidad, no cuál combinación prefieren las personas.
 
-### 8.4 Recocido simulado con varias semillas
+### 9.4 Recocido simulado con varias semillas
 
 10 semillas por inventario (300 corridas por fila), con el mismo catálogo y la misma utilidad:
 
@@ -372,7 +415,7 @@ base:
   backtracking con poda es mejor y además garantiza el óptimo.
 - La desviación entre semillas es pequeña: el resultado no depende de una semilla afortunada.
 
-### 8.5 Medición en el teléfono (V2436, 70 recetas)
+### 9.5 Medición en el teléfono (V2436, 70 recetas)
 
 `AgentDevicePerformanceTest`, APK debug, sin R8 y con una pantalla al frente:
 
@@ -392,7 +435,7 @@ caso de estrés, unos 10,9 s por inventario.
 - El tiempo con el APK release (R8) se mide en el flujo real de la app con `adb logcat -s SmartFoodIA`
   (`AiPlanViewModel`), que se registra aparte.
 
-### 8.6 Límite de 2 s (CA-RIA-02-13 y 02-14)
+### 9.6 Límite de 2 s (CA-RIA-02-13 y 02-14)
 
 La búsqueda ya no puede pasar de 2 s. Al llegar al límite, la ramificación y poda devuelve el mejor plan encontrado
 hasta ese momento: cumple todas las restricciones duras, pero no garantiza el óptimo, y la app lo dice («No alcancé a
@@ -402,10 +445,10 @@ contexto». Sin límite, el resultado es idéntico al anterior: `MealPlannerTest
 - En el teléfono, 7 de las 36 búsquedas llegaron al límite (las de estrés y alguna normal) y todas devolvieron un plan.
 - En los 30 inventarios normales, el plan con límite fue el óptimo (brecha 0).
 
-### 8.7 Lo que sigue sin validarse
+### 9.7 Lo que sigue sin validarse
 
 - Usuarios y despensas reales: desperdicio físico evitado, costo real, satisfacción y factibilidad de las recetas.
-- Calibrar los pesos con prioridades observadas; la §8.3 solo muestra qué tan estable es el plan ante cambios.
+- Calibrar los pesos con prioridades observadas; la §9.3 solo muestra qué tan estable es el plan ante cambios.
 - Las cantidades que no se pueden convertir siguen tratándose como un producto completo (supuesto documentado).
 - La brecha con el límite en el caso de estrés no se calculó en el teléfono, porque el óptimo tarda unos 44 s por
   inventario en el APK debug.

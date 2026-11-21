@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import coil3.compose.AsyncImage
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreenSoft
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 
 /**
  * Nombre: ProfileAvatar.kt
@@ -68,7 +68,7 @@ fun ProfileAvatar(
                 .size(size)
                 .clip(CircleShape)
                 // Figma 362:727: #DCFCE7; primaryContainer es el mismo verde del fondo y el círculo no se vería.
-                .background(GreenSoft)
+                .background(MaterialTheme.smartFoodColors.greenSoft)
         ) {
             if (photo != null) {
                 AsyncImage(

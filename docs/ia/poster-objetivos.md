@@ -30,7 +30,7 @@ servidor web propio ni pruebas de carga.
 
 | Sección | Dice | Propuesta | Por qué |
 |---|---|---|---|
-| Conclusiones | «Contribuye a la reducción del desperdicio de alimentos.» | «En 30 inventarios sintéticos, el plan usa el 88,9 % de los productos próximos a vencer que alguna receta puede aprovechar, frente al 74,7 % y 85,0 % de dos métodos simples.» | No se midió con usuarios ni despensas reales; el 88,9 % cuenta productos usados al menos en parte, no kilogramos (evaluación §8.1). |
+| Conclusiones | «Contribuye a la reducción del desperdicio de alimentos.» | «En 30 inventarios sintéticos, el plan usa el 88,9 % de los productos próximos a vencer que alguna receta puede aprovechar, frente al 74,7 % y 85,0 % de dos métodos simples.» | No se midió con usuarios ni despensas reales; el 88,9 % cuenta productos usados al menos en parte, no kilogramos (evaluación §9.1). |
 | Metodología, Pruebas | «Validación funcional, usabilidad y rendimiento.» | «Validación funcional, pruebas contra fuerza bruta y rendimiento.» | No hubo pruebas de usabilidad con usuarios; sí pruebas de optimalidad contra fuerza bruta y de rendimiento. |
 | Encabezado | «Asignatura: Dispositivos Móviles» | Confirmar con Zhair: si el póster también se presenta en Inteligencia Artificial, poner ambas asignaturas. | El informe de IA revisó este póster como evidencia del curso de IA. |
 

@@ -9,6 +9,13 @@
  */
 package com.smartfood.app.feature.inventory.ui.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.runtime.remember
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -41,7 +48,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
@@ -54,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.SpeechError
 import com.smartfood.app.feature.inventory.ui.messageRes
@@ -73,15 +80,34 @@ fun VoiceSearchOverlay(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (state == VoiceUiState.Hidden) return
+    // El aviso aparece y se va con disolvencia de 300 ms y, mientras se va, sigue mostrando el último estado
+    // (spec 007, CA-ANI-04-05).
+    val lastShown = remember { arrayOfNulls<VoiceUiState>(1) }
+    if (state != VoiceUiState.Hidden) lastShown[0] = state
+    AnimatedVisibility(
+        visible = state != VoiceUiState.Hidden,
+        enter = fadeIn(SmartFoodMotion.standard()),
+        exit = fadeOut(SmartFoodMotion.standard())
+    ) {
+        val shown = lastShown[0] ?: return@AnimatedVisibility
+        VoiceOverlayContent(state = shown, onRetry = onRetry, onDismiss = onDismiss, modifier = modifier)
+    }
+    if (state != VoiceUiState.Hidden) BackHandler(onBack = onDismiss)
+}
 
-    BackHandler(onBack = onDismiss)
-
+/** Velo y tarjeta del aviso de voz para un estado visible. */
+@Composable
+private fun VoiceOverlayContent(
+    state: VoiceUiState,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier,
+) {
     val dismissLabel = stringResource(id = R.string.cd_voice_dismiss)
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(ScrimColor)
+            .background(MaterialTheme.smartFoodColors.veil)
             .clickable(onClick = onDismiss)
             .semantics { contentDescription = dismissLabel },
         contentAlignment = Alignment.Center
@@ -96,6 +122,14 @@ fun VoiceSearchOverlay(
             shape = RoundedCornerShape(MaterialTheme.spacing.panelRadius),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
+            // Cada cambio de estado (escuchando, reconocido, procesando, error) dura 300 ms, ease-in-out (Figma
+            // "Grabadora"). La clave es el tipo de estado: el texto reconocido se actualiza sin reiniciar la animación.
+            AnimatedContent(
+                targetState = state,
+                contentKey = { it::class },
+                transitionSpec = { fadeIn(SmartFoodMotion.standard()) togetherWith fadeOut(SmartFoodMotion.standard()) },
+                label = "estadoDeVoz"
+            ) { state ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -163,6 +197,7 @@ fun VoiceSearchOverlay(
                     VoiceUiState.Hidden -> Unit
                 }
             }
+            }
         }
     }
 }
@@ -204,10 +239,6 @@ private fun VoiceWaves(modifier: Modifier = Modifier) {
         }
     }
 }
-
-/** Velo oscuro que separa el aviso del contenido de la búsqueda. */
-// Velo claro: el contenido de la búsqueda va desenfocado detrás, como el Figma (476:4507).
-private val ScrimColor = Color.White.copy(alpha = 0.35f)
 
 // Medidas del componente "Grabadora" (`476:4507`): ondas de 132 px y círculo de error de 100 px. No son medidas de
 // formulario, así que no van en FormMetrics.
