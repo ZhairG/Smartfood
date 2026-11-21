@@ -66,10 +66,15 @@ class FakeFavoritesRepository : FavoritesRepository {
     /** Llamadas recibidas en [setFavorite], en orden. */
     val setCalls = mutableListOf<FavoriteCall>()
 
+    /** Borrados que esperan al servidor; con [pendingWrites], quitar una favorita la deja aquí (CA-SAV-02-09). */
+    val pendingRemovals = MutableStateFlow<Set<String>>(emptySet())
+
     override fun observeFavorites(): Flow<List<Favorite>> = flow {
         observeFailure?.let { throw it }
         emitAll(favorites)
     }
+
+    override fun observePendingRemovals(): Flow<Set<String>> = pendingRemovals
 
     override suspend fun setFavorite(
         recipeId: String,
@@ -84,6 +89,11 @@ class FakeFavoritesRepository : FavoritesRepository {
                 Favorite(recipeId, source, savedAtMillis, pendingWrites)
         } else {
             favorites.value.filterNot { it.recipeId == recipeId }
+        }
+        pendingRemovals.value = if (!favorite && pendingWrites) {
+            pendingRemovals.value + recipeId
+        } else {
+            pendingRemovals.value - recipeId
         }
         return Result.success(outcome)
     }
@@ -113,7 +123,12 @@ class FakeOwnRecipesRepository : OwnRecipesRepository {
     var nextId: String = "own-recipe-1"
     val saveCalls = mutableListOf<SaveRecipeCall>()
 
+    /** Borrados que esperan al servidor; con [pendingWrites], borrar una receta la deja aquí (CA-SAV-02-09). */
+    val pendingRemovals = MutableStateFlow<Set<String>>(emptySet())
+
     override fun observeRecipes(): Flow<List<OwnRecipe>> = recipes
+
+    override fun observePendingRemovals(): Flow<Set<String>> = pendingRemovals
 
     override suspend fun getRecipe(id: String): Result<OwnRecipe> =
         getResult ?: recipes.value.firstOrNull { it.id == id }?.let { Result.success(it) }
@@ -125,12 +140,14 @@ class FakeOwnRecipesRepository : OwnRecipesRepository {
         saveCalls += SaveRecipeCall(recipe, isNew)
         saveResult?.let { return it }
         recipes.value = recipes.value.filterNot { it.id == recipe.id } + recipe.copy(isPendingSync = pendingWrites)
+        pendingRemovals.value = pendingRemovals.value - recipe.id
         return Result.success(outcome)
     }
 
     override suspend fun deleteRecipe(id: String): Result<WriteOutcome> {
         deleteResult?.let { return it }
         recipes.value = recipes.value.filterNot { it.id == id }
+        if (pendingWrites) pendingRemovals.value = pendingRemovals.value + id
         return Result.success(outcome)
     }
 

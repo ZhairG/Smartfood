@@ -52,8 +52,13 @@ class ObserveSavedRecipesUseCase @Inject constructor(
         combine(filter, query, sort) { selectedFilter, text, selectedSort ->
             Triple(selectedFilter, text, selectedSort)
         },
-    ) { source, options ->
-        buildData(source.first, source.second, source.third, options.first, options.second, options.third)
+        // Un borrado pendiente saca la tarjeta de la lista, pero sigue siendo un cambio sin sincronizar (CA-SAV-02-09).
+        combine(favorites.observePendingRemovals(), ownRecipes.observePendingRemovals()) { favoriteIds, ownIds ->
+            favoriteIds.isNotEmpty() || ownIds.isNotEmpty()
+        },
+    ) { source, options, hasPendingRemovals ->
+        val data = buildData(source.first, source.second, source.third, options.first, options.second, options.third)
+        if (hasPendingRemovals) data.copy(hasPendingSync = true) else data
     }
 
     private fun buildData(

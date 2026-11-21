@@ -22,7 +22,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | 6 | Revisión del modo oscuro | 013 (enmienda CA-UI-05-04) | Hecho | [#144](https://github.com/ZhairG/Smartfood/pull/144) |
 | 7 | Animaciones y transiciones | 007 | Hecho | [#145](https://github.com/ZhairG/Smartfood/pull/145) |
 | 8 | Correcciones de documentación y medición del agente | 009 (T047 a T053) | Hecho | [#146](https://github.com/ZhairG/Smartfood/pull/146) |
-| 9 | Pendientes menores | 009, 010 | Pendiente | — |
+| 9 | Pendientes menores | 009, 010 | Hecho | [#147](https://github.com/ZhairG/Smartfood/pull/147) |
 | 10 | Persistencia local con Room (opcional) | por definir | Pendiente | — |
 
 ## 1. Modo sin facturación (urgente)
@@ -134,6 +134,20 @@ Las cifras de §9 se midieron en la ronda final del 2026-11-20.
 
 - T024 de la spec 010.
 - Prueba intermitente `AiFlowScreenTest.caRia0207`.
+
+**Avance (rama `fix/009-010-pendientes-menores`, 2026-11-20):**
+- **Prueba intermitente:** la causa es externa. La ventana emergente de Truecaller se abrió encima de la prueba en el
+  V2436 y la dejó en pausa («No compose hierarchies found»). No hay que corregir código: la precaución quedó en
+  [`instalacion.md`](instalacion.md) y en la T046 de la spec 009.
+- **T024 (hecha el 2026-11-20):** comparación Figma vs app de las 11 pantallas, en claro y oscuro, y checklist manual,
+  con el APK de `integracion/ronda-final`. Todo está en `disenos-figma/Modulo 5 - Recetas guardadas/comparacion/README.md`.
+  Quedan sin corregir:
+  - un hallazgo de contraste del rojo en modo oscuro;
+  - 4 hallazgos menores de fidelidad;
+  - la favorita en otro teléfono, que no se verificó.
+- **T026 (encontrado en la ronda final):** quitar un ♡ o borrar una receta propia sin conexión no mostraba la tarjeta
+  «Sin conexión» de Guardadas, porque el borrado saca la tarjeta de la lista. Los repositorios ahora exponen los
+  borrados pendientes (CA-SAV-02-09).
 
 ## 10. Persistencia local con Room (opcional)
 

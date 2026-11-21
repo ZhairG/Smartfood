@@ -100,8 +100,20 @@
 - [x] T022 Suite instrumentada completa y `rules-test` en verde.
 - [x] T023 Despliegue del bloque `recipes` de `firestore.rules` (con confirmación de Zhair). El bloque `favorites` se
   despliega al cerrar el #117, para poder probar el ♡ contra Firebase.
-- [ ] T024 Checklist manual en el teléfono (abajo) y capturas Figma vs app en el PR.
+- [x] T024 Checklist manual en el teléfono (abajo) y capturas Figma vs app en el PR. *Hecha en la ronda final
+  (2026-11-20), con el APK debug de `integracion/ronda-final` en el V2436: 22 capturas (claro y oscuro), tabla y checklist en
+  [`disenos-figma/Modulo 5 - Recetas guardadas/comparacion/README.md`](../../disenos-figma/Modulo%205%20-%20Recetas%20guardadas/comparacion/README.md).*
+  - **Sin verificar:** la favorita en otro teléfono (paso 1). Zhair no tenía otro teléfono.
+  - **Hallazgos sin corregir (cada uno necesita su propio modo plan):**
+    - el rojo de error en modo oscuro tiene poco contraste (07, accesibilidad);
+    - los círculos del check y de la papelera no tienen sombra;
+    - el ⚠ es negro;
+    - el ícono de Categoría no está inclinado;
+    - falta la ayuda «0 min».
 - [x] T025 Matriz al día, `tools/ca_coverage_baseline.txt`, `README.md` y `AGENTS.md` (arquitectura de Guardadas).
+- [x] T026 **Sin conexión con borrados pendientes** (CA-SAV-02-09, encontrado en la ronda final del 2026-11-20):
+  `observePendingRemovals()` en `FavoritesRepository` y `OwnRecipesRepository` (rastreo en memoria en los repositorios
+  de Firestore) y `ObserveSavedRecipesUseCase` lo suma a `hasPendingSync`; fakes y `ObserveSavedRecipesUseCaseTest`.
 
 ## Matriz de trazabilidad
 

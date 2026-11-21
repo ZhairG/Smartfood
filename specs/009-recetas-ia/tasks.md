@@ -66,6 +66,12 @@
 - [x] T044 `CookingViewModel` crea el `operationId` una vez en `SavedStateHandle` y lo usa en cada intento (CA-RIA-04-09).
 - [x] T045 `rules-test`: un lote válido del cierre se acepta y uno que repite `cookings/{id}` se rechaza entero (CA-RIA-04-09).
 
+- [x] T046 Prueba intermitente de `AiFlowScreenTest` (punto 9 de los pendientes, 2026-11-20). La causa no estaba en la
+  app: en el V2436, la ventana emergente de Truecaller (`NeoPACSActivity`) se abrió 0,6 s después de que empezara una
+  prueba, la dejó en pausa y Compose falló con «No compose hierarchies found». Se reprodujo 1 vez en 5 corridas de la
+  clase; `caRia0207` sola pasó 20 de 20. No cambia el código; la precaución quedó en `docs/instalacion.md` («Pruebas»).
+  Sin esa ventana, la clase completa pasó 20 veces seguidas (240 pruebas, 0 fallas).
+
 ## Punto 8 de los pendientes: evaluación y medición del agente (2026-11-20)
 Rama `feature/009-evaluacion-agente`. Origen: informe de IA del 13/11/2026 ([`docs/pendientes.md`](../../docs/pendientes.md) §8).
 - [x] T047 Enmienda de la spec: CA-RIA-02-10 con 70 recetas, CA-RIA-02-13 y 02-14 (límite de 2 s), RNF-RIA-02 y la desviación del aviso.
