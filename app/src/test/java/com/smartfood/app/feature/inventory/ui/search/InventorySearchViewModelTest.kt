@@ -4,10 +4,15 @@
  * Fecha: Octubre 2026
  * Descripción: Pruebas unitarias de [InventorySearchViewModel] (spec 006, HU-INV-06 y HU-INV-07). Comprueban que el
  * estado sale del dominio (CA-INV-06-01 a 06-03, 06-07), que navegar es un efecto de un solo uso (CA-INV-06-08) y
- * que la voz pide permiso, escucha, llena la barra, cancela y respeta el filtro (CA-INV-07-01 a 07-09).
+ * que la voz pide permiso, escucha, llena la barra, cancela y respeta el filtro (CA-INV-07-01 a 07-09). También las
+ * búsquedas recientes, incluida la voz (spec 014, T006, CA-LOC-02-01 a 02-06).
  */
 package com.smartfood.app.feature.inventory.ui.search
 
+import com.smartfood.app.core.search.domain.ClearRecentSearchesUseCase
+import com.smartfood.app.core.search.domain.ObserveRecentSearchesUseCase
+import com.smartfood.app.core.search.domain.RecordRecentSearchUseCase
+import com.smartfood.app.core.search.domain.SearchScope
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
@@ -22,6 +27,7 @@ import com.smartfood.app.feature.inventory.domain.usecase.ParseSpokenIngredients
 import com.smartfood.app.feature.inventory.domain.usecase.SearchInventoryUseCase
 import com.smartfood.app.testutil.FakeInventoryRepository
 import com.smartfood.app.testutil.FakePhotoSync
+import com.smartfood.app.testutil.FakeRecentSearchesRepository
 import com.smartfood.app.testutil.FakeSpeechToText
 import com.smartfood.app.testutil.fixedClock
 import com.smartfood.app.testutil.inventoryItem
@@ -29,6 +35,7 @@ import com.smartfood.app.testutil.MainDispatcherRule
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -71,11 +78,16 @@ class InventorySearchViewModelTest {
         )
     }
 
+    private val recientes = FakeRecentSearchesRepository()
+
     private fun crearViewModel(inventario: InventoryRepository = repository) = InventorySearchViewModel(
         observeInventoryUseCase = ObserveInventoryUseCase(inventario, FakePhotoSync(), ClassifyExpiryUseCase(fixedClock(today))),
         searchInventoryUseCase = SearchInventoryUseCase(),
         speechToText = speech,
-        parseSpokenIngredientsUseCase = ParseSpokenIngredientsUseCase()
+        parseSpokenIngredientsUseCase = ParseSpokenIngredientsUseCase(),
+        observeRecentSearches = ObserveRecentSearchesUseCase(recientes),
+        recordRecentSearch = RecordRecentSearchUseCase(recientes, fixedClock(today)),
+        clearRecentSearches = ClearRecentSearchesUseCase(recientes)
     )
 
     /** Concede el permiso y deja la escucha activa, como al tocar el micrófono (CA-INV-07-01). */
@@ -136,6 +148,55 @@ class InventorySearchViewModelTest {
 
         viewModel.onEvent(InventorySearchEvent.BackClicked)
         assertEquals(InventorySearchEffect.NavigateBack, viewModel.effects.first())
+    }
+
+    @Test
+    fun `CA-LOC-02-02 tocar un resultado o pulsar Buscar guarda la busqueda y escribir no`() = runTest {
+        inventarioDePrueba()
+        val viewModel = crearViewModel()
+
+        viewModel.onEvent(InventorySearchEvent.QueryChanged("lec"))
+        viewModel.onEvent(InventorySearchEvent.QueryChanged("leche"))
+        advanceUntilIdle()
+        assertTrue("escribir no guarda", recientes.texts(SearchScope.INVENTORY).isEmpty())
+
+        viewModel.onEvent(InventorySearchEvent.ResultClicked("item-1"))
+        viewModel.effects.first()
+        viewModel.onEvent(InventorySearchEvent.QueryChanged("pera"))
+        viewModel.onEvent(InventorySearchEvent.SearchSubmitted)
+        advanceUntilIdle()
+
+        // Con el reloj fijo las dos tienen la misma fecha: el orden lo prueba RecentSearchUseCasesTest.
+        assertEquals(setOf("pera", "leche"), recientes.texts(SearchScope.INVENTORY).toSet())
+        assertTrue("Recetas no cambia", recientes.texts(SearchScope.RECIPES).isEmpty())
+    }
+
+    @Test
+    fun `CA-LOC-02-03 lo dictado por voz queda en recientes`() = runTest {
+        inventarioDePrueba()
+        val viewModel = crearViewModel()
+        empezarEscucha(viewModel)
+
+        speech.send(SpeechEvent.Result(listOf("carne, pollo y leche")))
+        viewModel.uiState.first { it.query == "carne, pollo, leche" }
+        advanceUntilIdle()
+
+        assertEquals(listOf("carne, pollo, leche"), recientes.texts(SearchScope.INVENTORY))
+    }
+
+    @Test
+    fun `CA-LOC-02-01 CA-LOC-02-05 CA-LOC-02-06 los chips salen en el estado, tocar uno busca y Borrar los quita`() = runTest {
+        inventarioDePrueba()
+        RecordRecentSearchUseCase(recientes, fixedClock(today))(SearchScope.INVENTORY, "manzana")
+        val viewModel = crearViewModel()
+        assertEquals(listOf("manzana"), viewModel.uiState.first { it.recentSearches.isNotEmpty() }.recentSearches)
+
+        viewModel.onEvent(InventorySearchEvent.RecentClicked("manzana"))
+        val buscando = viewModel.uiState.first { it.query == "manzana" }
+        assertEquals(listOf("item-2"), buscando.results.map { it.item.id })
+
+        viewModel.onEvent(InventorySearchEvent.ClearRecents)
+        assertTrue(viewModel.uiState.first { it.recentSearches.isEmpty() }.recentSearches.isEmpty())
     }
 
     @Test

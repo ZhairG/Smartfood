@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
@@ -37,7 +40,8 @@ import com.smartfood.app.core.designsystem.theme.SurfaceLight
  * @param placeholder Texto de ayuda; también lo anuncia TalkBack.
  * @param onQueryChanged Se llama al escribir.
  * @param onClearQuery Se llama al tocar la "x".
- * @param modifier Modificador opcional.
+ * @param modifier Modificador opcional; con `onFocusChanged` la pantalla sabe si la barra tiene el foco (spec 014).
+ * @param onSearch Si no es `null`, el teclado muestra «Buscar» y lo llama al pulsarlo (spec 014, CA-LOC-02-02).
  */
 @Composable
 fun RecipeSearchField(
@@ -46,6 +50,7 @@ fun RecipeSearchField(
     onQueryChanged: (String) -> Unit,
     onClearQuery: () -> Unit,
     modifier: Modifier = Modifier,
+    onSearch: (() -> Unit)? = null,
 ) {
     val textStyle = MaterialTheme.typography.bodyLarge.copy(
         fontSize = 13.sp,
@@ -56,6 +61,8 @@ fun RecipeSearchField(
         onValueChange = onQueryChanged,
         singleLine = true,
         textStyle = textStyle,
+        keyboardOptions = if (onSearch != null) KeyboardOptions(imeAction = ImeAction.Search) else KeyboardOptions.Default,
+        keyboardActions = KeyboardActions(onSearch = { onSearch?.invoke() }),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         modifier = modifier
             .fillMaxWidth()

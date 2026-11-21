@@ -19,6 +19,7 @@ import com.smartfood.app.feature.recipes.domain.model.RecipeFilter
  * @property filter Filtro activo.
  * @property recipes Tarjetas visibles, ya buscadas, filtradas y ordenadas.
  * @property favoriteIds Ids de las recetas del catálogo marcadas como favoritas (spec 010, CA-SAV-01-01).
+ * @property recentSearches Búsquedas recientes de esta barra, la última primero (spec 014, CA-LOC-02-01).
  */
 data class RecipesDiscoverUiState(
     val isLoading: Boolean = true,
@@ -27,6 +28,7 @@ data class RecipesDiscoverUiState(
     val filter: RecipeFilter = RecipeFilter.FOR_YOU,
     val recipes: List<RecipeCardUi> = emptyList(),
     val favoriteIds: Set<String> = emptySet(),
+    val recentSearches: List<String> = emptyList(),
 )
 
 /**
@@ -58,6 +60,15 @@ sealed interface RecipesDiscoverEvent {
 
     /** Tocó la "x" de la búsqueda. */
     data object ClearQuery : RecipesDiscoverEvent
+
+    /** Pulsó «Buscar» en el teclado: guarda la búsqueda (spec 014, CA-LOC-02-02). */
+    data object SearchSubmitted : RecipesDiscoverEvent
+
+    /** Tocó un chip de «Recientes»: busca ese texto (spec 014, CA-LOC-02-05). */
+    data class RecentClicked(val text: String) : RecipesDiscoverEvent
+
+    /** Tocó «Borrar» en «Recientes» (spec 014, CA-LOC-02-06). */
+    data object ClearRecents : RecipesDiscoverEvent
 
     /** Tocó un filtro. */
     data class FilterSelected(val filter: RecipeFilter) : RecipesDiscoverEvent

@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.auth.domain.usecase
 
+import com.smartfood.app.core.database.LocalUserData
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.User
 import com.smartfood.app.feature.auth.domain.model.authFailure
@@ -59,20 +60,24 @@ class GetCurrentUserUseCase @Inject constructor(
 
 /**
  * Cierra la sesión activa, cancela los avisos de vencimiento de esa cuenta (spec 006, CA-INV-08-06) y descarta las
- * fotos que esperaban subirse, para que no se suban a la cuenta siguiente (CA-INV-10-07).
+ * fotos que esperaban subirse, para que no se suban a la cuenta siguiente (CA-INV-10-07). También borra la base local
+ * del teléfono: el historial de cocina y las búsquedas recientes (spec 014, CA-LOC-01-05 y CA-LOC-02-08).
  *
  * @param authRepository Repositorio de cuenta y sesión.
  * @param reminderScheduler Aviso diario de productos por vencer.
  * @param photoSync Fotos que esperan subirse.
+ * @param localUserData Datos de la cuenta guardados en Room.
  */
 class LogoutUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val reminderScheduler: ExpiryReminderScheduler,
-    private val photoSync: PhotoSync
+    private val photoSync: PhotoSync,
+    private val localUserData: LocalUserData,
 ) {
     operator fun invoke() {
         reminderScheduler.cancel()
         photoSync.clearAll()
+        localUserData.clearAll()
         authRepository.logout()
     }
 }

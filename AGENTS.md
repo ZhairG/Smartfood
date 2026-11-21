@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code), Gemini or any other
 
 ## Proyecto
 
-App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, paquete `com.smartfood.app`. Proyecto universitario (UTADEO 2026-2) para reducir el desperdicio de comida en hogares: inventario + vencimientos + presupuesto, con un agente de recomendación de recetas. Hoy están implementados la autenticación (módulo 1), el **inventario** (spec 006), con uso sin conexión, el **perfil** (spec 008), **recetas + IA** (spec 009) y las **recetas guardadas** (spec 010).
+App Android (Kotlin + Jetpack Compose, Material 3) de un solo módulo `:app`, paquete `com.smartfood.app`. Proyecto universitario (UTADEO 2026-2) para reducir el desperdicio de comida en hogares: inventario + vencimientos + presupuesto, con un agente de recomendación de recetas. Hoy están implementados la autenticación (módulo 1), el **inventario** (spec 006), con uso sin conexión, el **perfil** (spec 008), **recetas + IA** (spec 009), las **recetas guardadas** (spec 010) y la **persistencia local con Room** (spec 014).
 
 Trabajo pendiente después de la entrega, en orden: [`docs/pendientes.md`](docs/pendientes.md).
 
@@ -14,7 +14,7 @@ Trabajo pendiente después de la entrega, en orden: [`docs/pendientes.md`](docs/
 
 Antes de escribir código, leer **`specs/constitution.md`** (principios no negociables) y la spec de la feature.
 
-- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario`, `008-perfil`, `009-recetas-ia` y `010-recetas-guardadas` y `011-cocinas-del-mundo` (implementadas). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`, `CA-RIA-01-01`, `CA-SAV-01-01`, `CA-COC-01-01`).
+- Specs actuales: `001-autenticacion`, `002-adaptabilidad-ui`, `003-recuperacion-real`, `004-correo-registro`, `005-documentos-legales`, `006-inventario`, `008-perfil`, `009-recetas-ia` y `010-recetas-guardadas` y `011-cocinas-del-mundo` (implementadas), y `014-persistencia-local` (en implementación). A partir de la 002, los códigos llevan prefijo (`CA-UI-01-01`, `CA-REC-01-01`, `CA-MAIL-01-01`, `CA-LEG-01-01`, `CA-INV-01-01`, `CA-PER-01-01`, `CA-RIA-01-01`, `CA-SAV-01-01`, `CA-COC-01-01`, `CA-LOC-01-01`).
 - Las capturas de referencia de cada módulo están en `disenos-figma/` (índice en su `README.md`); la fuente de verdad sigue siendo el Figma.
 - Cada feature vive en `specs/NNN-nombre/` con `spec.md` (QUÉ: historias, criterios Dado/Cuando/Entonces), `plan.md` (CÓMO: contratos, decisiones) y `tasks.md` (tareas + matriz CA → test).
 - Una feature nueva empieza creando su `spec.md`; el código viene después. Si el código y la spec discrepan, se corrige primero la spec.
@@ -238,6 +238,15 @@ Paquetes **por feature** (`feature/<nombre>/{domain,data,ui}`) más `core/` comp
   - **Recetas propias (`ui/own`):** editor, "¡Receta guardada!", detalle y "Eliminar receta". Sus pantallas conservan la barra inferior con Guardadas resaltada. `OwnRecipeText.kt` es el único mapeo de categorías y errores a texto.
   - **Deshacer:** `DeleteOwnRecipeUseCase` borra de verdad y deja la copia en `DeletedRecipeStore`; `SavedRecipesViewModel` cuenta de 8 a 1 y `RestoreOwnRecipeUseCase` la vuelve a escribir.
   - Textos en `res/values/strings_saved.xml`; la sombra de las tarjetas es `recipeCardShadow()`.
+- **Persistencia local con Room (spec 014, `core/database` y `core/search`):**
+  - `SmartFoodDatabase` (Room 2.7, esquema versionado en `app/schemas/`) con `cookings` y `recent_searches`. Cada fila
+    lleva el `uid` y los DAO siempre filtran por el de `CurrentUid`. Un cambio de tablas sube la versión con su migración.
+  - **Historial:** `CachedCookingHistoryRepository` lee de Room y copia los snapshots de `FirestoreCookingHistoryRepository`
+    (`@RemoteHistory`); Firestore sigue siendo la fuente de verdad. «Ahorrados este mes» se ve sin red.
+  - **Búsquedas recientes:** `RecordRecentSearchUseCase` es el único lugar con las reglas (≥ 2 letras, sin duplicar por
+    texto normalizado, 10 por barra). Se guardan al tocar un resultado, al pulsar «Buscar» y, en el Inventario, al dictar.
+    `SmartFoodRecentSearches` las muestra con la barra enfocada y vacía (desviación aprobada, sin ícono).
+  - `LogoutUseCase` llama a `LocalUserData.clearAll()`, que borra las tablas en el `@ApplicationScope`.
 - **Navegación (`core/navigation`):** `AppNavHost` arranca en `Splash`; `SplashViewModel` usa `ResolveSessionUseCase` para ir a `MainGraph` (Home) o a `AuthGraph` (Login). `authGraph()` y `mainGraph()` son extensiones de `NavGraphBuilder` en cada feature. Las transiciones push de 600 ms se declaran una sola vez (`NavTransitions`). `navigateToMainGraph()` y `navigateToLoginClearingBackStack()` limpian toda la pila.
 - **DI:** `core/di/CoreDataModule` provee `FirebaseAuth`, `FirebaseFirestore`, `FirebaseFunctions` y el `DataStore`, siempre **no nulos**; `feature/auth/data/di/AuthDataModule` enlaza las interfaces.
 - **Design system (`core/designsystem`):** `theme/` (tokens), `components/` (prefijo `SmartFood`) y `util/` (modificadores, `SystemBarEffect`, `ClearFocusOnKeyboardDismiss`).

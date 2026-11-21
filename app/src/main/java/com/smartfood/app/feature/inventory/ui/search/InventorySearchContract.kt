@@ -54,6 +54,7 @@ sealed interface VoiceUiState {
  *   no se muestra (CA-INV-07-08).
  * @property voice Estado del aviso de voz (CA-INV-07-01, CA-INV-07-02, CA-INV-07-05).
  * @property isLoading `true` hasta que llega el primer resultado del inventario.
+ * @property recentSearches Búsquedas recientes de esta barra, la última primero (spec 014, CA-LOC-02-01).
  */
 data class InventorySearchUiState(
     val query: String = "",
@@ -62,6 +63,7 @@ data class InventorySearchUiState(
     val isVoiceAvailable: Boolean = false,
     val voice: VoiceUiState = VoiceUiState.Hidden,
     val isLoading: Boolean = false,
+    val recentSearches: List<String> = emptyList(),
 ) {
     /** No hay nada que mostrar una vez terminada la carga (CA-INV-06-06). */
     val isEmptyResult: Boolean
@@ -77,6 +79,15 @@ sealed interface InventorySearchEvent {
 
     /** El usuario tocó la "x" de la barra (CA-INV-06-07). */
     data object ClearQuery : InventorySearchEvent
+
+    /** El usuario pulsó «Buscar» en el teclado: guarda la búsqueda (spec 014, CA-LOC-02-02). */
+    data object SearchSubmitted : InventorySearchEvent
+
+    /** El usuario tocó un chip de «Recientes»: busca ese texto (spec 014, CA-LOC-02-05). */
+    data class RecentClicked(val text: String) : InventorySearchEvent
+
+    /** El usuario tocó «Borrar» en «Recientes» (spec 014, CA-LOC-02-06). */
+    data object ClearRecents : InventorySearchEvent
 
     /** El usuario eligió un filtro de categoría; `null` es "Todos" (CA-INV-06-03). */
     data class CategorySelected(val category: FoodCategory?) : InventorySearchEvent

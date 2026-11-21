@@ -31,6 +31,8 @@ workManager = "2.12.0"
 androidxHilt = "1.2.0"
 # La misma que ya traen CameraX y Coil; se declara porque la usa la compresión de fotos (T018).
 exifinterface = "1.4.2"
+# Persistencia local (spec 014). 2.7.x funciona con Kotlin 2.2 y KSP2; minSdk 23.
+room = "2.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -95,6 +97,11 @@ androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", vers
 
 # Orientación EXIF de las fotos (spec 006, T018)
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
+
+# Room: historial de cocina y búsquedas recientes (spec 014)
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
