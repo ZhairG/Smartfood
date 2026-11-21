@@ -81,7 +81,7 @@ Leyenda: **U** = prueba unitaria, **I** = prueba instrumentada (verificada en un
 | CA-UI-05-01 | U `ThemeModeTest`, I `ColorModeTest.ca_ui_05_01_*` (tema y pantalla de éxito con el teléfono en modo oscuro; se comprueba el píxel de fondo `GreenLight`) |
 | CA-UI-05-02 | M (V2436 en modo oscuro: arranque en frío capturado cuadro a cuadro; el primer cuadro es `#F0FDF4` con el logo y ningún cuadro es oscuro) |
 | CA-UI-05-03 | U `ThemeModeTest`, I `ColorModeTest.ca_ui_05_03_*`; `isSystemInDarkTheme()` solo en `ThemeMode.kt` (RNF-UI-05) |
-| CA-UI-05-04 | Revisión de código: `Color.kt` y los esquemas de `Theme.kt` sin cambios; el `#F0FDF4` fijo de la Splash pasa al token `GreenLight` (mismo valor) |
+| CA-UI-05-04 | Revisión de código: `Color.kt` y los esquemas de `Theme.kt` sin cambios; el `#F0FDF4` fijo de la Splash pasa al token `GreenLight` (mismo valor). Desde la spec 013, el esquema oscuro cambia y el claro se comprueba con `SmartFoodColorsContrastTest` |
 | CA-UI-06-01 | I `LauncherIconTest.ca_ui_06_01_*` (`AdaptiveIconDrawable` con fondo `#F0FDF4`, normal y redondo) |
 | CA-UI-06-02 | `tools/generate_launcher_icon.py` (aserción por densidad: ningún píxel visible fuera del círculo de 66 dp); vista previa con máscaras de círculo, squircle y cuadrado |
 | CA-UI-06-03 | I `LauncherIconTest.ca_ui_06_03_*` (ejecutada en Android 13) |

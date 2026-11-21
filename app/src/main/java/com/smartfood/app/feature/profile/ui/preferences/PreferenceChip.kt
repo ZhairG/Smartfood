@@ -10,9 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.White
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 
 /**
  * Nombre: PreferenceChip.kt
@@ -48,14 +47,14 @@ fun PreferenceChip(
         colors = FilterChipDefaults.filterChipColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             labelColor = MaterialTheme.colorScheme.onSurface,
-            selectedContainerColor = GreenCheck,
-            selectedLabelColor = White
+            selectedContainerColor = MaterialTheme.smartFoodColors.checkedFill,
+            selectedLabelColor = MaterialTheme.smartFoodColors.onCheckedFill
         ),
         border = FilterChipDefaults.filterChipBorder(
             enabled = true,
             selected = selected,
             borderColor = MaterialTheme.colorScheme.outline,
-            selectedBorderColor = GreenCheck
+            selectedBorderColor = MaterialTheme.smartFoodColors.checkedFill
         ),
         modifier = modifier
     )

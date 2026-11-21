@@ -48,9 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
-import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.SurfaceLight
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
@@ -193,8 +192,8 @@ private fun SearchField(
                     .fillMaxWidth()
                     .heightIn(min = SearchBarHeight)
                     // Figma 476:3200: relleno #F3F4F6 con borde #E5E7EB de 1 px y radio 24.
-                    .background(color = SurfaceLight, shape = CircleShape)
-                    .border(width = SearchBarBorder, color = GreyDivider, shape = CircleShape)
+                    .background(color = MaterialTheme.smartFoodColors.softFill, shape = CircleShape)
+                    .border(width = SearchBarBorder, color = MaterialTheme.smartFoodColors.divider, shape = CircleShape)
                     .padding(horizontal = MaterialTheme.spacing.medium)
             ) {
                 Icon(

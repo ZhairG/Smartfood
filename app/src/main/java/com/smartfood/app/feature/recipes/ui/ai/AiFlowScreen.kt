@@ -47,12 +47,9 @@ import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreenDark
-import com.smartfood.app.core.designsystem.theme.GreenSoft
-import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.GreyLight
-import com.smartfood.app.core.designsystem.theme.LocalIsDarkTheme
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.YellowSoft
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.util.figmaShadow
 import com.smartfood.app.feature.inventory.ui.components.OptionSheet
 import com.smartfood.app.feature.profile.ui.preferences.titleRes
@@ -127,7 +124,7 @@ fun AiFlowScreen(
 private fun BarAction(text: String, onClick: () -> Unit) {
     Text(
         text = text,
-        color = MaterialTheme.colorScheme.onPrimary,
+        color = MaterialTheme.smartFoodColors.onHeader,
         style = CardTitleStyle(),
         modifier = Modifier.clickable(role = Role.Button, onClick = onClick)
     )
@@ -221,7 +218,7 @@ private fun ContextContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
         )
         Text(
             text = stringResource(id = R.string.recipes_ai_budget_value, formatCop(state.budgetCop)),
-            color = if (LocalIsDarkTheme.current) MaterialTheme.colorScheme.primary else GreenDark,
+            color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp, lineHeight = 22.5.sp, fontWeight = FontWeight.Bold)
         )
         Column {
@@ -319,18 +316,18 @@ private fun Pill(
 ) {
     val container = when {
         selected -> MaterialTheme.colorScheme.primary
-        highlighted && !LocalIsDarkTheme.current -> YellowSoft
+        highlighted -> MaterialTheme.smartFoodColors.highlight
         else -> MaterialTheme.colorScheme.surfaceVariant
     }
     val content = when {
         selected -> MaterialTheme.colorScheme.onPrimary
-        highlighted && !LocalIsDarkTheme.current -> GreenDark
+        highlighted -> MaterialTheme.smartFoodColors.onHighlight
         else -> MaterialTheme.colorScheme.onSurface
     }
     val base = Modifier
         .clip(CircleShape)
         .background(container)
-        .border(1.dp, if (selected) MaterialTheme.colorScheme.primary else GreyDivider, CircleShape)
+        .border(1.dp, if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.smartFoodColors.divider, CircleShape)
     val interactive = when {
         onClick == null -> base
         toggle -> base.toggleable(value = selected, role = Role.Switch, onValueChange = { onClick() })
@@ -395,7 +392,7 @@ private fun PlanContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
             .fillMaxWidth()
             .cardShadow()
             .clip(RoundedCornerShape(CardRadius))
-            .background(if (LocalIsDarkTheme.current) MaterialTheme.colorScheme.surfaceVariant else GreenSoft)
+            .background(MaterialTheme.smartFoodColors.greenSoft)
             .padding(CardPadding)
     ) {
         Text(

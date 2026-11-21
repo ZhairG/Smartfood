@@ -45,9 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreenCheck
-import com.smartfood.app.core.designsystem.theme.GreenMain20
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
@@ -241,11 +240,11 @@ private fun CategoryLabel(item: InventoryItem, modifier: Modifier = Modifier) {
             lineHeight = TextUnit.Unspecified,
             fontWeight = FontWeight.Bold
         ),
-        color = GreenCheck,
+        color = MaterialTheme.smartFoodColors.onTag,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
-            .background(color = GreenMain20, shape = CategoryLabelShape)
+            .background(color = MaterialTheme.smartFoodColors.tag, shape = CategoryLabelShape)
             .padding(horizontal = CategoryLabelPadding)
     )
 }

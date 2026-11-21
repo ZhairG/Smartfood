@@ -47,9 +47,10 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.core.designsystem.util.smartFoodSheetProperties
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +68,7 @@ fun <T> OptionSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        properties = smartFoodSheetProperties(),
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(topStart = spacing.panelRadius, topEnd = spacing.panelRadius)
     ) {
@@ -96,7 +98,7 @@ fun <T> OptionSheet(
                         RadioButton(
                             selected = isMarked,
                             onClick = null,
-                            colors = RadioButtonDefaults.colors(selectedColor = GreenCheck)
+                            colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.smartFoodColors.greenIcon)
                         )
                         Text(
                             text = label(option),
@@ -110,13 +112,15 @@ fun <T> OptionSheet(
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.medium), modifier = Modifier.fillMaxWidth()) {
                 SheetButton(
                     text = stringResource(id = R.string.editor_sheet_save),
-                    containerColor = GreenCheck,
+                    containerColor = MaterialTheme.smartFoodColors.checkedFill,
+                    contentColor = MaterialTheme.smartFoodColors.onCheckedFill,
                     onClick = { onConfirm(marked) },
                     modifier = Modifier.weight(1f)
                 )
                 SheetButton(
                     text = stringResource(id = R.string.editor_sheet_cancel),
                     containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f)
                 )
@@ -130,6 +134,7 @@ fun <T> OptionSheet(
 private fun SheetButton(
     text: String,
     containerColor: Color,
+    contentColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -138,7 +143,7 @@ private fun SheetButton(
         shape = RoundedCornerShape(MaterialTheme.spacing.buttonRadius),
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            contentColor = contentColor
         ),
         modifier = modifier.height(LocalFormMetrics.current.inputHeight)
     ) {

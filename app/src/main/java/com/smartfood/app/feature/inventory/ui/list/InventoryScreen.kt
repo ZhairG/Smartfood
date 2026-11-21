@@ -47,7 +47,9 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.components.SmartFoodPrimaryButton
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
+import com.smartfood.app.core.designsystem.util.SystemBarEffect
 import com.smartfood.app.feature.inventory.domain.model.ExpiryStatus
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 import com.smartfood.app.feature.inventory.domain.model.InventoryError
@@ -108,16 +110,18 @@ private fun InventoryTopBar(
     onSearchClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Encabezado verde: íconos blancos en la barra de estado, también al abrir la app en frío (spec 013, CA-OSC-04-03).
+    SystemBarEffect(isLightBackground = false)
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.smartFoodColors.header)
             .windowInsetsPadding(WindowInsets.statusBars)
             .height(TopBarHeight)
     ) {
         Text(
             text = stringResource(id = R.string.inventory_title),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.smartFoodColors.onHeader,
             style = MaterialTheme.typography.titleLarge.copy(
                 fontSize = TopBarTitleSize,
                 fontWeight = FontWeight.Bold
@@ -139,7 +143,7 @@ private fun InventoryTopBar(
             Icon(
                 painter = painterResource(id = R.drawable.ic_figma_search),
                 contentDescription = stringResource(id = R.string.cd_search_button),
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = MaterialTheme.smartFoodColors.onHeader,
                 modifier = Modifier.size(FigmaIconSize)
             )
         }

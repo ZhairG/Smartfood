@@ -25,9 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreyDivider
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
-import com.smartfood.app.core.designsystem.theme.SurfaceLight
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.core.designsystem.theme.spacing
 import com.smartfood.app.feature.inventory.domain.model.FoodCategory
 
@@ -92,7 +91,7 @@ private fun CategoryChip(
         },
         shape = CircleShape,
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = SurfaceLight,
+            containerColor = MaterialTheme.smartFoodColors.softFill,
             labelColor = MaterialTheme.colorScheme.onSurface,
             selectedContainerColor = MaterialTheme.colorScheme.primary,
             selectedLabelColor = MaterialTheme.colorScheme.onPrimary
@@ -100,7 +99,7 @@ private fun CategoryChip(
         border = FilterChipDefaults.filterChipBorder(
             enabled = true,
             selected = selected,
-            borderColor = GreyDivider,
+            borderColor = MaterialTheme.smartFoodColors.divider,
             selectedBorderColor = MaterialTheme.colorScheme.primary
         )
     )

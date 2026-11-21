@@ -3,6 +3,7 @@ package com.smartfood.app.feature.recipes.ui.own
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -10,9 +11,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.GreenCheck
-import com.smartfood.app.core.designsystem.theme.GreenSoft
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 import com.smartfood.app.feature.recipes.ui.components.OutlineActionButton
 import com.smartfood.app.feature.recipes.ui.components.RecipeActionButton
 
@@ -43,11 +43,11 @@ fun OwnRecipeSavedScreen(
         heading = stringResource(id = R.string.own_saved_heading),
         body = stringResource(id = if (edited) R.string.own_saved_updated else R.string.own_saved_created, name),
         icon = {
-            ResultCircle(color = GreenSoft) {
+            ResultCircle(color = MaterialTheme.smartFoodColors.greenSoft) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_figma_check),
                     contentDescription = null,
-                    tint = GreenCheck,
+                    tint = MaterialTheme.smartFoodColors.greenIcon,
                     modifier = Modifier.size(width = 50.dp, height = 36.dp)
                 )
             }

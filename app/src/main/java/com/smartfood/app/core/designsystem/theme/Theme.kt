@@ -15,10 +15,11 @@ import androidx.compose.ui.platform.LocalContext
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Configuración del Tema de Material 3 para la aplicación Smartfood. El modo de color lo decide
- * [ThemeMode] (claro por defecto, spec 002 HU-UI-05); los esquemas de color no cambian.
+ * [ThemeMode] (claro por defecto, spec 002 HU-UI-05). El esquema claro no cambia; el oscuro se ajustó en la spec 013
+ * para que sea legible, y los roles propios de la app están en [SmartFoodColors].
  */
 
-private val LightColorScheme = lightColorScheme(
+internal val LightColorScheme = lightColorScheme(
     primary = GreenDark,
     onPrimary = White,
     primaryContainer = GreenLight,
@@ -44,11 +45,16 @@ private val LightColorScheme = lightColorScheme(
     onError = White
 )
 
-private val DarkColorScheme = darkColorScheme(
+/**
+ * Esquema oscuro. Spec 013 (RF-OSC-03): `onPrimary` es [GreenDark2] porque el blanco sobre [GreenMain] solo llega a
+ * 1,6:1, y `primaryContainer` es [GreenDark] para que los contenedores no queden claros sobre el fondo oscuro.
+ * `error` es [ErrorRedDark] con `onError` [OnErrorDark] (T009).
+ */
+internal val DarkColorScheme = darkColorScheme(
     primary = GreenMain,
-    onPrimary = White,
-    primaryContainer = GreenLight,
-    onPrimaryContainer = GreenDark,
+    onPrimary = GreenDark2,
+    primaryContainer = GreenDark,
+    onPrimaryContainer = GreenMain,
 
     secondary = OrangeMain,
     onSecondary = White,
@@ -65,8 +71,9 @@ private val DarkColorScheme = darkColorScheme(
 
     outline = BorderDark,
 
-    error = ErrorRed,
-    onError = White
+    // Spec 013, T009: el rojo claro se lee sobre los paneles oscuros, y su contenido es rojo oscuro.
+    error = ErrorRedDark,
+    onError = OnErrorDark
 )
 
 /**
@@ -95,7 +102,8 @@ fun SmartfoodTheme(
 
     CompositionLocalProvider(
         LocalSpacing provides Spacing(),
-        LocalIsDarkTheme provides darkTheme
+        LocalIsDarkTheme provides darkTheme,
+        LocalSmartFoodColors provides if (darkTheme) DarkSmartFoodColors else LightSmartFoodColors
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
