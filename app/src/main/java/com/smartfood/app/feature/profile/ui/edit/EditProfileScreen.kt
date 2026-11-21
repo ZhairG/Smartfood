@@ -248,9 +248,13 @@ private fun EditProfileDialogs(state: EditProfileUiState, onEvent: (EditProfileE
                     modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * GlyphFraction)
                 )
             },
-            title = stringResource(id = R.string.edit_profile_saved),
+            title = stringResource(
+                id = if (dialog.onPhone) R.string.profile_saved_on_phone else R.string.edit_profile_saved
+            ),
             body = dialog.emailChangedTo?.let { stringResource(id = R.string.edit_profile_email_changed, it) }
-                ?: stringResource(id = R.string.edit_profile_saved_body)
+                ?: stringResource(
+                    id = if (dialog.onPhone) R.string.profile_saved_on_phone_body else R.string.edit_profile_saved_body
+                )
         )
         null -> Unit
     }

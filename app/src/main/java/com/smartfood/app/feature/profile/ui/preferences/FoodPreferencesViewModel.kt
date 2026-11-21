@@ -6,6 +6,7 @@ import com.smartfood.app.feature.auth.domain.model.toAuthError
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.usecase.GetFoodPreferencesUseCase
 import com.smartfood.app.feature.profile.domain.usecase.SaveFoodPreferencesUseCase
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -95,10 +96,13 @@ class FoodPreferencesViewModel @Inject constructor(
         _uiState.update { it.copy(dialog = null, isSaving = true, error = null) }
         viewModelScope.launch {
             savePreferences(state.draft)
-                .onSuccess {
-                    _uiState.update {
-                        it.copy(isSaving = false, saved = state.draft, dialog = FoodPreferencesDialog.Saved)
+                .onSuccess { outcome ->
+                    val dialog = if (outcome == WriteOutcome.PENDING) {
+                        FoodPreferencesDialog.SavedOnPhone
+                    } else {
+                        FoodPreferencesDialog.Saved
                     }
+                    _uiState.update { it.copy(isSaving = false, saved = state.draft, dialog = dialog) }
                     closeSavedLater()
                 }
                 .onFailure { error -> _uiState.update { it.copy(isSaving = false, error = error.toAuthError()) } }
@@ -108,7 +112,10 @@ class FoodPreferencesViewModel @Inject constructor(
     /** "Guardado" se cierra solo (CA-PER-03-03). */
     private suspend fun closeSavedLater() {
         delay(RESULT_DIALOG_MILLIS)
-        _uiState.update { if (it.dialog is FoodPreferencesDialog.Saved) it.copy(dialog = null) else it }
+        _uiState.update {
+            val open = it.dialog == FoodPreferencesDialog.Saved || it.dialog == FoodPreferencesDialog.SavedOnPhone
+            if (open) it.copy(dialog = null) else it
+        }
     }
 
     private fun <T> Set<T>.toggle(value: T): Set<T> = if (value in this) this - value else this + value
