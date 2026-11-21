@@ -18,6 +18,12 @@ interface FavoritesRepository {
     fun observeFavorites(): Flow<List<Favorite>>
 
     /**
+     * Ids de las favoritas quitadas cuyo borrado todavía espera al servidor. Un borrado saca el documento de
+     * [observeFavorites], así que sin este flujo Guardadas no sabría que hay un cambio pendiente (CA-SAV-02-09).
+     */
+    fun observePendingRemovals(): Flow<Set<String>>
+
+    /**
      * Marca o quita una receta como favorita.
      *
      * @param recipeId Id del catálogo o de una receta propia.

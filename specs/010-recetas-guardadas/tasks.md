@@ -104,6 +104,9 @@
   pendientes (punto 9, 2026-11-20), sobre `master` con todos los PR fusionados: la tabla y el checklist están en
   [`disenos-figma/Modulo 5 - Recetas guardadas/comparacion/README.md`](../../disenos-figma/Modulo%205%20-%20Recetas%20guardadas/comparacion/README.md).*
 - [x] T025 Matriz al día, `tools/ca_coverage_baseline.txt`, `README.md` y `AGENTS.md` (arquitectura de Guardadas).
+- [x] T026 **Sin conexión con borrados pendientes** (CA-SAV-02-09, encontrado en la ronda final del 2026-11-20):
+  `observePendingRemovals()` en `FavoritesRepository` y `OwnRecipesRepository` (rastreo en memoria en los repositorios
+  de Firestore) y `ObserveSavedRecipesUseCase` lo suma a `hasPendingSync`; fakes y `ObserveSavedRecipesUseCaseTest`.
 
 ## Matriz de trazabilidad
 

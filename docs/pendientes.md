@@ -131,6 +131,9 @@ fusionó. Hoy está en el *stash* local «On docs/007-animaciones: borrador spec
   [`instalacion.md`](instalacion.md) y en la T046 de la spec 009.
 - **T024:** se hace en la ronda final, sobre `master` con todo fusionado. La tabla Figma vs app y el checklist están
   en `disenos-figma/Modulo 5 - Recetas guardadas/comparacion/README.md`.
+- **T026 (encontrado en la ronda final):** quitar un ♡ o borrar una receta propia sin conexión no mostraba la tarjeta
+  «Sin conexión» de Guardadas, porque el borrado saca la tarjeta de la lista. Los repositorios ahora exponen los
+  borrados pendientes (CA-SAV-02-09).
 
 ## 10. Persistencia local con Room (opcional)
 

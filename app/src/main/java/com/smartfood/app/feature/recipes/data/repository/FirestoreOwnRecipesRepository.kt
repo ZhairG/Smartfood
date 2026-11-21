@@ -18,10 +18,13 @@ import com.smartfood.app.feature.recipes.domain.model.OwnRecipeError
 import com.smartfood.app.feature.recipes.domain.model.OwnRecipeException
 import com.smartfood.app.feature.recipes.domain.repository.OwnRecipesRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Date
@@ -69,10 +72,25 @@ class FirestoreOwnRecipesRepository @Inject constructor(
             OwnRecipeDocument.CREATED_AT to if (isNew) FieldValue.serverTimestamp() else Timestamp(Date(recipe.createdAtMillis)),
             OwnRecipeDocument.UPDATED_AT to FieldValue.serverTimestamp(),
         )
+        // Deshacer vuelve a escribir la receta: su borrado ya no está pendiente.
+        pendingRemovals.update { it - recipe.id }
         recipes().document(recipe.id).set(fields)
     }
 
-    override suspend fun deleteRecipe(id: String): Result<WriteOutcome> = write { recipes().document(id).delete() }
+    override suspend fun deleteRecipe(id: String): Result<WriteOutcome> = write {
+        val task = recipes().document(id).delete()
+        // El borrado cuenta como pendiente hasta que Firestore lo confirma o lo rechaza (CA-SAV-02-09).
+        pendingRemovals.update { it + id }
+        task.addOnCompleteListener { pendingRemovals.update { it - id } }
+    }
+
+    /**
+     * Borrados que esperan al servidor. Vive en memoria (el repositorio es `@Singleton`): si la app se cierra antes
+     * de sincronizar, Firestore igual sube el borrado, pero la tarjeta no lo cuenta al reabrir (spec 010 §9).
+     */
+    private val pendingRemovals = MutableStateFlow<Set<String>>(emptySet())
+
+    override fun observePendingRemovals(): Flow<Set<String>> = pendingRemovals.asStateFlow()
 
     private suspend fun write(block: () -> Task<Void>): Result<WriteOutcome> = safeRunCatching {
         val confirmed = withTimeoutOrNull(WRITE_WAIT_MILLIS) { block().await(); Unit } != null

@@ -142,6 +142,41 @@ class ObserveSavedRecipesUseCaseTest {
         assertFalse(data.isEmptyOverall)
     }
 
+    @Test
+    fun `CA-SAV-02-09 muestra sin conexion si quitar una favorita espera sincronizarse`() = runTest {
+        favorites.favorites.value = listOf(savedFavorite("pasta"))
+        favorites.pendingWrites = true
+
+        favorites.setFavorite("pasta", FavoriteSource.CATALOG, favorite = false)
+        val data = savedData(SavedFilter.FAVORITES, "", SavedSort.RECENT)
+
+        assertTrue(data.cards.isEmpty())
+        assertTrue(data.hasPendingSync)
+    }
+
+    @Test
+    fun `CA-SAV-02-09 muestra sin conexion si borrar una receta propia espera sincronizarse`() = runTest {
+        ownRecipes.recipes.value = listOf(ownRecipe(id = "propia-1"))
+        ownRecipes.pendingWrites = true
+
+        ownRecipes.deleteRecipe("propia-1")
+        val data = savedData(SavedFilter.OWN, "", SavedSort.RECENT)
+
+        assertTrue(data.cards.isEmpty())
+        assertTrue(data.hasPendingSync)
+    }
+
+    @Test
+    fun `CA-SAV-02-09 la tarjeta desaparece cuando el borrado se sincroniza`() = runTest {
+        favorites.pendingRemovals.value = setOf("pasta")
+        val flow = observe(flowOf(SavedFilter.FAVORITES), flowOf(""), flowOf(SavedSort.RECENT))
+        assertTrue(flow.first().hasPendingSync)
+
+        favorites.pendingRemovals.value = emptySet()
+
+        assertFalse(flow.first().hasPendingSync)
+    }
+
     private suspend fun savedData(
         filter: SavedFilter,
         query: String,
