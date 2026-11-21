@@ -161,9 +161,17 @@ sealed interface PlanSuggestion {
 
 /** Resultado del agente. */
 sealed interface PlanResult {
-    /** El plan de mayor utilidad entre todos los válidos (CA-RIA-02-04). */
-    data class Found(val plan: MealPlan) : PlanResult
+    /**
+     * El plan de mayor utilidad entre todos los válidos (CA-RIA-02-04). Con [complete] en `false`, el límite de tiempo
+     * cortó la búsqueda: es el mejor encontrado hasta ese momento y cumple todas las restricciones (CA-RIA-02-13).
+     *
+     * @property nodes Nodos que visitó la búsqueda (para la medición, RNF-RIA-02).
+     */
+    data class Found(val plan: MealPlan, val complete: Boolean = true, val nodes: Long = 0) : PlanResult
 
     /** Ningún plan cumple las restricciones; [suggestions] dice qué cambiar (CA-RIA-02-07). */
     data class NoPlan(val suggestions: List<PlanSuggestion>) : PlanResult
+
+    /** El límite de tiempo venció antes de encontrar algún plan (CA-RIA-02-14). */
+    data class TimedOut(val nodes: Long) : PlanResult
 }

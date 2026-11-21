@@ -23,7 +23,8 @@ import org.junit.Test
  * Fecha: Octubre 2026
  * Descripción: Pruebas unitarias del agente [MealPlanner] (spec 009 §2, plan §3.4, T011): cada restricción del CSP, la
  * optimalidad del plan contra una búsqueda exhaustiva (fuerza bruta) en catálogos aleatorios con semilla fija, el
- * determinismo, las sugerencias cuando no hay plan, las restricciones alimentarias (T012a) y la Cocina Favorita (spec 011).
+ * determinismo, las sugerencias cuando no hay plan, las restricciones alimentarias (T012a), la Cocina Favorita (spec 011)
+ * y el límite de tiempo (T048, CA-RIA-02-13 y 02-14).
  */
 class MealPlannerTest {
 
@@ -334,6 +335,62 @@ class MealPlannerTest {
 
         assertFalse(PlanSuggestion.RemoveCuisine in (planner.plan(conCocinas, despensa, vegano) as PlanResult.NoPlan).suggestions)
         assertFalse(PlanSuggestion.RemoveCuisine in (planner.plan(conCocinas, despensa, sinCocinas) as PlanResult.NoPlan).suggestions)
+    }
+
+    /** Vence después de [consultas] consultas: simula un reloj que llega al límite a mitad de la búsqueda. */
+    private fun venceTras(consultas: Int): SearchDeadline {
+        var hechas = 0
+        return SearchDeadline { ++hechas > consultas }
+    }
+
+    @Test
+    fun `CA-RIA-02-13 sin limite la busqueda termina y da el mismo plan que siempre`() {
+        val resultado = planner.plan(catalogo, despensa, ctx()) as PlanResult.Found
+
+        assertTrue("terminó", resultado.complete)
+        assertTrue("contó nodos", resultado.nodes > 0)
+        assertEquals(planner.search(catalogo, despensa, ctx()), resultado.plan)
+    }
+
+    @Test
+    fun `CA-RIA-02-13 si el limite vence con un plan encontrado devuelve ese plan valido y avisa que no termino`() {
+        val completo = planner.plan(catalogo, despensa, ctx(maxMinutes = 35, noSpicy = true)) as PlanResult.Found
+        // El primer límite que ya deja un plan encontrado, pero corta antes de revisar todo el árbol.
+        val corto = (1 until completo.nodes.toInt()).asSequence()
+            .map { planner.plan(catalogo, despensa, ctx(maxMinutes = 35, noSpicy = true), venceTras(it)) }
+            .filterIsInstance<PlanResult.Found>()
+            .first()
+
+        assertFalse("no terminó", corto.complete)
+        assertTrue("visitó menos nodos", corto.nodes < completo.nodes)
+        assertTrue("nunca supera al óptimo", corto.plan.utility <= completo.plan.utility + 1e-9)
+        val plan = corto.plan
+        assertEquals("distintas", 3, plan.days.map { it.recipe.id }.toSet().size)
+        plan.days.forEach { d ->
+            assertTrue("tiempo ${d.recipe.id}", d.recipe.totalMinutes <= 35)
+            assertTrue("picante ${d.recipe.id}", !d.recipe.spicy)
+            assertTrue("faltantes ${d.recipe.id}", d.uses.count { it.isMissing } <= 3)
+        }
+        assertTrue("presupuesto", plan.totalCostCop <= 50_000)
+    }
+
+    @Test
+    fun `CA-RIA-02-13 el limite con reloj vence al pasar el tiempo`() {
+        val reloj = kotlin.time.TestTimeSource()
+        val limite = SearchDeadline.after(kotlin.time.Duration.parse("2s"), reloj)
+
+        assertFalse(limite.expired())
+        reloj += kotlin.time.Duration.parse("1999ms")
+        assertFalse(limite.expired())
+        reloj += kotlin.time.Duration.parse("1ms")
+        assertTrue(limite.expired())
+    }
+
+    @Test
+    fun `CA-RIA-02-14 si el limite vence antes de encontrar un plan no hay plan ni sugerencias`() {
+        val resultado = planner.plan(catalogo, despensa, ctx(), SearchDeadline { true })
+
+        assertEquals(PlanResult.TimedOut(nodes = 0), resultado)
     }
 
     /**
