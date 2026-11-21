@@ -42,7 +42,7 @@ class EditProfileViewModelTest {
     private val repository = FakeProfileRepository()
     private val photos = FakeProfilePhotoRepository()
     private val auth = FakeAuthRepository()
-    private val emailChange = FakeEmailChangeRepository()
+    private var emailChange = FakeEmailChangeRepository()
 
     private fun crearViewModel(): EditProfileViewModel {
         val validate = ValidateProfileUseCase(fixedClock(today))
@@ -158,6 +158,24 @@ class EditProfileViewModelTest {
         assertEquals(60, viewModel.state.resendCooldownSeconds)
         assertEquals("la cuenta aún no cambia", FakeAuthRepository.DEFAULT_EMAIL, viewModel.state.original?.email)
     }
+
+    @Test
+    fun `CA-SPK-03-01 CA-SPK-03-02 en el modo gratuito se envia un enlace y el correo sigue siendo el anterior`() =
+        runTest {
+            emailChange = FakeEmailChangeRepository(usesCode = false)
+            val viewModel = crearViewModel()
+            viewModel.onEvent(EditProfileEvent.EmailChanged("nuevo@correo.com"))
+            viewModel.onEvent(EditProfileEvent.CurrentPasswordChanged("Clave#123"))
+            viewModel.onEvent(EditProfileEvent.SaveConfirmed)
+            runCurrent()
+
+            assertEquals(listOf("nuevo@correo.com"), emailChange.requested)
+            assertEquals("Clave#123", auth.lastReauthPassword)
+            assertEquals(EditProfileDialog.Saved(emailLinkSentTo = "nuevo@correo.com"), viewModel.state.dialog)
+            assertEquals("no se pide código", 0, viewModel.state.resendCooldownSeconds)
+            assertEquals(FakeAuthRepository.DEFAULT_EMAIL, viewModel.state.original?.email)
+            assertEquals(FakeAuthRepository.DEFAULT_EMAIL, viewModel.state.email)
+        }
 
     @Test
     fun `CA-PER-02-12 el codigo correcto cambia el correo al instante y muestra Guardado`() = runTest {
