@@ -48,6 +48,7 @@ internal val LightColorScheme = lightColorScheme(
 /**
  * Esquema oscuro. Spec 013 (RF-OSC-03): `onPrimary` es [GreenDark2] porque el blanco sobre [GreenMain] solo llega a
  * 1,6:1, y `primaryContainer` es [GreenDark] para que los contenedores no queden claros sobre el fondo oscuro.
+ * `error` es [ErrorRedDark] con `onError` [OnErrorDark] (T009).
  */
 internal val DarkColorScheme = darkColorScheme(
     primary = GreenMain,
@@ -70,8 +71,9 @@ internal val DarkColorScheme = darkColorScheme(
 
     outline = BorderDark,
 
-    error = ErrorRed,
-    onError = White
+    // Spec 013, T009: el rojo claro se lee sobre los paneles oscuros, y su contenido es rojo oscuro.
+    error = ErrorRedDark,
+    onError = OnErrorDark
 )
 
 /**

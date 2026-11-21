@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.smartfood.app.core.designsystem.theme.Black
 import com.smartfood.app.core.designsystem.theme.DarkColorScheme
 import com.smartfood.app.core.designsystem.theme.DarkSmartFoodColors
+import com.smartfood.app.core.designsystem.theme.ErrorRed
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.GreenDark
 import com.smartfood.app.core.designsystem.theme.GreenDark2
@@ -52,6 +53,9 @@ class SmartFoodColorsContrastTest {
             "contenedor verde (íconos del Perfil, etiquetas)" to (scheme.primaryContainer to scheme.onPrimaryContainer),
             "checklist de contraseña" to (scheme.surfaceVariant to scheme.onSurface),
             "títulos verdes sobre el panel" to (scheme.surface to scheme.primary),
+            "texto de error sobre el panel (T009)" to (scheme.surface to scheme.error),
+            "texto de error sobre un campo (T009)" to (scheme.surfaceVariant to scheme.error),
+            "botón Eliminar y papelera de la foto (T009)" to (scheme.error to scheme.onError),
         )
 
         pares.forEach { (nombre, par) -> assertContraste(nombre, par.first, par.second, minimo = 4.5) }
@@ -65,6 +69,7 @@ class SmartFoodColorsContrastTest {
             "botón flotante sobre el panel" to (scheme.surface to scheme.primary),
             "relleno marcado sobre una hoja" to (scheme.surfaceVariant to dark.checkedFill),
             "texto verde de la pestaña activa (GreenCheck)" to (scheme.surface to GreenCheck),
+            "punto rojo de Vencido sobre el panel (T009)" to (scheme.surface to ErrorRed),
         )
 
         pares.forEach { (nombre, par) -> assertContraste(nombre, par.first, par.second, minimo = 3.0) }
@@ -94,6 +99,8 @@ class SmartFoodColorsContrastTest {
         assertEquals(GreenDark, LightColorScheme.onPrimaryContainer)
         assertEquals(GreenLight, LightColorScheme.surface)
         assertEquals(White, LightColorScheme.surfaceVariant)
+        assertEquals(ErrorRed, LightColorScheme.error)
+        assertEquals(White, LightColorScheme.onError)
     }
 
     @Test

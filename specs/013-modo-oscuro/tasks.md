@@ -19,6 +19,9 @@
   guardada!".
 - [x] T008 **Pruebas** (HU-OSC-01, CA-OSC-02-01, 02-03, 03-01): `SmartFoodColorsContrastTest` y casos nuevos en
   `ColorModeTest`.
+- [x] T009 **Rojo de error legible** (CA-OSC-01-01, CA-OSC-01-03, §9): `ErrorRedDark` y `OnErrorDark` en `Color.kt`,
+  `error`/`onError` del esquema oscuro en `Theme.kt` y sus pares en `SmartFoodColorsContrastTest`. Hallazgo de la T024
+  de la spec 010 (pantalla 07).
 
 ## Matriz de trazabilidad
 
@@ -45,6 +48,8 @@ U: unitaria. I: instrumentada. M: captura por adb en el V2436.
   editor (misma `OptionSheet` que "Tema de la app"); "Cancelar" naranja con texto blanco y "Guardar" verde con texto
   oscuro.
 - [x] Editor de producto en oscuro: la basura de la foto es roja con ícono blanco y la cámara verde con ícono oscuro.
+- [ ] Rojo de error en oscuro (T009): el aviso y el mensaje de la pantalla 07 de Guardadas se leen, y la basura de la foto
+  y el botón "Eliminar" son rojo claro con contenido rojo oscuro.
 - [x] Búsqueda del inventario en oscuro: buscador, chips y etiquetas oscuros y legibles.
 - [ ] Barra de estado blanca al abrir en frío (CA-OSC-04-03): en el V2436 solo se cumple al navegar o al recrearse la
   actividad (limitación del teléfono, plan §2.3); falta probarlo en otro dispositivo o emulador.
