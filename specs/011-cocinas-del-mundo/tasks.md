@@ -26,7 +26,7 @@
 | CA-COC-02-01 a 02-05 | `MealPlannerTest` |
 | CA-COC-03-01 | `AiPlanViewModelTest`, `AiFlowScreenTest` |
 | CA-COC-03-02, 03-03 | `MealPlannerTest`, `AiFlowScreenTest` |
-| CA-COC-03-04 | `GetAiContextUseCaseTest` |
+| CA-COC-03-04 | `GetAiContextUseCaseTest`, `AiPlanViewModelTest` (ver CA-RIA-02-12) |
 
 ### Checklist de verificación manual
 
