@@ -14,7 +14,7 @@ Si eres integrante del equipo y vas a ejecutar la app contra el Firebase del pro
 
 ## A. Instalar la APK
 
-La APK está publicada en la página de **Releases** del repositorio: [`v1.0-entrega`](https://github.com/ZhairG/Smartfood/releases/tag/v1.0-entrega).
+La APK está publicada en la página de **Releases** del repositorio: [`v1.2`](https://github.com/ZhairG/Smartfood/releases/tag/v1.2).
 Es la versión de la rama `master` compilada en modo *release* (con R8, optimizada).
 
 ### Requisitos
