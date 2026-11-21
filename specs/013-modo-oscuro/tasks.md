@@ -50,8 +50,10 @@ U: unitaria. I: instrumentada. M: captura por adb en el V2436.
   editor (misma `OptionSheet` que "Tema de la app"); "Cancelar" naranja con texto blanco y "Guardar" verde con texto
   oscuro.
 - [x] Editor de producto en oscuro: la basura de la foto es roja con ícono blanco y la cámara verde con ícono oscuro.
-- [ ] Rojo de error en oscuro (T009): el aviso y el mensaje de la pantalla 07 de Guardadas se leen, y la basura de la foto
-  y el botón "Eliminar" son rojo claro con contenido rojo oscuro.
+- [x] Rojo de error en oscuro (T009), comprobado el 2026-11-21 en el V2436 (antes y después en
+  [`capturas/`](./capturas/)): en la pantalla 07 de Guardadas, el texto del aviso pasa de 2,9:1 a 4,8:1 y el mensaje bajo
+  el campo de 3,5:1 a 6,8:1; "Sí, eliminar" (pantalla 10) es rojo claro con texto rojo oscuro, 6,5:1.
+- [ ] La basura de la foto del editor de producto en oscuro, con el rojo nuevo (ya usaba `onError`; falta la captura).
 - [x] Búsqueda del inventario en oscuro: buscador, chips y etiquetas oscuros y legibles.
 - [ ] Barra de estado blanca al abrir en frío (CA-OSC-04-03): en el V2436 solo se cumple al navegar o al recrearse la
   actividad (limitación del teléfono, plan §2.3); falta probarlo en otro dispositivo o emulador.
