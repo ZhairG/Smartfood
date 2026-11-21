@@ -89,7 +89,7 @@ claras.
 |---|---|
 | RF-OSC-01 | `core/designsystem/theme/SmartFoodColors.kt` define los roles propios de la app (encabezado, relleno marcado, superficie suave, divisor, verde suave, resaltado, etiqueta, ícono verde y velo) para claro y oscuro. `SmartfoodTheme` los provee con `LocalSmartFoodColors`. |
 | RF-OSC-02 | Las pantallas leen esos roles o los de Material. No usan tokens fijos de un solo modo, salvo los que el Figma pide iguales en los dos (naranja, `GreenCheck` en textos e íconos sobre fondo y el punto rojo de "Vencido", que como gráfico llega a 3,5:1). Los textos, íconos y botones de error leen el rol `error` (T009). |
-| RF-OSC-03 | En `DarkColorScheme` cambian cinco roles: `onPrimary = GreenDark2`, `primaryContainer = GreenDark`, `onPrimaryContainer = GreenMain`, `error = ErrorRedDark` y `onError = OnErrorDark` (T009). Los tokens que ya existían en `Color.kt` no cambian; `ErrorRedDark` (#F87171) y `OnErrorDark` (#450A0A) son nuevos (aprobados por Zhair el 2026-11-20). |
+| RF-OSC-03 | En `DarkColorScheme` cambian cinco roles: `onPrimary = GreenDark2`, `primaryContainer = GreenDark`, `onPrimaryContainer = GreenMain`, `error = ErrorRedDark` y `onError = OnErrorDark` (T009). Los tokens que ya existían en `Color.kt` no cambian; `ErrorRedDark` (#FA8080) y `OnErrorDark` (#450A0A) son nuevos (aprobados por Zhair el 2026-11-20). |
 | RF-OSC-04 | El modo sigue decidiéndose solo con `ThemeMode` (CA-UI-05-03). Las pantallas no consultan `LocalIsDarkTheme` para elegir colores; lo hacen los roles. La excepción es `ActionSuccessScreen`, que ya copia sus frames claro y oscuro del Figma (`GreenLight` y `GreenDark2`). |
 
 ## 5. Requisitos no funcionales
@@ -130,7 +130,7 @@ claras.
 | Los rellenos de acción (botón flotante, chips seleccionados, micrófono, cámara, "Guardar" verde) son `GreenMain` con contenido `GreenDark2`. | Con `GreenDark` se confundían con el fondo (1,9:1); así se distinguen del encabezado y llegan a ~9:1. |
 | Las superficies suaves (`SurfaceLight`, `GreenSoft`, `YellowSoft`) pasan a `InputDark`. | Son tarjetas claras sobre fondo claro; en oscuro deben ser tarjetas oscuras. |
 | El velo del aviso de voz es negro al 35 % en oscuro. | El velo blanco del Figma `476:4507` aclara toda la pantalla oscura. |
-| El rojo de error en oscuro es `ErrorRedDark` (#F87171), y el contenido sobre un relleno rojo (botón "Eliminar", papelera de la foto) es `OnErrorDark` (#450A0A). Aplica también a los frames oscuros de autenticación. Aprobada por Zhair el 2026-11-20 (T009). | `ErrorRed` (#D92E2E) llega a 3,5:1 sobre `SurfaceDark` y a 3,1:1 sobre `InputDark` (hallazgo de la T024 de la spec 010, pantalla 07). Con #F87171 llega a 6,1:1 y 5,4:1, y el contenido del botón a 5,8:1. |
+| El rojo de error en oscuro es `ErrorRedDark` (#FA8080), y el contenido sobre un relleno rojo (botón "Eliminar", papelera de la foto) es `OnErrorDark` (#450A0A). Aplica también a los frames oscuros de autenticación. Aprobada por Zhair el 2026-11-20 (T009). | `ErrorRed` (#D92E2E) llega a 3,5:1 sobre `SurfaceDark` y a 3,1:1 sobre `InputDark` (hallazgo de la T024 de la spec 010, pantalla 07). Con #FA8080 llega a 6,8:1 y 6,0:1, el contenido del botón a 6,5:1 y el texto del aviso teñido de rojo (pantalla 07) a 4,8:1; con #F87171, medido en el V2436, el aviso se quedaba en 4,4:1. |
 
 ## 10. Plan de entrega
 

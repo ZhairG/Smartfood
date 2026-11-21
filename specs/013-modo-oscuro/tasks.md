@@ -20,7 +20,8 @@
 - [x] T008 **Pruebas** (HU-OSC-01, CA-OSC-02-01, 02-03, 03-01): `SmartFoodColorsContrastTest` y casos nuevos en
   `ColorModeTest`.
 - [x] T009 **Rojo de error legible** (CA-OSC-01-01, CA-OSC-01-03, §9): `ErrorRedDark` y `OnErrorDark` en `Color.kt`,
-  `error`/`onError` del esquema oscuro en `Theme.kt` y sus pares en `SmartFoodColorsContrastTest`. Hallazgo de la T024
+  `error`/`onError` del esquema oscuro en `Theme.kt` y sus pares en `SmartFoodColorsContrastTest`, incluido el aviso
+  teñido de rojo del editor de recetas propias. Hallazgo de la T024
   de la spec 010 (pantalla 07).
 
 ## Matriz de trazabilidad

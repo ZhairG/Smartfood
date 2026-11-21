@@ -1,6 +1,7 @@
 package com.smartfood.app.core.designsystem
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import com.smartfood.app.core.designsystem.theme.Black
 import com.smartfood.app.core.designsystem.theme.DarkColorScheme
 import com.smartfood.app.core.designsystem.theme.DarkSmartFoodColors
@@ -56,6 +57,9 @@ class SmartFoodColorsContrastTest {
             "texto de error sobre el panel (T009)" to (scheme.surface to scheme.error),
             "texto de error sobre un campo (T009)" to (scheme.surfaceVariant to scheme.error),
             "botón Eliminar y papelera de la foto (T009)" to (scheme.error to scheme.onError),
+            // ErrorCard de OwnRecipeEditorScreen: el rojo al 14 % sobre surfaceVariant (pantalla 07 de la spec 010).
+            "texto del aviso de error teñido de rojo (T009)" to
+                (scheme.error.copy(alpha = 0.14f).compositeOver(scheme.surfaceVariant) to scheme.error),
         )
 
         pares.forEach { (nombre, par) -> assertContraste(nombre, par.first, par.second, minimo = 4.5) }

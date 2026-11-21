@@ -86,11 +86,12 @@ val ErrorRed = Color(0xFFD92E2E)
 
 /**
  * Rojo de error del modo oscuro (spec 013, T009; aprobado por Zhair el 2026-11-20): [ErrorRed] solo llega a 3,5:1
- * sobre [SurfaceDark] y a 3,1:1 sobre [InputDark]; este llega a 6,1:1 y 5,4:1.
+ * sobre [SurfaceDark] y a 3,1:1 sobre [InputDark]; este llega a 6,8:1 y 6,0:1, y a 4,8:1 dentro del aviso de error
+ * teñido de rojo de las recetas propias (con #F87171 se quedaba en 4,4:1).
  */
-val ErrorRedDark = Color(0xFFF87171)
+val ErrorRedDark = Color(0xFFFA8080)
 
-/** Contenido sobre un relleno [ErrorRedDark] (botón "Eliminar", papelera de la foto): 5,8:1 (spec 013, T009). */
+/** Contenido sobre un relleno [ErrorRedDark] (botón "Eliminar", papelera de la foto): 6,5:1 (spec 013, T009). */
 val OnErrorDark = Color(0xFF450A0A)
 
 // === Estados del inventario ===
