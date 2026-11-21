@@ -21,7 +21,8 @@
   `ColorModeTest`.
 - [x] T009 **Rojo de error legible** (CA-OSC-01-01, CA-OSC-01-03, §9): `ErrorRedDark` y `OnErrorDark` en `Color.kt`,
   `error`/`onError` del esquema oscuro en `Theme.kt` y sus pares en `SmartFoodColorsContrastTest`, incluido el aviso
-  teñido de rojo del editor de recetas propias. Hallazgo de la T024
+  teñido de rojo del editor de recetas propias. `RecipeActionButton` recibe `contentColor` para que "Sí, eliminar"
+  use `onError` (con texto blanco fijo bajaba a 2,5:1 sobre el rojo nuevo; medido en el V2436). Hallazgo de la T024
   de la spec 010 (pantalla 07).
 
 ## Matriz de trazabilidad

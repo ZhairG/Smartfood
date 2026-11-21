@@ -68,6 +68,7 @@ fun DeleteOwnRecipeScreen(
                 onClick = onConfirm,
                 enabled = !state.isDeleting,
                 containerColor = error,
+                contentColor = MaterialTheme.colorScheme.onError,
                 modifier = Modifier.fillMaxWidth()
             )
         }
