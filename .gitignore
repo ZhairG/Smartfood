@@ -36,3 +36,6 @@ ui-debug.log
 
 # Informes de evaluación de los profesores: privados, solo locales (docs/pendientes.md)
 /retroalimentacion/
+
+# Caché del compilador de Kotlin (Gradle 8+)
+/.kotlin/
