@@ -69,6 +69,35 @@ class PhotoCompressorTest {
         assertEquals(600, resultado.outHeight)
     }
 
+    /** Foto de colores al azar: casi no se comprime, así que pesa mucho más que una foto normal. */
+    private fun fotoConRuido(width: Int, height: Int): File {
+        val file = File(cacheDir, "ruido_${System.nanoTime()}.jpg").also { archivos += it }
+        val random = java.util.Random(7)
+        val pixels = IntArray(width * height) { Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256)) }
+        val bitmap = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888)
+        file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it) }
+        bitmap.recycle()
+        return file
+    }
+
+    @Test
+    fun caSpk0501_compressToFitDejaLaFotoEnElLimiteDeFirestore() {
+        val limite = 900 * 1024
+        val bytes = PhotoCompressor().compressToFit(fotoConRuido(2000, 1500), limite)
+
+        assertTrue("Pesa ${bytes.size} bytes", bytes.size <= limite)
+        assertEquals("image/jpeg", bounds(bytes).outMimeType)
+    }
+
+    @Test
+    fun caSpk0501_conUnLimiteMuyBajoTambienReduceElTamano() {
+        val limite = 60 * 1024
+        val bytes = PhotoCompressor().compressToFit(fotoConRuido(1200, 900), limite)
+
+        assertTrue("Pesa ${bytes.size} bytes", bytes.size <= limite)
+        assertTrue("se redujo el ancho", bounds(bytes).outWidth < 1080)
+    }
+
     @Test(expected = IOException::class)
     fun unArchivoQueNoEsImagenLanzaIOException() {
         val file = File(cacheDir, "no_imagen.jpg").also { archivos += it }

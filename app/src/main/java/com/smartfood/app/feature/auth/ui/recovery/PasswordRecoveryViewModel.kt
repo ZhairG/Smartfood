@@ -30,7 +30,8 @@ import kotlin.time.Duration.Companion.seconds
  * Descripción: ViewModel del flujo de recuperación de contraseña en 3 pasos (HU-04).
  * Al salir de la pantalla el ViewModel se destruye, por lo que el flujo siempre vuelve a empezar en el
  * paso 1 (CA-04-12). Si el paso 3 falla porque el código ya no vale, regresa al paso 2 (CA-REC-02-03).
- * Cuenta hacia atrás la espera que informa el servidor antes de poder pedir otro código (HU-REC-04).
+ * Cuenta hacia atrás la espera que informa el servidor antes de poder pedir otro código (HU-REC-04). En el modo
+ * gratuito (spec 012) el paso 1 envía un enlace y el flujo termina en «Revisa tu correo» (CA-SPK-02-02).
  *
  * @param requestCode Caso de uso del paso 1.
  * @param verifyCode Caso de uso del paso 2.
@@ -45,7 +46,7 @@ class PasswordRecoveryViewModel @Inject constructor(
     private val validatePassword: ValidatePasswordUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(PasswordRecoveryUiState())
+    private val _uiState = MutableStateFlow(PasswordRecoveryUiState(isLinkMode = !requestCode.usesCode))
 
     /** Estado observable de la pantalla. */
     val uiState: StateFlow<PasswordRecoveryUiState> = _uiState.asStateFlow()
@@ -84,13 +85,16 @@ class PasswordRecoveryViewModel @Inject constructor(
     /**
      * Paso 1 y "Reenviar código": en ambos casos se pasa (o se queda) en el paso 2 con el código borrado y empieza
      * la cuenta regresiva. Mientras corre para este correo, no se pide otro código (CA-REC-04-01 y CA-REC-04-03).
+     * Con el enlace (spec 012) se pasa a «Revisa tu correo», con la misma espera para reenviarlo (CA-SPK-02-03).
      */
     private fun sendCode() {
         val state = _uiState.value
         if (state.isEmailInCooldown) return
         runStep(
             action = { requestCode(it.email) },
-            onSuccess = { it.copy(step = RecoveryStep.OTP_VERIFICATION, otpCode = "") },
+            onSuccess = {
+                it.copy(step = if (it.isLinkMode) RecoveryStep.LINK_SENT else RecoveryStep.OTP_VERIFICATION, otpCode = "")
+            },
             afterSuccess = { wait -> startCooldown(state.email, wait) }
         )
     }

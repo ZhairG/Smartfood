@@ -29,6 +29,12 @@ interface AuthRepository {
     /** Cierra la sesión activa. */
     fun logout()
 
+    /**
+     * Pide a Firebase el correo de verificación estándar, en español, para la cuenta con sesión. Solo se usa en el
+     * modo gratuito, donde no hay correo de bienvenida (spec 012, CA-SPK-04-01).
+     */
+    suspend fun sendEmailVerification(): Result<Unit>
+
     /** Correo de la cuenta con sesión, o `null` si no hay sesión (spec 008, CA-PER-02-12). */
     fun currentEmail(): String?
 
