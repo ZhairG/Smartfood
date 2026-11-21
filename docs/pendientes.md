@@ -14,7 +14,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 
 | # | Punto | Spec | Estado | PR |
 |---|---|---|---|---|
-| 1 | Modo sin facturación (sin plan Blaze) | [012](../specs/012-modo-sin-facturacion/spec.md) | Implementado, pruebas en la ronda final | — |
+| 1 | Modo sin facturación (sin plan Blaze) | [012](../specs/012-modo-sin-facturacion/spec.md) | Hecho | [#139](https://github.com/ZhairG/Smartfood/pull/139) |
 | 2 | La dieta se pierde si falla la lectura del perfil | 009 (CA-RIA-02-12) | Hecho | [#140](https://github.com/ZhairG/Smartfood/pull/140) |
 | 3 | Cierre de cocina: precio y reintentos | 009 (CA-RIA-04-08, 04-09) | Hecho | [#141](https://github.com/ZhairG/Smartfood/pull/141) |
 | 4 | Guardado pendiente o confirmado en el Perfil | 008 (CA-PER-02-14, 03-06) | Hecho | [#142](https://github.com/ZhairG/Smartfood/pull/142) |
