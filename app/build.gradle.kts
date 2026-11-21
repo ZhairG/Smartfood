@@ -33,11 +33,18 @@ android {
                 "FIREBASE_EMULATOR_HOST",
                 "\"${providers.gradleProperty("firebaseEmulatorHost").getOrElse("10.0.2.2")}\""
             )
+            // Modo del backend forzado (spec 012, CA-SPK-01-04): -PbackendMode=blaze o -PbackendMode=free.
+            buildConfigField(
+                "String",
+                "FORCED_BACKEND_MODE",
+                "\"${providers.gradleProperty("backendMode").getOrElse("")}\""
+            )
         }
         release {
             buildConfigField("boolean", "USE_DEMO_RECOVERY", "false")
             buildConfigField("boolean", "USE_FIREBASE_EMULATOR", "false")
             buildConfigField("String", "FIREBASE_EMULATOR_HOST", "\"\"")
+            buildConfigField("String", "FORCED_BACKEND_MODE", "\"\"")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -92,12 +99,13 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Firebase (BOM, Auth, Firestore, Functions y Storage)
+    // Firebase (BOM, Auth, Firestore, Functions, Storage y Remote Config para el modo sin facturación, spec 012)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.functions)
     implementation(libs.firebase.storage)
+    implementation(libs.firebase.config)
 
     // Inventario (spec 006): cámara, imágenes y avisos en segundo plano
     implementation(libs.androidx.camera.core)

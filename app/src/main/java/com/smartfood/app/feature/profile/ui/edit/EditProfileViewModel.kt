@@ -154,6 +154,13 @@ class EditProfileViewModel @Inject constructor(
                     if (newEmail == null || wait == null) {
                         _uiState.update { it.loaded(saved).copy(dialog = EditProfileDialog.Saved()) }
                         closeSavedLater()
+                    } else if (!requestEmailChange.usesCode) {
+                        // Modo gratuito: Firebase envió un enlace al correo nuevo y el correo cambia cuando se abre;
+                        // mientras tanto se sigue mostrando el anterior (spec 012, CA-SPK-03-01 y CA-SPK-03-02).
+                        _uiState.update {
+                            it.loaded(saved).copy(dialog = EditProfileDialog.Saved(emailLinkSentTo = newEmail))
+                        }
+                        closeSavedLater()
                     } else {
                         // Los demás datos ya quedaron; el correo cambia al confirmar el código (CA-PER-02-10).
                         _uiState.update {

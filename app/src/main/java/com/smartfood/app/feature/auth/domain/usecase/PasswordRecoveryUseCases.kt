@@ -26,6 +26,9 @@ class RequestRecoveryCodeUseCase @Inject constructor(
     private val recoveryRepository: PasswordRecoveryRepository,
     private val validateEmailUseCase: ValidateEmailUseCase
 ) {
+    /** `true` si el flujo usa el código; `false` si se envía un enlace (spec 012, modo gratuito, CA-SPK-02-01). */
+    val usesCode: Boolean get() = recoveryRepository.usesCode
+
     suspend operator fun invoke(email: String): Result<Duration> {
         val trimmedEmail = email.trim()
         if (trimmedEmail.isBlank()) return authFailure(AuthError.EmptyFields(setOf(AuthField.EMAIL)))

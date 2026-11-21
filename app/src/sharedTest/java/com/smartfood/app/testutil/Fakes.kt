@@ -58,6 +58,15 @@ class FakeAuthRepository : AuthRepository {
         return Result.success(Unit)
     }
 
+    /** Resultado de [sendEmailVerification] y llamadas recibidas (spec 012). */
+    var sendVerificationResult: Result<Unit> = Result.success(Unit)
+    var sendVerificationCalls = 0
+
+    override suspend fun sendEmailVerification(): Result<Unit> {
+        sendVerificationCalls++
+        return sendVerificationResult
+    }
+
     override fun logout() {
         logoutCalls++
         signedInUserId = null
@@ -124,8 +133,11 @@ class FakeSessionPreferences(var rememberMe: Boolean = true) : SessionPreference
     }
 }
 
-/** Fake de [PasswordRecoveryRepository] con resultados configurables por paso. */
-class FakePasswordRecoveryRepository : PasswordRecoveryRepository {
+/**
+ * Fake de [PasswordRecoveryRepository] con resultados configurables por paso.
+ * @param usesCode `false` simula el modo gratuito con enlace (spec 012).
+ */
+class FakePasswordRecoveryRepository(override val usesCode: Boolean = true) : PasswordRecoveryRepository {
     var requestCodeResult: Result<Duration> = Result.success(60.seconds)
     var verifyCodeResult: Result<Unit> = Result.success(Unit)
     var resetPasswordResult: Result<Unit> = Result.success(Unit)
