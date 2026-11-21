@@ -130,6 +130,28 @@ class InventorySearchScreenTest {
     }
 
     @Test
+    fun caLoc0201_0205_0206_0207_recientesConLaBarraEnfocadaYVacia() {
+        // CA-LOC-02-01: sin foco no aparece; al tocar la barra vacía, sí.
+        flujo.mostrar(InventorySearchUiState(recentSearches = listOf("leche", "carne, pollo")))
+        composeTestRule.onNodeWithText("Recientes").assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription("Buscar producto…").performClick()
+        composeTestRule.mostrado("Recientes", "leche", "carne, pollo", "Borrar")
+
+        // CA-LOC-02-05 y 02-06: tocar un chip y «Borrar» emiten sus eventos.
+        composeTestRule.onNodeWithText("carne, pollo").performClick()
+        composeTestRule.onNodeWithText("Borrar").performClick()
+        assertEquals(
+            "chip y borrar",
+            listOf(InventorySearchEvent.RecentClicked("carne, pollo"), InventorySearchEvent.ClearRecents),
+            flujo.eventos
+        )
+
+        // CA-LOC-02-07: con texto en la barra, «Recientes» se oculta.
+        flujo.paso(InventorySearchUiState(query = "le", recentSearches = listOf("leche")))
+        composeTestRule.onNodeWithText("Recientes").assertDoesNotExist()
+    }
+
+    @Test
     fun caInv0701_0702_0707_elAvisoDeVozEscuchaProcesaYSeCierraAlTocarFuera() {
         composeTestRule.mainClock.autoAdvance = false
         flujo.mostrar(InventorySearchUiState(isVoiceAvailable = true, voice = VoiceUiState.Listening))

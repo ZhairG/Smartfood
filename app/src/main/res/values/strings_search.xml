@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Búsquedas recientes de Recetas y del Inventario (spec 014, HU-LOC-02). -->
+<resources>
+    <string name="search_recent_title">Recientes</string>
+    <string name="search_recent_clear">Borrar</string>
+</resources>

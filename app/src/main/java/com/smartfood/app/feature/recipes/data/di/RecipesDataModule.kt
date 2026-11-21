@@ -3,8 +3,10 @@ package com.smartfood.app.feature.recipes.data.di
 import com.smartfood.app.feature.recipes.data.catalog.AndroidRecipeAssetSource
 import com.smartfood.app.feature.recipes.data.catalog.AssetsRecipeCatalog
 import com.smartfood.app.feature.recipes.data.catalog.RecipeAssetSource
+import com.smartfood.app.feature.recipes.data.repository.CachedCookingHistoryRepository
 import com.smartfood.app.feature.recipes.data.repository.FirestoreCookingHistoryRepository
 import com.smartfood.app.feature.recipes.data.repository.FirestoreCookingRepository
+import com.smartfood.app.feature.recipes.data.repository.RemoteHistory
 import com.smartfood.app.feature.recipes.data.repository.FirestoreFavoritesRepository
 import com.smartfood.app.feature.recipes.data.repository.FirestoreOwnRecipesRepository
 import com.smartfood.app.feature.recipes.domain.repository.CookingHistoryRepository
@@ -42,11 +44,19 @@ abstract class RecipesDataModule {
     @Singleton
     abstract fun bindRecipeAssetSource(impl: AndroidRecipeAssetSource): RecipeAssetSource
 
-    /** Historial de cocción guardado en Firestore (`users/{uid}/cookings`, T021). */
+    /** Historial de cocción guardado en Firestore (`users/{uid}/cookings`, T021), la fuente de verdad. */
+    @Binds
+    @Singleton
+    @RemoteHistory
+    abstract fun bindRemoteCookingHistoryRepository(
+        impl: FirestoreCookingHistoryRepository
+    ): CookingHistoryRepository
+
+    /** El historial que usa la app: Firestore con una copia en Room (spec 014, HU-LOC-01). */
     @Binds
     @Singleton
     abstract fun bindCookingHistoryRepository(
-        impl: FirestoreCookingHistoryRepository
+        impl: CachedCookingHistoryRepository
     ): CookingHistoryRepository
 
     /** Cierre de la cocina: descuento del inventario y registro en un solo lote (plan §6, CA-RIA-04-09). */

@@ -5,6 +5,7 @@ import com.smartfood.app.feature.auth.domain.model.User
 import com.smartfood.app.testutil.FakeAuthRepository
 import com.smartfood.app.testutil.FakeAuthRepository.Companion.DEFAULT_UID
 import com.smartfood.app.testutil.FakeExpiryReminderScheduler
+import com.smartfood.app.testutil.FakeLocalUserData
 import com.smartfood.app.testutil.FakeSessionPreferences
 import com.smartfood.app.testutil.FakePhotoSync
 import com.smartfood.app.testutil.FakeUserRepository
@@ -75,7 +76,7 @@ class SessionUseCasesTest {
     fun `CA-05-03 cerrar sesion delega en el repositorio`() {
         authRepository.signedInUserId = DEFAULT_UID
 
-        LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), FakePhotoSync())()
+        LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), FakePhotoSync(), FakeLocalUserData())()
 
         assertNull(authRepository.currentUserId())
     }
@@ -85,7 +86,7 @@ class SessionUseCasesTest {
         val scheduler = FakeExpiryReminderScheduler()
         authRepository.signedInUserId = DEFAULT_UID
 
-        LogoutUseCase(authRepository, scheduler, FakePhotoSync())()
+        LogoutUseCase(authRepository, scheduler, FakePhotoSync(), FakeLocalUserData())()
 
         assertEquals(1, scheduler.cancelCalls)
         assertEquals(0, scheduler.scheduleCalls)
@@ -97,10 +98,21 @@ class SessionUseCasesTest {
         val photoSync = FakePhotoSync().apply { pending.value = mapOf("leche" to "/files/pending/leche/a.jpg") }
         authRepository.signedInUserId = DEFAULT_UID
 
-        LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), photoSync)()
+        LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), photoSync, FakeLocalUserData())()
 
         assertEquals(1, photoSync.clearAllCalls)
         assertFalse(photoSync.hasPending())
+        assertNull(authRepository.currentUserId())
+    }
+
+    @Test
+    fun `CA-LOC-01-05 CA-LOC-02-08 cerrar sesion borra el historial y las busquedas guardados en el telefono`() {
+        val localUserData = FakeLocalUserData()
+        authRepository.signedInUserId = DEFAULT_UID
+
+        LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), FakePhotoSync(), localUserData)()
+
+        assertEquals(1, localUserData.clears)
         assertNull(authRepository.currentUserId())
     }
 }

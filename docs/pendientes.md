@@ -23,7 +23,7 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 | 7 | Animaciones y transiciones | 007 | Hecho | [#145](https://github.com/ZhairG/Smartfood/pull/145) |
 | 8 | Correcciones de documentación y medición del agente | 009 (T047 a T053) | Hecho | [#146](https://github.com/ZhairG/Smartfood/pull/146) |
 | 9 | Pendientes menores | 009, 010 | Hecho | [#147](https://github.com/ZhairG/Smartfood/pull/147) |
-| 10 | Persistencia local con Room (opcional) | por definir | Pendiente | — |
+| 10 | Persistencia local con Room (opcional) | 014 (nueva) | Hecho | [#148](https://github.com/ZhairG/Smartfood/pull/148) |
 
 ## 1. Modo sin facturación (urgente)
 

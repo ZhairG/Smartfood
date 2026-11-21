@@ -20,6 +20,7 @@ import com.smartfood.app.feature.recipes.domain.usecase.CountSavedRecipesUseCase
 import com.smartfood.app.feature.recipes.domain.usecase.GetMonthlySavingsUseCase
 import com.smartfood.app.testutil.EmptyRecipeCatalog
 import com.smartfood.app.testutil.FakeFavoritesRepository
+import com.smartfood.app.testutil.FakeLocalUserData
 import com.smartfood.app.testutil.FakeOwnRecipesRepository
 import com.smartfood.app.testutil.ownRecipe
 import com.smartfood.app.testutil.savedFavorite
@@ -83,7 +84,7 @@ class ProfileViewModelTest {
     private fun crearViewModel(repository: InventoryRepository = inventoryRepository) = ProfileViewModel(
         observeProfile = ObserveProfileUseCase(profileRepository),
         syncProfileEmail = SyncProfileEmailUseCase(authRepository, profileRepository),
-        logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), photoSync),
+        logout = LogoutUseCase(authRepository, FakeExpiryReminderScheduler(), photoSync, FakeLocalUserData()),
         observeInventory = ObserveInventoryUseCase(
             repository,
             FakePhotoSync(),

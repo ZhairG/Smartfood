@@ -26,6 +26,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,20 +36,27 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.components.SmartFoodRecentSearches
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.smartFoodColors
@@ -80,6 +89,8 @@ fun InventorySearchScreen(
     onOpenSettings: () -> Unit = {},
     onDismissPermissionRationale: () -> Unit = {},
 ) {
+    // «Recientes» solo aparece con la barra enfocada y vacía, y se oculta al escribir (spec 014, CA-LOC-02-01, 02-07).
+    var searchFocused by remember { mutableStateOf(false) }
     Box(modifier = modifier.fillMaxSize()) {
         // Con el aviso de voz abierto, la búsqueda se desenfoca detrás (Figma 476:4507; API 31+).
         val blurRadius = if (state.voice == VoiceUiState.Hidden) 0.dp else VoiceBlur
@@ -100,8 +111,18 @@ fun InventorySearchScreen(
                 SearchField(
                     query = state.query,
                     onQueryChanged = { onEvent(InventorySearchEvent.QueryChanged(it)) },
-                    onClearQuery = { onEvent(InventorySearchEvent.ClearQuery) }
+                    onClearQuery = { onEvent(InventorySearchEvent.ClearQuery) },
+                    onSearch = { onEvent(InventorySearchEvent.SearchSubmitted) },
+                    modifier = Modifier.onFocusChanged { searchFocused = it.isFocused }
                 )
+
+                if (searchFocused && state.query.isEmpty() && state.recentSearches.isNotEmpty()) {
+                    SmartFoodRecentSearches(
+                        items = state.recentSearches,
+                        onItemClick = { onEvent(InventorySearchEvent.RecentClicked(it)) },
+                        onClear = { onEvent(InventorySearchEvent.ClearRecents) }
+                    )
+                }
 
                 if (state.isVoiceAvailable) {
                     VoiceSearchCard(onClick = { onEvent(InventorySearchEvent.VoiceClicked) })
@@ -174,12 +195,16 @@ fun InventorySearchScreen(
  * @param query Texto actual de la barra.
  * @param onQueryChanged Se llama con cada carácter escrito.
  * @param onClearQuery Se llama al tocar la "x", que aparece solo con texto (CA-INV-06-07).
+ * @param onSearch Se llama al pulsar «Buscar» en el teclado (spec 014, CA-LOC-02-02).
+ * @param modifier Modificador opcional; la pantalla lo usa para saber si la barra tiene el foco.
  */
 @Composable
 private fun SearchField(
     query: String,
     onQueryChanged: (String) -> Unit,
     onClearQuery: () -> Unit,
+    onSearch: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val placeholder = stringResource(id = R.string.inventory_search_placeholder)
     // Figma 476:3203: Poppins Regular de 14 px.
@@ -191,8 +216,10 @@ private fun SearchField(
         onValueChange = onQueryChanged,
         singleLine = true,
         textStyle = textStyle,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = { onSearch() }),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .semantics { contentDescription = placeholder },
         decorationBox = { innerTextField ->
