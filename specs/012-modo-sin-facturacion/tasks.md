@@ -19,6 +19,8 @@
 - [x] T009 **Reglas** (RNF-SPK-03): `media` y `photoPath` del perfil en `firestore.rules`, con sus pruebas.
 - [x] T010 **Migración** (RF-SPK-07, HU-SPK-06): `functions/scripts/migrar-storage-a-firestore.mjs`.
 - [x] T011 **Documentación**: `AGENTS.md`, `docs/backend.md` y `docs/pendientes.md`.
+- [x] T012 **Cobertura de los CA-SPK**: `tools/ca_coverage.py` reconoce el área SPK en sus expresiones regulares (solo
+  estaba en `AREAS`) y `tools/ca_coverage_baseline.txt` suma los 17 CA-SPK cubiertos (2026-11-21).
 
 ## Matriz de trazabilidad
 
