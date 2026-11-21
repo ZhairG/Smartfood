@@ -3,18 +3,20 @@
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas de firestore.rules para el inventario (spec 006, RNF-INV-01, plan §3), las favoritas
- * (spec 010, RNF-SAV-01), las fotos del modo gratuito (spec 012, RNF-SPK-03) y regresión del perfil (spec 005,
- * CA-LEG-02-02). Se ejecutan contra el emulador de Firestore:
+ * (spec 010, RNF-SAV-01), las fotos del modo gratuito (spec 012, RNF-SPK-03), el lote del cierre de la cocina
+ * (spec 009, CA-RIA-04-08 y 04-09) y regresión del perfil (spec 005, CA-LEG-02-02). Se ejecutan contra el emulador de
+ * Firestore:
  * firebase emulators:exec --only firestore,storage "npm --prefix rules-test test"
  */
 import { after, before, beforeEach, describe, test } from 'node:test';
 import { readFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
 import {
   assertFails,
   assertSucceeds,
   initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { Bytes, deleteField, doc, getDoc, serverTimestamp, setDoc, deleteDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import { Bytes, deleteField, doc, getDoc, serverTimestamp, setDoc, deleteDoc, Timestamp, updateDoc, writeBatch } from 'firebase/firestore';
 
 let env;
 
@@ -313,6 +315,58 @@ describe('historial de cocción (spec 009, CA-RIA-04-05)', () => {
   test('CA-RIA-04-05 no se permite la edición de un registro ya creado', async () => {
     await assertSucceeds(setDoc(cooking('u1'), validCooking()));
     await assertFails(setDoc(cooking('u1'), validCooking({ rescuedValueCop: 5000 })));
+  });
+
+  /** El lote del cierre tal como lo escribe FirestoreCookingRepository (plan §6). */
+  const loteDelCierre = (operacion = 'op1', cantidad = 3) => {
+    // El lote y sus documentos deben salir de la misma instancia: cada db() crea una nueva.
+    const firestore = db('u1');
+    const lote = writeBatch(firestore);
+    lote.update(doc(firestore, 'users/u1/inventory/item1'), { quantity: cantidad, unit: 'UNITS', updatedAt: serverTimestamp() });
+    lote.delete(doc(firestore, 'users/u1/inventory/item2'));
+    lote.set(doc(firestore, `users/u1/cookings/${operacion}`), validCooking());
+    return lote.commit();
+  };
+
+  const sembrarCierre = async () => {
+    await sembrar({ quantity: 5, unit: 'UNITS', price: 3000, photoPath: 'p/a.jpg', photoUrl: 'https://foto/a.jpg' });
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'users/u1/inventory/item2'), {
+        ...valido(),
+        createdAt: Timestamp.fromDate(new Date('2026-10-01T10:00:00Z')),
+        updatedAt: Timestamp.fromDate(new Date('2026-10-01T10:00:00Z')),
+      });
+    });
+  };
+
+  test('CA-RIA-04-08 CA-RIA-04-09 el lote del cierre se acepta y conserva el precio y la foto', async () => {
+    await sembrarCierre();
+
+    await assertSucceeds(loteDelCierre());
+
+    const producto = (await leerSinReglas('users/u1/inventory/item1')).data();
+    assert.equal(producto.quantity, 3);
+    assert.equal(producto.price, 3000);
+    assert.equal(producto.photoPath, 'p/a.jpg');
+    assert.equal((await leerSinReglas('users/u1/inventory/item2')).exists(), false);
+    assert.equal((await leerSinReglas('users/u1/cookings/op1')).exists(), true);
+  });
+
+  test('CA-RIA-04-09 repetir el lote con la misma operación se rechaza entero', async () => {
+    await sembrarCierre();
+    await assertSucceeds(loteDelCierre());
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'users/u1/inventory/item2'), {
+        ...valido(),
+        createdAt: Timestamp.fromDate(new Date('2026-10-01T10:00:00Z')),
+        updatedAt: Timestamp.fromDate(new Date('2026-10-01T10:00:00Z')),
+      });
+    });
+
+    await assertFails(loteDelCierre('op1', 1));
+
+    assert.equal((await leerSinReglas('users/u1/inventory/item1')).data().quantity, 3);
+    assert.equal((await leerSinReglas('users/u1/inventory/item2')).exists(), true);
   });
 });
 
