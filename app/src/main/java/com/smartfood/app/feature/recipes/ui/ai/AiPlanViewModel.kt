@@ -35,7 +35,8 @@ import kotlinx.coroutines.launch
  * [GetAiContextUseCase], guarda lo que la persona elige y, al generar, muestra "Analizando opciones" al menos
  * [MIN_LOADING_MILLIS] (desviación aprobada, spec §9) mientras [GeneratePlanUseCase] calcula. "Cancelar" descarta el
  * cálculo y vuelve al contexto sin resultado (CA-RIA-02-02); "Ajustar" vuelve con los mismos datos (CA-RIA-02-08). No
- * calcula nada del agente: solo orquesta.
+ * calcula nada del agente: solo orquesta. Si la búsqueda llega al límite de 2 s, marca el plan como incompleto
+ * (CA-RIA-02-13) o muestra "Sin coincidencias" con el mensaje del límite (CA-RIA-02-14).
  *
  * @param getAiContext Inventario emparejado, restricciones y tienda.
  * @param generatePlan Plan de 3 días o sugerencias.
@@ -142,7 +143,9 @@ class AiPlanViewModel @Inject constructor(
         // Sin las preferencias no se sabe la dieta: no se arma un plan "sin restricciones" (CA-RIA-02-12).
         if (!current.preferencesKnown) return
         if (_uiState.value.step == AiStep.Loading) return
-        _uiState.update { it.copy(step = AiStep.Loading, plan = null, reasons = emptyList(), suggestions = emptyList()) }
+        _uiState.update {
+            it.copy(step = AiStep.Loading, plan = null, cuisineRecipes = null, reasons = emptyList(), suggestions = emptyList())
+        }
         val state = _uiState.value
         generation = viewModelScope.launch {
             // Las restricciones del Perfil no avisan cuando cambian: se leen otra vez justo antes de buscar (CA-RIA-02-11).
@@ -153,8 +156,10 @@ class AiPlanViewModel @Inject constructor(
                     val started = System.nanoTime()
                     generatePlan(loaded, state.budgetCop, state.servings, state.maxMinutes, state.noSpicy).also {
                         // Tiempo del agente para CA-RIA-02-10 (≤ 2 s con 50 recetas), medido en el teléfono con el APK
-                        // release: `adb logcat -s SmartFoodIA`.
-                        Log.i(TAG, "Plan calculado en ${(System.nanoTime() - started) / 1_000_000} ms")
+                        // release: `adb logcat -s SmartFoodIA`. También dice cuántos nodos visitó y si llegó al límite de
+                        // 2 s (RNF-RIA-02, CA-RIA-02-13 y 02-14).
+                        val millis = (System.nanoTime() - started) / 1_000_000
+                        Log.i(TAG, "Plan calculado en $millis ms (${describe(it)})")
                     }
                 }
                 delay(MIN_LOADING_MILLIS)
@@ -162,11 +167,27 @@ class AiPlanViewModel @Inject constructor(
             }
             _uiState.update {
                 when (outcome) {
-                    is AiPlanOutcome.Found -> it.copy(step = AiStep.Plan, plan = outcome.plan, reasons = outcome.reasons)
-                    is AiPlanOutcome.NoPlan -> it.copy(step = AiStep.NoPlan, suggestions = outcome.suggestions)
+                    is AiPlanOutcome.Found -> it.copy(
+                        step = AiStep.Plan,
+                        plan = outcome.plan,
+                        reasons = outcome.reasons,
+                        cuisineRecipes = outcome.cuisineRecipes,
+                        planComplete = outcome.complete,
+                        timedOut = false,
+                    )
+                    is AiPlanOutcome.NoPlan -> it.copy(step = AiStep.NoPlan, suggestions = outcome.suggestions, timedOut = false)
+                    // CA-RIA-02-14: "Sin coincidencias" con el mensaje del límite y sin sugerencias.
+                    is AiPlanOutcome.TimedOut -> it.copy(step = AiStep.NoPlan, suggestions = emptyList(), timedOut = true)
                 }
             }
         }
+    }
+
+    /** Resumen del resultado para el registro de la medición. */
+    private fun describe(outcome: AiPlanOutcome): String = when (outcome) {
+        is AiPlanOutcome.Found -> "${outcome.nodes} nodos, " + if (outcome.complete) "completo" else "límite de 2 s"
+        is AiPlanOutcome.NoPlan -> "sin plan"
+        is AiPlanOutcome.TimedOut -> "${outcome.nodes} nodos, límite de 2 s sin plan"
     }
 
     private fun send(effect: AiEffect) {

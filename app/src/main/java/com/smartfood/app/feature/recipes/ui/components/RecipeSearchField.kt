@@ -24,7 +24,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
-import com.smartfood.app.core.designsystem.theme.SurfaceLight
+import com.smartfood.app.core.designsystem.theme.smartFoodColors
 
 /**
  * Nombre: RecipeSearchField.kt
@@ -66,7 +66,7 @@ fun RecipeSearchField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = SearchHeight)
-                    .background(color = SurfaceLight, shape = CircleShape)
+                    .background(color = MaterialTheme.smartFoodColors.softFill, shape = CircleShape)
                     .padding(horizontal = SearchSidePadding)
             ) {
                 Icon(

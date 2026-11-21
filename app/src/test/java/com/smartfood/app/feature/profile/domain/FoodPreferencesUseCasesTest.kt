@@ -2,6 +2,7 @@ package com.smartfood.app.feature.profile.domain
 
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.AuthException
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
@@ -21,7 +22,7 @@ import org.junit.Test
  * Autor: SmartFood Team
  * Fecha: Octubre 2026
  * Descripción: Pruebas unitarias de los casos de uso de preferencias alimentarias (spec 008, HU-PER-03, T011): leen y
- * guardan en el repositorio y propagan el error tipado.
+ * guardan en el repositorio, propagan el error tipado y dicen si el guardado quedó en el teléfono (CA-PER-03-06).
  */
 class FoodPreferencesUseCasesTest {
 
@@ -56,6 +57,14 @@ class FoodPreferencesUseCasesTest {
 
         assertEquals(listOf(completas), repository.savedPreferences)
         assertEquals(completas, repository.preferences)
+    }
+
+    @Test
+    fun `CA-PER-03-06 guardar dice si quedo confirmado o en el telefono`() = runTest {
+        assertEquals(WriteOutcome.SYNCED, savePreferences(completas).getOrNull())
+
+        repository.outcome = WriteOutcome.PENDING
+        assertEquals(WriteOutcome.PENDING, savePreferences(completas).getOrNull())
     }
 
     @Test

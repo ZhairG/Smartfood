@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
+import com.smartfood.app.core.designsystem.components.AnimatedMessage
 import com.smartfood.app.core.designsystem.components.SmartFoodTopBar
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
@@ -116,7 +117,7 @@ private fun EditorForm(state: OwnRecipeEditorUiState, onEvent: (OwnRecipeEditorE
             .verticalScroll(rememberScrollState())
             .padding(horizontal = SidePadding, vertical = VerticalPadding)
     ) {
-        state.error?.let { error ->
+        AnimatedMessage(message = state.error) { error ->
             ErrorCard(ownRecipeErrorReason(error, state.draft.cookMinutes))
         }
 

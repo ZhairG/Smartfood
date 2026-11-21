@@ -16,13 +16,13 @@ escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tab
 |---|---|---|---|---|
 | 1 | Modo sin facturación (sin plan Blaze) | [012](../specs/012-modo-sin-facturacion/spec.md) | Implementado, pruebas en la ronda final | — |
 | 2 | La dieta se pierde si falla la lectura del perfil | 009 (CA-RIA-02-12) | Hecho | [#140](https://github.com/ZhairG/Smartfood/pull/140) |
-| 3 | Cierre de cocina: precio y reintentos | 009 | Pendiente | — |
-| 4 | Guardado pendiente o confirmado en el Perfil | 008 | Pendiente | — |
-| 5 | Cocina Favorita sin plan posible | 011 | Pendiente | — |
-| 6 | Revisión del modo oscuro | 002 (enmienda) o 013 | Pendiente | — |
-| 7 | Animaciones y transiciones | 007 | Pendiente | — |
-| 8 | Correcciones de documentación y medición del agente | 009 | Pendiente | — |
-| 9 | Pendientes menores | 009, 010 | Hecho (T046, T024 y T026; ronda final del 2026-11-20) | — |
+| 3 | Cierre de cocina: precio y reintentos | 009 (CA-RIA-04-08, 04-09) | Hecho | [#141](https://github.com/ZhairG/Smartfood/pull/141) |
+| 4 | Guardado pendiente o confirmado en el Perfil | 008 (CA-PER-02-14, 03-06) | Hecho | [#142](https://github.com/ZhairG/Smartfood/pull/142) |
+| 5 | Cocina Favorita sin plan posible | 011 (CA-COC-02-06, 02-07, 03-05) | Hecho | [#143](https://github.com/ZhairG/Smartfood/pull/143) |
+| 6 | Revisión del modo oscuro | 013 (enmienda CA-UI-05-04) | Hecho | [#144](https://github.com/ZhairG/Smartfood/pull/144) |
+| 7 | Animaciones y transiciones | 007 | Hecho | [#145](https://github.com/ZhairG/Smartfood/pull/145) |
+| 8 | Correcciones de documentación y medición del agente | 009 (T047 a T053) | Hecho | [#146](https://github.com/ZhairG/Smartfood/pull/146) |
+| 9 | Pendientes menores | 009, 010 | Hecho | [#147](https://github.com/ZhairG/Smartfood/pull/147) |
 | 10 | Persistencia local con Room (opcional) | por definir | Pendiente | — |
 
 ## 1. Modo sin facturación (urgente)
@@ -124,6 +124,11 @@ fusionó. Hoy está en el *stash* local «On docs/007-animaciones: borrador spec
 - Medir en un teléfono con el catálogo de 70 recetas, incluido el caso de estrés (8,3 s en un portátil, frente a la
   meta de 2 s). Definir un tiempo límite y una respuesta clara si la búsqueda no termina.
 - Corregir los objetivos específicos del póster.
+
+**Hecho (rama `feature/009-evaluacion-agente`, 2026-11-20):** límite de 2 s con el mejor plan encontrado (CA-RIA-02-13 y
+02-14), n/N y cantidad consumida, frontera media y máxima, `AgentSensitivityTest`, `AgentDevicePerformanceTest`,
+correcciones de [`ia/evaluacion-agente.md`](ia/evaluacion-agente.md) §8 y [`ia/poster-objetivos.md`](ia/poster-objetivos.md).
+Las cifras de §8 se midieron en la ronda final del 2026-11-20.
 
 ## 9. Pendientes menores
 

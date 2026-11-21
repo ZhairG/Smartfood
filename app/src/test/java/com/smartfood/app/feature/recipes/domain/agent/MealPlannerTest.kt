@@ -23,7 +23,8 @@ import org.junit.Test
  * Fecha: Octubre 2026
  * Descripción: Pruebas unitarias del agente [MealPlanner] (spec 009 §2, plan §3.4, T011): cada restricción del CSP, la
  * optimalidad del plan contra una búsqueda exhaustiva (fuerza bruta) en catálogos aleatorios con semilla fija, el
- * determinismo, las sugerencias cuando no hay plan, las restricciones alimentarias (T012a) y la Cocina Favorita (spec 011).
+ * determinismo, las sugerencias cuando no hay plan, las restricciones alimentarias (T012a), la Cocina Favorita (spec 011)
+ * y el límite de tiempo (T048, CA-RIA-02-13 y 02-14).
  */
 class MealPlannerTest {
 
@@ -321,10 +322,97 @@ class MealPlannerTest {
     }
 
     @Test
-    fun `CA-COC-03-02 sin plan por la cocina sugiere quitarla`() {
-        val resultado = planner.plan(conCocinas, despensa, ctxCocinas(RecipeCuisine.MEXICAN))
+    fun `CA-COC-03-02 sin plan ni con una receta de la cocina sugiere quitarla`() {
+        // La única mexicana es picante: con "Sin picante" no entra ni una, y sin la cocina sí hay plan.
+        val resultado = planner.plan(conCocinas, despensa, ctxCocinas(RecipeCuisine.MEXICAN).copy(noSpicy = true))
 
         assertTrue(PlanSuggestion.RemoveCuisine in (resultado as PlanResult.NoPlan).suggestions)
+    }
+
+    @Test
+    fun `CA-COC-02-06 sin plan con 3 mexicanas lo completa con otras cocinas y dice cuantas son mexicanas`() {
+        // Solo hay una receta mexicana: no hay plan con 3 ni con 2, pero sí con 1.
+        val resultado = planner.plan(conCocinas, despensa, ctxCocinas(RecipeCuisine.MEXICAN)) as PlanResult.Found
+
+        assertEquals(1, resultado.cuisineRecipes)
+        assertEquals(1, resultado.plan.days.count { it.recipe.cuisine == RecipeCuisine.MEXICAN })
+        assertTrue(resultado.plan.days.any { it.recipe.id == "pollo-picante" })
+    }
+
+    @Test
+    fun `CA-COC-02-06 con dos recetas posibles de la cocina el plan usa las dos`() {
+        val dosAsiaticas = catalogo.map { receta ->
+            receta.copy(
+                cuisine = if (receta.id == "huevos-arroz" || receta.id == "tortilla") RecipeCuisine.ASIAN else RecipeCuisine.ITALIAN
+            )
+        }
+        val contexto = ctxCocinas(RecipeCuisine.ASIAN)
+
+        val resultado = planner.plan(dosAsiaticas, despensa, contexto) as PlanResult.Found
+
+        assertEquals(2, resultado.cuisineRecipes)
+        val esperado = bruteForce(RandomScenario(ingredients, dosAsiaticas, despensa), contexto.copy(minCuisineRecipes = 2))
+        assertEquals(esperado?.second, resultado.plan.days.map { it.recipe.id })
+    }
+
+    @Test
+    fun `CA-COC-02-07 al completar con otras cocinas la dieta nunca se relaja`() {
+        // La única mexicana tiene pollo: con dieta vegetariana no entra, y las demás recetas tampoco pueden llevar carne.
+        val contexto = ctxCocinas(RecipeCuisine.MEXICAN, diet = setOf(DietRule.VEGETARIAN)).copy(budgetCop = 1_000_000)
+
+        when (val resultado = planner.plan(conCocinas, despensa, contexto)) {
+            is PlanResult.Found -> resultado.plan.days.forEach {
+                assertTrue(it.recipe.id, planner.fitsDiet(it.recipe, contexto))
+            }
+            is PlanResult.NoPlan -> assertTrue(resultado.suggestions.isNotEmpty())
+            // Sin límite de tiempo la búsqueda siempre termina (CA-RIA-02-13).
+            is PlanResult.TimedOut -> org.junit.Assert.fail("Sin límite no puede vencer: $resultado")
+        }
+    }
+
+    @Test
+    fun `CA-COC-02-06 CA-COC-02-07 con la cocina relajada coincide con la fuerza bruta en cada nivel`() {
+        val cocinas = RecipeCuisine.entries
+        var relaxedPlans = 0
+        repeat(100) { seed ->
+            val base = randomScenario(seed + 500, recipeCount = 8 + seed % 5)
+            // Pocas recetas de la cocina elegida, para que la relajación haga falta a menudo.
+            val recetas = base.recipes.mapIndexed { i, receta -> receta.copy(cuisine = cocinas[if (i % 4 == 0) 0 else 1 + i % 3]) }
+            val s = RandomScenario(base.ingredients, recetas, base.pantry)
+            val context = PlanContext(
+                budgetCop = 150_000,
+                servings = 4,
+                cuisines = setOf(cocinas[0]),
+                diet = if (seed % 2 == 0) setOf(DietRule.VEGETARIAN) else emptySet(),
+            )
+
+            // Cada nivel por separado.
+            for (min in 1..2) {
+                val expected = bruteForce(s, context.copy(minCuisineRecipes = min))
+                val actual = MealPlanner(s.ingredients).search(s.recipes, s.pantry, context.copy(minCuisineRecipes = min))
+                if (expected == null) {
+                    assertNull("semilla $seed, mínimo $min: no debería haber plan", actual)
+                } else {
+                    assertEquals("semilla $seed, mínimo $min: plan", expected.second, actual?.days?.map { it.recipe.id })
+                    assertEquals("semilla $seed, mínimo $min: utilidad", expected.first, actual!!.utility, 1e-9)
+                }
+            }
+
+            // La escalera de plan(): gana el primer nivel con plan (3, luego 2, luego 1).
+            val levels = listOf<Int?>(null, 2, 1)
+            val expectedLevel = levels.firstNotNullOfOrNull { min -> bruteForce(s, context.copy(minCuisineRecipes = min))?.let { min to it } }
+            val result = MealPlanner(s.ingredients).plan(s.recipes, s.pantry, context)
+            if (expectedLevel == null) {
+                assertTrue("semilla $seed: no debería haber plan", result is PlanResult.NoPlan)
+            } else {
+                val found = result as PlanResult.Found
+                assertEquals("semilla $seed: nivel", expectedLevel.first, found.cuisineRecipes)
+                assertEquals("semilla $seed: plan de la escalera", expectedLevel.second.second, found.plan.days.map { it.recipe.id })
+                if (found.cuisineRecipes != null) relaxedPlans++
+            }
+        }
+        // La comparación debe cubrir planes relajados, no solo los que tienen todas las recetas de la cocina.
+        assertTrue("planes relajados: $relaxedPlans de 100", relaxedPlans >= 20)
     }
 
     @Test
@@ -336,6 +424,62 @@ class MealPlannerTest {
         assertFalse(PlanSuggestion.RemoveCuisine in (planner.plan(conCocinas, despensa, sinCocinas) as PlanResult.NoPlan).suggestions)
     }
 
+    /** Vence después de [consultas] consultas: simula un reloj que llega al límite a mitad de la búsqueda. */
+    private fun venceTras(consultas: Int): SearchDeadline {
+        var hechas = 0
+        return SearchDeadline { ++hechas > consultas }
+    }
+
+    @Test
+    fun `CA-RIA-02-13 sin limite la busqueda termina y da el mismo plan que siempre`() {
+        val resultado = planner.plan(catalogo, despensa, ctx()) as PlanResult.Found
+
+        assertTrue("terminó", resultado.complete)
+        assertTrue("contó nodos", resultado.nodes > 0)
+        assertEquals(planner.search(catalogo, despensa, ctx()), resultado.plan)
+    }
+
+    @Test
+    fun `CA-RIA-02-13 si el limite vence con un plan encontrado devuelve ese plan valido y avisa que no termino`() {
+        val completo = planner.plan(catalogo, despensa, ctx(maxMinutes = 35, noSpicy = true)) as PlanResult.Found
+        // El primer límite que ya deja un plan encontrado, pero corta antes de revisar todo el árbol.
+        val corto = (1 until completo.nodes.toInt()).asSequence()
+            .map { planner.plan(catalogo, despensa, ctx(maxMinutes = 35, noSpicy = true), venceTras(it)) }
+            .filterIsInstance<PlanResult.Found>()
+            .first()
+
+        assertFalse("no terminó", corto.complete)
+        assertTrue("visitó menos nodos", corto.nodes < completo.nodes)
+        assertTrue("nunca supera al óptimo", corto.plan.utility <= completo.plan.utility + 1e-9)
+        val plan = corto.plan
+        assertEquals("distintas", 3, plan.days.map { it.recipe.id }.toSet().size)
+        plan.days.forEach { d ->
+            assertTrue("tiempo ${d.recipe.id}", d.recipe.totalMinutes <= 35)
+            assertTrue("picante ${d.recipe.id}", !d.recipe.spicy)
+            assertTrue("faltantes ${d.recipe.id}", d.uses.count { it.isMissing } <= 3)
+        }
+        assertTrue("presupuesto", plan.totalCostCop <= 50_000)
+    }
+
+    @Test
+    fun `CA-RIA-02-13 el limite con reloj vence al pasar el tiempo`() {
+        val reloj = kotlin.time.TestTimeSource()
+        val limite = SearchDeadline.after(kotlin.time.Duration.parse("2s"), reloj)
+
+        assertFalse(limite.expired())
+        reloj += kotlin.time.Duration.parse("1999ms")
+        assertFalse(limite.expired())
+        reloj += kotlin.time.Duration.parse("1ms")
+        assertTrue(limite.expired())
+    }
+
+    @Test
+    fun `CA-RIA-02-14 si el limite vence antes de encontrar un plan no hay plan ni sugerencias`() {
+        val resultado = planner.plan(catalogo, despensa, ctx(), SearchDeadline { true })
+
+        assertEquals(PlanResult.TimedOut(nodes = 0), resultado)
+    }
+
     /**
      * Búsqueda exhaustiva: prueba todas las secuencias de recetas distintas, simulando el inventario y el presupuesto
      * día a día con el mismo evaluador. Devuelve la utilidad máxima y sus ids (desempate por ids menores).
@@ -344,8 +488,12 @@ class MealPlannerTest {
         val recipes = scenario.recipes
         val evaluator = RecipeEvaluator(scenario.ingredients, PlannerWeights())
         var best: Pair<Double, List<String>>? = null
+        val min = context.minCuisineRecipes
+        // Cocina Favorita relajada (CA-COC-02-06): un mínimo del plan, no un filtro de cada receta.
+        val relaxed = context.cuisines.isNotEmpty() && min != null && min < context.days
         fun go(seq: List<Recipe>, stock: PantryStock, spent: Long, partial: Double) {
             if (seq.size == context.days) {
+                if (relaxed && seq.count { it.cuisine in context.cuisines } < min!!) return
                 val u = partial - PlannerWeights().waste * evaluator.waste(stock)
                 val ids = seq.map { it.id }
                 val b = best
@@ -358,7 +506,7 @@ class MealPlannerTest {
                 if (seq.any { it.id == r.id }) continue
                 if (context.maxMinutes != null && r.totalMinutes > context.maxMinutes) continue
                 if (context.noSpicy && r.spicy) continue
-                if (context.cuisines.isNotEmpty() && r.cuisine !in context.cuisines) continue
+                if (!relaxed && context.cuisines.isNotEmpty() && r.cuisine !in context.cuisines) continue
                 val forbidden = context.diet.flatMap { it.forbidden }
                 if (r.ingredients.any { ri -> scenario.ingredients.getValue(ri.ingredientId).tags.any { it in forbidden } }) continue
                 val e = evaluator.evaluate(r, context.servings, seq.size + 1, stock, context.store)

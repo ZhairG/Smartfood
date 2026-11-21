@@ -7,6 +7,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -35,11 +36,25 @@ import org.junit.Test
  *
  * Cada prueba cierra su diálogo al terminar con [cerrarDialogo]: `Dialog` abre una ventana aparte y, si queda abierta,
  * la prueba siguiente no alcanza a crear su propia jerarquía de Compose.
+ *
+ * Desde la spec 007 (CA-ANI-04-02), un botón anima la salida y la acción llega al terminarla, y un segundo toque se
+ * ignora. Por eso cada toque se prueba en un diálogo recién abierto ([reabrir]) y se espera con `waitForIdle` antes de
+ * revisar los contadores.
  */
 class SmartFoodDialogsTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    /** Cambiarlo vuelve a montar el diálogo, como cuando la pantalla lo abre otra vez. */
+    private val apertura = mutableStateOf(0)
+
+    /** Espera a que termine la salida del diálogo y lo abre de nuevo. */
+    private fun reabrir() {
+        composeTestRule.waitForIdle()
+        apertura.value++
+        composeTestRule.waitForIdle()
+    }
 
     // CA-INV-04-01, 04-03 y CA-INV-05-04: "Eliminar" confirma la acción destructiva y "Cancelar" la descarta.
     @Test
@@ -50,7 +65,9 @@ class SmartFoodDialogsTest {
 
         composeTestRule.onNodeWithText("¿Desea eliminar el producto?").assertIsDisplayed()
         composeTestRule.onNodeWithText("Eliminar").performClick()
+        reabrir()
         composeTestRule.onNodeWithText("Cancelar").performClick()
+        composeTestRule.waitForIdle()
 
         assertEquals("confirmar y cancelar", 1 to 1, confirmaciones to cancelaciones)
         cerrarDialogo(visible)
@@ -100,7 +117,7 @@ class SmartFoodDialogsTest {
         val visible = mutableStateOf(true)
         composeTestRule.setContent {
             SmartfoodTheme {
-                if (visible.value) {
+                if (visible.value) key(apertura.value) {
                     SmartFoodWarningDialog(
                         title = "¿Cerrar sesión?",
                         body = if (rojo.value) "Tienes cambios sin subir." else "Tendrás que iniciar sesión nuevamente.",
@@ -117,12 +134,16 @@ class SmartFoodDialogsTest {
         composeTestRule.onNodeWithText("¿Cerrar sesión?").assertIsDisplayed()
         composeTestRule.onNodeWithText("Tendrás que iniciar sesión nuevamente.").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cerrar sesión").performClick()
+        reabrir()
         composeTestRule.onNodeWithText("Cancelar").performClick()
+        composeTestRule.waitForIdle()
         assertEquals("aviso normal", 1 to 1, confirmaciones to cancelaciones)
 
         rojo.value = true
+        reabrir()
         composeTestRule.onNodeWithText("Tienes cambios sin subir.").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cerrar sesión").performClick()
+        composeTestRule.waitForIdle()
         assertEquals("aviso rojo", 2, confirmaciones)
         cerrarDialogo(visible)
     }
@@ -132,7 +153,7 @@ class SmartFoodDialogsTest {
         val visible = mutableStateOf(true)
         composeTestRule.setContent {
             SmartfoodTheme {
-                if (visible.value) {
+                if (visible.value) key(apertura.value) {
                     SmartFoodConfirmDialog(
                         icon = { IconoEliminacion() },
                         question = "¿Desea eliminar el producto?",

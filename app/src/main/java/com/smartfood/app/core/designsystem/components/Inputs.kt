@@ -32,6 +32,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -72,6 +74,7 @@ import androidx.compose.ui.unit.sp
 import com.smartfood.app.R
 import com.smartfood.app.core.designsystem.theme.GreenCheck
 import com.smartfood.app.core.designsystem.theme.LocalFormMetrics
+import com.smartfood.app.core.designsystem.theme.SmartFoodMotion
 import com.smartfood.app.core.designsystem.theme.SmartfoodTheme
 import com.smartfood.app.core.designsystem.theme.White
 import com.smartfood.app.core.designsystem.util.inputBorderAndBackground
@@ -191,11 +194,16 @@ private fun FieldFrame(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val metrics = LocalFormMetrics.current
-    val borderColor = when {
-        isError -> MaterialTheme.colorScheme.error
-        isFocused -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.outline
-    }
+    // El borde cambia de color en 150 ms, ease-out, al enfocar, desenfocar o marcar un error (CA-ANI-03-01).
+    val borderColor by animateColorAsState(
+        targetValue = when {
+            isError -> MaterialTheme.colorScheme.error
+            isFocused -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.outline
+        },
+        animationSpec = SmartFoodMotion.focus(),
+        label = "bordeDelCampo"
+    )
     Column(verticalArrangement = Arrangement.spacedBy(metrics.labelSpacing)) {
         if (label != null) {
             Text(
@@ -301,16 +309,19 @@ fun SmartFoodPasswordField(
         contentType = contentType,
         trailingContent = {
             IconButton(onClick = { visible = !visible }, modifier = Modifier.size(40.dp)) {
-                Icon(
-                    imageVector = if (visible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                    contentDescription = if (visible) {
-                        stringResource(id = R.string.cd_hide_password)
-                    } else {
-                        stringResource(id = R.string.cd_show_password)
-                    },
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                // El ojo cambia con disolvencia de 150 ms (CA-ANI-03-04).
+                Crossfade(targetState = visible, animationSpec = SmartFoodMotion.focus(), label = "ojo") { mostrando ->
+                    Icon(
+                        imageVector = if (mostrando) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (mostrando) {
+                            stringResource(id = R.string.cd_hide_password)
+                        } else {
+                            stringResource(id = R.string.cd_show_password)
+                        },
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         },
     )
