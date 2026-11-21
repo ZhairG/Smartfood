@@ -172,6 +172,7 @@ Zhair (planeador) da recomendaciones durante el trabajo. **Toda recomendación n
 | 2026-10-18 | Guardar las capturas de Figma por módulo en la raíz del proyecto. | `disenos-figma/Modulo N - Nombre/`, con `README.md` de índice (pantalla, `node-id`). |
 | 2026-10-18 | Que nadie borre trabajo ajeno en las ramas compartidas del módulo. | Ver §1 "Ramas compartidas": `git pull` ante un rechazo y nunca `--force`. |
 | 2026-10-18 | Medir la fluidez de las animaciones en el build release. | En debug, Compose pierde ~300 ms al iniciar cada pantalla; las animaciones se juzgan con el APK release en el teléfono (medición del 18/10/2026). |
+| 2026-11-18 | Los pendientes posteriores a la entrega los hace Zhair solo, y las pruebas van al final. | Ver «Reglas» de [`docs/pendientes.md`](docs/pendientes.md): rama y PR en *draft* por punto, sin Issues, y una sola ronda de pruebas al terminar todos los puntos. |
 
 ## Comandos
 
