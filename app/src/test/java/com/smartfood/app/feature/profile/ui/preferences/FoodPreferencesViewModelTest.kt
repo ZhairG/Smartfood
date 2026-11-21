@@ -2,6 +2,7 @@ package com.smartfood.app.feature.profile.ui.preferences
 
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.authFailure
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.profile.domain.model.Cuisine
 import com.smartfood.app.feature.profile.domain.model.DietaryRestriction
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
@@ -168,6 +169,25 @@ class FoodPreferencesViewModelTest {
         assertFalse(viewModel.state.isSaving)
         assertFalse(viewModel.state.hasChanges)
         assertEquals(FoodPreferencesDialog.Saved, viewModel.state.dialog)
+
+        advanceTimeBy(FoodPreferencesViewModel.RESULT_DIALOG_MILLIS + 1)
+        assertNull(viewModel.state.dialog)
+    }
+
+    @Test
+    fun `CA-PER-03-06 sin conexion muestra Guardado en tu telefono y lo cierra a los 2 segundos`() = runTest {
+        repository.preferences = guardadas
+        repository.outcome = WriteOutcome.PENDING
+        val viewModel = crearViewModel()
+        viewModel.onEvent(FoodPreferencesEvent.SpiceSelected(SpiceLevel.HOT))
+        val esperado = viewModel.state.draft
+
+        viewModel.onEvent(FoodPreferencesEvent.SaveConfirmed)
+        runCurrent()
+
+        assertEquals(FoodPreferencesDialog.SavedOnPhone, viewModel.state.dialog)
+        assertEquals(esperado, viewModel.state.saved)
+        assertFalse(viewModel.state.hasChanges)
 
         advanceTimeBy(FoodPreferencesViewModel.RESULT_DIALOG_MILLIS + 1)
         assertNull(viewModel.state.dialog)

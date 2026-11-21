@@ -39,6 +39,11 @@
 - [x] T021 Pantalla `ChangePassword` con checklist, botón habilitado según reglas, carga, "Guardado" y vuelta al Perfil (CA-PER-05-01 a 05-06).
 - [x] T022 Pruebas: `ChangePasswordViewModelTest` y `ChangePasswordScreenTest`.
 
+## Correcciones después de la entrega
+- [x] T027 Guardado pendiente o confirmado en el Perfil (2026-11-19, punto 4 de `docs/pendientes.md`): CA-PER-02-14, 03-06 y su desviación.
+- [x] T028 `ProfileRepository.updateProfile` y `savePreferences` devuelven `WriteOutcome`; `UpdateProfileUseCase` devuelve `SavedProfile` (CA-PER-02-14, 03-06).
+- [x] T029 "Guardado en tu teléfono" en "Editar información" y "Preferencias alimentarias" (CA-PER-02-14, 03-06).
+
 ## Cierre (en el mismo PR)
 - [x] T023 Suite instrumentada completa y `rules-test` en verde. 34 clases y 146 pruebas en el teléfono (Android 16) el 2026-10-19; `rules-test` 34/34 y `functions` 48/48.
 - [ ] T024 Despliegue de `firestore.rules` y `storage.rules` (con confirmación de Zhair).
@@ -68,10 +73,12 @@ Leyenda: **U** = unitaria, **I** = instrumentada, **R** = `rules-test`, **F** = 
 | CA-PER-02-11 | F `emailChangeService.test`, U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, I `EditProfileScreenTest` |
 | CA-PER-02-12 | F `emailChangeService.test`, U `ProfileUseCasesTest`, U `ProfileViewModelTest`, M |
 | CA-PER-02-13 | U `EditProfileViewModelTest` |
+| CA-PER-02-14 | U `ProfileUseCasesTest`, U `EditProfileViewModelTest`, I `EditProfileScreenTest` |
 | CA-PER-03-01 | I `FoodPreferencesScreenTest` |
 | CA-PER-03-02 | U `FoodPreferencesViewModelTest` |
 | CA-PER-03-03 | U `FoodPreferencesViewModelTest`, I `FoodPreferencesScreenTest` |
 | CA-PER-03-05 | U `PreferencesDocumentTest`, U `FoodPreferencesViewModelTest`, I `FoodPreferencesScreenTest`, R |
+| CA-PER-03-06 | U `FoodPreferencesUseCasesTest`, U `FoodPreferencesViewModelTest`, I `FoodPreferencesScreenTest` |
 | CA-PER-03-04 | U `PreferencesDocumentTest`, U `FoodPreferencesUseCasesTest`, U `FoodPreferencesViewModelTest`, R, M |
 | CA-PER-04-01 | U `DataStoreNotificationSettingsTest`, I `NotificationSettingsScreenTest` |
 | CA-PER-04-02 | U `DataStoreNotificationSettingsTest`, U `NotificationSettingsViewModelTest` |

@@ -3,6 +3,7 @@ package com.smartfood.app.feature.profile.ui.edit
 import com.smartfood.app.feature.auth.domain.model.AuthError
 import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.feature.auth.domain.usecase.ValidateEmailUseCase
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.profile.domain.usecase.ConfirmEmailChangeUseCase
 import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
 import com.smartfood.app.feature.profile.domain.usecase.RequestEmailChangeUseCase
@@ -114,6 +115,23 @@ class EditProfileViewModelTest {
         assertEquals(EditProfileDialog.Saved(), viewModel.state.dialog)
         assertFalse("sigue en la pantalla con los datos nuevos y sin cambios", viewModel.state.hasChanges)
         assertNull(viewModel.state.newPhotoPath)
+
+        advanceTimeBy(EditProfileViewModel.RESULT_DIALOG_MILLIS + 1)
+        assertNull(viewModel.state.dialog)
+    }
+
+    @Test
+    fun `CA-PER-02-14 sin conexion muestra Guardado en tu telefono y conserva los datos nuevos`() = runTest {
+        repository.outcome = WriteOutcome.PENDING
+        val viewModel = crearViewModel()
+        viewModel.onEvent(EditProfileEvent.FullNameChanged("Ana María"))
+
+        viewModel.onEvent(EditProfileEvent.SaveConfirmed)
+        runCurrent()
+
+        assertEquals(EditProfileDialog.Saved(onPhone = true), viewModel.state.dialog)
+        assertEquals("Ana María", repository.updates.single().fullName)
+        assertFalse(viewModel.state.hasChanges)
 
         advanceTimeBy(EditProfileViewModel.RESULT_DIALOG_MILLIS + 1)
         assertNull(viewModel.state.dialog)
