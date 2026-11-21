@@ -9,7 +9,9 @@ import com.smartfood.app.feature.profile.domain.usecase.ConfirmEmailChangeUseCas
 import com.smartfood.app.feature.profile.domain.usecase.ObserveProfileUseCase
 import com.smartfood.app.feature.profile.domain.usecase.ProfileEdits
 import com.smartfood.app.feature.profile.domain.usecase.RequestEmailChangeUseCase
+import com.smartfood.app.feature.profile.domain.usecase.SavedProfile
 import com.smartfood.app.feature.profile.domain.usecase.UpdateProfileUseCase
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.profile.domain.usecase.ValidateProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -146,25 +148,36 @@ class EditProfileViewModel @Inject constructor(
                 validateProfile(state.fullName, state.phone, state.birthDate).getOrThrow()
                 val wait = newEmail?.let { requestEmailChange(it, state.currentPassword).getOrThrow() }
                 val edits = ProfileEdits(state.fullName, state.phone, state.birthDate, state.newPhotoPath)
-                val saved = if (state.hasProfileChanges) updateProfile(original, edits).getOrThrow() else original
+                val saved = if (state.hasProfileChanges) {
+                    updateProfile(original, edits).getOrThrow()
+                } else {
+                    SavedProfile(original, WriteOutcome.SYNCED)
+                }
                 saved to wait
             }
             result
                 .onSuccess { (saved, wait) ->
                     if (newEmail == null || wait == null) {
-                        _uiState.update { it.loaded(saved).copy(dialog = EditProfileDialog.Saved()) }
+                        // Sin conexión los datos ya se ven, pero se avisa que esperan en el teléfono (CA-PER-02-14).
+                        val onPhone = saved.outcome == WriteOutcome.PENDING
+                        _uiState.update { it.loaded(saved.profile).copy(dialog = EditProfileDialog.Saved(onPhone = onPhone)) }
                         closeSavedLater()
                     } else if (!requestEmailChange.usesCode) {
                         // Modo gratuito: Firebase envió un enlace al correo nuevo y el correo cambia cuando se abre;
                         // mientras tanto se sigue mostrando el anterior (spec 012, CA-SPK-03-01 y CA-SPK-03-02).
                         _uiState.update {
-                            it.loaded(saved).copy(dialog = EditProfileDialog.Saved(emailLinkSentTo = newEmail))
+                            it.loaded(saved.profile).copy(
+                                dialog = EditProfileDialog.Saved(
+                                    emailLinkSentTo = newEmail,
+                                    onPhone = saved.outcome == WriteOutcome.PENDING,
+                                )
+                            )
                         }
                         closeSavedLater()
                     } else {
                         // Los demás datos ya quedaron; el correo cambia al confirmar el código (CA-PER-02-10).
                         _uiState.update {
-                            it.loaded(saved).copy(
+                            it.loaded(saved.profile).copy(
                                 email = newEmail,
                                 currentPassword = state.currentPassword,
                                 dialog = EditProfileDialog.EmailCode(newEmail)

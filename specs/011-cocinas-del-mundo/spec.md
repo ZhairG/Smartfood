@@ -43,10 +43,12 @@ ingredientes y más usuarios, así que el pedido queda registrado como decisión
 | Código | Criterio |
 |---|---|
 | CA-COC-02-01 | **Dado** que no elegí ninguna cocina, **cuando** genero el plan, **entonces** el agente considera todo el catálogo. |
-| CA-COC-02-02 | **Dado** que elegí una cocina, **cuando** hay plan, **entonces** todas sus recetas son de esa cocina. |
-| CA-COC-02-03 | **Dado** que elegí varias cocinas, **cuando** hay plan, **entonces** cada receta es de cualquiera de ellas. |
+| CA-COC-02-02 | **Dado** que elegí una cocina, **cuando** hay plan con todas las recetas de esa cocina, **entonces** todas sus recetas son de esa cocina (enmienda del 2026-11-19: si no lo hay, aplica CA-COC-02-06). |
+| CA-COC-02-03 | **Dado** que elegí varias cocinas, **cuando** hay plan con todas las recetas de ellas, **entonces** cada receta es de cualquiera de ellas (enmienda del 2026-11-19: si no lo hay, aplica CA-COC-02-06). |
 | CA-COC-02-04 | **Dado** cocinas y restricciones alimentarias, **cuando** hay plan, **entonces** sus recetas cumplen las dos. |
 | CA-COC-02-05 | **Dado** una cocina elegida, **cuando** hay plan, **entonces** es el de mayor utilidad entre los válidos con esa cocina, comprobado contra fuerza bruta. |
+| CA-COC-02-06 | **Dado** cocinas elegidas, **cuando** no hay plan con las 3 recetas de esas cocinas, **entonces** el agente busca con 2 y luego con 1, y entrega el plan del primer nivel que lo tenga: el de mayor utilidad con ese mínimo de recetas de mis cocinas, comprobado contra fuerza bruta (2026-11-19). |
+| CA-COC-02-07 | **Dado** cocinas y restricciones alimentarias, **cuando** el plan se completa con otras cocinas, **entonces** todas sus recetas siguen cumpliendo la dieta: la dieta nunca se relaja (2026-11-19). |
 
 ### HU-COC-03: Ver y ajustar la Cocina Favorita en el flujo de la IA
 **Como** usuario **quiero** ver qué cocinas se aplican y qué hacer si no hay plan **para** entender el resultado.
@@ -54,9 +56,10 @@ ingredientes y más usuarios, así que el pedido queda registrado como decisión
 | Código | Criterio |
 |---|---|
 | CA-COC-03-01 | **Dado** cocinas elegidas en el Perfil, **cuando** abro "Sugerencia con IA", **entonces** veo la línea "Cocina favorita: …" con sus nombres. Sin cocinas, la línea no aparece. |
-| CA-COC-03-02 | **Dado** que no hay plan con mis cocinas y sin ellas sí lo habría, **entonces** "Prueba una de estas opciones" incluye "Quita tu cocina favorita en el Perfil". |
+| CA-COC-03-02 | **Dado** que no hay plan ni con una receta de mis cocinas y sin ellas sí lo habría, **entonces** "Prueba una de estas opciones" incluye "Quita tu cocina favorita en el Perfil". |
 | CA-COC-03-03 | **Dado** que no hay plan y quitar las cocinas no lo arregla, o que no elegí cocinas, **entonces** esa sugerencia no aparece. |
 | CA-COC-03-04 | **Dado** que las preferencias no se pueden leer, **entonces** no se genera el plan ni se quitan las cocinas en silencio: se aplica CA-RIA-02-12 de la [spec 009](../009-recetas-ia/spec.md) (aviso con "Reintentar"; enmienda del 2026-11-19). |
+| CA-COC-03-05 | **Dado** que el plan se completó con otras cocinas (CA-COC-02-06), **entonces** bajo "Tu plan de 3 días" veo "No alcanzó para 3 recetas de cocina <cocinas>: completamos tu plan con otras cocinas." (2026-11-19). |
 
 ## 4. Requisitos funcionales
 
@@ -105,9 +108,11 @@ usa la lista existente de "Prueba una de estas opciones" (`recipes_ai_*`).
 | La píldora de precios del detalle de receta dice "D1 · precios de octubre y noviembre 2026" y no "octubre 2026" (aprobada el 2026-11-07). | Los 50 ingredientes originales son del 20 de octubre y los 7 de esta spec, del 6 de noviembre; con "octubre" el texto sería inexacto. |
 | Línea "Cocina favorita: …" en el contexto de la IA, que no está en el Figma. | La persona debe saber por qué el plan solo trae esas cocinas. |
 | Sugerencia "Quita tu cocina favorita en el Perfil", que no está en el Figma. | Cada cocina tiene pocas recetas y sin esta salida la persona quedaría sin plan. |
+| Aviso "No alcanzó para 3 recetas de cocina …: completamos tu plan con otras cocinas." bajo "Tu plan de 3 días", que no está en el Figma (aprobada por Zhair el 2026-11-19, CA-COC-03-05). | La persona debe saber por qué el plan trae recetas de otras cocinas. |
 
 La restricción dura deja a menudo sin plan y el inventario enorme supera los 2 s en el portátil. Zhair aceptó las dos
-limitaciones el 2026-11-06; los datos están en `docs/ia/evaluacion-agente.md` §7.
+limitaciones el 2026-11-06; los datos están en `docs/ia/evaluacion-agente.md` §7. La primera se corrigió el 2026-11-19
+con la relajación escalonada (CA-COC-02-06, `docs/ia/evaluacion-agente.md` §8).
 
 ## 10. Plan de entrega
 

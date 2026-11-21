@@ -56,6 +56,7 @@ mi cuenta tenga mis datos reales.
 | CA-PER-02-11 | **Dado** el cambio de correo, **cuando** la contraseña es incorrecta, el correo ya está en uso, el código es incorrecto o venció (10 min, 5 intentos) o no hay conexión, **entonces** se muestra el error correspondiente y el correo no cambia. |
 | CA-PER-02-12 | **Dado** que escribí el código correcto, **entonces** "Guardado" dice "Tu correo ahora es <correo nuevo>", la cuenta y el perfil cambian al instante y el Perfil muestra el correo nuevo **sin cerrar sesión**; el próximo inicio de sesión es con el correo nuevo. |
 | CA-PER-02-13 | **Dado** cambios sin guardar, **cuando** salgo con la flecha o "atrás", **entonces** se descartan sin preguntar, igual que el editor de productos (CA-INV-03-04). |
+| CA-PER-02-14 | **Dado** que guardo "Editar información" sin conexión (o el servidor no confirma en 3 s), **entonces** veo "Guardado en tu teléfono · Se subirá cuando vuelva la conexión." en lugar de "Guardado", que se cierra solo a los 2 segundos, y el Perfil ya muestra los datos nuevos (spec 006 §13). |
 
 ### HU-PER-03: Mis preferencias alimentarias
 **Como** usuario **quiero** guardar mis restricciones, cocinas favoritas, nivel de picante y presupuesto por comida
@@ -68,6 +69,7 @@ mi cuenta tenga mis datos reales.
 | CA-PER-03-03 | **Dado** que toco "Guardar Preferencias", **entonces** aparece "¿Desea guardar los cambios?" (Figma `593:1976`) y, al confirmar, el diálogo de carga y "Guardado · Preferencias se actualizó" (Figma `593:1898`), que se cierra solo. "Guardar Preferencias" está deshabilitado si no cambié nada. |
 | CA-PER-03-04 | **Dado** que guardé mis preferencias, **cuando** vuelvo a la pantalla (o en otro teléfono con la misma cuenta), **entonces** veo las mismas elecciones. |
 | CA-PER-03-05 | **Dado** el grupo "Mi supermercado" (Éxito, Carulla, Olímpica, D1), **entonces** elijo uno (D1 si no he elegido) y se guarda con las demás preferencias; las recetas muestran sus precios (spec 009, CA-RIA-04-07). |
+| CA-PER-03-06 | **Dado** que guardo "Preferencias alimentarias" sin conexión (o el servidor no confirma en 3 s), **entonces** veo "Guardado en tu teléfono · Se subirá cuando vuelva la conexión." en lugar de "Guardado", que se cierra solo, y las preferencias nuevas ya se usan en el teléfono. |
 
 ### HU-PER-04: Mis notificaciones
 **Como** usuario **quiero** elegir qué avisos recibo **para** que la app no me moleste de más.
@@ -174,6 +176,7 @@ misma pantalla, y en Cambiar contraseña al Perfil.
 | Mientras se guarda se ve el diálogo de carga "Guardando cambios…", y los errores se muestran en rojo bajo los campos. | El Figma no define los estados de carga ni de error (como el inventario, CA-INV-02-12). |
 | ~~"Recetas guardadas" y "Ahorrados este mes" muestran 0 y $0.~~ Cerrada: "Recetas guardadas" llegó con la spec 010 y "Ahorrados este mes", con la spec 009. | Dependían de esos módulos. |
 | Notificaciones guarda al tocar cada interruptor; el Figma no muestra botón "Guardar". | El frame no tiene botón visible. |
+| Sin conexión, "Editar información" y "Preferencias alimentarias" muestran "Guardado en tu teléfono · Se subirá cuando vuelva la conexión." con el mismo diálogo de "Guardado" (aprobada por Zhair el 2026-11-19, CA-PER-02-14 y 03-06). | El Figma no tiene este estado; es el mismo aviso del inventario y de la cocina guiada (retroalimentación de la entrega). |
 
 ## 10. Plan de entrega
 

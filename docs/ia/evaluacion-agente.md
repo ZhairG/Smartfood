@@ -283,6 +283,49 @@ sigue siendo una cota más ajustada, revisada contra `MealPlannerTest`.
 - **Con cocinas elegidas** el dominio es tan pequeño que la búsqueda tarda menos de 1 ms. En "Italiana y mexicana", el recocido
   encontró plan en 3 de 6 inventarios y los exactos en 4 de 6.
 
+## 8. Cocina Favorita relajada (2026-11-19, punto 5 de `docs/pendientes.md`)
+
+§7.2 mostró que la restricción dura dejaba sin plan a la mayoría de los inventarios con una sola cocina (asiática y
+vegetariano: 0 de 6). La Cocina Favorita deja de ser una restricción de una sola receta y pasa a ser una **restricción global
+con un mínimo**: el plan debe tener al menos `minCuisineRecipes` recetas de las cocinas elegidas (spec 011, CA-COC-02-06).
+
+- **Búsqueda escalonada:** `MealPlanner.plan` busca con el mínimo en 3 (todas, como antes), luego en 2 y luego en 1, y entrega
+  el plan del primer nivel que lo tenga. Así se respeta la preferencia lo más posible y, dentro de cada nivel, el objetivo
+  sigue siendo la utilidad.
+- **Poda:** una rama se descarta si las recetas de la cocina ya elegidas más los días que faltan no alcanzan el mínimo. Es una
+  forma de *forward checking* para la restricción global; no cambia la cota de ramificación y poda.
+- **Lo que no se relaja:** la dieta, el tiempo, el picante y el presupuesto siguen en la consistencia de nodo (CA-COC-02-07).
+- **Sin plan ni con una receta:** se mantiene la sugerencia "Quita tu cocina favorita en el Perfil" (CA-COC-03-02).
+- **Costo:** en el peor caso son 3 búsquedas en lugar de una; con el mínimo bajo, el dominio vuelve a ser todo el catálogo que
+  cumple la dieta. `MealPlannerPerformanceTest` incluye este caso.
+- **Verificación:** `MealPlannerTest` compara 100 escenarios aleatorios con cocinas y mínimos de 1 a 3 contra la fuerza bruta,
+  que aprende la misma restricción.
+
+### 8.1 Planes por cocina (2026-11-21)
+
+Mismos 6 inventarios sintéticos, COP 100.000 y 4 porciones que §7.2, en la JVM del portátil
+(`AlgorithmComparisonTest`, "CA-COC-02-06 tabla de la cocina relajada", con `SMARTFOOD_COMPARISON=1`). "Antes" es la
+búsqueda con el mínimo en 3, que equivale a la restricción dura, y reproduce §7.2. La columna "3 / 2 / 1" dice cuántos
+planes tienen esas recetas de la cocina elegida.
+
+| Cocina elegida | Con plan antes (dura) | Con plan ahora | 3 / 2 / 1 recetas de la cocina | Costo medio | ms medio | ms máximo |
+|---|---|---|---|---|---|---|
+| Italiana | 3 de 6 | **6 de 6** | 3 / 3 / 0 | COP 47.333 | 13,5 | 52,2 |
+| Asiática | 1 de 6 | **6 de 6** | 1 / 4 / 1 | COP 34.560 | 22,7 | 61,6 |
+| Mexicana | 1 de 6 | **6 de 6** | 1 / 5 / 0 | COP 40.135 | 10,9 | 18,4 |
+| Mediterránea | 2 de 6 | **6 de 6** | 2 / 4 / 0 | COP 32.302 | 13,9 | 33,8 |
+| Italiana y mexicana | 4 de 6 | **6 de 6** | 4 / 2 / 0 | COP 47.328 | 4,9 | 16,7 |
+| Asiática y vegetariano | 0 de 6 | **6 de 6** | 0 / 3 / 3 | COP 26.605 | 23,9 | 74,1 |
+
+- **Todos los inventarios tienen plan** (36 de 36, frente a 11 de 36 con la restricción dura), y la preferencia se respeta
+  lo más posible: 11 planes con las 3 recetas de la cocina, 21 con 2 y solo 4 con 1.
+- **"Asiática y vegetariano"** pasa de 0 a 6 de 6, pero la mitad de esos planes tiene una sola receta asiática: con la dieta
+  vegetariana quedan muy pocas recetas asiáticas.
+- **El costo medio no es comparable con §7.2:** allí se promedian solo los inventarios con plan, y aquí los 6,
+  que incluyen planes completados con otras cocinas.
+- **Tiempo:** el peor caso fue de 74,1 ms, lejos de los 2 s de RNF-RIA-02, aunque en el peor caso se hacen 3 búsquedas. Es la
+  JVM del portátil, no el teléfono.
+
 ## Anexo: tablas completas por perfil (2026-11-05)
 
 ### Sin restricciones (6 inventarios)

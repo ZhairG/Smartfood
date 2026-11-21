@@ -40,8 +40,17 @@ data class AiContext(
 /** Resultado del agente con su explicación (CA-RIA-02-03, 02-06, 02-07). */
 sealed interface AiPlanOutcome {
 
-    /** El plan de 3 días y las razones de "¿Por qué te conviene?". */
-    data class Found(val plan: MealPlan, val reasons: List<PlanExplainer.Reason>) : AiPlanOutcome
+    /**
+     * El plan de 3 días y las razones de "¿Por qué te conviene?".
+     *
+     * @property cuisineRecipes Si el plan se completó con otras cocinas, cuántas de sus recetas son de las favoritas;
+     *   `null` si no hizo falta (spec 011, CA-COC-02-06 y 03-05).
+     */
+    data class Found(
+        val plan: MealPlan,
+        val reasons: List<PlanExplainer.Reason>,
+        val cuisineRecipes: Int? = null,
+    ) : AiPlanOutcome
 
     /** Ningún plan cumple; [suggestions] dice qué cambiar. */
     data class NoPlan(val suggestions: List<PlanSuggestion>) : AiPlanOutcome
