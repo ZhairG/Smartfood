@@ -16,12 +16,12 @@ feature/recipes/
 │   │   ├── RecipeEvaluator.kt        uso de inventario, faltantes, costo y utilidad de una receta o un plan
 │   │   ├── MealPlanner.kt            CSP: backtracking + forward checking + ramificación y poda
 │   │   └── PlanExplainer.kt          "¿Por qué te conviene?" a partir del plan
-│   ├── repository/   RecipeCatalog, CookingHistoryRepository
+│   ├── repository/   RecipeCatalog, CookingHistoryRepository, CookingRepository
 │   └── usecase/      GetRecipes, SearchRecipes, RankRecipesForMe, GeneratePlan, GetRecipeDetail,
 │                     FinishCooking, GetMonthlySavings
 ├── data/
 │   ├── catalog/      AssetsRecipeCatalog (lee assets/recetas.json e ingredientes.json con kotlinx.serialization)
-│   ├── repository/   FirestoreCookingHistoryRepository
+│   ├── repository/   FirestoreCookingHistoryRepository, FirestoreCookingRepository
 │   └── di/           RecipesDataModule
 └── ui/
     ├── discover/     Descubrir (pestaña Recetas)
@@ -161,11 +161,36 @@ valor de referencia de los ingredientes por vencer usados.
 
 ## 6. Descuento del inventario (`FinishCookingUseCase`)
 
-1. Para cada `IngredientUse` del producto `p`: si `p` no tiene cantidad o le queda ≤ 0 → `DeleteItemUseCase(p.id)`;
-   si no → `UpdateItemUseCase` con la cantidad restante en su unidad original.
-2. Guardar `cookings/{id}` con el valor rescatado.
-3. Todo con la cola sin conexión del inventario (spec 006 §13): cada escritura espera al servidor como mucho 3 s y, si
-   no responde, el resultado es "Guardado en tu teléfono"; si no, "Guardado". Después vuelve al detalle.
+*Revisado el 2026-11-19 (punto 3 de `docs/pendientes.md`, CA-RIA-04-08 y 04-09).*
+
+1. `CookingViewModel` crea un `operationId` (`CookingRepository.newOperationId()`) una sola vez, lo guarda en
+   `SavedStateHandle` y lo usa en cada intento. Es el id de `cookings/{id}`.
+2. Si `CookingRepository.isFinished(operationId)` (el registro ya existe, en la caché o en el servidor), el caso de uso
+   devuelve éxito sin escribir nada.
+3. Para cada `IngredientUse` del producto `p`: si `p` no tiene cantidad o le queda ≤ 0 → `InventoryChange.Delete(p)`;
+   si no → `InventoryChange.UpdateQuantity(p, cantidad restante en su unidad original)`.
+4. `CookingRepository.finishCooking(record, changes)` escribe todo en **un solo `WriteBatch`** (sin transacciones,
+   para conservar la cola sin conexión de la spec 006 §13): en las actualizaciones, solo `quantity`, `unit` y
+   `updatedAt` (el precio y la foto no se tocan); los borrados, y `cookings/{id}` con el valor rescatado. Espera al
+   servidor como mucho 3 s: `SYNCED` es "Guardado" y `PENDING`, "Guardado en tu teléfono". Después vuelve al detalle.
+5. Con el lote confirmado, se encola en `PhotoSync` el borrado de las fotos de los productos borrados.
+6. Las reglas niegan editar `cookings`: un lote que repite el mismo `operationId` se rechaza entero, sin tocar el
+   inventario.
+
+```kotlin
+interface CookingRepository {
+    fun newOperationId(): String
+    suspend fun isFinished(operationId: String): Boolean
+    suspend fun finishCooking(record: CookingRecord, changes: List<InventoryChange>): Result<WriteOutcome>
+}
+sealed interface InventoryChange {
+    val item: InventoryItem
+    data class UpdateQuantity(override val item: InventoryItem, val quantity: Quantity) : InventoryChange
+    data class Delete(override val item: InventoryItem) : InventoryChange
+}
+```
+
+`CookingHistoryRepository` queda solo con `observeHistory()` ("Ahorrados este mes").
 
 ## 7. Decisiones (ADR)
 

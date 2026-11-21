@@ -126,6 +126,14 @@ class EditProfileScreenTest {
     }
 
     @Test
+    fun caPer0214_sinConexionMuestraGuardadoEnTuTelefono() {
+        mostrar(estado(dialog = EditProfileDialog.Saved(onPhone = true)))
+
+        composeTestRule.onNodeWithText("Guardado en tu teléfono").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Se subirá cuando vuelva la conexión.").assertIsDisplayed()
+    }
+
+    @Test
     fun caPer0208_laHojaDeLaFotoOfreceGaleria() {
         mostrar(estado(dialog = EditProfileDialog.PhotoSourceSheet))
 

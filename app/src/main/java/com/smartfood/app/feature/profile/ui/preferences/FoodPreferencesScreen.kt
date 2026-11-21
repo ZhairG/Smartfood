@@ -216,7 +216,7 @@ private fun FoodPreferencesDialogs(
             onDismiss = { onEvent(FoodPreferencesEvent.DialogDismissed) }
         )
         // Figma 593:1898: círculo verde claro con el chulo verde y "Preferencias se actualizó" en naranja.
-        FoodPreferencesDialog.Saved -> SmartFoodResultDialog(
+        FoodPreferencesDialog.Saved, FoodPreferencesDialog.SavedOnPhone -> SmartFoodResultDialog(
             icon = {
                 Icon(
                     imageVector = Icons.Outlined.Check,
@@ -225,8 +225,15 @@ private fun FoodPreferencesDialogs(
                     modifier = Modifier.size(MaterialTheme.spacing.iconDialogSize * GlyphFraction)
                 )
             },
-            title = stringResource(id = R.string.preferences_saved),
-            body = stringResource(id = R.string.preferences_saved_body)
+            // Sin conexión, el mismo aviso dice que las preferencias esperan en el teléfono (CA-PER-03-06).
+            title = stringResource(
+                id = if (state.dialog == FoodPreferencesDialog.SavedOnPhone) R.string.profile_saved_on_phone
+                else R.string.preferences_saved
+            ),
+            body = stringResource(
+                id = if (state.dialog == FoodPreferencesDialog.SavedOnPhone) R.string.profile_saved_on_phone_body
+                else R.string.preferences_saved_body
+            )
         )
         null -> Unit
     }

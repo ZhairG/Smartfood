@@ -40,8 +40,13 @@ sealed interface EditProfileDialog {
      *
      * @property emailChangedTo Correo nuevo de la cuenta si el correo cambió, o `null` (CA-PER-02-12).
      * @property emailLinkSentTo Correo al que se envió el enlace del modo gratuito, o `null` (spec 012, CA-SPK-03-02).
+     * @property onPhone Sin conexión: "Guardado en tu teléfono" (CA-PER-02-14).
      */
-    data class Saved(val emailChangedTo: String? = null, val emailLinkSentTo: String? = null) : EditProfileDialog
+    data class Saved(
+        val emailChangedTo: String? = null,
+        val emailLinkSentTo: String? = null,
+        val onPhone: Boolean = false,
+    ) : EditProfileDialog
 }
 
 /**

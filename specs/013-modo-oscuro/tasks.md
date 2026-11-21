@@ -19,6 +19,11 @@
   guardada!".
 - [x] T008 **Pruebas** (HU-OSC-01, CA-OSC-02-01, 02-03, 03-01): `SmartFoodColorsContrastTest` y casos nuevos en
   `ColorModeTest`.
+- [x] T009 **Rojo de error legible** (CA-OSC-01-01, CA-OSC-01-03, §9): `ErrorRedDark` y `OnErrorDark` en `Color.kt`,
+  `error`/`onError` del esquema oscuro en `Theme.kt` y sus pares en `SmartFoodColorsContrastTest`, incluido el aviso
+  teñido de rojo del editor de recetas propias. `RecipeActionButton` recibe `contentColor` para que "Sí, eliminar"
+  use `onError` (con texto blanco fijo bajaba a 2,5:1 sobre el rojo nuevo; medido en el V2436). Hallazgo de la T024
+  de la spec 010 (pantalla 07).
 
 ## Matriz de trazabilidad
 
@@ -37,14 +42,24 @@ U: unitaria. I: instrumentada. M: captura por adb en el V2436.
 
 ### Checklist de verificación manual (ronda final)
 
-- [ ] En oscuro, las 16 pantallas capturadas el 2026-11-19 (Perfil y sus 4 subpantallas, hoja de tema, Inventario,
+- [x] En oscuro, las 16 pantallas capturadas el 2026-11-19 (Perfil y sus 4 subpantallas, hoja de tema, Inventario,
   búsqueda, editor, Recetas, detalle, IA, sin coincidencias, Guardadas, editor de receta propia, "Antes de empezar" y
-  un paso de cocina) se leen sin manchas claras.
-- [ ] En claro, las mismas pantallas son idénticas a las capturas de antes.
+  un paso de cocina) se leen sin manchas claras. Comprobado el 2026-11-21 en el V2436 con `integracion/ronda-final`
+  (antes y después en `capturas/oscuro-antes-despues-*.png`). "Sin coincidencias" salió como "Tu plan de 3 días",
+  porque la cocina relajada (spec 011) ya arma un plan con la Cocina Favorita Mexicana; las recetas y los productos
+  son otros porque cambiaron los datos.
+- [x] En claro, las 5 pantallas que tienen captura de antes (Perfil, hoja de tema, Inventario, Recetas y Guardadas) son
+  iguales salvo por los datos (`capturas/claro-antes-despues.png`, 2026-11-21). Las demás no tienen captura de antes
+  en claro; los roles claros los cubre `SmartFoodColorsContrastTest.ca_osc_01_03`.
 - [x] Las hojas en oscuro no dejan la barra de navegación clara: comprobado el 2026-11-19 con la hoja de categoría del
   editor (misma `OptionSheet` que "Tema de la app"); "Cancelar" naranja con texto blanco y "Guardar" verde con texto
   oscuro.
 - [x] Editor de producto en oscuro: la basura de la foto es roja con ícono blanco y la cámara verde con ícono oscuro.
+- [x] Rojo de error en oscuro (T009), comprobado el 2026-11-21 en el V2436 (antes y después en
+  [`capturas/`](./capturas/)): en la pantalla 07 de Guardadas, el texto del aviso pasa de 2,9:1 a 4,8:1 y el mensaje bajo
+  el campo de 3,5:1 a 6,8:1; "Sí, eliminar" (pantalla 10) es rojo claro con texto rojo oscuro, 6,5:1.
+- [x] La basura de la foto y "Eliminar" del editor de producto en oscuro, con el rojo nuevo: rojo claro con ícono y
+  texto rojo oscuro (2026-11-21, `capturas/oscuro-antes-despues-2.png`).
 - [x] Búsqueda del inventario en oscuro: buscador, chips y etiquetas oscuros y legibles.
 - [ ] Barra de estado blanca al abrir en frío (CA-OSC-04-03): en el V2436 solo se cumple al navegar o al recrearse la
   actividad (limitación del teléfono, plan §2.3); falta probarlo en otro dispositivo o emulador.

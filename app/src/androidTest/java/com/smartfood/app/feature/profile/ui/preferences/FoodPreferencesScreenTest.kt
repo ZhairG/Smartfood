@@ -168,4 +168,12 @@ class FoodPreferencesScreenTest {
         composeTestRule.onNodeWithText("Guardado").assertIsDisplayed()
         composeTestRule.onNodeWithText("Preferencias se actualizó").assertIsDisplayed()
     }
+
+    @Test
+    fun caPer0306_sinConexionMuestraGuardadoEnTuTelefono() {
+        mostrar(estado(dialog = FoodPreferencesDialog.SavedOnPhone))
+
+        composeTestRule.onNodeWithText("Guardado en tu teléfono").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Se subirá cuando vuelva la conexión.").assertIsDisplayed()
+    }
 }

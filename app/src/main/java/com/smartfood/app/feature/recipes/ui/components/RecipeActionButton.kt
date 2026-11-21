@@ -44,6 +44,8 @@ import com.smartfood.app.core.designsystem.util.figmaShadow
  * @param enabled `false` lo atenúa y lo deshabilita.
  * @param trailingIcon Ícono del Figma a la derecha del texto, o `null`.
  * @param containerColor Color del botón; por defecto, el naranja. "Sí, eliminar" usa el rojo (spec 010, Figma `557:2620`).
+ * @param contentColor Color del texto y del ícono; por defecto, `onSecondary`. Con el rojo va `onError`, que en oscuro es
+ * rojo oscuro (spec 013, T009).
  */
 @Composable
 fun RecipeActionButton(
@@ -53,6 +55,7 @@ fun RecipeActionButton(
     enabled: Boolean = true,
     @DrawableRes trailingIcon: Int? = null,
     containerColor: Color = MaterialTheme.colorScheme.secondary,
+    contentColor: Color = MaterialTheme.colorScheme.onSecondary,
 ) {
     val shape = RoundedCornerShape(ButtonRadius)
     // Atenuado con colores opacos (no con transparencia): así no se ve la lista a través ni se corta la sombra.
@@ -61,7 +64,7 @@ fun RecipeActionButton(
     } else {
         lerp(MaterialTheme.colorScheme.surface, containerColor, DisabledMix)
     }
-    val content = MaterialTheme.colorScheme.onSecondary.copy(alpha = if (enabled) 1f else DisabledContentAlpha)
+    val content = contentColor.copy(alpha = if (enabled) 1f else DisabledContentAlpha)
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,

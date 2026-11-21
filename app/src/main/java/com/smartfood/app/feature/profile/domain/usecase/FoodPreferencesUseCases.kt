@@ -1,5 +1,6 @@
 package com.smartfood.app.feature.profile.domain.usecase
 
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.profile.domain.model.FoodPreferences
 import com.smartfood.app.feature.profile.domain.repository.ProfileRepository
 import javax.inject.Inject
@@ -24,12 +25,14 @@ class GetFoodPreferencesUseCase @Inject constructor(
 }
 
 /**
- * Guarda las preferencias elegidas y reemplaza el mapa anterior (CA-PER-03-04).
+ * Guarda las preferencias elegidas y reemplaza el mapa anterior (CA-PER-03-04). Dice si el servidor lo confirmó o si
+ * quedó en el teléfono (CA-PER-03-06).
  *
  * @param repository Contrato del perfil; las preferencias viven en `users/{uid}`.
  */
 class SaveFoodPreferencesUseCase @Inject constructor(
     private val repository: ProfileRepository,
 ) {
-    suspend operator fun invoke(preferences: FoodPreferences): Result<Unit> = repository.savePreferences(preferences)
+    suspend operator fun invoke(preferences: FoodPreferences): Result<WriteOutcome> =
+        repository.savePreferences(preferences)
 }

@@ -454,6 +454,15 @@ private fun PlanContent(state: AiUiState, onEvent: (AiEvent) -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = BodyStyle()
         )
+        // Plan completado con otras cocinas (spec 011, CA-COC-03-05): se avisa por qué hay recetas de otras cocinas.
+        if (state.cuisineRecipes != null && state.cuisines.isNotEmpty()) {
+            Text(
+                text = cuisineRelaxedText(state.cuisines, plan.days.size),
+                color = MaterialTheme.colorScheme.secondary,
+                style = BodyStyle(),
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+            )
+        }
     }
     plan.days.forEach { day ->
         DayCard(day = day, onClick = { onEvent(AiEvent.RecipeClicked(day.recipe.id)) })
