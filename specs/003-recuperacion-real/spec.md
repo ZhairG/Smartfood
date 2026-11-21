@@ -110,4 +110,6 @@ saber por qué no pasa nada.
 
 - El proyecto de Firebase está en el plan Blaze (prueba gratuita de Google Cloud hasta el 4 de enero de 2027; ver
   [plan 001 §6.5](../001-autenticacion/plan.md#65-ruta-a-una-recuperación-real-post-entrega)).
+  **Enmienda (spec 012):** este flujo es el del modo Blaze. Con `blaze_activo = false` la recuperación usa el enlace de
+  Firebase y la pantalla «Revisa tu correo» ([spec 012](../012-modo-sin-facturacion/spec.md), HU-SPK-02).
 - El equipo tiene una cuenta de Gmail con verificación en 2 pasos para generar una contraseña de aplicación.

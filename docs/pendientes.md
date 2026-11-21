@@ -5,12 +5,17 @@ informes de evaluación (IA y Aplicaciones Móviles), de una revisión del modo 
 abiertos. Cada punto pasa por el modo plan de [`AGENTS.md`](../AGENTS.md) (preguntas, plan y aprobación) antes de
 escribir código. Al cerrarse un punto se actualizan su estado y su PR en la tabla.
 
+> **Informes de evaluación:** los dos informes completos están en `retroalimentacion/` (`informe-ia.pdf` e
+> `informe-moviles.pdf`). Esa carpeta es local y está en `.gitignore`: solo existe en el computador de Zhair, porque
+> los informes incluyen notas y datos de los integrantes. Al empezar un punto marcado con «Origen: informe…», el
+> agente vuelve a leer el informe correspondiente.
+
 ## Estado
 
 | # | Punto | Spec | Estado | PR |
 |---|---|---|---|---|
-| 1 | Modo sin facturación (sin plan Blaze) | 012 (nueva) | Pendiente | — |
-| 2 | La dieta se pierde si falla la lectura del perfil | 009 | Pendiente | — |
+| 1 | Modo sin facturación (sin plan Blaze) | [012](../specs/012-modo-sin-facturacion/spec.md) | Implementado, pruebas en la ronda final | — |
+| 2 | La dieta se pierde si falla la lectura del perfil | 009 (CA-RIA-02-12) | Hecho | [#140](https://github.com/ZhairG/Smartfood/pull/140) |
 | 3 | Cierre de cocina: precio y reintentos | 009 | Pendiente | — |
 | 4 | Guardado pendiente o confirmado en el Perfil | 008 | Pendiente | — |
 | 5 | Cocina Favorita sin plan posible | 011 | Pendiente | — |
@@ -149,6 +154,11 @@ caso pertinente sería una caché local del historial de cocina o de las recetas
 ## Reglas para todos los puntos
 
 - Modo plan con preguntas antes de cualquier cambio, y aprobación de Zhair.
-- Una rama por punto, desde `master` actualizado, y un commit por tarea (`Tnnn`).
+- Zhair implementa los 10 puntos solo. No se crean Issues por punto.
+- Una rama por punto, desde `master` actualizado, con un commit por tarea (`Tnnn`) y su PR abierto como *draft*.
+- **Las pruebas van al final.** Unitarias, compilación, lint, instrumentadas, `rules-test`, `functions` y prueba en el
+  teléfono se corren una sola vez, cuando todos los puntos estén implementados. Después, los PR se marcan como listos
+  y se fusionan en orden. Es una excepción al paso 3 de [`AGENTS.md`](../AGENTS.md) que vale solo para esta lista.
+  Las pruebas nuevas de cada punto sí se escriben con el código y citan su CA.
 - Nunca incluir `app/release/*` en los commits.
 - Antes de cada `git push`, confirmar con `gh auth status` que la cuenta activa sea la del dueño del repositorio.

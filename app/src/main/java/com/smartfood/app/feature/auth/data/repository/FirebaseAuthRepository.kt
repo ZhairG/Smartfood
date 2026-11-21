@@ -44,6 +44,13 @@ class FirebaseAuthRepository @Inject constructor(
 
     override fun logout() = firebaseAuth.signOut()
 
+    override suspend fun sendEmailVerification(): Result<Unit> = safeRunCatching {
+        val user = firebaseAuth.currentUser ?: throw AuthException(AuthError.AccountNotFound)
+        firebaseAuth.setLanguageCode(VERIFICATION_LANGUAGE)
+        user.sendEmailVerification().await()
+        Unit
+    }.mapFirebaseError()
+
     override fun currentEmail(): String? = firebaseAuth.currentUser?.email
 
     override suspend fun reauthenticate(currentPassword: String): Result<Unit> = safeRunCatching {
@@ -73,3 +80,6 @@ class FirebaseAuthRepository @Inject constructor(
         Unit
     }.mapFirebaseError()
 }
+
+/** Idioma del correo de verificación del modo gratuito (spec 012). */
+private const val VERIFICATION_LANGUAGE = "es"

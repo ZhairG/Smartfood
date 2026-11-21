@@ -7,6 +7,7 @@ import com.smartfood.app.feature.recipes.domain.model.DietRule
 import com.smartfood.app.feature.recipes.domain.model.Store
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -46,11 +47,34 @@ class GetAiContextUseCaseTest {
     }
 
     @Test
-    fun `CA-COC-03-04 si las preferencias no se leen el contexto sigue sin cocinas`() = runTest {
+    fun `CA-COC-03-04 si las preferencias no se leen las cocinas quedan desconocidas, no vacias`() = runTest {
         val fixtures = AiFixtures()
         fixtures.profile.preferences = FoodPreferences(cuisines = setOf(Cuisine.ITALIAN))
         fixtures.profile.getPreferencesResult = Result.failure(IllegalStateException("sin red"))
 
-        assertTrue(fixtures.getAiContext().cuisines.isEmpty())
+        val context = fixtures.getAiContext()
+
+        assertTrue(context.cuisines.isEmpty())
+        assertFalse("Sin leer el Perfil no se sabe si hay cocinas", context.preferencesKnown)
+    }
+
+    @Test
+    fun `CA-RIA-02-12 un perfil VEGAN con la lectura fallida no pasa por sin restricciones`() = runTest {
+        val fixtures = AiFixtures(setOf(DietaryRestriction.VEGAN))
+        fixtures.profile.getPreferencesResult = Result.failure(IllegalStateException("sin red"))
+
+        val context = fixtures.getAiContext()
+
+        assertFalse("El contexto debe decir que el Perfil es desconocido", context.preferencesKnown)
+        assertTrue("El inventario se sigue mostrando", context.items.isNotEmpty())
+        assertEquals(Store.D1, context.store)
+    }
+
+    @Test
+    fun `CA-RIA-02-12 con el perfil leido las preferencias son conocidas, aunque no haya restricciones`() = runTest {
+        val context = AiFixtures().getAiContext()
+
+        assertTrue(context.restrictions.isEmpty())
+        assertTrue(context.preferencesKnown)
     }
 }

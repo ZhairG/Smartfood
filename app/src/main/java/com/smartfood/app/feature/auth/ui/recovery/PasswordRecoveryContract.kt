@@ -23,7 +23,10 @@ enum class RecoveryStep(val stepIndex: Int) {
     OTP_VERIFICATION(1),
 
     /** Paso 3: definir y confirmar la nueva contraseña. */
-    NEW_PASSWORD(2)
+    NEW_PASSWORD(2),
+
+    /** Modo gratuito: se envió el enlace de Firebase y el flujo termina en «Revisa tu correo» (spec 012, CA-SPK-02-02). */
+    LINK_SENT(1)
 }
 
 /**
@@ -40,6 +43,7 @@ enum class RecoveryStep(val stepIndex: Int) {
  * @property error Último error de negocio, o `null`.
  * @property resendCooldownSeconds Segundos que faltan para poder pedir otro código; 0 si ya se puede (HU-REC-04).
  * @property cooldownEmail Correo al que aplica la espera.
+ * @property isLinkMode El flujo envía un enlace en lugar del código (spec 012, modo gratuito, CA-SPK-02-01).
  */
 @Immutable
 data class PasswordRecoveryUiState(
@@ -52,7 +56,8 @@ data class PasswordRecoveryUiState(
     val isLoading: Boolean = false,
     val error: AuthError? = null,
     val resendCooldownSeconds: Int = 0,
-    val cooldownEmail: String = ""
+    val cooldownEmail: String = "",
+    val isLinkMode: Boolean = false
 ) {
     /**
      * La espera aplica al correo escrito: "Reenviar código" y "Enviar Código" muestran la cuenta regresiva y no
