@@ -5,6 +5,7 @@ import com.smartfood.app.feature.auth.domain.model.AuthField
 import com.smartfood.app.feature.auth.domain.model.authFailure
 import com.smartfood.app.feature.auth.domain.repository.AuthRepository
 import com.smartfood.app.feature.auth.domain.usecase.ValidateEmailUseCase
+import com.smartfood.app.feature.inventory.domain.model.WriteOutcome
 import com.smartfood.app.feature.profile.domain.model.UserProfile
 import com.smartfood.app.feature.profile.domain.repository.EmailChangeRepository
 import com.smartfood.app.feature.profile.domain.repository.ProfilePhotoRepository
@@ -80,15 +81,22 @@ class ValidateProfileUseCase @Inject constructor(private val clock: Clock) {
 }
 
 /**
+ * Perfil guardado y cómo terminó su escritura: confirmada o en el teléfono (CA-PER-02-14), como `SavedItem` del
+ * inventario.
+ */
+data class SavedProfile(val profile: UserProfile, val outcome: WriteOutcome)
+
+/**
  * Guarda los datos del perfil y, si hay foto nueva, la sube primero (CA-PER-02-04, 02-09). Si guardar falla, borra
- * la foto recién subida; si sale bien, borra la anterior. Sin red, la foto no se sube y nada cambia.
+ * la foto recién subida; si sale bien, borra la anterior. Sin red, la foto no se sube y nada cambia. Sin foto nueva y
+ * sin conexión, los datos quedan en el teléfono y el resultado lo dice (CA-PER-02-14).
  */
 class UpdateProfileUseCase @Inject constructor(
     private val validate: ValidateProfileUseCase,
     private val repository: ProfileRepository,
     private val photos: ProfilePhotoRepository,
 ) {
-    suspend operator fun invoke(current: UserProfile, edits: ProfileEdits): Result<UserProfile> {
+    suspend operator fun invoke(current: UserProfile, edits: ProfileEdits): Result<SavedProfile> {
         val valid = validate(edits.fullName, edits.phoneText, edits.birthDate).getOrElse { return Result.failure(it) }
         val uploaded = edits.newPhotoPath?.let { path -> photos.upload(path).getOrElse { return Result.failure(it) } }
         val updated = current.copy(
@@ -98,12 +106,12 @@ class UpdateProfileUseCase @Inject constructor(
             photoPath = uploaded?.first ?: current.photoPath,
             photoUrl = uploaded?.second ?: current.photoUrl,
         )
-        repository.updateProfile(updated).onFailure { error ->
+        val outcome = repository.updateProfile(updated).getOrElse { error ->
             uploaded?.let { photos.delete(it.first) }
             return Result.failure(error)
         }
         if (uploaded != null) current.photoPath?.let { photos.delete(it) }
-        return Result.success(updated)
+        return Result.success(SavedProfile(updated, outcome))
     }
 }
 
